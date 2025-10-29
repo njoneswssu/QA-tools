@@ -252,13 +252,154 @@ function saveMerchantTestResult(data) {
   });
 }
 
+// Function to get test sessions
+function getTestSessions(limit = 50) {
+  return new Promise((resolve, reject) => {
+    db.all(`SELECT * FROM test_sessions ORDER BY started_at DESC LIMIT ?`, 
+      [limit], 
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      }
+    );
+  });
+}
+
+// Function to get merchant test results
+function getMerchantTestResults(sessionId = null, limit = 1000) {
+  return new Promise((resolve, reject) => {
+    let query = `SELECT * FROM merchant_test_results`;
+    let params = [];
+    
+    if (sessionId) {
+      query += ` WHERE session_id = ?`;
+      params.push(sessionId);
+    }
+    
+    query += ` ORDER BY tested_at DESC LIMIT ?`;
+    params.push(limit);
+    
+    db.all(query, params, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
+// Function to get stats
+function getStats() {
+  return new Promise((resolve, reject) => {
+    const stats = {};
+    
+    // Get session stats
+    db.get(`SELECT 
+      COUNT(*) as total_sessions,
+      SUM(total_merchants) as total_merchants_tested,
+      SUM(successful_merchants) as total_successful,
+      SUM(flagged_merchants) as total_flagged
+    FROM test_sessions`, (err, sessionStats) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      
+      stats.sessions = sessionStats;
+      
+      // Get recent activity
+      db.all(`SELECT 
+        session_id, 
+        COUNT(*) as merchant_count,
+        MAX(tested_at) as last_tested
+      FROM merchant_test_results 
+      GROUP BY session_id 
+      ORDER BY last_tested DESC 
+      LIMIT 10`, (err, recentActivity) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        
+        stats.recentActivity = recentActivity;
+        resolve(stats);
+      });
+    });
+  });
+}
+
+// Function to get categories
+function getCategories() {
+  return new Promise((resolve, reject) => {
+    db.all(`SELECT DISTINCT primary_category 
+            FROM merchant_master_data 
+            WHERE primary_category IS NOT NULL 
+            ORDER BY primary_category`, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows.map(row => row.primary_category));
+      }
+    });
+  });
+}
+
+// Function to get merchant master data
+function getMerchantMasterData(filters = {}) {
+  return new Promise((resolve, reject) => {
+    let query = `SELECT * FROM merchant_master_data WHERE 1=1`;
+    let params = [];
+    
+    if (filters.search) {
+      query += ` AND merchant_name LIKE ?`;
+      params.push(`%${filters.search}%`);
+    }
+    
+    if (filters.category) {
+      query += ` AND primary_category = ?`;
+      params.push(filters.category);
+    }
+    
+    if (filters.app_id) {
+      query += ` AND app_id = ?`;
+      params.push(filters.app_id);
+    }
+    
+    query += ` ORDER BY merchant_name LIMIT ?`;
+    params.push(filters.limit || 100);
+    
+    db.all(query, params, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
+// Function to get database instance
+function getDatabase() {
+  return db;
+}
+
 // Export database and functions
 module.exports = {
   db,
+  getDatabase,
   populateMerchantMasterData,
   createTestSession,
   updateTestSession,
   saveMerchantTestResult,
+  getTestSessions,
+  getMerchantTestResults,
+  getStats,
+  getCategories,
+  getMerchantMasterData,
   dbPath
 };
 

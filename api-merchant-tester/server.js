@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const { db, createTestSession, updateTestSession, saveMerchantTestResult } = require('./database/init_db');
+const APITestRunner = require('./api-test-runner');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,15 +11,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'frontend')));
+app.use('/tester', express.static(__dirname));
 
 // Serve the main HTML file
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+    res.sendFile(path.join(__dirname, 'api-merchant-tester', 'frontend', 'index.html'));
 });
 
 // Serve the merchant tester UI
 app.get('/tester', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'merchant-tester.html'));
+    res.sendFile(path.join(__dirname, 'api-merchant-tester', 'merchant-tester.html'));
 });
 
 // API Routes
@@ -265,26 +267,146 @@ app.post('/api/merchant-results', async (req, res) => {
     }
 });
 
+// Store merchants from API data
+app.post('/api/store-merchants', async (req, res) => {
+    try {
+        const { merchants } = req.body;
+        
+        if (!merchants || !Array.isArray(merchants)) {
+            return res.status(400).json({ error: 'Invalid merchants data' });
+        }
+        
+        console.log(`📦 Storing ${merchants.length} merchants in database`);
+        
+        // Use the populateMerchantMasterData function
+        const { populateMerchantMasterData } = require('./database/init_db');
+        await populateMerchantMasterData(merchants);
+        
+        console.log(`✅ Successfully stored ${merchants.length} merchants`);
+        
+        res.json({ 
+            success: true, 
+            message: `Stored ${merchants.length} merchants`,
+            count: merchants.length
+        });
+    } catch (error) {
+        console.error('Error storing merchants:', error);
+        res.status(500).json({ error: 'Failed to store merchants' });
+    }
+});
+
+// Get stored merchants
+app.get('/api/stored-merchants', async (req, res) => {
+    try {
+        const { app_id, limit = 1000 } = req.query;
+        
+        let query = 'SELECT * FROM merchant_master_data';
+        let params = [];
+        
+        if (app_id) {
+            query += ' WHERE app_id = ?';
+            params.push(app_id);
+        }
+        
+        query += ' ORDER BY merchant_name LIMIT ?';
+        params.push(parseInt(limit));
+        
+        const merchants = await new Promise((resolve, reject) => {
+            db.all(query, params, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+        
+        // Convert back to API format
+        const apiFormat = merchants.map(merchant => ({
+            AppID: merchant.app_id,
+            MerchantID: merchant.merchant_id,
+            MerchantName: merchant.merchant_name,
+            MerchantDomains: JSON.parse(merchant.merchant_domains || '[]'),
+            MerchantScore: merchant.merchant_score,
+            IsFeaturedMerchant: merchant.is_featured_merchant === 1,
+            PrimaryCategory: merchant.primary_category,
+            PrimaryCategoryID: merchant.primary_category_id,
+            ParentCategory: merchant.parent_category,
+            ParentCategoryID: merchant.parent_category_id,
+            MaxRate: merchant.max_rate,
+            MaxRateKind: merchant.max_rate_kind,
+            MaxRateCurrency: merchant.max_rate_currency,
+            MaxRateLedgerID: merchant.max_rate_ledger_id,
+            Boosted: merchant.boosted === 1,
+            MaxOfferScore: merchant.max_offer_score,
+            DetailedRates: JSON.parse(merchant.detailed_rates || '[]'),
+            Coupons: JSON.parse(merchant.coupons || '[]'),
+            BrandColor: merchant.brand_color,
+            TextColor: merchant.text_color,
+            FeaturedImageURL: merchant.featured_image_url,
+            LogoImageExists: merchant.logo_image_exists === 1,
+            Images: JSON.parse(merchant.images || '[]'),
+            CreatedDate: merchant.created_date,
+            ModifiedDate: merchant.modified_date
+        }));
+        
+        res.json({
+            merchants: apiFormat,
+            count: apiFormat.length
+        });
+    } catch (error) {
+        console.error('Error fetching stored merchants:', error);
+        res.status(500).json({ error: 'Failed to fetch stored merchants' });
+    }
+});
+
+// Get available App IDs from database
+app.get('/api/app-ids', async (req, res) => {
+    try {
+        const appIds = await new Promise((resolve, reject) => {
+            db.all(`
+                SELECT DISTINCT app_id 
+                FROM merchant_master_data 
+                WHERE app_id IS NOT NULL 
+                ORDER BY app_id
+            `, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows.map(row => row.app_id));
+            });
+        });
+        
+        res.json(appIds);
+    } catch (error) {
+        console.error('Error fetching App IDs:', error);
+        res.status(500).json({ error: 'Failed to fetch App IDs' });
+    }
+});
+
 // Start API-driven merchant test
 app.post('/api/start-test', async (req, res) => {
     const { merchants, sessionId, testName } = req.body;
     
     try {
-        console.log(`Starting test for ${merchants.length} merchants`);
-        console.log(`Session ID: ${sessionId}`);
-        console.log(`Test Name: ${testName}`);
+        console.log(`🚀 Starting API merchant test`);
+        console.log(`📊 Merchants: ${merchants.length}`);
+        console.log(`🆔 Session: ${sessionId}`);
+        console.log(`📝 Test Name: ${testName}`);
+        
+        // Create test session in database
+        try {
+            await createTestSession(sessionId, testName);
+            console.log(`✅ Database session created: ${sessionId}`);
+        } catch (dbError) {
+            console.log(`⚠️ Database session creation failed: ${dbError.message}`);
+        }
         
         // Import and use the API test runner
-        const APITestRunner = require('./api-test-runner');
         const testRunner = new APITestRunner();
         
         // Start the test asynchronously (don't wait for completion)
         testRunner.runTest(merchants, sessionId, testName)
             .then(result => {
-                console.log('Test completed:', result);
+                console.log('✅ Test completed:', result);
             })
             .catch(error => {
-                console.error('Test failed:', error);
+                console.error('❌ Test failed:', error);
             });
         
         res.json({ 
@@ -295,6 +417,56 @@ app.post('/api/start-test', async (req, res) => {
     } catch (error) {
         console.error('Error starting test:', error);
         res.status(500).json({ error: 'Failed to start test' });
+    }
+});
+
+// Reset database (dangerous operation)
+app.post('/api/reset-database', async (req, res) => {
+    try {
+        console.log('🚨 Database reset requested');
+        
+        // Clear all tables
+        await new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.run('DELETE FROM merchant_test_results', (err) => {
+                    if (err) {
+                        console.error('Error clearing merchant_test_results:', err);
+                        reject(err);
+                        return;
+                    }
+                });
+                
+                db.run('DELETE FROM test_sessions', (err) => {
+                    if (err) {
+                        console.error('Error clearing test_sessions:', err);
+                        reject(err);
+                        return;
+                    }
+                });
+                
+                db.run('DELETE FROM merchant_master_data', (err) => {
+                    if (err) {
+                        console.error('Error clearing merchant_master_data:', err);
+                        reject(err);
+                        return;
+                    }
+                    
+                    console.log('✅ Database reset completed');
+                    resolve();
+                });
+            });
+        });
+        
+        res.json({ 
+            success: true, 
+            message: 'Database reset successfully' 
+        });
+    } catch (error) {
+        console.error('❌ Database reset failed:', error);
+        res.status(500).json({ 
+            error: 'Failed to reset database',
+            details: error.message 
+        });
     }
 });
 

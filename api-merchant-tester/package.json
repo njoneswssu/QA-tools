@@ -7,7 +7,11 @@
     "start": "node tester-server.js",
     "dev": "nodemon tester-server.js",
     "test": "npx playwright test api-merchant-tester.spec.js --headed",
-    "test-headless": "npx playwright test api-merchant-tester.spec.js"
+    "test-headless": "npx playwright test api-merchant-tester.spec.js",
+    "init-db": "node database/init_db.js",
+    "populate-merchants": "node database/populate_merchants.js",
+    "setup": "npm install && npx playwright install && npm run init-db",
+    "install-browsers": "npx playwright install"
   },
   "keywords": [
     "playwright",

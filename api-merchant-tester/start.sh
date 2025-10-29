@@ -15,6 +15,12 @@ if [ ! -d "node_modules/@playwright/test" ]; then
     npx playwright install
 fi
 
+# Check if database exists
+if [ ! -f "database/merchant_tests.db" ]; then
+    echo "🗄️  Setting up database..."
+    node setup-database.js
+fi
+
 echo "🌐 Starting server on http://localhost:3001"
 echo "🧪 API Merchant Tester will be available at the URL above"
 echo "================================"

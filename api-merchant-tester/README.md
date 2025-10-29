@@ -14,12 +14,26 @@ A standalone web application for testing merchant websites using API data and Pl
 
 ## 📁 Files
 
+### Frontend
 - `merchant-tester.html` - Main UI interface
 - `tester-styles.css` - Styling for the interface
 - `tester-script.js` - Frontend JavaScript functionality
+
+### Backend
 - `tester-server.js` - Express.js backend server
 - `api-test-runner.js` - Playwright test execution engine
 - `api-merchant-tester.spec.js` - Playwright test specification
+
+### Database
+- `database/init_db.js` - SQLite database initialization and functions
+- `database/merchant_tests.db` - SQLite database file
+- `database/populate_merchants.js` - Script to populate merchant master data
+- `setup-database.js` - Database setup utility
+
+### Utilities
+- `package.json` - Dependencies and scripts
+- `start.sh` / `start.bat` - Cross-platform startup scripts
+- `README.md` - This documentation
 
 ## 🛠️ Setup
 
@@ -109,11 +123,13 @@ Click "Start Testing" to:
 ## 🔧 Configuration
 
 ### Database Integration
-The tester integrates with the main project's SQLite database:
-- Automatic session tracking
-- Detailed result storage
-- Historical test data
-- Export capabilities
+The tester includes its own SQLite database:
+- **Self-contained**: No external database dependencies
+- **Automatic session tracking**: Each test run gets a unique session
+- **Detailed result storage**: Full merchant data and test results
+- **Historical test data**: View past test sessions and results
+- **Master merchant data**: Store and query merchant information from API
+- **Export capabilities**: Download results as CSV or view in dashboard
 
 ### Playwright Settings
 - Headed browser mode for visibility

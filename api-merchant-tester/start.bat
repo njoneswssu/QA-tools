@@ -14,6 +14,12 @@ if not exist "node_modules\@playwright\test" (
     npx playwright install
 )
 
+REM Check if database exists
+if not exist "database\merchant_tests.db" (
+    echo 🗄️  Setting up database...
+    node setup-database.js
+)
+
 echo 🌐 Starting server on http://localhost:3001
 echo 🧪 API Merchant Tester will be available at the URL above
 echo ================================

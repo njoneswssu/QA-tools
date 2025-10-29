@@ -211,7 +211,11 @@ test.describe('API Merchant Tester - UI Generated', () => {
           const pageContent = await page.textContent('body');
           let pageText = pageContent ? pageContent.toLowerCase() : '';
           
-          // Enhanced content detection
+          // Get page title for enhanced detection
+          const pageTitle = await page.title();
+          const titleText = pageTitle ? pageTitle.toLowerCase() : '';
+          
+          // Enhanced content detection with scrolling
           try {
             for (let i = 0; i < 3; i++) {
               await page.evaluate(() => window.scrollBy(0, window.innerHeight));
@@ -227,21 +231,179 @@ test.describe('API Merchant Tester - UI Generated', () => {
 
           const testDuration = Date.now() - testStartTime;
           
-          // Check for unavailability patterns
-          const unavailabilityPatterns = [
-            'this store is unavailable', 'store is currently unavailable',
-            'store temporarily closed', 'under maintenance', 'coming soon',
-            'under construction', 'this website is for sale', 'suspended'
+          // COMPREHENSIVE DETECTION LOGIC FROM WEBSITE-QUICKCHECK
+          
+          // Major brand protection - never flag these
+          const majorBrands = [
+            'amazon', 'walmart', 'target', 'bestbuy', 'home depot', 'lowes', 'macys', 'nordstrom',
+            'nike', 'adidas', 'apple', 'microsoft', 'google', 'facebook', 'twitter', 'instagram',
+            'ebay', 'etsy', 'shopify', 'square', 'paypal', 'stripe', 'visa', 'mastercard',
+            'coca cola', 'pepsi', 'mcdonalds', 'starbucks', 'disney', 'netflix', 'spotify'
           ];
-
-          let foundPattern = null;
-          for (const pattern of unavailabilityPatterns) {
-            if (pageText.includes(pattern)) {
-              foundPattern = pattern;
-              break;
+          
+          const isMajorBrand = majorBrands.some(brand => {
+            const nameMatch = website.name.toLowerCase().includes(brand.toLowerCase());
+            const urlMatch = website.url.toLowerCase().includes(brand.toLowerCase());
+            return nameMatch || urlMatch;
+          });
+          
+          if (isMajorBrand) {
+            console.log(\`🛡️ MAJOR BRAND PROTECTION: \${website.name} - Auto-success\`);
+            successfulWebsites.push({
+              name: website.name,
+              url: website.url,
+              reason: 'Major brand protection - automatically successful'
+            });
+            await saveMerchantToDatabase(website, 'success', 'Major brand protection', null, testDuration);
+            checkedWebsites.push({ name: website.name, url: website.url });
+            continue;
+          }
+          
+          // BUSINESS MODEL DETECTION
+          const businessModels = {
+            ticketing: {
+              sites: ['todaytix', 'stubhub', 'ticketmaster', 'vivid seats', 'seatgeek'],
+              contentPatterns: ['tickets', 'shows', 'events', 'theater', 'concert', 'venue', 'performance'],
+              pricingPatterns: [/\\$\\d+.*ticket/i, /tickets.*\\$\\d+/i, /from.*\\$\\d+/i],
+              functionalIndicators: ['buy tickets', 'select seats', 'choose event', 'book tickets', 'event listing']
+            },
+            travel: {
+              sites: ['cheapflightsfares', 'expedia', 'kayak', 'booking', 'priceline', 'orbitz'],
+              contentPatterns: ['flights', 'hotels', 'travel', 'destinations', 'airlines', 'airports', 'booking'],
+              pricingPatterns: [/\\$\\d+.*flight/i, /flights.*\\$\\d+/i, /from.*\\$\\d+/i, /starting.*\\$\\d+/i],
+              functionalIndicators: ['search flights', 'book flight', 'find flights', 'travel deals', 'flight search']
+            },
+            fitness: {
+              sites: ['lifepro fitness', 'lifepro', 'peloton', 'nordictrack', 'bowflex'],
+              contentPatterns: ['fitness', 'workout', 'exercise', 'equipment', 'gym', 'training', 'health'],
+              pricingPatterns: [/\\$\\d+/i],
+              functionalIndicators: ['buy now', 'add to cart', 'shop now', 'order now', 'purchase']
+            },
+            luxury: {
+              sites: ['anuschka', 'creme de la mer', 'grown brilliance'],
+              contentPatterns: ['luxury', 'premium', 'collection', 'exclusive', 'designer'],
+              pricingPatterns: [/\\$\\d+/i],
+              functionalIndicators: ['shop', 'buy', 'purchase', 'add to cart', 'collection']
+            },
+            domainMarketplace: {
+              sites: ['hugedomains', 'sedo', 'godaddy auctions', 'namecheap marketplace', 'flippa'],
+              contentPatterns: ['domain', 'domains', 'domain name', 'domain marketplace', 'domain auction'],
+              pricingPatterns: [/\\$\\d+.*domain/i, /domain.*\\$\\d+/i, /\\$\\d+/i],
+              functionalIndicators: ['buy now', 'buy domain', 'purchase domain', 'domain for sale', 'make offer']
+            }
+          };
+          
+          // Detect business model
+          let detectedModel = null;
+          let confidence = 0;
+          
+          for (const [modelName, model] of Object.entries(businessModels)) {
+            const siteMatch = model.sites.some(site => 
+              website.name.toLowerCase().includes(site) || 
+              website.url.toLowerCase().includes(site) ||
+              titleText.includes(site.toLowerCase())
+            );
+            
+            if (siteMatch) {
+              const contentScore = model.contentPatterns.filter(pattern => 
+                pageText.includes(pattern.toLowerCase())
+              ).length;
+              
+              const pricingScore = model.pricingPatterns.filter(pattern => 
+                pattern.test(pageText)
+              ).length;
+              
+              const functionalScore = model.functionalIndicators.filter(indicator => 
+                pageText.includes(indicator.toLowerCase())
+              ).length;
+              
+              const totalScore = contentScore + pricingScore + functionalScore;
+              
+              if (totalScore > confidence) {
+                detectedModel = modelName;
+                confidence = totalScore;
+              }
             }
           }
-
+          
+          // PRICING AND FUNCTIONALITY DETECTION
+          const hasPricing = /\\$\\s*\\d+(?:\\.\\d{1,2})?|\\d+(?:\\.\\d{1,2})?\\s*\\$/.test(pageText);
+          const hasHotelPricing = /\\$\\d+.*night|per night.*\\$\\d+|\\$\\d+.*room|room.*\\$\\d+/i.test(pageText);
+          const hasTravelPricing = /\\$\\d+.*flight|flight.*\\$\\d+|\\$\\d+.*ticket|ticket.*\\$\\d+/i.test(pageText);
+          const hasTicketPricing = /\\$\\d+.*ticket|ticket.*\\$\\d+|from.*\\$\\d+|starting.*\\$\\d+/i.test(pageText);
+          
+          const hasShoppingFeatures = /add to cart|buy now|purchase|checkout|shopping cart|add to bag|shop now|order now/i.test(pageText);
+          const hasHotelBookingFeatures = /book now|check availability|reserve room|book room|select room/i.test(pageText);
+          const hasTravelBookingFeatures = /book flight|search flights|find flights|book now|select flight/i.test(pageText);
+          const hasTicketBookingFeatures = /buy tickets|select seats|book tickets|purchase tickets|get tickets/i.test(pageText);
+          
+          const hasPercentageOff = /\\d+%\\s*off|save\\s*\\d+%|\\d+%\\s*discount|\\d+%\\s*savings/i.test(pageText);
+          
+          // Site type detection
+          const isHotelSite = website.name.toLowerCase().includes('hotel') || 
+                             website.name.toLowerCase().includes('resort') ||
+                             website.url.toLowerCase().includes('hotel');
+          
+          const isTravelSite = website.name.toLowerCase().includes('flight') || 
+                             website.name.toLowerCase().includes('travel') ||
+                             website.name.toLowerCase().includes('airline') ||
+                             website.url.toLowerCase().includes('flight');
+          
+          const isTicketSite = website.name.toLowerCase().includes('ticket') || 
+                             website.name.toLowerCase().includes('tix') ||
+                             website.url.toLowerCase().includes('ticket');
+          
+          // Combined functionality detection
+          const hasFunctionalFeatures = hasShoppingFeatures || hasHotelBookingFeatures || hasTravelBookingFeatures || hasTicketBookingFeatures;
+          const hasAnyPricing = hasPricing || hasHotelPricing || hasTravelPricing || hasTicketPricing;
+          
+          // STRONG UNAVAILABILITY PATTERNS (override pricing)
+          const strongUnavailabilityPatterns = [
+            'this store is unavailable',
+            'our store is unavailable', 
+            'store is currently unavailable',
+            'sorry, this store is currently unavailable',
+            'store temporarily closed',
+            'shop temporarily closed',
+            'website temporarily unavailable',
+            'site temporarily unavailable',
+            'this website is for sale',
+            'this domain is for sale',
+            'enter password to access this site',
+            'website suspended',
+            'account suspended',
+            'website maintenance mode',
+            'site maintenance mode',
+            'down for maintenance',
+            'site not found',
+            'website not found',
+            'page not found - 404',
+            '404 error',
+            'error 404'
+          ];
+          
+          const hasStrongUnavailabilityPattern = strongUnavailabilityPatterns.some(pattern => 
+            pageText.includes(pattern.toLowerCase()) || titleText.includes(pattern.toLowerCase())
+          );
+          
+          // DECISION LOGIC
+          let foundPattern = null;
+          
+          // Check for strong unavailability patterns first
+          if (hasStrongUnavailabilityPattern) {
+            foundPattern = strongUnavailabilityPatterns.find(pattern => 
+              pageText.includes(pattern.toLowerCase()) || titleText.includes(pattern.toLowerCase())
+            );
+          }
+          
+          // If we have a business model and functional features, override weak patterns
+          if (detectedModel && (hasFunctionalFeatures || hasAnyPricing || hasPercentageOff)) {
+            if (!hasStrongUnavailabilityPattern) {
+              foundPattern = null; // Clear any weak patterns
+            }
+          }
+          
+          // Final decision
           if (foundPattern) {
             console.log(\`🚨 FLAGGED: \${website.name} - Pattern: "\${foundPattern}"\`);
             
@@ -251,17 +413,25 @@ test.describe('API Merchant Tester - UI Generated', () => {
               pattern: foundPattern
             });
 
-            await saveMerchantToDatabase(website, 'flagged', \`Unavailability pattern: \${foundPattern}\`, foundPattern, testDuration);
+            await saveMerchantToDatabase(website, 'flagged', \`Website unavailable: \${foundPattern}\`, foundPattern, testDuration);
           } else {
-            // Check for positive indicators
-            const hasEcommerce = /add to cart|buy now|purchase|checkout|shopping cart/i.test(pageText);
-            const hasPricing = /\\$\\s*\\d+|\\d+\\s*\\$|price|pricing/i.test(pageText);
+            // Determine success reason
+            let successReason = 'Website appears to be available and functional';
             
-            let successReason = 'Website appears to be available';
-            if (hasEcommerce) {
-              successReason = 'E-commerce features detected';
-            } else if (hasPricing) {
+            if (detectedModel) {
+              successReason = \`Business model detected: \${detectedModel}\`;
+            } else if (hasAnyPricing && hasFunctionalFeatures) {
+              let siteType = 'E-commerce';
+              if (isHotelSite) siteType = 'Hotel booking';
+              else if (isTravelSite) siteType = 'Travel booking';
+              else if (isTicketSite) siteType = 'Ticket booking';
+              successReason = \`\${siteType} features detected with pricing\`;
+            } else if (hasFunctionalFeatures) {
+              successReason = 'Functional e-commerce features detected';
+            } else if (hasAnyPricing) {
               successReason = 'Pricing information detected';
+            } else if (hasPercentageOff) {
+              successReason = 'Promotional offers detected';
             }
             
             console.log(\`✅ SUCCESS: \${website.name} - \${successReason}\`);

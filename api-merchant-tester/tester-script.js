@@ -11,6 +11,9 @@ let testResults = {
     current: 0
 };
 let currentTestingUrl = null;
+let testStartTime = null;
+let autoScroll = true;
+let testPaused = false;
 
 // DOM elements
 const elements = {
@@ -20,8 +23,18 @@ const elements = {
     merchantLimit: document.getElementById('merchant-limit'),
     testName: document.getElementById('test-name'),
     merchantPreview: document.getElementById('merchant-preview'),
+    merchantSearch: document.getElementById('merchant-search'),
+    statusFilter: document.getElementById('status-filter'),
+    merchantCountDisplay: document.getElementById('merchant-count-display'),
     validateBtn: document.getElementById('validate-btn'),
     startTestBtn: document.getElementById('start-test-btn'),
+    resetDatabaseBtn: document.getElementById('reset-database-btn'),
+    loadStoredBtn: document.getElementById('load-stored-btn'),
+    pauseTestBtn: document.getElementById('pause-test-btn'),
+    resumeTestBtn: document.getElementById('resume-test-btn'),
+    logContainer: document.getElementById('log-container'),
+    clearLogBtn: document.getElementById('clear-log-btn'),
+    autoScrollBtn: document.getElementById('auto-scroll-btn'),
     resultsSection: document.getElementById('results-section'),
     completionSection: document.getElementById('completion-section'),
     
@@ -70,8 +83,18 @@ function initializeEventListeners() {
     elements.appIdFilter.addEventListener('input', debounce(validateAndPreview, 300));
     elements.categoryFilter.addEventListener('change', validateAndPreview);
     elements.merchantLimit.addEventListener('input', debounce(validateAndPreview, 300));
+    elements.merchantSearch.addEventListener('input', filterMerchants);
+    elements.statusFilter.addEventListener('change', filterMerchants);
+    
+    // Button events
     elements.validateBtn.addEventListener('click', validateAndPreview);
     elements.startTestBtn.addEventListener('click', startTest);
+    elements.loadStoredBtn.addEventListener('click', loadStoredMerchants);
+    elements.resetDatabaseBtn.addEventListener('click', handleDatabaseReset);
+    elements.pauseTestBtn.addEventListener('click', pauseTest);
+    elements.resumeTestBtn.addEventListener('click', resumeTest);
+    elements.clearLogBtn.addEventListener('click', clearLog);
+    elements.autoScrollBtn.addEventListener('click', toggleAutoScroll);
     
     // Test control events
     elements.pauseTestBtn.addEventListener('click', pauseTest);
@@ -142,6 +165,11 @@ function validateAndPreview() {
         applyFiltersAndPreview();
         elements.startTestBtn.disabled = false;
         
+        // Auto-store merchants in database
+        storeApiMerchants(data.Merchants).catch(error => {
+            console.warn('Failed to auto-store merchants:', error);
+        });
+        
         showSuccess('API data validated successfully!');
         
     } catch (error) {
@@ -192,7 +220,9 @@ function applyFiltersAndPreview() {
     }
     
     filteredMerchants = merchants;
-    updatePreview();
+    allMerchants = merchants; // Update allMerchants for filtering
+    displayMerchantList(merchants);
+    elements.merchantCountDisplay.textContent = `${merchants.length} merchants`;
 }
 
 // Update merchant preview
@@ -282,11 +312,17 @@ async function startTest() {
 
 // Run the test
 async function runTest() {
+    testStartTime = Date.now();
     updateStats();
     clearResultsLists();
+    clearLog();
+    
+    addLogEntry(`Starting test with ${filteredMerchants.length} merchants`, 'info');
     
     try {
         // Trigger the actual Playwright test
+        addLogEntry('Sending test request to server...', 'info');
+        
         const response = await fetch('/api/start-test', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -302,21 +338,26 @@ async function runTest() {
         }
         
         const result = await response.json();
-        console.log('Playwright test started:', result);
+        addLogEntry(`Playwright test started successfully (Session: ${result.sessionId})`, 'success');
         
         // Show message that real test is running
         elements.currentMerchant.textContent = 'Real Playwright test is now running...';
         elements.currentUrl.textContent = 'Check the browser window that opened';
         elements.currentDetails.textContent = 'The actual website testing is happening in the Playwright browser';
         
+        addLogEntry('Browser automation started - check the opened browser window', 'info');
+        addLogEntry('Polling for results every 2 seconds...', 'info');
+        
         // Start polling for results
         pollForResults();
         
     } catch (error) {
         console.error('Failed to start test:', error);
+        addLogEntry(`Failed to start Playwright test: ${error.message}`, 'error');
         showError('Failed to start Playwright test: ' + error.message);
         
         // Fallback to simulation mode
+        addLogEntry('Falling back to simulation mode...', 'warning');
         showInfo('Falling back to simulation mode...');
         await runSimulatedTest();
     }
@@ -336,13 +377,23 @@ async function pollForResults() {
                 
                 // Update stats if we have new results
                 if (results.length > lastResultCount) {
+                    const newResults = results.slice(lastResultCount);
+                    newResults.forEach(result => {
+                        const status = result.is_user_passed ? 'success' : result.test_status;
+                        const statusText = status === 'success' ? '✅' : '🚨';
+                        addLogEntry(`${statusText} ${result.merchant_name}: ${result.test_result}`, status === 'success' ? 'success' : 'error');
+                    });
+                    
                     updateStatsFromResults(results);
                     updateResultsFromDatabase(results);
                     lastResultCount = results.length;
+                    
+                    addLogEntry(`Progress: ${results.length}/${filteredMerchants.length} merchants tested`, 'info');
                 }
                 
                 // Check if test is complete
                 if (results.length >= filteredMerchants.length) {
+                    addLogEntry('Test completed successfully!', 'success');
                     completeTest();
                     return;
                 }
@@ -757,3 +808,247 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Terminal Log Functions
+function addLogEntry(message, type = 'info') {
+    const now = new Date();
+    const timestamp = now.toTimeString().split(' ')[0];
+    
+    const logEntry = document.createElement('div');
+    logEntry.className = `log-entry ${type}`;
+    
+    logEntry.innerHTML = `
+        <span class="log-time">[${timestamp}]</span>
+        <span class="log-message">${escapeHtml(message)}</span>
+    `;
+    
+    elements.logContainer.appendChild(logEntry);
+    
+    // Auto scroll if enabled
+    if (autoScroll) {
+        elements.logContainer.scrollTop = elements.logContainer.scrollHeight;
+    }
+}
+
+function clearLog() {
+    elements.logContainer.innerHTML = `
+        <div class="log-entry">
+            <span class="log-time">[${new Date().toTimeString().split(' ')[0]}]</span>
+            <span class="log-message">Log cleared</span>
+        </div>
+    `;
+}
+
+function toggleAutoScroll() {
+    autoScroll = !autoScroll;
+    elements.autoScrollBtn.classList.toggle('active', autoScroll);
+    
+    if (autoScroll) {
+        elements.logContainer.scrollTop = elements.logContainer.scrollHeight;
+    }
+}
+
+// Merchant Storage Functions
+async function loadStoredMerchants() {
+    try {
+        addLogEntry('Loading stored merchants from database...', 'info');
+        
+        const response = await fetch('/api/stored-merchants');
+        if (!response.ok) {
+            throw new Error('Failed to load stored merchants');
+        }
+        
+        const data = await response.json();
+        
+        if (data.merchants && data.merchants.length > 0) {
+            // Set the API data
+            elements.apiData.value = JSON.stringify({ Merchants: data.merchants }, null, 2);
+            
+            // Trigger validation
+            await validateAndPreview();
+            
+            addLogEntry(`Loaded ${data.merchants.length} stored merchants`, 'success');
+            showSuccess(`Loaded ${data.merchants.length} stored merchants from database`);
+        } else {
+            addLogEntry('No stored merchants found in database', 'warning');
+            showInfo('No stored merchants found. Please paste API data first.');
+        }
+    } catch (error) {
+        console.error('Error loading stored merchants:', error);
+        addLogEntry(`Error loading stored merchants: ${error.message}`, 'error');
+        showError('Failed to load stored merchants');
+    }
+}
+
+async function storeApiMerchants(merchants) {
+    try {
+        addLogEntry(`Storing ${merchants.length} merchants in database...`, 'info');
+        
+        const response = await fetch('/api/store-merchants', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ merchants })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to store merchants');
+        }
+        
+        const result = await response.json();
+        addLogEntry(`Successfully stored ${result.count} merchants`, 'success');
+        
+        return result;
+    } catch (error) {
+        console.error('Error storing merchants:', error);
+        addLogEntry(`Error storing merchants: ${error.message}`, 'error');
+        throw error;
+    }
+}
+
+// Test Control Functions
+function pauseTest() {
+    testPaused = true;
+    elements.pauseTestBtn.style.display = 'none';
+    elements.resumeTestBtn.style.display = 'inline-block';
+    addLogEntry('Test paused by user', 'warning');
+    showInfo('Test paused. Click Resume to continue.');
+}
+
+function resumeTest() {
+    testPaused = false;
+    elements.pauseTestBtn.style.display = 'inline-block';
+    elements.resumeTestBtn.style.display = 'none';
+    addLogEntry('Test resumed by user', 'info');
+    showInfo('Test resumed.');
+}
+
+// Enhanced merchant filtering
+function filterMerchants() {
+    if (!allMerchants.length) return;
+    
+    const searchTerm = elements.merchantSearch.value.toLowerCase();
+    const statusFilter = elements.statusFilter.value;
+    
+    let filtered = allMerchants.filter(merchant => {
+        // Search filter
+        const matchesSearch = !searchTerm || 
+            merchant.MerchantName.toLowerCase().includes(searchTerm) ||
+            (merchant.MerchantDomains && merchant.MerchantDomains.some(domain => 
+                domain.toLowerCase().includes(searchTerm)
+            ));
+        
+        // Status filter
+        const merchantStatus = merchantStatuses.get(merchant.MerchantID) || 'untested';
+        const matchesStatus = !statusFilter || merchantStatus === statusFilter;
+        
+        return matchesSearch && matchesStatus;
+    });
+    
+    displayMerchantList(filtered);
+    elements.merchantCountDisplay.textContent = `${filtered.length} merchants`;
+}
+
+// Enhanced merchant list display
+function displayMerchantList(merchants) {
+    if (!merchants || merchants.length === 0) {
+        elements.merchantPreview.innerHTML = `
+            <div class="preview-placeholder">
+                <i class="fas fa-search"></i>
+                <p>No merchants match your filters</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const merchantList = document.createElement('div');
+    merchantList.className = 'merchant-list';
+    
+    merchants.forEach(merchant => {
+        const status = merchantStatuses.get(merchant.MerchantID) || 'untested';
+        const domain = merchant.MerchantDomains && merchant.MerchantDomains[0] ? merchant.MerchantDomains[0] : 'No domain';
+        
+        const merchantItem = document.createElement('div');
+        merchantItem.className = 'merchant-item';
+        merchantItem.innerHTML = `
+            <div class="merchant-info-item">
+                <div class="merchant-name-item">${escapeHtml(merchant.MerchantName)}</div>
+                <div class="merchant-url-item">${escapeHtml(domain)}</div>
+                <div class="merchant-category-item">${escapeHtml(merchant.PrimaryCategory || 'No category')}</div>
+            </div>
+            <div class="merchant-status ${status}">${status}</div>
+        `;
+        
+        merchantList.appendChild(merchantItem);
+    });
+    
+    elements.merchantPreview.innerHTML = '';
+    elements.merchantPreview.appendChild(merchantList);
+}
+
+// Database reset with confirmation
+let resetClickCount = 0;
+let resetTimeout = null;
+
+async function handleDatabaseReset() {
+    resetClickCount++;
+    
+    if (resetClickCount === 1) {
+        elements.resetDatabaseBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Click Again to Confirm';
+        elements.resetDatabaseBtn.style.background = '#dc2626';
+        addLogEntry('Database reset requested - click again to confirm', 'warning');
+        
+        resetTimeout = setTimeout(() => {
+            resetClickCount = 0;
+            elements.resetDatabaseBtn.innerHTML = '<i class="fas fa-database"></i> Reset Database';
+            elements.resetDatabaseBtn.style.background = '';
+        }, 3000);
+        
+        return;
+    }
+    
+    if (resetClickCount >= 2) {
+        clearTimeout(resetTimeout);
+        
+        try {
+            addLogEntry('Resetting database...', 'warning');
+            
+            const response = await fetch('/api/reset-database', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to reset database');
+            }
+            
+            const result = await response.json();
+            
+            // Reset UI state
+            merchantsData = null;
+            allMerchants = [];
+            filteredMerchants = [];
+            merchantStatuses.clear();
+            elements.apiData.value = '';
+            elements.merchantPreview.innerHTML = `
+                <div class="preview-placeholder">
+                    <i class="fas fa-upload"></i>
+                    <p>Paste API data above to preview merchants</p>
+                </div>
+            `;
+            elements.startTestBtn.disabled = true;
+            
+            addLogEntry('Database reset completed successfully', 'success');
+            showSuccess('Database reset successfully');
+            
+        } catch (error) {
+            console.error('Error resetting database:', error);
+            addLogEntry(`Database reset failed: ${error.message}`, 'error');
+            showError('Failed to reset database');
+        }
+        
+        // Reset button state
+        resetClickCount = 0;
+        elements.resetDatabaseBtn.innerHTML = '<i class="fas fa-database"></i> Reset Database';
+        elements.resetDatabaseBtn.style.background = '';
+    }
+}
