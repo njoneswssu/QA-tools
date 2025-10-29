@@ -9,7 +9,7 @@ const path = require('path');
 
 class APITestRunner {
     constructor() {
-        this.tempDir = path.join(__dirname, '..', 'e2e', 'temp');
+        this.tempDir = path.join(__dirname, 'temp');
         this.ensureTempDir();
     }
 
@@ -30,7 +30,7 @@ const path = require('path');
 // Database integration
 let dbModule;
 try {
-  dbModule = require(path.join(__dirname, '..', 'database', 'init_db'));
+  dbModule = require(path.join(__dirname, 'database', 'init_db'));
 } catch (error) {
   console.log('Database module not found, results will only be saved to console/file');
   dbModule = null;
@@ -529,7 +529,7 @@ test.describe('API Merchant Tester - UI Generated', () => {
                 // Run Playwright test
                 const playwrightProcess = spawn('npx', ['playwright', 'test', tempTestFile, '--headed', '--project=chromium-with-extension'], {
                     stdio: 'inherit',
-                    cwd: path.join(__dirname, '..'),
+                    cwd: __dirname,
                     shell: true
                 });
 

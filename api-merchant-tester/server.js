@@ -15,12 +15,12 @@ app.use('/tester', express.static(__dirname));
 
 // Serve the main HTML file
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'api-merchant-tester', 'frontend', 'index.html'));
+    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
 // Serve the merchant tester UI
 app.get('/tester', (req, res) => {
-    res.sendFile(path.join(__dirname, 'api-merchant-tester', 'merchant-tester.html'));
+    res.sendFile(path.join(__dirname, 'merchant-tester.html'));
 });
 
 // API Routes

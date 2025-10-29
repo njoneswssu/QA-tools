@@ -1,220 +1,194 @@
-# Merchant Test Results Dashboard
+# API Merchant Tester
 
-A comprehensive system for testing merchant websites and viewing results through a modern web dashboard.
+A standalone web application for testing merchant websites using API data and Playwright automation.
 
-## Features
+## 🚀 Features
 
-### 🧪 Automated Testing
-- **Website Availability Testing**: Automated checks for merchant website functionality
-- **Smart Detection**: Identifies business models, e-commerce features, and availability patterns
-- **User Controls**: Manual pass/fail controls with keyboard shortcuts and UI buttons
-- **Real-time Progress**: Live progress tracking with checkpoints every 10 merchants
-- **Error Handling**: Comprehensive timeout and network error detection
+- **API Data Input**: Paste merchant JSON data directly into the interface
+- **Smart Filtering**: Filter by App ID, category, and test status
+- **Real Playwright Testing**: Automated browser testing with full website interaction
+- **Live Results**: Real-time progress tracking and result updates
+- **Website Preview**: Preview merchant websites during testing
+- **Database Integration**: Automatic result storage and retrieval
+- **User-Friendly UI**: Modern, responsive interface for non-technical users
 
-### 📊 Database Storage
-- **SQLite Database**: Persistent storage of all test results
-- **Session Management**: Track multiple test sessions with timestamps
-- **Merchant Master Data**: Integration with merchant information (categories, rates, etc.)
-- **Detailed Analytics**: Store comprehensive test analysis and reasoning
+## 📁 Files
 
-### 🎨 Modern Dashboard
-- **Responsive UI**: Beautiful, mobile-friendly interface
-- **Advanced Filtering**: Filter by status, category, date range, and search terms
-- **Multiple Views**: Switch between table and card layouts
-- **Real-time Stats**: Live statistics and success rates
-- **Export Functionality**: Download results as CSV files
-- **Detailed Modals**: In-depth view of individual test results
+### Frontend
+- `merchant-tester.html` - Main UI interface
+- `tester-styles.css` - Styling for the interface
+- `tester-script.js` - Frontend JavaScript functionality
 
-## Quick Start
+### Backend
+- `tester-server.js` - Express.js backend server
+- `api-test-runner.js` - Playwright test execution engine
+- `api-merchant-tester.spec.js` - Playwright test specification
+
+### Database
+- `database/init_db.js` - SQLite database initialization and functions
+- `database/merchant_tests.db` - SQLite database file
+- `database/populate_merchants.js` - Script to populate merchant master data
+- `setup-database.js` - Database setup utility
+
+### Utilities
+- `package.json` - Dependencies and scripts
+- `start.sh` / `start.bat` - Cross-platform startup scripts
+- `README.md` - This documentation
+
+## 🛠️ Setup
 
 ### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Initialize Database
+### 2. Install Playwright Browsers
 ```bash
-npm run setup
+npx playwright install
 ```
 
-This will:
-- Install all Node.js dependencies
-- Create the SQLite database with proper schema
-- Populate merchant master data
-
-### 3. Start the Dashboard
+### 3. Start the Server
 ```bash
 npm start
 ```
 
-The dashboard will be available at: http://localhost:3000
+### 4. Access the Interface
+Open your browser to: http://localhost:3001
 
-### 4. Run Tests (Optional)
-```bash
-# Navigate to the e2e directory and run Playwright tests
-cd e2e
-npx playwright test website-quickcheck.spec.js --headed
+## 📖 How to Use
+
+### 1. Input API Data
+Paste your merchant JSON data in this format:
+```json
+{
+  "Merchants": [
+    {
+      "AppID": 451,
+      "MerchantID": 6745,
+      "MerchantName": "Example Store",
+      "MerchantDomains": ["example.com"],
+      "PrimaryCategory": "Clothing & Apparel",
+      "MaxRate": "1.875",
+      "MaxRateKind": "PERCENTAGE"
+    }
+  ]
+}
 ```
 
-## Project Structure
+### 2. Apply Filters
+- **App ID**: Select from available App IDs in your data
+- **Category**: Filter by merchant category
+- **Status**: View tested, successful, or flagged merchants
+- **Limit**: Set maximum number of merchants to test
 
-```
-├── database/
-│   ├── init_db.js              # Database schema and functions
-│   ├── populate_merchants.js   # Merchant data population
-│   └── merchant_tests.db       # SQLite database (created after setup)
-├── frontend/
-│   ├── index.html              # Main dashboard HTML
-│   ├── styles.css              # Dashboard styling
-│   └── script.js               # Frontend JavaScript
-├── e2e/
-│   └── website-quickcheck.spec.js  # Playwright test script (enhanced with DB)
-├── server.js                   # Express server with API endpoints
-├── package.json                # Node.js dependencies
-└── README.md                   # This file
-```
+### 3. Validate Data
+Click "Validate API Data" to:
+- Parse and validate JSON structure
+- Display merchant list with filtering options
+- Populate App ID dropdown
+- Show merchant count and categories
 
-## Database Schema
+### 4. Start Testing
+Click "Start Testing" to:
+- Launch Playwright browser automation
+- Test each merchant website automatically
+- Save results to database
+- Display live progress and results
 
-### Test Sessions
-- Session tracking with start/end times
-- Summary statistics (total, successful, flagged, user-passed)
-- Session status (running, completed, interrupted)
+### 5. Monitor Results
+- **Live Stats**: Total tested, successful, flagged
+- **Current Testing**: See which merchant is being tested
+- **Website Preview**: Preview current merchant's website
+- **Results Tabs**: View successful, flagged, and all results
 
-### Merchant Test Results
-- Individual test results with detailed analysis
-- Test status (success, flagged, user_passed)
-- Error patterns and duration tracking
-- Links to merchant master data
+## 🎯 Testing Features
 
-### Merchant Master Data
-- Complete merchant information from your JSON data
-- Categories, rates, images, and metadata
-- Used for enhanced filtering and display
+### Automated Detection
+- E-commerce functionality (cart, checkout, purchase)
+- Pricing information
+- Website availability
+- Error patterns and timeouts
 
-## API Endpoints
+### Manual Controls
+- **Pass Current**: Mark current merchant as successful
+- **Pause Test**: Pause testing at any time
+- **Preview Website**: View merchant website in modal
+- **Stop Test**: End testing early
 
-### GET /api/merchant-results
-Get paginated merchant test results with filtering options.
+### Result Categories
+- **Successful**: Website loads and appears functional
+- **Flagged**: Website has issues (unavailable, errors, timeouts)
+- **User Passed**: Manually marked as successful
 
-**Query Parameters:**
-- `session_id` - Filter by test session
-- `status` - Filter by test status (success, flagged, user_passed)
-- `category` - Filter by merchant category
-- `search` - Search merchant names and URLs
-- `date_from` / `date_to` - Date range filtering
-- `page` / `limit` - Pagination
+## 🔧 Configuration
 
-### GET /api/sessions
-Get all test sessions with summary statistics.
+### Database Integration
+The tester includes its own SQLite database:
+- **Self-contained**: No external database dependencies
+- **Automatic session tracking**: Each test run gets a unique session
+- **Detailed result storage**: Full merchant data and test results
+- **Historical test data**: View past test sessions and results
+- **Master merchant data**: Store and query merchant information from API
+- **Export capabilities**: Download results as CSV or view in dashboard
 
-### GET /api/categories
-Get all available merchant categories for filtering.
+### Playwright Settings
+- Headed browser mode for visibility
+- 30-second action timeout
+- 60-second navigation timeout
+- Screenshot on failure
+- Video recording on failure
 
-### GET /api/stats
-Get overall statistics across all tests.
+## 📊 API Endpoints
 
-### POST /api/sessions
-Create a new test session.
+- `GET /` - Main tester interface
+- `GET /api/app-ids` - Get available App IDs
+- `GET /api/merchant-results` - Get test results
+- `POST /api/sessions` - Create test session
+- `POST /api/start-test` - Start Playwright test
+- `POST /api/merchant-results` - Save test result
+- `GET /health` - Health check
 
-### POST /api/merchant-results
-Save a new merchant test result.
+## 🚨 Troubleshooting
 
-## Dashboard Features
+### Test Not Starting
+- Ensure Playwright browsers are installed: `npx playwright install`
+- Check that port 3001 is available
+- Verify database connection in main project
 
-### 📈 Statistics Dashboard
-- **Total Tested**: Overall count of tested merchants
-- **Successful**: Merchants that passed all checks
-- **Flagged**: Merchants requiring manual review
-- **User Passed**: Merchants manually approved by users
+### No Results Showing
+- Check browser console for errors
+- Verify API data format is correct
+- Ensure database is accessible
 
-### 🔍 Advanced Filtering
-- **Session Filter**: View results from specific test runs
-- **Status Filter**: Filter by success/flagged/user-passed status
-- **Category Filter**: Filter by merchant categories
-- **Search**: Find merchants by name or URL
-- **Date Range**: Filter by test date
+### Browser Not Opening
+- Confirm Playwright is installed correctly
+- Check system permissions for browser automation
+- Try running test manually: `npm run test`
 
-### 📋 Multiple Views
-- **Table View**: Detailed tabular data with sorting
-- **Card View**: Visual card layout for easier browsing
-- **Modal Details**: Comprehensive details for each merchant
+## 🔗 Integration
 
-### 📤 Export Options
-- **CSV Export**: Download filtered results as CSV
-- **Real-time Updates**: Refresh data without page reload
+This tester integrates with the main merchant testing dashboard:
+- Shared database for result storage
+- Compatible session management
+- Unified result viewing and analysis
 
-## Enhanced Test Script Features
+## 📝 Development
 
-The Playwright test script now includes:
-
-### 🎮 User Controls
-- **F8 / Ctrl+P**: Pause testing and download results
-- **Ctrl+S**: Mark current site as successful (user pass)
-- **UI Buttons**: Visual controls for pause and pass actions
-
-### 📊 Progress Tracking
-- **Checkpoints**: Progress reports every 10 merchants
-- **Real-time Stats**: Success rates and flagging rates
-- **Auto-download**: Results files every 50 merchants
-
-### 💾 Database Integration
-- **Automatic Saving**: All results saved to database
-- **Session Tracking**: Each test run gets a unique session ID
-- **Detailed Analysis**: Enhanced descriptions for all results
-
-### 🔍 Smart Detection
-- **Business Models**: Automatic detection of e-commerce patterns
-- **Error Categorization**: Detailed timeout and network error analysis
-- **Protection Systems**: Whitelist and brand protection logic
-
-## Development
-
-### Running in Development Mode
+### Start Development Server
 ```bash
 npm run dev
 ```
 
-This uses nodemon for automatic server restarts during development.
-
-### Database Management
+### Run Tests Manually
 ```bash
-# Reinitialize database
-npm run init-db
-
-# Repopulate merchant data
-npm run populate-merchants
+npm run test        # Headed mode
+npm run test-headless  # Headless mode
 ```
 
-### Adding New Merchant Data
-1. Update the merchant data in `database/populate_merchants.js`
-2. Run `npm run populate-merchants` to update the database
+## 🎯 Use Cases
 
-## Troubleshooting
-
-### Database Issues
-- Ensure SQLite3 is properly installed: `npm install sqlite3`
-- Check database file permissions in the `database/` directory
-- Reinitialize database if corrupted: `npm run init-db`
-
-### Test Script Issues
-- Ensure Playwright is installed: `npx playwright install`
-- Check that the database module path is correct in the test script
-- Verify browser permissions for file downloads
-
-### Dashboard Issues
-- Check that the server is running on port 3000
-- Verify API endpoints are responding: `curl http://localhost:3000/api/stats`
-- Check browser console for JavaScript errors
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details.
+- **QA Testing**: Validate merchant website functionality
+- **Bulk Validation**: Test hundreds of merchants efficiently  
+- **API Integration**: Test merchants from external APIs
+- **Non-Technical Users**: User-friendly interface for manual testing
+- **Automated Monitoring**: Regular merchant health checks
