@@ -8,7 +8,12 @@
     "dev": "nodemon server.js",
     "init-db": "node database/init_db.js",
     "populate-merchants": "node database/populate_merchants.js",
-    "setup": "npm install && npm run init-db && npm run populate-merchants"
+    "setup": "npm install && npx playwright install && npm run init-db && npm run populate-merchants",
+    "test": "npx playwright test e2e/website-quickcheck.spec.js --headed",
+    "test-headless": "npx playwright test e2e/website-quickcheck.spec.js",
+    "test-api": "npx playwright test e2e/api-merchant-tester.spec.js --headed",
+    "test-api-headless": "npx playwright test e2e/api-merchant-tester.spec.js",
+    "install-browsers": "npx playwright install"
   },
   "keywords": [
     "merchant",
@@ -22,7 +27,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "sqlite3": "^5.1.6",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "@playwright/test": "^1.40.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

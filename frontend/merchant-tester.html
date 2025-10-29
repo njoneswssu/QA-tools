@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Merchant Tester</title>
+    <link rel="stylesheet" href="tester-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="tester-header">
+            <h1><i class="fas fa-rocket"></i> API Merchant Tester</h1>
+            <p>Test merchant websites from API data with advanced filtering and real-time results</p>
+        </header>
+
+        <div class="setup-section">
+            <div class="setup-card">
+                <h2><i class="fas fa-cog"></i> Test Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="api-data">
+                        <i class="fas fa-code"></i> API Data (JSON)
+                        <span class="required">*</span>
+                    </label>
+                    <textarea 
+                        id="api-data" 
+                        placeholder='Paste your merchant API JSON here, e.g.:
+{
+  "Merchants": [
+    {
+      "AppID": 451,
+      "MerchantID": 6745,
+      "MerchantName": "Example Store",
+      "MerchantDomains": ["example.com"],
+      "PrimaryCategory": "Clothing & Apparel",
+      "MaxRate": "1.875",
+      "MaxRateKind": "PERCENTAGE"
+    }
+  ]
+}'
+                        rows="12"
+                    ></textarea>
+                    <div class="input-help">
+                        <i class="fas fa-info-circle"></i>
+                        Paste your complete merchant API response here. The system will automatically extract merchant information.
+                    </div>
+                </div>
+
+                <div class="filters-row">
+                    <div class="form-group">
+                        <label for="app-id-filter">
+                            <i class="fas fa-filter"></i> Filter by App ID
+                        </label>
+                        <input 
+                            type="number" 
+                            id="app-id-filter" 
+                            placeholder="e.g., 451 (leave empty for all)"
+                        >
+                        <div class="input-help">Filter merchants by specific App ID</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category-filter">
+                            <i class="fas fa-tags"></i> Filter by Category
+                        </label>
+                        <select id="category-filter">
+                            <option value="">All Categories</option>
+                        </select>
+                        <div class="input-help">Filter merchants by category</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="merchant-limit">
+                            <i class="fas fa-list-ol"></i> Limit Merchants
+                        </label>
+                        <input 
+                            type="number" 
+                            id="merchant-limit" 
+                            placeholder="e.g., 50 (leave empty for all)"
+                            min="1"
+                        >
+                        <div class="input-help">Limit number of merchants to test</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="test-name">
+                        <i class="fas fa-tag"></i> Test Session Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="test-name" 
+                        placeholder="e.g., Q4 2025 Merchant Validation"
+                        value=""
+                    >
+                    <div class="input-help">Optional name for this test session</div>
+                </div>
+
+                <div class="preview-section">
+                    <h3><i class="fas fa-eye"></i> Merchant Preview</h3>
+                    <div id="merchant-preview" class="merchant-preview">
+                        <div class="preview-placeholder">
+                            <i class="fas fa-upload"></i>
+                            <p>Paste API data above to preview merchants</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="validate-btn" class="btn btn-secondary">
+                        <i class="fas fa-check-circle"></i> Validate API Data
+                    </button>
+                    <button id="start-test-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-play"></i> Start Testing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section" id="results-section" style="display: none;">
+            <div class="results-header">
+                <h2><i class="fas fa-chart-line"></i> Test Results</h2>
+                <div class="test-controls">
+                    <button id="pause-test-btn" class="btn btn-warning">
+                        <i class="fas fa-pause"></i> Pause Test
+                    </button>
+                    <button id="stop-test-btn" class="btn btn-danger">
+                        <i class="fas fa-stop"></i> Stop Test
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-tested">0</div>
+                    <div class="stat-label">Total Tested</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-number" id="successful-count">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card flagged">
+                    <div class="stat-number" id="flagged-count">0</div>
+                    <div class="stat-label">Flagged</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="progress-percent">0%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+            </div>
+
+            <div class="current-test">
+                <h3><i class="fas fa-globe"></i> Currently Testing</h3>
+                <div class="current-merchant">
+                    <div class="merchant-info">
+                        <div class="merchant-name" id="current-merchant">Ready to start...</div>
+                        <div class="merchant-url" id="current-url"></div>
+                        <div class="merchant-details" id="current-details"></div>
+                    </div>
+                    <div class="test-actions">
+                        <button id="pass-current-btn" class="btn btn-success btn-sm">
+                            <i class="fas fa-check"></i> Pass Current
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="live-results">
+                <div class="results-tabs">
+                    <button class="tab-btn active" data-tab="successful">
+                        <i class="fas fa-check-circle"></i> Successful (<span id="successful-tab-count">0</span>)
+                    </button>
+                    <button class="tab-btn" data-tab="flagged">
+                        <i class="fas fa-exclamation-triangle"></i> Flagged (<span id="flagged-tab-count">0</span>)
+                    </button>
+                    <button class="tab-btn" data-tab="all">
+                        <i class="fas fa-list"></i> All Results (<span id="all-tab-count">0</span>)
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <div id="successful-results" class="tab-pane active">
+                        <div class="results-list" id="successful-list">
+                            <div class="no-results">
+                                <i class="fas fa-hourglass-start"></i>
+                                <p>No successful merchants yet</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="flagged-results" class="tab-pane">
+                        <div class="results-list" id="flagged-list">
+                            <div class="no-results">
+                                <i class="fas fa-hourglass-start"></i>
+                                <p>No flagged merchants yet</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="all-results" class="tab-pane">
+                        <div class="results-list" id="all-list">
+                            <div class="no-results">
+                                <i class="fas fa-hourglass-start"></i>
+                                <p>No results yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="completion-section" id="completion-section" style="display: none;">
+            <div class="completion-card">
+                <h2><i class="fas fa-flag-checkered"></i> Test Completed!</h2>
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <span class="stat-value" id="final-total">0</span>
+                        <span class="stat-label">Total Tested</span>
+                    </div>
+                    <div class="final-stat success">
+                        <span class="stat-value" id="final-successful">0</span>
+                        <span class="stat-label">Successful</span>
+                    </div>
+                    <div class="final-stat flagged">
+                        <span class="stat-value" id="final-flagged">0</span>
+                        <span class="stat-label">Flagged</span>
+                    </div>
+                </div>
+                <div class="completion-actions">
+                    <button id="view-dashboard-btn" class="btn btn-primary">
+                        <i class="fas fa-chart-bar"></i> View Full Dashboard
+                    </button>
+                    <button id="download-results-btn" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Download Results
+                    </button>
+                    <button id="start-new-test-btn" class="btn btn-outline">
+                        <i class="fas fa-plus"></i> Start New Test
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="tester-script.js"></script>
+</body>
+</html>
