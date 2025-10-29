@@ -1,6 +1,8 @@
 // Global state
 let merchantsData = null;
+let allMerchants = [];
 let filteredMerchants = [];
+let merchantStatuses = new Map(); // Track merchant test statuses
 let testSession = null;
 let testResults = {
     total: 0,
@@ -8,6 +10,7 @@ let testResults = {
     flagged: 0,
     current: 0
 };
+let currentTestingUrl = null;
 
 // DOM elements
 const elements = {
@@ -282,6 +285,115 @@ async function runTest() {
     updateStats();
     clearResultsLists();
     
+    try {
+        // Trigger the actual Playwright test
+        const response = await fetch('/api/start-test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                merchants: filteredMerchants,
+                sessionId: testSession.session_id,
+                testName: elements.testName.value.trim() || 'API Merchant Test'
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to start Playwright test');
+        }
+        
+        const result = await response.json();
+        console.log('Playwright test started:', result);
+        
+        // Show message that real test is running
+        elements.currentMerchant.textContent = 'Real Playwright test is now running...';
+        elements.currentUrl.textContent = 'Check the browser window that opened';
+        elements.currentDetails.textContent = 'The actual website testing is happening in the Playwright browser';
+        
+        // Start polling for results
+        pollForResults();
+        
+    } catch (error) {
+        console.error('Failed to start test:', error);
+        showError('Failed to start Playwright test: ' + error.message);
+        
+        // Fallback to simulation mode
+        showInfo('Falling back to simulation mode...');
+        await runSimulatedTest();
+    }
+}
+
+// Poll for test results from the database
+async function pollForResults() {
+    const pollInterval = 2000; // Poll every 2 seconds
+    let lastResultCount = 0;
+    
+    const poll = async () => {
+        try {
+            const response = await fetch(`/api/merchant-results?session_id=${testSession.session_id}&limit=1000`);
+            if (response.ok) {
+                const data = await response.json();
+                const results = data.data || data;
+                
+                // Update stats if we have new results
+                if (results.length > lastResultCount) {
+                    updateStatsFromResults(results);
+                    updateResultsFromDatabase(results);
+                    lastResultCount = results.length;
+                }
+                
+                // Check if test is complete
+                if (results.length >= filteredMerchants.length) {
+                    completeTest();
+                    return;
+                }
+                
+                // Continue polling
+                setTimeout(poll, pollInterval);
+            }
+        } catch (error) {
+            console.error('Error polling results:', error);
+            setTimeout(poll, pollInterval);
+        }
+    };
+    
+    // Start polling
+    setTimeout(poll, pollInterval);
+}
+
+// Update stats from database results
+function updateStatsFromResults(results) {
+    const successful = results.filter(r => r.test_status === 'success' || r.is_user_passed).length;
+    const flagged = results.filter(r => r.test_status === 'flagged').length;
+    
+    testResults.current = results.length;
+    testResults.successful = successful;
+    testResults.flagged = flagged;
+    
+    updateStats();
+}
+
+// Update results display from database
+function updateResultsFromDatabase(results) {
+    // Clear existing results
+    clearResultsLists();
+    
+    results.forEach(result => {
+        const merchant = {
+            MerchantName: result.merchant_name,
+            MerchantDomains: [result.merchant_url?.replace('https://', '') || '']
+        };
+        
+        const testResult = {
+            status: result.is_user_passed ? 'success' : result.test_status,
+            reason: result.test_result || 'No reason provided'
+        };
+        
+        addResultToList(merchant, testResult);
+    });
+}
+
+// Fallback simulation for when Playwright test fails to start
+async function runSimulatedTest() {
     for (let i = 0; i < filteredMerchants.length; i++) {
         const merchant = filteredMerchants[i];
         testResults.current = i + 1;
@@ -290,7 +402,7 @@ async function runTest() {
         updateCurrentMerchant(merchant);
         updateStats();
         
-        // Simulate testing (in real implementation, this would call the Playwright test)
+        // Simulate testing
         const result = await testMerchant(merchant);
         
         // Save result to database

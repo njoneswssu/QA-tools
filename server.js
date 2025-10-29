@@ -270,11 +270,22 @@ app.post('/api/start-test', async (req, res) => {
     const { merchants, sessionId, testName } = req.body;
     
     try {
-        // In a real implementation, this would trigger the Playwright test
-        // For now, we'll just acknowledge the request
         console.log(`Starting test for ${merchants.length} merchants`);
         console.log(`Session ID: ${sessionId}`);
         console.log(`Test Name: ${testName}`);
+        
+        // Import and use the API test runner
+        const APITestRunner = require('./api-test-runner');
+        const testRunner = new APITestRunner();
+        
+        // Start the test asynchronously (don't wait for completion)
+        testRunner.runTest(merchants, sessionId, testName)
+            .then(result => {
+                console.log('Test completed:', result);
+            })
+            .catch(error => {
+                console.error('Test failed:', error);
+            });
         
         res.json({ 
             success: true, 

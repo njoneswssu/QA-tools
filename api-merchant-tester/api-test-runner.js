@@ -9,7 +9,7 @@ const path = require('path');
 
 class APITestRunner {
     constructor() {
-        this.tempDir = path.join(__dirname, 'temp');
+        this.tempDir = path.join(__dirname, '..', 'e2e', 'temp');
         this.ensureTempDir();
     }
 
@@ -357,9 +357,10 @@ test.describe('API Merchant Tester - UI Generated', () => {
                 console.log(`📁 Temp test file: ${tempTestFile}`);
                 
                 // Run Playwright test
-                const playwrightProcess = spawn('npx', ['playwright', 'test', tempTestFile, '--headed'], {
+                const playwrightProcess = spawn('npx', ['playwright', 'test', tempTestFile, '--headed', '--project=chromium-with-extension'], {
                     stdio: 'inherit',
-                    cwd: __dirname
+                    cwd: path.join(__dirname, '..'),
+                    shell: true
                 });
 
                 playwrightProcess.on('close', (code) => {
