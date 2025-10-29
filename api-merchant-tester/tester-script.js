@@ -494,6 +494,7 @@ async function startTest() {
     elements.resultsSection.scrollIntoView({ behavior: 'smooth' });
     
     // Start the actual testing
+    isTestRunning = true;
     runTest();
 }
 
@@ -1153,11 +1154,28 @@ async function loadStoredMerchants() {
         const data = await response.json();
         
         if (data.merchants && data.merchants.length > 0) {
-            // Set the API data
-            elements.apiData.value = JSON.stringify({ Merchants: data.merchants }, null, 2);
+            // Directly set merchantsData instead of going through JSON string conversion
+            merchantsData = {
+                Merchants: data.merchants,
+                PageCount: 1,
+                PageSize: data.merchants.length,
+                TotalCount: data.merchants.length
+            };
             
-            // Trigger validation
-            await validateAndPreview();
+            console.log('Loaded merchantsData:', merchantsData);
+            
+            // Auto-detect and set AppID
+            autoDetectAppId(data.merchants);
+            
+            // Populate categories
+            populateCategories();
+            
+            // Apply filters and display merchants
+            applyFiltersAndPreview();
+            
+            // Enable buttons
+            elements.startTestBtn.disabled = false;
+            elements.saveToDbBtn.disabled = false;
             
             addLogEntry(`Loaded ${data.merchants.length} stored merchants`, 'success');
             showSuccess(`Loaded ${data.merchants.length} stored merchants from database`);
@@ -1495,12 +1513,26 @@ function suggestUrlCorrection(url) {
     return suggestions;
 }
 
+// Extract App ID from API URL
+function extractAppIdFromUrl(url) {
+    // Look for patterns like /merchant/451/ or /merchant/451?
+    const match = url.match(/\/merchant\/(\d+)[\/\?]/);
+    return match ? match[1] : null;
+}
+
 async function testApiEndpoint() {
     const apiUrl = elements.apiUrl.value.trim();
     
     if (!apiUrl) {
         showError('Please enter an API URL first');
         return;
+    }
+    
+    // Auto-detect App ID from URL
+    const detectedAppId = extractAppIdFromUrl(apiUrl);
+    if (detectedAppId) {
+        elements.appIdFilter.value = detectedAppId;
+        addLogEntry(`🔍 Auto-detected App ID: ${detectedAppId}`, 'info');
     }
     
     // Smart URL correction suggestions
@@ -1583,6 +1615,13 @@ async function fetchAllPages() {
     if (!apiUrl) {
         showError('Please enter an API URL first');
         return;
+    }
+    
+    // Auto-detect App ID from URL
+    const detectedAppId = extractAppIdFromUrl(apiUrl);
+    if (detectedAppId) {
+        elements.appIdFilter.value = detectedAppId;
+        addLogEntry(`🔍 Auto-detected App ID from URL: ${detectedAppId}`, 'info');
     }
     
     if (!apiUrl.includes('{page}')) {
@@ -1791,5 +1830,64 @@ async function fetchAllPages() {
         setTimeout(() => {
             elements.fetchProgress.style.display = 'none';
         }, 3000);
+    }
+}
+
+// Test control functions
+let testProcess = null;
+let isTestRunning = false;
+
+function pauseTest() {
+    addLogEntry('⏸️ Pause requested - test will pause at next checkpoint', 'warning');
+    showInfo('Test will pause at the next checkpoint');
+}
+
+function resumeTest() {
+    addLogEntry('▶️ Resume requested', 'info');
+    showInfo('Test resumed');
+}
+
+function passCurrentMerchant() {
+    addLogEntry('👤 Pass current merchant requested', 'info');
+    showInfo('Current merchant will be marked as passed');
+}
+
+async function stopTest() {
+    if (!isTestRunning) {
+        showError('No test is currently running');
+        return;
+    }
+    
+    try {
+        addLogEntry('🛑 Stopping test...', 'warning');
+        showWarning('Stopping test - this may take a moment...');
+        
+        // Try to stop the Playwright process
+        if (testProcess) {
+            testProcess.kill('SIGTERM');
+            testProcess = null;
+        }
+        
+        // Call the server to stop the test
+        const response = await fetch('/api/stop-test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: testSession?.session_id })
+        });
+        
+        if (response.ok) {
+            addLogEntry('✅ Test stopped successfully', 'success');
+            showSuccess('Test stopped successfully');
+        } else {
+            addLogEntry('⚠️ Test stop request sent, but server response was not OK', 'warning');
+        }
+        
+        isTestRunning = false;
+        completeTest();
+        
+    } catch (error) {
+        console.error('Error stopping test:', error);
+        addLogEntry(`❌ Error stopping test: ${error.message}`, 'error');
+        showError('Error stopping test: ' + error.message);
     }
 }

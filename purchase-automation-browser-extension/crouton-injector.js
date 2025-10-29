@@ -20,7 +20,7 @@ function createPurchaseCrouton() {
     purchaseCroutonContainer.innerHTML = `
         <div class="crouton-header">
             <h3>🛒 Smart Purchase Bot</h3>
-            <button class="minimize-btn" onclick="window.purchaseAutomationToggle()" aria-label="Minimize">−</button>
+            <button class="minimize-btn" aria-label="Minimize">−</button>
         </div>
         <div class="crouton-content">
             <div class="form-group">
@@ -37,7 +37,7 @@ function createPurchaseCrouton() {
                     <input type="number" id="max-price" min="0" step="0.01" placeholder="100" />
                 </div>
             </div>
-            <button id="start-automation-btn" onclick="window.startPurchaseAutomation()">
+            <button id="start-automation-btn">
                 🚀 Start Shopping
             </button>
             <div id="automation-status" class="status-display">Ready to find the best deals...</div>
@@ -46,8 +46,43 @@ function createPurchaseCrouton() {
 
     document.body.appendChild(purchaseCroutonContainer);
     
+    // Add event listeners
+    setupEventListeners();
+    
     // Load default settings
     loadDefaultSettings();
+}
+
+function setupEventListeners() {
+    console.log('Setting up event listeners for crouton');
+    
+    // Minimize button
+    const minimizeBtn = purchaseCroutonContainer.querySelector('.minimize-btn');
+    if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Minimize button clicked via event listener');
+            toggleCrouton();
+        });
+        console.log('Minimize button event listener added');
+    } else {
+        console.error('Minimize button not found');
+    }
+    
+    // Start automation button
+    const startBtn = purchaseCroutonContainer.querySelector('#start-automation-btn');
+    if (startBtn) {
+        startBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Start automation button clicked via event listener');
+            startPurchaseAutomation();
+        });
+        console.log('Start automation button event listener added');
+    } else {
+        console.error('Start automation button not found');
+    }
 }
 
 async function loadDefaultSettings() {
@@ -65,21 +100,40 @@ async function loadDefaultSettings() {
 }
 
 function toggleCrouton() {
-    if (!purchaseCroutonContainer) return;
+    console.log('toggleCrouton called');
+    if (!purchaseCroutonContainer) {
+        console.log('No crouton container found');
+        return;
+    }
     
     const content = purchaseCroutonContainer.querySelector('.crouton-content');
     const minimizeBtn = purchaseCroutonContainer.querySelector('.minimize-btn');
     
-    if (!content || !minimizeBtn) return;
+    if (!content || !minimizeBtn) {
+        console.log('Content or minimize button not found');
+        return;
+    }
     
-    if (content.style.display === 'none' || content.style.display === '') {
+    console.log('Current content display:', content.style.display);
+    console.log('Current content computed display:', window.getComputedStyle(content).display);
+    
+    // Check if content is currently hidden
+    const isHidden = content.style.display === 'none';
+    
+    if (isHidden) {
+        // Show content
         content.style.display = 'block';
+        content.style.setProperty('display', 'block', 'important');
         minimizeBtn.textContent = '−';
         minimizeBtn.setAttribute('aria-label', 'Minimize');
+        console.log('Showing content');
     } else {
+        // Hide content
         content.style.display = 'none';
+        content.style.setProperty('display', 'none', 'important');
         minimizeBtn.textContent = '+';
         minimizeBtn.setAttribute('aria-label', 'Expand');
+        console.log('Hiding content');
     }
 }
 
@@ -133,6 +187,7 @@ async function startPurchaseAutomation() {
         console.log('Sending automation config:', config);
 
         // Execute automation directly on the current page
+        console.log('About to call executeAutomationProcess with config:', config);
         await executeAutomationProcess(config);
         
         updateStatus('✅ Automation completed successfully!', 'success');
@@ -147,13 +202,17 @@ async function startPurchaseAutomation() {
 }
 
 async function executeAutomationProcess(config) {
+    console.log('executeAutomationProcess called with:', config);
     const { category, minPrice, maxPrice } = config;
     
     try {
+        console.log('Starting automation process...');
         updateStatus('🔍 Searching for category...', 'info');
         
         // Step 1: Find and navigate to category
+        console.log('Looking for category:', category);
         const categoryFound = await findAndNavigateToCategory(category);
+        console.log('Category found result:', categoryFound);
         if (!categoryFound) {
             throw new Error(`Category "${category}" not found on this website`);
         }
@@ -207,48 +266,48 @@ async function executeAutomationProcess(config) {
 }
 
 async function findAndNavigateToCategory(category) {
-    console.log('Looking for category:', category);
+    console.log('findAndNavigateToCategory called with:', category);
     
-    // Common category selectors for different e-commerce sites
-    const categorySelectors = [
-        // Navigation menus
-        `nav a:contains("${category}")`,
-        `.nav-item a:contains("${category}")`,
-        `.menu-item a:contains("${category}")`,
-        `.category a:contains("${category}")`,
-        
-        // Category links
-        `a[href*="${category.toLowerCase()}"]`,
-        `[data-category*="${category.toLowerCase()}"]`,
-        
-        // Dropdown menus
-        `.dropdown a:contains("${category}")`,
-        `.submenu a:contains("${category}")`,
-        
-        // Sidebar categories
-        `.sidebar a:contains("${category}")`,
-        `.categories a:contains("${category}")`
-    ];
-
     // Try text-based search first
+    console.log('Searching through all links on the page...');
     const links = document.querySelectorAll('a');
+    console.log(`Found ${links.length} links on the page`);
+    
+    // Log first few links for debugging
+    const firstFewLinks = Array.from(links).slice(0, 10);
+    console.log('First 10 links on page:', firstFewLinks.map(link => ({
+        text: link.textContent.trim(),
+        href: link.href
+    })));
+    
     for (const link of links) {
         const linkText = link.textContent.toLowerCase().trim();
         const categoryLower = category.toLowerCase();
         
         if (linkText.includes(categoryLower) || categoryLower.includes(linkText)) {
-            console.log('Found category link:', link.textContent, link.href);
+            console.log('Found matching category link:', {
+                text: link.textContent,
+                href: link.href,
+                linkText: linkText,
+                categoryLower: categoryLower
+            });
+            
+            // Scroll into view and click
+            link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            await wait(500);
             link.click();
+            console.log('Clicked on category link');
             return true;
         }
     }
 
+    console.log('No direct category links found, trying search...');
     // Try search functionality if category navigation fails
     return await searchForCategory(category);
 }
 
 async function searchForCategory(category) {
-    console.log('Trying search for category:', category);
+    console.log('searchForCategory called with:', category);
     
     const searchSelectors = [
         'input[type="search"]',
@@ -259,13 +318,20 @@ async function searchForCategory(category) {
         '[data-testid*="search"]'
     ];
 
+    console.log('Looking for search inputs...');
     for (const selector of searchSelectors) {
         const searchInput = document.querySelector(selector);
+        console.log(`Trying selector ${selector}:`, searchInput ? 'found' : 'not found');
+        
         if (searchInput && searchInput.offsetParent !== null) { // Check if visible
-            console.log('Found search input:', selector);
+            console.log('Found visible search input:', selector);
             
+            // Clear and set value
             searchInput.focus();
+            searchInput.value = '';
             searchInput.value = category;
+            
+            console.log('Set search value to:', category);
             
             // Trigger input events
             searchInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -274,16 +340,21 @@ async function searchForCategory(category) {
             // Try to find and click search button
             const searchButton = findSearchButton(searchInput);
             if (searchButton) {
+                console.log('Found search button, clicking...');
                 searchButton.click();
             } else {
+                console.log('No search button found, trying Enter key...');
                 // Try Enter key
                 searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+                searchInput.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', bubbles: true }));
             }
             
+            console.log('Search initiated');
             return true;
         }
     }
 
+    console.log('No search inputs found');
     return false;
 }
 
@@ -546,12 +617,30 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
 }
 
 // Make functions available globally with unique names to avoid conflicts
-window.initializePurchaseCrouton = initializePurchaseCrouton;
-window.purchaseAutomationToggle = function() {
-    console.log('Toggle button clicked');
-    toggleCrouton();
-};
-window.startPurchaseAutomation = function() {
-    console.log('Start automation called from window');
-    startPurchaseAutomation();
-};
+if (typeof window !== 'undefined') {
+    window.initializePurchaseCrouton = initializePurchaseCrouton;
+    
+    window.purchaseAutomationToggle = function() {
+        console.log('Toggle button clicked from window function');
+        try {
+            toggleCrouton();
+        } catch (error) {
+            console.error('Error in toggle function:', error);
+        }
+    };
+    
+    window.startPurchaseAutomation = function() {
+        console.log('Start automation called from window function');
+        try {
+            startPurchaseAutomation();
+        } catch (error) {
+            console.error('Error in start automation function:', error);
+        }
+    };
+    
+    // Log that functions are available
+    console.log('Purchase automation functions loaded:', {
+        toggle: typeof window.purchaseAutomationToggle,
+        start: typeof window.startPurchaseAutomation
+    });
+}

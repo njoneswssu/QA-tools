@@ -911,21 +911,21 @@ body {
 
 .merchant-name-item {
     font-weight: 700;
-    color: #ffffff;
+    color: #1f2937;
     margin-bottom: 4px;
     font-size: 1.05em;
 }
 
 .merchant-url-item {
     font-size: 0.9em;
-    color: #cbd5e1;
+    color: #4b5563;
     margin-bottom: 2px;
     font-weight: 500;
 }
 
 .merchant-category-item {
     font-size: 0.85em;
-    color: #94a3b8;
+    color: #6b7280;
     font-weight: 500;
 }
 

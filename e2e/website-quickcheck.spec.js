@@ -9790,6 +9790,11 @@ test.describe('Website Availability Checker', () => {
                 reason: reason,
                 checkedAt: new Date().toISOString()
               });
+              
+              // Show successful list every 10 successful sites
+              if (successfulWebsites.length % 10 === 0) {
+                displaySuccessfulWebsitesList();
+              }
             } else {
               console.log(`⚠️ DUPLICATE PREVENTION: ${website.name} already in successful list`);
             }
@@ -10580,7 +10585,6 @@ test.describe('Website Availability Checker', () => {
                   
                   // Add to successful websites list
                   addToSuccessfulWebsites(website, 'User manually passed');
-
                   
                   // Track that this was user-passed
                   userPassedWebsites.push({
@@ -11461,7 +11465,6 @@ test.describe('Website Availability Checker', () => {
                   
                   // Add to successful websites list
                   addToSuccessfulWebsites(website, `Business model detected: ${detectedModel}`);
-
                   
                   // Add website to checked list before skipping
                   checkedWebsites.push({

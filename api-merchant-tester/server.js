@@ -9,7 +9,8 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Increased limit for large merchant datasets
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'frontend')));
 app.use('/tester', express.static(__dirname));
 
@@ -298,7 +299,7 @@ app.post('/api/store-merchants', async (req, res) => {
 // Get stored merchants
 app.get('/api/stored-merchants', async (req, res) => {
     try {
-        const { app_id, limit = 1000 } = req.query;
+        const { app_id, limit = 50000 } = req.query; // Increased default limit
         
         let query = 'SELECT * FROM merchant_master_data';
         let params = [];
@@ -318,34 +319,46 @@ app.get('/api/stored-merchants', async (req, res) => {
             });
         });
         
-        // Convert back to API format
-        const apiFormat = merchants.map(merchant => ({
-            AppID: merchant.app_id,
-            MerchantID: merchant.merchant_id,
-            MerchantName: merchant.merchant_name,
-            MerchantDomains: JSON.parse(merchant.merchant_domains || '[]'),
-            MerchantScore: merchant.merchant_score,
-            IsFeaturedMerchant: merchant.is_featured_merchant === 1,
-            PrimaryCategory: merchant.primary_category,
-            PrimaryCategoryID: merchant.primary_category_id,
-            ParentCategory: merchant.parent_category,
-            ParentCategoryID: merchant.parent_category_id,
-            MaxRate: merchant.max_rate,
-            MaxRateKind: merchant.max_rate_kind,
-            MaxRateCurrency: merchant.max_rate_currency,
-            MaxRateLedgerID: merchant.max_rate_ledger_id,
-            Boosted: merchant.boosted === 1,
-            MaxOfferScore: merchant.max_offer_score,
-            DetailedRates: JSON.parse(merchant.detailed_rates || '[]'),
-            Coupons: JSON.parse(merchant.coupons || '[]'),
-            BrandColor: merchant.brand_color,
-            TextColor: merchant.text_color,
-            FeaturedImageURL: merchant.featured_image_url,
-            LogoImageExists: merchant.logo_image_exists === 1,
-            Images: JSON.parse(merchant.images || '[]'),
-            CreatedDate: merchant.created_date,
-            ModifiedDate: merchant.modified_date
-        }));
+        // Convert back to API format with safe JSON parsing
+        const apiFormat = merchants.map(merchant => {
+            // Safe JSON parsing function
+            const safeJsonParse = (jsonString, fallback = []) => {
+                try {
+                    return JSON.parse(jsonString || JSON.stringify(fallback));
+                } catch (error) {
+                    console.warn(`JSON parse error for merchant ${merchant.merchant_name}:`, error.message);
+                    return fallback;
+                }
+            };
+            
+            return {
+                AppID: merchant.app_id,
+                MerchantID: merchant.merchant_id,
+                MerchantName: merchant.merchant_name,
+                MerchantDomains: safeJsonParse(merchant.merchant_domains, []),
+                MerchantScore: merchant.merchant_score,
+                IsFeaturedMerchant: merchant.is_featured_merchant === 1,
+                PrimaryCategory: merchant.primary_category,
+                PrimaryCategoryID: merchant.primary_category_id,
+                ParentCategory: merchant.parent_category,
+                ParentCategoryID: merchant.parent_category_id,
+                MaxRate: merchant.max_rate,
+                MaxRateKind: merchant.max_rate_kind,
+                MaxRateCurrency: merchant.max_rate_currency,
+                MaxRateLedgerID: merchant.max_rate_ledger_id,
+                Boosted: merchant.boosted === 1,
+                MaxOfferScore: merchant.max_offer_score,
+                DetailedRates: safeJsonParse(merchant.detailed_rates, []),
+                Coupons: safeJsonParse(merchant.coupons, []),
+                BrandColor: merchant.brand_color,
+                TextColor: merchant.text_color,
+                FeaturedImageURL: merchant.featured_image_url,
+                LogoImageExists: merchant.logo_image_exists === 1,
+                Images: safeJsonParse(merchant.images, []),
+                CreatedDate: merchant.created_date,
+                ModifiedDate: merchant.modified_date
+            };
+        });
         
         res.json({
             merchants: apiFormat,
@@ -417,6 +430,40 @@ app.post('/api/start-test', async (req, res) => {
     } catch (error) {
         console.error('Error starting test:', error);
         res.status(500).json({ error: 'Failed to start test' });
+    }
+});
+
+// Stop API test
+app.post('/api/stop-test', async (req, res) => {
+    try {
+        const { sessionId } = req.body;
+        
+        console.log(`🛑 Stop test requested for session: ${sessionId}`);
+        
+        // Kill any running Playwright processes
+        const { spawn } = require('child_process');
+        spawn('pkill', ['-f', 'playwright.*test'], { stdio: 'ignore' });
+        
+        // Update session status in database
+        if (sessionId) {
+            try {
+                await updateTestSession(sessionId, {
+                    status: 'stopped',
+                    completed_at: new Date().toISOString()
+                });
+            } catch (dbError) {
+                console.error('Error updating session status:', dbError);
+            }
+        }
+        
+        res.json({
+            success: true,
+            message: 'Test stop request processed'
+        });
+        
+    } catch (error) {
+        console.error('Error stopping test:', error);
+        res.status(500).json({ error: 'Failed to stop test' });
     }
 });
 

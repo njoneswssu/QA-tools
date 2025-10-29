@@ -30,7 +30,7 @@ const path = require('path');
 // Database integration
 let dbModule;
 try {
-  dbModule = require(path.join(__dirname, 'database', 'init_db'));
+  dbModule = require(path.join(__dirname, '..', 'database', 'init_db'));
 } catch (error) {
   console.log('Database module not found, results will only be saved to console/file');
   dbModule = null;
@@ -42,7 +42,7 @@ test.describe('API Merchant Tester - UI Generated', () => {
     
     const browser = await chromium.launch({
       headless: false,
-      slowMo: 500
+      slowMo: 1000  // Increased slowMo for better visibility
     });
     
     const context = await browser.newContext({
@@ -165,6 +165,9 @@ test.describe('API Merchant Tester - UI Generated', () => {
         console.log(\`\\n[\${checkedCount}/\${websites.length}] 📋 Testing: \${website.name}\`);
         console.log(\`🔗 URL: \${website.url}\`);
         console.log(\`📂 Category: \${website.primaryCategory}\`);
+        
+        // Add delay before starting each website test
+        await page.waitForTimeout(1000);
 
         // Check for user pass
         try {
@@ -206,7 +209,15 @@ test.describe('API Merchant Tester - UI Generated', () => {
             timeout: 30000
           });
           
-          await page.waitForTimeout(2000);
+          // Wait for page to fully load and render
+          await page.waitForTimeout(3000);
+          
+          // Additional wait for any dynamic content
+          try {
+            await page.waitForLoadState('networkidle', { timeout: 5000 });
+          } catch (e) {
+            // Continue if networkidle timeout - some sites have continuous requests
+          }
           
           const pageContent = await page.textContent('body');
           let pageText = pageContent ? pageContent.toLowerCase() : '';
@@ -471,8 +482,12 @@ test.describe('API Merchant Tester - UI Generated', () => {
           console.log(\`\\n📊 CHECKPOINT: \${checkedCount}/\${websites.length} completed\`);
           console.log(\`✅ Successful: \${successfulWebsites.length}\`);
           console.log(\`🚨 Flagged: \${unavailableWebsites.length}\`);
-          await page.waitForTimeout(2000);
+          console.log('⏸️  Pausing for 3 seconds...');
+          await page.waitForTimeout(3000);
         }
+        
+        // Small delay between each website for better visibility
+        await page.waitForTimeout(500);
       }
 
       // Update database session
