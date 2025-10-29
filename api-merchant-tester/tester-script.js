@@ -3,6 +3,7 @@ let merchantsData = null;
 let allMerchants = [];
 let filteredMerchants = [];
 let merchantStatuses = new Map(); // Track merchant test statuses
+let isValidating = false; // Prevent recursive validation calls
 let testSession = null;
 let testResults = {
     total: 0,
@@ -26,7 +27,7 @@ const elements = {
     merchantSearch: document.getElementById('merchant-search'),
     statusFilter: document.getElementById('status-filter'),
     merchantCountDisplay: document.getElementById('merchant-count-display'),
-    validateBtn: document.getElementById('validate-btn'),
+    saveToDbBtn: document.getElementById('save-to-database-btn'),
     startTestBtn: document.getElementById('start-test-btn'),
     resetDatabaseBtn: document.getElementById('reset-database-btn'),
     loadStoredBtn: document.getElementById('load-stored-btn'),
@@ -74,20 +75,29 @@ const elements = {
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     generateDefaultTestName();
+    
+    // Clear any default values that might limit merchants
+    elements.merchantLimit.value = '';
+    
+    // Populate dropdowns
+    populateAppIdDropdown();
+    
+    // Auto-load stored merchants if available
+    autoLoadStoredMerchants();
 });
 
 // Event listeners
 function initializeEventListeners() {
-    // Setup events
+    // Setup events - auto-validate on input
     elements.apiData.addEventListener('input', debounce(validateAndPreview, 500));
-    elements.appIdFilter.addEventListener('input', debounce(validateAndPreview, 300));
-    elements.categoryFilter.addEventListener('change', validateAndPreview);
-    elements.merchantLimit.addEventListener('input', debounce(validateAndPreview, 300));
+    elements.appIdFilter.addEventListener('input', debounce(applyFiltersAndPreview, 300));
+    elements.categoryFilter.addEventListener('change', applyFiltersAndPreview);
+    elements.merchantLimit.addEventListener('input', debounce(applyFiltersAndPreview, 300));
     elements.merchantSearch.addEventListener('input', filterMerchants);
     elements.statusFilter.addEventListener('change', filterMerchants);
     
     // Button events
-    elements.validateBtn.addEventListener('click', validateAndPreview);
+    elements.saveToDbBtn.addEventListener('click', saveToDatabase);
     elements.startTestBtn.addEventListener('click', startTest);
     elements.loadStoredBtn.addEventListener('click', loadStoredMerchants);
     elements.resetDatabaseBtn.addEventListener('click', handleDatabaseReset);
@@ -129,53 +139,166 @@ function generateDefaultTestName() {
 
 // Validate and preview API data
 function validateAndPreview() {
+    // Prevent recursive calls
+    if (isValidating) return;
+    isValidating = true;
+    
     const apiText = elements.apiData.value.trim();
     
     if (!apiText) {
         showPreviewPlaceholder();
         elements.startTestBtn.disabled = true;
+        elements.saveToDbBtn.disabled = true;
+        isValidating = false;
         return;
     }
     
     try {
-        // Parse JSON
-        const data = JSON.parse(apiText);
+        // Check if this is multiple pages separated by ---
+        const pages = apiText.includes('---') ? 
+            apiText.split('---').map(page => page.trim()).filter(page => page.length > 0) :
+            [apiText];
         
-        // Validate structure
-        if (!data.Merchants || !Array.isArray(data.Merchants)) {
-            throw new Error('Invalid format: Expected "Merchants" array');
+        addLogEntry(`📄 Processing ${pages.length} page(s) of data...`, 'info');
+        
+        let allMerchants = [];
+        let totalCount = 0;
+        let pageSize = 50;
+        
+        // Process each page
+        for (let i = 0; i < pages.length; i++) {
+            try {
+                const pageData = JSON.parse(pages[i]);
+                
+                // Validate structure
+                if (!pageData.Merchants || !Array.isArray(pageData.Merchants)) {
+                    throw new Error(`Page ${i + 1}: Invalid format - Expected "Merchants" array`);
+                }
+                
+                if (pageData.Merchants.length === 0) {
+                    addLogEntry(`⚠️ Page ${i + 1}: No merchants found - skipped`, 'warning');
+                    continue;
+                }
+                
+                // Validate merchant structure
+                const requiredFields = ['MerchantName', 'MerchantDomains'];
+                const invalidMerchants = pageData.Merchants.filter(merchant => 
+                    !requiredFields.every(field => merchant[field])
+                );
+                
+                if (invalidMerchants.length > 0) {
+                    throw new Error(`Page ${i + 1}: ${invalidMerchants.length} merchants missing required fields (MerchantName, MerchantDomains)`);
+                }
+                
+                // Add merchants from this page
+                allMerchants = allMerchants.concat(pageData.Merchants);
+                
+                // Track metadata from first page
+                if (i === 0) {
+                    totalCount = pageData.TotalCount || pageData.Merchants.length;
+                    pageSize = pageData.PageSize || 50;
+                }
+                
+                addLogEntry(`✅ Page ${i + 1}: ${pageData.Merchants.length} merchants processed`, 'success');
+                
+            } catch (error) {
+                throw new Error(`Page ${i + 1}: ${error.message}`);
+            }
         }
         
-        if (data.Merchants.length === 0) {
-            throw new Error('No merchants found in data');
+        if (allMerchants.length === 0) {
+            throw new Error('No valid merchants found in any page');
         }
         
-        // Validate merchant structure
-        const requiredFields = ['MerchantName', 'MerchantDomains'];
-        const invalidMerchants = data.Merchants.filter(merchant => 
-            !requiredFields.every(field => merchant[field])
-        );
+        // Create combined data structure
+        merchantsData = {
+            Merchants: allMerchants,
+            PageCount: 1, // Now it's all combined into one page
+            PageSize: allMerchants.length,
+            TotalCount: allMerchants.length
+        };
         
-        if (invalidMerchants.length > 0) {
-            throw new Error(`${invalidMerchants.length} merchants missing required fields (MerchantName, MerchantDomains)`);
-        }
+        // Auto-detect and set AppID if available
+        autoDetectAppId(allMerchants);
         
-        merchantsData = data;
         populateCategories();
         applyFiltersAndPreview();
         elements.startTestBtn.disabled = false;
+        elements.saveToDbBtn.disabled = false;
+        
+        // Show success message with details
+        if (pages.length > 1) {
+            showSuccess(`✅ Successfully processed ${pages.length} pages with ${allMerchants.length} total merchants!`);
+            addLogEntry(`🎉 Multi-page processing complete: ${allMerchants.length} merchants from ${pages.length} pages`, 'success');
+        } else {
+            showSuccess('✅ API data validated successfully!');
+            addLogEntry(`📊 Single page processed: ${allMerchants.length} merchants`, 'success');
+        }
         
         // Auto-store merchants in database
-        storeApiMerchants(data.Merchants).catch(error => {
+        storeApiMerchants(allMerchants).catch(error => {
             console.warn('Failed to auto-store merchants:', error);
         });
-        
-        showSuccess('API data validated successfully!');
         
     } catch (error) {
         showError(`Invalid API data: ${error.message}`);
         showPreviewPlaceholder();
         elements.startTestBtn.disabled = true;
+        elements.saveToDbBtn.disabled = true;
+    } finally {
+        isValidating = false;
+    }
+}
+
+// Auto-detect AppID from merchant data
+function autoDetectAppId(merchants) {
+    if (!merchants || merchants.length === 0) return;
+    
+    // Get all unique AppIDs from the merchants
+    const appIds = [...new Set(merchants
+        .map(m => m.AppID)
+        .filter(id => id !== null && id !== undefined)
+    )];
+    
+    if (appIds.length === 1) {
+        // If all merchants have the same AppID, auto-select it
+        const appId = appIds[0];
+        elements.appIdFilter.value = appId;
+        
+        // Show success message
+        showSuccess(`Auto-detected AppID: ${appId} (${merchants.length} merchants)`);
+        
+        // Log the detection
+        addLogEntry(`🎯 Auto-detected AppID: ${appId} - ${merchants.length} merchants loaded`, 'info');
+        
+    } else if (appIds.length > 1) {
+        // Multiple AppIDs found
+        showWarning(`Multiple AppIDs found: ${appIds.join(', ')}. Please select one manually.`);
+        addLogEntry(`⚠️ Multiple AppIDs detected: ${appIds.join(', ')} - ${merchants.length} merchants loaded`, 'warning');
+    } else {
+        // No AppIDs found
+        showWarning('No AppIDs found in merchant data. All merchants will be included.');
+        addLogEntry(`❌ No AppIDs found - ${merchants.length} merchants loaded`, 'warning');
+    }
+}
+
+// Populate App ID dropdown from database
+async function populateAppIdDropdown() {
+    try {
+        const response = await fetch('/api/app-ids');
+        const appIds = await response.json();
+        
+        elements.appIdFilter.innerHTML = '<option value="">All App IDs</option>';
+        appIds.forEach(appId => {
+            const option = document.createElement('option');
+            option.value = appId;
+            option.textContent = appId;
+            elements.appIdFilter.appendChild(option);
+        });
+        
+        console.log(`Loaded ${appIds.length} App IDs into dropdown`);
+    } catch (error) {
+        console.error('Error loading App IDs:', error);
     }
 }
 
@@ -214,9 +337,14 @@ function applyFiltersAndPreview() {
     }
     
     // Apply limit
-    const limit = parseInt(elements.merchantLimit.value);
+    const limitValue = elements.merchantLimit.value.trim();
+    const limit = limitValue ? parseInt(limitValue) : null;
     if (limit && limit > 0) {
+        console.log(`Applying merchant limit: ${limit} (from ${merchants.length} merchants)`);
         merchants = merchants.slice(0, limit);
+        addLogEntry(`📊 Applied limit: showing ${limit} of ${merchantsData.Merchants.length} total merchants`, 'info');
+    } else {
+        console.log(`No limit applied, showing all ${merchants.length} merchants`);
     }
     
     filteredMerchants = merchants;
@@ -760,6 +888,10 @@ function showInfo(message) {
     showNotification(message, 'info');
 }
 
+function showWarning(message) {
+    showNotification(message, 'warning');
+}
+
 function showNotification(message, type) {
     // Simple notification system
     const notification = document.createElement('div');
@@ -782,6 +914,8 @@ function showNotification(message, type) {
         notification.style.background = '#10b981';
     } else if (type === 'error') {
         notification.style.background = '#ef4444';
+    } else if (type === 'warning') {
+        notification.style.background = '#f59e0b';
     } else {
         notification.style.background = '#3b82f6';
     }
@@ -849,6 +983,35 @@ function toggleAutoScroll() {
 }
 
 // Merchant Storage Functions
+async function autoLoadStoredMerchants() {
+    try {
+        const response = await fetch('/api/stored-merchants');
+        if (!response.ok) {
+            // No stored merchants or error - this is fine for first load
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (data.merchants && data.merchants.length > 0) {
+            addLogEntry(`Auto-loaded ${data.merchants.length} stored merchants from database`, 'success');
+            
+            // Set the API data
+            elements.apiData.value = JSON.stringify({ Merchants: data.merchants }, null, 2);
+            
+            // Trigger validation and preview
+            await validateAndPreview();
+            
+            addLogEntry('✅ Stored merchants loaded and ready for testing', 'success');
+        } else {
+            addLogEntry('No stored merchants found in database', 'info');
+        }
+    } catch (error) {
+        // Silent fail for auto-load - don't spam the user on page load
+        console.log('Auto-load merchants failed (this is normal for first visit):', error.message);
+    }
+}
+
 async function loadStoredMerchants() {
     try {
         addLogEntry('Loading stored merchants from database...', 'info');
@@ -902,6 +1065,110 @@ async function storeApiMerchants(merchants) {
         console.error('Error storing merchants:', error);
         addLogEntry(`Error storing merchants: ${error.message}`, 'error');
         throw error;
+    }
+}
+
+
+// Manual save to database function
+async function saveToDatabase() {
+    if (!merchantsData || !merchantsData.Merchants) {
+        showError('No merchant data to save. Please validate API data first.');
+        return;
+    }
+    
+    try {
+        elements.saveToDbBtn.disabled = true;
+        elements.saveToDbBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        
+        await storeApiMerchants(merchantsData.Merchants);
+        
+        // Refresh the AppID dropdown after saving
+        await populateAppIdDropdown();
+        
+        showSuccess(`Successfully saved ${merchantsData.Merchants.length} merchants to database!`);
+        addLogEntry(`💾 Manually saved ${merchantsData.Merchants.length} merchants to database`, 'success');
+        
+    } catch (error) {
+        showError(`Failed to save merchants: ${error.message}`);
+        addLogEntry(`❌ Save failed: ${error.message}`, 'error');
+    } finally {
+        elements.saveToDbBtn.disabled = false;
+        elements.saveToDbBtn.innerHTML = '<i class="fas fa-save"></i> Save to Database';
+    }
+}
+
+// Database reset function with confirmation
+async function handleDatabaseReset() {
+    // First confirmation
+    const firstConfirm = confirm('⚠️ WARNING: This will permanently delete ALL test results and merchant data from the database.\n\nAre you sure you want to continue?');
+    
+    if (!firstConfirm) {
+        return;
+    }
+    
+    // Second confirmation
+    const secondConfirm = confirm('🚨 FINAL WARNING: This action cannot be undone!\n\nClick OK to permanently delete all data, or Cancel to abort.');
+    
+    if (!secondConfirm) {
+        return;
+    }
+    
+    try {
+        elements.resetDatabaseBtn.disabled = true;
+        elements.resetDatabaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+        
+        const response = await fetch('/api/reset-database', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Clear local data
+            merchantsData = null;
+            allMerchants = [];
+            filteredMerchants = [];
+            merchantStatuses.clear();
+            
+            // Reset UI elements
+            elements.apiData.value = '';
+            elements.merchantLimit.value = '';
+            elements.merchantSearch.value = '';
+            elements.statusFilter.value = '';
+            elements.categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            elements.merchantCountDisplay.textContent = '0 merchants';
+            elements.startTestBtn.disabled = true;
+            elements.saveToDbBtn.disabled = true;
+            
+            // Reset test results
+            testResults = {
+                total: 0,
+                successful: 0,
+                flagged: 0,
+                current: 0
+            };
+            
+            // Clear preview
+            showPreviewPlaceholder();
+            
+            // Refresh AppID dropdown
+            await populateAppIdDropdown();
+            
+            showSuccess('✅ Database reset successfully! All data has been cleared.');
+            addLogEntry('🗑️ Database reset completed - all data cleared', 'success');
+        } else {
+            throw new Error(result.error || 'Failed to reset database');
+        }
+    } catch (error) {
+        console.error('Error resetting database:', error);
+        showError('❌ Error resetting database: ' + error.message);
+        addLogEntry(`❌ Database reset failed: ${error.message}`, 'error');
+    } finally {
+        elements.resetDatabaseBtn.disabled = false;
+        elements.resetDatabaseBtn.innerHTML = '<i class="fas fa-database"></i> Reset Database';
     }
 }
 

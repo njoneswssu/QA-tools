@@ -146,6 +146,8 @@ body {
     border-radius: 6px;
     font-size: 0.9rem;
     transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: white;
+    color: #374151;
 }
 
 .filter-group select:focus,
@@ -203,6 +205,16 @@ body {
 .btn-outline:hover {
     background: #f9fafb;
     border-color: #d1d5db;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
 }
 
 /* Results Section */

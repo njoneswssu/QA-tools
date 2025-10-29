@@ -50,229 +50,6 @@ test.describe('Website Availability Checker', () => {
     await page.pause();
     // Only the 4 requested websites
     const websites = [
-      { name: 'Body Kitchen', url: 'https://www.bodykitchen.com' },
-      { name: 'CMY Cubes', url: 'https://cmycubes.com/pages/faq' },
-      { name: 'Velous', url: 'https://www.velousfootwear.com' },
-      { name: 'Partytrick', url: 'https://www.partytrick.com' },
-      { name: 'Cool Relief', url: 'https://www.coolrelief.net' },
-      { name: 'Rolli Shades', url: 'https://rollishades.com' },
-      { name: 'Trideer', url: 'https://trideer.com/' },
-      { name: 'Canary Skincare', url: 'https://canaryskincare.com' },
-      { name: 'Yami Lighting', url: 'https://www.yami-lighting.com' },
-      { name: 'Magic Canvas', url: 'https://magiccanvas.com' },
-      { name: 'Pupper', url: 'https://pupper.com' },
-      { name: 'Shenzhen Zhencheng Technology Co.,Ltd.', url: 'https://sjcamstores.com' },
-      { name: 'Summer Summit LLC', url: 'https://www.summersummit.com' },
-      { name: 'HOMVANA', url: 'https://www.homvana.shop/' },
-      { name: 'Under Your Skin', url: 'https://underyourskin.us' },
-      { name: 'Blogify', url: 'https://www.blogify.ai' },
-      { name: 'July', url: 'https://july.com/' },
-      { name: 'Symptom Media', url: 'https://symptommedia.com' },
-      { name: 'MiniBloom', url: 'https://www.minibloom.com' },
-      { name: 'Foto & Tech', url: 'https://fotoandtech.com' },
-      { name: 'North Authentic', url: 'https://www.maneprint.com' },
-      { name: 'Planigent Business Plans', url: 'https://www.planigent.com' },
-      { name: 'Kashaya Probiotics', url: 'https://www.kashayaprobiotics.com' },
-      { name: 'MiamiMD', url: 'https://www.miamimd.co?utm_medium=affiliate&utm_source=shareasale&affid=7FF2AEEC&c1=SaSDeepLink' },
-      { name: 'Plant Based Candles', url: 'https://www.plantbasedcandles.com' },
-      { name: 'herbOrder', url: 'https://herborder.com' },
-      { name: 'Wurth Tool', url: 'https://wurthtool.com' },
-      { name: 'RITFIT', url: 'https://www.ritfitsports.com/' },
-      { name: 'Irieveda', url: 'https://www.irieveda.com' },
-      { name: 'Eufora', url: 'https://eufora.net' },
-      { name: 'Hotelchevra.com', url: 'https://www.hotelchevra.com' },
-      { name: 'Fount', url: 'https://fount.bio' },
-      { name: 'Boisson', url: 'https://boisson.co' },
-      { name: 'Fosmon Inc', url: 'https://www.fosmon.com' },
-      { name: '187 Killer Pads', url: 'https://www.187killerpads.com' },
-      { name: 'Sohnne', url: 'https://sohnne.com' },
-      { name: 'Eternity Medicine Rx', url: 'https://www.eternitymedicinerx.com/' },
-      { name: 'OpenRock', url: 'https://www.openrock.com' },
-      { name: 'Secret Element', url: 'https://secretelement.com/' },
-      { name: 'Sunshine Jewelry', url: 'https://www.sunshinejewelry.com' },
-      { name: 'THISTLES', url: 'https://thistles.nyc' },
-      { name: 'Manuka Health New Zealand', url: 'https://us.manukahealth.com/en' },
-      { name: 'Space Mask', url: 'https://www.shopspacemask.com' },
-      { name: 'Ocelot Market', url: 'https://OcelotMarket.com' },
-      { name: 'peaksNpaws', url: 'https://www.peaksnpaws.com' },
-      { name: 'Vana Chupp Studio', url: 'https://www.vanachuppstudio.com' },
-      { name: 'NHR Science', url: 'https://nhrscience.com/' },
-      { name: 'Hermosa Hair', url: 'https://www.hermosahair.com' },
-      { name: 'Scout & Nimble', url: 'https://www.scoutandnimble.com' },
-      { name: '101 Blockchains', url: 'https://101blockchains.com' },
-      { name: 'PizzaPartyShop', url: 'https://www.pizzapartyshop.com/it/pale-per-pizza' },
-      { name: 'Ainfox', url: 'https://www.ainfox.com' },
-      { name: 'Echo Neon', url: 'https://www.echoneon.com' },
-      { name: 'Toyotress', url: 'https://www.toyotress.com/' },
-      { name: 'klaiyi hair', url: 'https://www.klaiyihair.com/' },
-      { name: 'Gearharts Fine Chocolates', url: 'https://www.gearhartschocolates.com' },
-      { name: 'Bermies', url: 'https://www.bermies.com' },
-      { name: 'TaleInShop', url: 'https://www.telesinstore.com' },
-      { name: 'OdinLake', url: 'https://www.odinlake.com/products/ergo-art-odinlake-643' },
-      { name: 'Jonny Cota', url: 'https://www.jonnycota.com' },
-      { name: 'Blueberry Pet', url: 'https://www.blueberrypet.com' },
-      { name: 'TTLife Oxygen Concentrator', url: 'https://www.oxygenconcentrator.shop/' },
-      { name: 'Beyond Body', url: 'https://beyondbody.me/' },
-      { name: 'Beyond By Vera', url: 'https://www.beyondbyvera.com' },
-      { name: 'Torras', url: 'https://www.torraslife.com' },
-      { name: 'Linguix', url: 'https://www.linguix.com' },
-      { name: 'IJustWantTo Correct My Tongue Thrust', url: 'https://correctmytonguethrust.com' },
-      { name: 'QVR Hair', url: 'https://www.qvr.com/' },
-      { name: 'Bright Brain', url: 'https://www.brightbrain.com/?utm_source=shareasale&utm_medium=text&utm_campaign=text_link&utm_content=1_Rated' },
-      { name: 'Pros Marketplace', url: 'https://prosmarketplace.com/' },
-      { name: 'RoleCosplay', url: 'https://www.rolecosplay.com' },
-      { name: 'Retro Stage', url: 'https://retro-stage.com' },
-      { name: 'AffordableBlinds.com', url: 'https://affordableblinds.com' },
-      { name: 'Cheerble', url: 'https://www.cheerble.com/products/wickedball?variant=29437253451894' },
-      { name: 'Marshmalloo LLC', url: 'https://www.marshmalloo.com' },
-      { name: 'JUST ONE NAME', url: 'https://www.just1name.com' },
-      { name: 'Boosta INC', url: 'https://sitechecker.pro' },
-      { name: 'OHWILL', url: 'https://ohwill.com' },
-      { name: 'Day Owl', url: 'http://dayowl.com/' },
-      { name: 'Lipogen Products', url: 'https://www.lipogenbio.com' },
-      { name: 'Han Ao', url: 'https://dolthe.com' },
-      { name: 'Oyster VPN', url: 'https://oystervpn.com/' },
-      { name: 'Modern Vanilla', url: 'https://www.themodernvanilla.com' },
-      { name: 'Magic Makers, Inc.', url: 'https://magicmakersinc.com' },
-      { name: 'Lacros', url: 'https://lacrosebike.com/' },
-      { name: 'Pins & Aces', url: 'https://www.pinsandaces.com' },
-      { name: 'Chicsew', url: 'https://www.chicsew.com' },
-      { name: 'American Water Resources', url: 'https://www.awrusa.com' },
-      { name: 'Baja Llama', url: 'https://bajallama.com/' },
-      { name: 'Banbe Eyewear', url: 'https://us-banbeeyewear.com/' },
-      { name: 'Jessica Simpson', url: 'https://www.jessicasimpson.com' },
-      { name: 'Bombay Hair', url: 'https://bombayhair.com' },
-      { name: 'Mokwheel', url: 'https://www.mokwheel.com/' },
-      { name: 'Bugaboo', url: 'https://www.bugaboo.com/us-en' },
-      { name: 'Nana Jacqueline', url: 'https://www.nanajacqueline.com' },
-      { name: 'Xtratuf', url: 'https://www.xtratuf.com' },
-      { name: 'Oneisall', url: 'https://oneisall.com' },
-      { name: 'Fusion Pain Solutions', url: 'https://fusionpainsolutions.com/' },
-      { name: 'CaraKit', url: 'https://www.carakit.com/' },
-      { name: 'INMOTION', url: 'https://store.inmotionworld.com/' },
-      { name: 'tink', url: 'https://www.tink.us' },
-      { name: 'EasySMX', url: 'https://www.easysmx.com' },
-      { name: 'Super-Resume', url: 'https://www.super-resume.com' },
-      { name: 'SafeStreets', url: 'https://www.getsafestreets.com/' },
-      { name: 'Breeo', url: 'https://breeo.com/' },
-      { name: 'Madda Fella', url: 'https://maddafella.com/' },
-      { name: 'English4Today', url: 'https://www.english4today.com' },
-      { name: 'Busbud', url: 'https://www.busbud.com' },
-      { name: 'Voiply', url: 'https://www.voiply.com' },
-      { name: 'FinditParts', url: 'https://www.finditparts.com/' },
-      { name: 'Smalls', url: 'https://www.smalls.com/' },
-      { name: 'Bourbon and Boweties', url: 'https://www.bourbonandboweties.com/' },
-      { name: 'Inspire Uplift', url: 'https://inspireuplift.com' },
-      { name: 'Spafinder.com', url: 'https://www.spafinder.com/buy-gift-cards' },
-      { name: 'ALPAKA', url: 'https://alpakagear.com/' },
-      { name: 'CitizenM', url: 'https://www.citizenm.com/' },
-      { name: 'BodyGuardz', url: 'https://bodyguardz.com' },
-      { name: 'FarmHaven', url: 'https://thefarmhaven.com' },
-      { name: 'TeePublic', url: 'https://www.teepublic.com' },
-      { name: 'RentRedi', url: 'https://rentredi.com' },
-      { name: 'Freedom Fatigues', url: 'https://www.freedomfatigues.com/' },
-      { name: 'SCUBAPRO', url: 'https://www.scubapro.com/' },
-      { name: 'Club Ride Apparel', url: 'https://www.clubrideapparel.com/' },
-      { name: 'Fox River', url: 'https://foxsox.com/' },
-      { name: 'Rastellis', url: 'https://www.rastellis.com' },
-      { name: 'La Ligne', url: 'https://lalignenyc.com' },
-      { name: 'Nutrient Survival', url: 'https://nutrientsurvival.com/' },
-      { name: 'Game On!', url: 'https://gameonlures.com/' },
-      { name: 'S&B Watches', url: 'https://www.smithandbradley.com/' },
-      { name: 'JobGet', url: 'https://jobget.com' },
-      { name: 'Persol', url: 'https://www.persol.com/usa' },
-      { name: '54kibo', url: 'https://54kibo.com/' },
-      { name: 'Thimble', url: 'https://www.thimble.com' },
-      { name: 'Wildbird', url: 'https://wildbird.co/' },
-      { name: 'Vaulted', url: 'https://www.vaulted.com' },
-      { name: 'ILoveDooney', url: 'https://www.ilovedooney.com' },
-      { name: 'City.Travel', url: 'https://city.travel/' },
-      { name: 'Gepur', url: 'https://gepur.com/' },
-      { name: 'CRSED: F.O.A.D.', url: 'https://crsed.net/' },
-      { name: 'YouTravel.me', url: 'https://youtravel.me/' },
-      { name: 'J. Jill', url: 'https://www.jjill.com' },
-      { name: 'Yoga Wake Up', url: 'https://www.yogawakeup.com' },
-      { name: 'Stoneside Blinds & Shades', url: 'https://www.stoneside.com' },
-      { name: 'Hunter Fan', url: 'https://hunterfan.com/' },
-      { name: 'Hippie Farms', url: 'https://hippie-farms.com/' },
-      { name: 'BlockCard', url: 'https://getblockcard.com' },
-      { name: 'Solo Stove', url: 'https://solostove.com' },
-      { name: 'NatureCity', url: 'https://www.naturecity.com/' },
-      { name: 'Mashvisor', url: 'https://www.mashvisor.com/' },
-      { name: 'Trade Coffee', url: 'https://www.drinktrade.com/' },
-      { name: 'BioIonic', url: 'https://www.bioionic.com/' },
-      { name: 'Michaels', url: 'https://www.michaels.com/' },
-      { name: 'The Healthy Place', url: 'https://findyourhealthyplace.com' },
-      { name: 'Huffy Bikes', url: 'https://www.huffy.com/' },
-      { name: 'Delfina Skin', url: 'https://delfinaskin.com' },
-      { name: 'Boardroom Socks', url: 'https://boardroomsocks.com' },
-      { name: 'Bricks Masons', url: 'https://www.bricksmasons.com' },
-      { name: 'ABBYY', url: 'https://www.abbyy.com' },
-      { name: 'JOYA MIA', url: 'https://joyamia.com/' },
-      { name: 'Embellish Beauty', url: 'https://embellishbeauty.com/' },
-      { name: 'CookUnity', url: 'https://www.cookunity.com' },
-      { name: 'Brahmin', url: 'https://brahmin.com' },
-      { name: 'PI Nutrition', url: 'https://pi-nutrition.com' },
-      { name: 'Seymayka', url: 'https://www.seymayka.com/' },
-      { name: 'Casa Leo Pet', url: 'https://www.casaleopet.com' },
-      { name: 'TJ Maxx', url: 'https://tjmaxx.tjx.com/store/index.jsp' },
-      { name: 'Indie Lee', url: 'https://indielee.com/' },
-      { name: 'Creative Market', url: 'https://www.creativemarket.com' },
-      { name: 'Azuna', url: 'https://azunafresh.com' },
-      { name: 'Randalls', url: 'https://www.randalls.com' },
-      { name: 'Gardyn', url: 'https://mygardyn.com/' },
-      { name: 'Safi Hotel', url: 'https://safihotel.com/en/' },
-      { name: 'Letter Folk', url: 'https://www.letterfolk.com/' },
-      { name: 'Oscar Deen', url: 'https://www.oscardeen.com/' },
-      { name: 'Mosaic Foods', url: 'https://www.mosaicfoods.com/' },
-      { name: 'Wheeler Tools', url: 'https://www.wheelertools.com/' },
-      { name: 'Bartesian', url: 'https://bartesian.com' },
-      { name: 'The Beard Club', url: 'https://thebeardclub.com' },
-      { name: 'Kanzen Knives', url: 'https://kanzenknives.com' },
-      { name: 'GOG', url: 'https://www.gog.com' },
-      { name: 'FemiClear', url: 'https://femiclear.com/' },
-      { name: 'Chubbies', url: 'https://www.chubbiesshorts.com/' },
-      { name: 'Destira', url: 'https://destira.com/' },
-      { name: 'Until Gone', url: 'https://www.untilgone.com' },
-      { name: 'Helt Studio', url: 'https://www.heltstudio.com' },
-      { name: 'Ark7', url: 'https://ark7.com' },
-      { name: 'Crazy Domains', url: 'https://www.crazydomains.com' },
-      { name: 'Live Love Spa', url: 'https://livelovespashop.myshopify.com' },
-      { name: 'Tinybeans', url: 'https://tinybeans.com/' },
-      { name: 'Trifecta', url: 'https://www.trifectanutrition.com' },
-      { name: 'Legal Templates', url: 'https://legaltemplates.net' },
-      { name: 'Lockdown', url: 'https://www.lockdown.com/' },
-      { name: 'CocoaVia', url: 'https://www.cocoavia.com/' },
-      { name: 'Peacesake', url: 'https://www.peacesake.com' },
-      { name: 'Coco & Eve', url: 'https://www.cocoandeve.com' },
-      { name: 'Austin Air', url: 'https://austinair.com/' },
-      { name: 'Rocket Dollar', url: 'https://www.rocketdollar.com' },
-      { name: 'Aniise', url: 'https://aniise-natural-skin-care-and-cosmetics.myshopify.com' },
-      { name: 'Tote&Carry', url: 'https://totencarry.myshopify.com' },
-      { name: 'COS', url: 'https://www.cos.com/' },
-      { name: 'Odele Beauty', url: 'https://odelebeauty.com/' },
-      { name: 'Jonesbar', url: 'https://jonesbar.com' },
-      { name: 'Sasa Official Site', url: 'https://www.sasa.com/' },
-      { name: 'BioTRUST', url: 'https://www.biotrust.com/' },
-      { name: 'Car Keys Express', url: 'https://store.carkeysexpress.com/' },
-      { name: 'Trendgallery', url: 'https://trendgallery.art' },
-      { name: 'Spoonflower', url: 'https://www.spoonflower.com' },
-      { name: 'Kodak Photo Printer', url: 'https://shop.kodakphotoprinter.com' },
-      { name: 'Slumber', url: 'https://slumbercbn.com/' },
-      { name: 'Samplize', url: 'https://samplize.com' },
-      { name: 'Catrice Cosmetics', url: 'https://www.catricecosmetics.com/' },
-      { name: 'Calendar.com', url: 'https://Calendar.com' },
-      { name: 'Jambu', url: 'https://jambu.com/' },
-      { name: 'Stress Free Car Rental', url: 'https://www.stressfreecarrental.com/en-GB/partner-link' },
-      { name: 'Miracle Laundry Detergent Sheets', url: 'https://www.miraclelaundry.co/' },
-      { name: 'BIBA Los Angeles', url: 'https://www.bibalosangeles.com/' },
-      { name: 'Black Beard Fire Starters', url: 'https://Blackbeardfire.com' },
-      { name: 'Nootopia', url: 'https://nootopia.com' },
-      { name: 'Wayre', url: 'https://www.shopwayre.com/' },
-      { name: 'James Bark', url: 'https://jamesbark.us/' },
-      { name: 'Greys', url: 'https://greysfishing.com/' },
-      { name: 'Armasight', url: 'https://www.armasight.com' },
-      { name: 'Die Free Co', url: 'https://www.diefree.com' },
       { name: '888 Lots', url: 'https://888lots.com/' },
       { name: 'Hedley & Bennett', url: 'https://www.hedleyandbennett.com/' },
       { name: 'AFTER', url: 'https://after.com' },
@@ -10118,6 +9895,39 @@ test.describe('Website Availability Checker', () => {
           let userPassedWebsites = [];
           const totalWebsites = websites.length;
 
+          // Helper function to add website to successful list (prevents duplicates)
+          function addToSuccessfulWebsites(website, reason) {
+            const alreadyExists = successfulWebsites.some(site => 
+              site.name === website.name && site.url === website.url
+            );
+            if (!alreadyExists) {
+              successfulWebsites.push({
+                name: website.name,
+                url: website.url,
+                reason: reason,
+                checkedAt: new Date().toISOString()
+              });
+            } else {
+              console.log(`⚠️ DUPLICATE PREVENTION: ${website.name} already in successful list`);
+            }
+          }
+          
+          // Helper function to add website to unavailable list (prevents duplicates)
+          function addToUnavailableWebsites(website, pattern) {
+            const alreadyExists = unavailableWebsites.some(site => 
+              site.name === website.name && site.url === website.url
+            );
+            if (!alreadyExists) {
+              unavailableWebsites.push({
+                name: website.name,
+                url: website.url,
+                pattern: pattern
+              });
+            } else {
+              console.log(`⚠️ DUPLICATE PREVENTION: ${website.name} already in unavailable list`);
+            }
+          }
+
 
           
           // Function to display running list of flagged sites
@@ -10201,7 +10011,22 @@ test.describe('Website Availability Checker', () => {
             }
             
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const dateFolder = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
             const filename = `merchant-test-results-${timestamp}.txt`;
+            
+            // Create organized folder structure
+            const fs = require('fs');
+            const path = require('path');
+            const resultsBaseDir = path.join(process.cwd(), 'test-results');
+            const sessionDir = path.join(resultsBaseDir, dateFolder, `session-${timestamp}`);
+            
+            // Ensure directories exist
+            if (!fs.existsSync(resultsBaseDir)) {
+              fs.mkdirSync(resultsBaseDir, { recursive: true });
+            }
+            if (!fs.existsSync(sessionDir)) {
+              fs.mkdirSync(sessionDir, { recursive: true });
+            }
             
             let fileContent = '';
             fileContent += '='.repeat(80) + '\n';
@@ -10437,15 +10262,12 @@ test.describe('Website Availability Checker', () => {
                 console.log(`⚠️ Browser download failed: ${browserError.message}`);
                 console.log('📁 Attempting Node.js file write...');
                 
-                // Fallback to Node.js file system
-                const fs = require('fs');
-                const path = require('path');
-                
-                // Write to current directory
-                const filePath = path.join(process.cwd(), filename);
+                // Fallback to Node.js file system - write to organized session directory
+                // Write to organized session directory
+                const filePath = path.join(sessionDir, filename);
                 fs.writeFileSync(filePath, fileContent, 'utf8');
                 
-                console.log(`📁 Results file saved via Node.js: ${filePath}`);
+                console.log(`📁 Results saved to: ${filePath}`);
               }
               
               console.log(`📊 File contains ${checkedWebsites.length} tested merchants`);
@@ -10473,7 +10295,20 @@ test.describe('Website Availability Checker', () => {
               const path = require('path');
               
               const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+              const dateFolder = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
               const filename = `merchant-test-results-${timestamp}.txt`;
+              
+              // Create organized folder structure
+              const resultsBaseDir = path.join(process.cwd(), 'test-results');
+              const sessionDir = path.join(resultsBaseDir, dateFolder, `session-${timestamp}`);
+              
+              // Ensure directories exist
+              if (!fs.existsSync(resultsBaseDir)) {
+                fs.mkdirSync(resultsBaseDir, { recursive: true });
+              }
+              if (!fs.existsSync(sessionDir)) {
+                fs.mkdirSync(sessionDir, { recursive: true });
+              }
               
               let fileContent = '';
               fileContent += '='.repeat(80) + '\n';
@@ -10561,11 +10396,11 @@ test.describe('Website Availability Checker', () => {
               fileContent += '='.repeat(80) + '\n';
               fileContent += 'End of Report\n';
               
-              // Write to current directory
-              const filePath = path.join(process.cwd(), filename);
+              // Write to organized session directory
+              const filePath = path.join(sessionDir, filename);
               fs.writeFileSync(filePath, fileContent, 'utf8');
               
-              console.log(`📁 Results file saved: ${filePath}`);
+              console.log(`📁 Results saved to: ${filePath}`);
               console.log(`📊 File contains ${checkedWebsites.length} tested merchants`);
               console.log(`✅ ${successfulWebsites.length} successful, 🚨 ${unavailableWebsites.length} flagged`);
               return filename;
@@ -10610,7 +10445,7 @@ test.describe('Website Availability Checker', () => {
           console.log('   ⏸️ Download when pausing (F8 or pause button)');
           console.log('   ✅ Download when test completes');
           console.log('   🚨 Download when test stops early (except browser closure)');
-          console.log('   💡 Files saved as: merchant-test-results-YYYY-MM-DD-HH-MM-SS.txt');
+          console.log('   💡 Files organized in: test-results/YYYY-MM-DD/session-TIMESTAMP/');
           console.log('='.repeat(70));
           
           // Add pause instructions and setup
@@ -10837,12 +10672,7 @@ test.describe('Website Availability Checker', () => {
                   console.log('✅'.repeat(30));
                   
                   // Add to successful websites list
-                  successfulWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    reason: 'User manually passed',
-                    checkedAt: new Date().toISOString()
-                  });
+                  addToSuccessfulWebsites(website, 'User manually passed');
 
                   
                   // Track that this was user-passed
@@ -11059,11 +10889,7 @@ test.describe('Website Availability Checker', () => {
                   console.log(`🚨 BACKUP FORCE FLAGGING: "${backupPattern}"`);
                   
                   // Add to unavailable list immediately
-                  unavailableWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    pattern: backupPattern
-                  });
+                  addToUnavailableWebsites(website, backupPattern);
                   
                   // Display running list
                   displayRunningFlaggedList();
@@ -11116,78 +10942,54 @@ test.describe('Website Availability Checker', () => {
                       }
                     }
                     
-                    // Try clicking on product links to check for deeper e-commerce functionality
-                    // Enhanced for hotels: also detect room, suite, and booking links
-                    // EXCLUDE social media links to prevent Facebook/Twitter tabs from opening
-                    const allProductLinks = await page.locator('a[href*="product"], a[href*="shop"], a[href*="/p/"], .product a, .item a, [class*="product"] a, a[href*="room"], a[href*="suite"], a[href*="book"], a[href*="reserve"], a[href*="accommodation"], .room a, .suite a, [class*="room"] a, [class*="suite"] a').all();
+                    // Optimized product link detection - target only actual product/commerce links
+                    // Use more specific selectors to avoid processing non-product links entirely
+                    const productLinks = await page.locator(`
+                      a[href*="/product/"]:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      a[href*="/shop/"]:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      a[href*="/item/"]:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      a[href*="/p/"]:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]):not([href*="policy"]),
+                      .product a:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      .item a:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      [class*="product"] a:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      a[href*="/room/"]:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      a[href*="/suite/"]:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      a[href*="book"]:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      .room a:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"]),
+                      .suite a:not([href*="facebook"]):not([href*="twitter"]):not([href*="instagram"]):not([href*="review"]):not([href*="privacy"]):not([href*="terms"])
+                    `).all();
                     
-                    // Filter out social media, Google review, and policy links to prevent unwanted navigation
-                    const productLinks = [];
-                    for (const link of allProductLinks) {
-                      const href = await link.getAttribute('href');
-                      const className = await link.getAttribute('class') || '';
-                      const linkText = await link.textContent() || '';
-                      
-                      const isSocialMedia = href && (
-                        href.includes('facebook.com') || href.includes('fb.com') ||
-                        href.includes('twitter.com') || href.includes('t.co') ||
-                        href.includes('instagram.com') || href.includes('linkedin.com') ||
-                        href.includes('youtube.com') || href.includes('tiktok.com') ||
-                        href.includes('pinterest.com') || href.includes('snapchat.com') ||
-                        className.includes('social') || className.includes('share')
-                      );
-                      
-                      const isGoogleReviewLink = href && (
-                        href.includes('google.com/reviews') ||
-                        href.includes('google.com/shopping') ||
-                        href.includes('google.com/maps') ||
-                        className.includes('review') ||
-                        linkText.toLowerCase().includes('google review') ||
-                        linkText.toLowerCase().includes('customer review')
-                      );
-                      
-                      const isPolicyLink = href && (
-                        href.includes('/privacy') || href.includes('/policy') ||
-                        href.includes('/terms') || href.includes('/legal') ||
-                        linkText.toLowerCase().includes('privacy policy') ||
-                        linkText.toLowerCase().includes('terms of service') ||
-                        linkText.toLowerCase().includes('cookie policy')
-                      );
-                      
-                      const isReviewSiteLink = href && (
-                        href.includes('gartner.com') || href.includes('trustradius.com') ||
-                        href.includes('g2.com') || href.includes('capterra.com') ||
-                        href.includes('reviews') || href.includes('review') ||
-                        linkText.toLowerCase().includes('gartner') ||
-                        linkText.toLowerCase().includes('trustradius') ||
-                        linkText.toLowerCase().includes('g2') ||
-                        linkText.toLowerCase().includes('capterra') ||
-                        linkText.toLowerCase().includes('review') ||
-                        linkText.toLowerCase().includes('rating')
-                      );
-                      
-                      if (!isSocialMedia && !isGoogleReviewLink && !isPolicyLink && !isReviewSiteLink) {
-                        productLinks.push(link);
-                      } else {
-                        let reason = '';
-                        if (isSocialMedia) reason = 'social media';
-                        else if (isGoogleReviewLink) reason = 'Google review';
-                        else if (isPolicyLink) reason = 'policy/legal';
-                        else if (isReviewSiteLink) reason = 'review site';
-                        console.log(`🚫 Excluded ${reason} link: ${href}`);
+                    console.log(`🔍 ${website.name}: Found ${productLinks.length} targeted product/commerce links`);
+                    
+                    // Additional quick validation to ensure we have actual product links
+                    const validProductLinks = [];
+                    for (let i = 0; i < Math.min(5, productLinks.length); i++) {
+                      try {
+                        const href = await productLinks[i].getAttribute('href');
+                        const linkText = await productLinks[i].textContent() || '';
+                        
+                        // Quick validation - skip if clearly not a product link
+                        if (href && !href.includes('mailto:') && !href.includes('tel:') && 
+                            !linkText.toLowerCase().includes('contact') && 
+                            !linkText.toLowerCase().includes('about') &&
+                            !linkText.toLowerCase().includes('support')) {
+                          validProductLinks.push(productLinks[i]);
+                        }
+                      } catch (e) {
+                        // Skip invalid links
                       }
                     }
                     
-                    if (productLinks.length > 0) {
-                      console.log(`🔍 ${website.name}: Found ${productLinks.length} product/room links, testing one for functional features...`);
+                    if (validProductLinks.length > 0) {
+                      console.log(`🔍 ${website.name}: Testing ${validProductLinks.length} validated product links for functional features...`);
                       
                       try {
                         // Get the current page URL
                         const currentUrl = page.url();
                         
-                        // Click on the first product link
-                        await productLinks[0].click({ timeout: 3000 });
-                        await page.waitForTimeout(2000); // Wait for page to load
+                        // Click on the first validated product link with reduced timeout for speed
+                        await validProductLinks[0].click({ timeout: 2000 });
+                        await page.waitForTimeout(1500); // Reduced wait time for faster processing
                         
                         // Check if we navigated to a product page
                         const newUrl = page.url();
@@ -11260,6 +11062,8 @@ test.describe('Website Availability Checker', () => {
                           console.log(`⚠️ ${website.name}: Could not navigate back to homepage`);
                         }
                       }
+                    } else {
+                      console.log(`🔍 ${website.name}: No valid product links found, proceeding with standard content analysis`);
                     }
                     
                     // Get updated page content after all interactions
@@ -11611,11 +11415,7 @@ test.describe('Website Availability Checker', () => {
                   console.log(`   - Content sample: "${pageText.substring(0, 300)}..."`);
                   
                   // Add to unavailable list
-                  unavailableWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    pattern: forcePattern
-                  });
+                  addToUnavailableWebsites(website, forcePattern);
                   
                   // Display running list
                   displayRunningFlaggedList();
@@ -11753,12 +11553,7 @@ test.describe('Website Availability Checker', () => {
                   console.log(`⏭️ BUSINESS MODEL SKIP: ${website.name} - functional business detected`);
                   
                   // Add to successful websites list
-                  successfulWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    reason: `Business model detected: ${detectedModel}`,
-                    checkedAt: new Date().toISOString()
-                  });
+                  addToSuccessfulWebsites(website, `Business model detected: ${detectedModel}`);
 
                   
                   // Add website to checked list before skipping
@@ -11784,12 +11579,7 @@ test.describe('Website Availability Checker', () => {
                   console.log(`⏭️ NUCLEAR SKIP: ${website.name} - hardcoded protection`);
                   
                   // Add to successful websites list
-                  successfulWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    reason: 'Nuclear protection - never flag list',
-                    checkedAt: new Date().toISOString()
-                  });
+                  addToSuccessfulWebsites(website, 'Nuclear protection - never flag list');
                   
                   // Add website to checked list before skipping
                   checkedWebsites.push({
@@ -11809,12 +11599,7 @@ test.describe('Website Availability Checker', () => {
                   console.log(`⏭️ SKIPPING: ${website.name} - major brand absolute protection`);
                   
                   // Add to successful websites list
-                  successfulWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    reason: 'Major brand protection',
-                    checkedAt: new Date().toISOString()
-                  });
+                  addToSuccessfulWebsites(website, 'Major brand protection');
                   
                   // Add website to checked list before skipping
                   checkedWebsites.push({
@@ -11864,11 +11649,7 @@ test.describe('Website Availability Checker', () => {
                   console.log('='.repeat(50));
                   
                   // Force immediate flagging
-                  unavailableWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    pattern: detectedMessage
-                  });
+                  addToUnavailableWebsites(website, detectedMessage);
                   
                   // Display running list
                   displayRunningFlaggedList();
@@ -11935,12 +11716,7 @@ test.describe('Website Availability Checker', () => {
                   console.log(`⏭️ SKIPPING: ${website.name} - considered functional based on ${detectionType} detection`);
                   
                   // Add to successful websites list
-                  successfulWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    reason: `Functional ${detectionType} features detected (${protectionLevel} protection)`,
-                    checkedAt: new Date().toISOString()
-                  });
+                  addToSuccessfulWebsites(website, `Functional ${detectionType} features detected (${protectionLevel} protection)`);
                   
                   // Add website to checked list before skipping
                   checkedWebsites.push({
@@ -11979,12 +11755,7 @@ test.describe('Website Availability Checker', () => {
                     console.log(`⏭️ BASIC PROTECTION SKIP: ${website.name} - functional with no severe issues`);
                     
                     // Add to successful websites list
-                    successfulWebsites.push({
-                      name: website.name,
-                      url: website.url,
-                      reason: 'Basic functional features detected, no severe problems',
-                      checkedAt: new Date().toISOString()
-                    });
+                    addToSuccessfulWebsites(website, 'Basic functional features detected, no severe problems');
                     
                     // Add website to checked list before skipping
                     checkedWebsites.push({
@@ -12018,12 +11789,7 @@ test.describe('Website Availability Checker', () => {
                     console.log(`⏭️ SKIPPING: ${website.name} - Shopify site with strong evidence`);
                     
                     // Add to successful websites list
-                    successfulWebsites.push({
-                      name: website.name,
-                      url: website.url,
-                      reason: `Shopify site with strong ${evidenceType} evidence`,
-                      checkedAt: new Date().toISOString()
-                    });
+                    addToSuccessfulWebsites(website, `Shopify site with strong ${evidenceType} evidence`);
                     
                     // Add website to checked list before skipping
                     checkedWebsites.push({
@@ -12160,11 +11926,7 @@ test.describe('Website Availability Checker', () => {
                   console.log(`⚖️ Decision: FLAG FOR MANUAL REVIEW`);
                   console.log('='.repeat(50));
                   
-                  unavailableWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    pattern: foundPattern
-                  });
+                  addToUnavailableWebsites(website, foundPattern);
                   
                   // Display running list
                   displayRunningFlaggedList();
@@ -12222,11 +11984,7 @@ test.describe('Website Availability Checker', () => {
                     console.log(`   - This is a critical error - forcing immediate flagging NOW`);
                     
                     // Emergency flagging
-                    unavailableWebsites.push({
-                      name: website.name,
-                      url: website.url,
-                      pattern: 'emergency catch - should have been force flagged'
-                    });
+                    addToUnavailableWebsites(website, 'emergency catch - should have been force flagged');
                     
                     // Display running list
                     displayRunningFlaggedList();
@@ -12290,11 +12048,7 @@ test.describe('Website Availability Checker', () => {
                       console.log(`⚖️ Decision: FLAG - No functionality + severe problems = genuinely broken`);
                       console.log('='.repeat(50));
                       
-                      unavailableWebsites.push({
-                        name: website.name,
-                        url: website.url,
-                        pattern: detectedPattern
-                      });
+                      addToUnavailableWebsites(website, detectedPattern);
                       
                       // Display running list
                       displayRunningFlaggedList();
@@ -12307,26 +12061,23 @@ test.describe('Website Availability Checker', () => {
                       console.log(`✅ Available: ${website.name} (no severe problems detected)`);
                       
                       // Add to successful websites list
-                      successfulWebsites.push({
-                        name: website.name,
-                        url: website.url,
-                        reason: 'No severe problems detected',
-                        checkedAt: new Date().toISOString()
-                      });
+                      addToSuccessfulWebsites(website, 'No severe problems detected');
                     }
                   } else {
                     console.log(`✅ Available: ${website.name} (has functional features)`);
                     
                     // Add to successful websites list
-                    successfulWebsites.push({
-                      name: website.name,
-                      url: website.url,
-                      reason: 'Has functional features',
-                      checkedAt: new Date().toISOString()
-                    });
+                    addToSuccessfulWebsites(website, 'Has functional features');
                   }
                   }
                 }
+                
+                // Add website to checked list after processing is complete (for successful sites)
+                checkedWebsites.push({
+                      name: website.name,
+                      url: website.url,
+                      checkedAt: new Date().toISOString()
+                    });
                 
               } catch (error) {
                 console.log(`❌ Error checking ${website.name}: ${error.message}`);
@@ -12410,11 +12161,7 @@ test.describe('Website Availability Checker', () => {
                     errorType = 'DNS resolution failed';
                   }
                   
-                  unavailableWebsites.push({
-                    name: website.name,
-                    url: website.url,
-                    pattern: `${errorType}: ${error.message.split('\n')[0]}`
-                  });
+                  addToUnavailableWebsites(website, `${errorType}: ${error.message.split('\n')[0]}`);
 
                   
                   // Display running list

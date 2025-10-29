@@ -34,18 +34,18 @@
                         id="api-data" 
                         placeholder='Paste your merchant API JSON here, e.g.:
 {
-  "Merchants": [
-    {
-      "AppID": 451,
-      "MerchantID": 6745,
-      "MerchantName": "Example Store",
-      "MerchantDomains": ["example.com"],
-      "PrimaryCategory": "Clothing & Apparel",
-      "MaxRate": "1.875",
-      "MaxRateKind": "PERCENTAGE"
-    }
-  ]
-}'
+  "Merchants": [...],
+  "PageCount": 1,
+  "PageSize": 50,
+  "TotalCount": 10000
+}
+
+For multiple pages, separate with --- on new lines:
+Page 1 JSON
+---
+Page 2 JSON
+---
+Page 3 JSON'
                         rows="12"
                     ></textarea>
                     <div class="input-help">
@@ -82,7 +82,7 @@
                         <input 
                             type="number" 
                             id="merchant-limit" 
-                            placeholder="e.g., 50 (leave empty for all)"
+                            placeholder="Leave empty to test ALL merchants"
                             min="1"
                         >
                         <div class="input-help">Limit number of merchants to test</div>
@@ -140,8 +140,8 @@
                     <button id="load-stored-btn" class="btn btn-info">
                         <i class="fas fa-database"></i> Load Stored Merchants
                     </button>
-                    <button id="validate-btn" class="btn btn-secondary">
-                        <i class="fas fa-check-circle"></i> Validate API Data
+                    <button id="save-to-database-btn" class="btn btn-success" disabled title="Save merchants to database">
+                        <i class="fas fa-save"></i> Save to Database
                     </button>
                     <button id="start-test-btn" class="btn btn-primary" disabled>
                         <i class="fas fa-play"></i> Start Testing

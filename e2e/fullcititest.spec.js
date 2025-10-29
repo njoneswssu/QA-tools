@@ -891,10 +891,10 @@ async function injectFloatingControls(page, websiteName, currentIndex, totalWebs
       searchInput.style.cssText = `
         width: 100%;
         padding: 8px 12px;
-        border: 1px solid rgba(255,255,255,0.3);
+        border: 2px solid #000000;
         border-radius: 6px;
-        background: rgba(255,255,255,0.15);
-        color: white !important;
+        background: rgba(255,255,255,0.95);
+        color: #000000 !important;
         font-size: 12px;
         font-family: inherit;
         outline: none;
@@ -907,19 +907,19 @@ async function injectFloatingControls(page, websiteName, currentIndex, totalWebs
       const style = document.createElement('style');
       style.textContent = `
         #citishop-floating-controls input::placeholder {
-          color: rgba(255,255,255,0.8) !important;
+          color: rgba(0,0,0,0.6) !important;
           opacity: 1 !important;
         }
         #citishop-floating-controls input::-webkit-input-placeholder {
-          color: rgba(255,255,255,0.8) !important;
+          color: rgba(0,0,0,0.6) !important;
           opacity: 1 !important;
         }
         #citishop-floating-controls input::-moz-placeholder {
-          color: rgba(255,255,255,0.8) !important;
+          color: rgba(0,0,0,0.6) !important;
           opacity: 1 !important;
         }
         #citishop-floating-controls input:-ms-input-placeholder {
-          color: rgba(255,255,255,0.8) !important;
+          color: rgba(0,0,0,0.6) !important;
           opacity: 1 !important;
         }
         #citishop-search-input {
@@ -943,8 +943,8 @@ async function injectFloatingControls(page, websiteName, currentIndex, totalWebs
       // Search input event handlers with focus protection
       searchInput.onfocus = () => {
         console.log('🔍 Search input focused');
-        searchInput.style.background = 'rgba(255,255,255,0.25)';
-        searchInput.style.borderColor = 'rgba(255,255,255,0.5)';
+        searchInput.style.background = 'rgba(255,255,255,1.0)';
+        searchInput.style.borderColor = '#333333';
         searchInput.style.transform = 'scale(1.02)';
         
         // Prevent focus loss by stopping event propagation
@@ -953,8 +953,8 @@ async function injectFloatingControls(page, websiteName, currentIndex, totalWebs
       
       searchInput.onblur = () => {
         console.log('🔍 Search input blurred');
-        searchInput.style.background = 'rgba(255,255,255,0.15)';
-        searchInput.style.borderColor = 'rgba(255,255,255,0.3)';
+        searchInput.style.background = 'rgba(255,255,255,0.95)';
+        searchInput.style.borderColor = '#000000';
         searchInput.style.transform = 'scale(1)';
         // Save the current value to localStorage when focus is lost
         localStorage.setItem('citishop-search-value', searchInput.value);

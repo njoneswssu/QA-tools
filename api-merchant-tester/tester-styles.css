@@ -348,6 +348,16 @@ body {
     transform: translateY(-2px);
 }
 
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-warning:hover:not(:disabled) {
+    background: #d97706;
+    transform: translateY(-2px);
+}
+
 .btn-outline {
     background: transparent;
     color: #667eea;
@@ -816,9 +826,10 @@ body {
     align-items: end;
     margin-bottom: 15px;
     padding: 15px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .filter-group {
@@ -836,16 +847,27 @@ body {
 .filter-group select,
 .filter-group input {
     padding: 8px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid #000000;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(255, 255, 255, 0.95);
+    color: #000000;
     font-size: 0.9em;
+    font-weight: 500;
 }
 
 .filter-group input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 400;
 }
+
+.filter-group select:focus,
+.filter-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 1.0);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
 
 .merchant-count {
     color: #94a3b8;
@@ -855,24 +877,28 @@ body {
 
 /* Merchant List Styles */
 .merchant-list {
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .merchant-item {
-    padding: 12px 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 15px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .merchant-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #667eea;
+    padding-left: 14px;
 }
 
 .merchant-item:last-child {
@@ -884,20 +910,23 @@ body {
 }
 
 .merchant-name-item {
-    font-weight: 600;
-    color: #f1f5f9;
+    font-weight: 700;
+    color: #ffffff;
     margin-bottom: 4px;
+    font-size: 1.05em;
 }
 
 .merchant-url-item {
-    font-size: 0.85em;
-    color: #94a3b8;
+    font-size: 0.9em;
+    color: #cbd5e1;
     margin-bottom: 2px;
+    font-weight: 500;
 }
 
 .merchant-category-item {
-    font-size: 0.8em;
-    color: #64748b;
+    font-size: 0.85em;
+    color: #94a3b8;
+    font-weight: 500;
 }
 
 .merchant-status {
@@ -921,6 +950,68 @@ body {
 .merchant-status.flagged {
     background: rgba(239, 68, 68, 0.2);
     color: #ef4444;
+}
+
+/* Form Inputs and Textarea */
+#api-data {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #000000;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+    resize: vertical;
+    min-height: 200px;
+}
+
+#api-data::placeholder {
+    color: rgba(0, 0, 0, 0.6);
+    font-style: italic;
+}
+
+#api-data:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 1.0);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.form-group label i {
+    margin-right: 8px;
+    color: #667eea;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 4px;
+}
+
+.input-help {
+    margin-top: 8px;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.input-help i {
+    color: #667eea;
 }
 
 /* Website Preview Modal */
