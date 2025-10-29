@@ -117,4 +117,4 @@ pids/
 .fusebox/
 
 # DynamoDB Local files
-.dynamodb/
+.dynamodb/video-editor/
