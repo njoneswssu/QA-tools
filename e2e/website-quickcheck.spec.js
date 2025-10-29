@@ -50,123 +50,6 @@ test.describe('Website Availability Checker', () => {
     await page.pause();
     // Only the 4 requested websites
     const websites = [
-      { name: '888 Lots', url: 'https://888lots.com/' },
-      { name: 'Hedley & Bennett', url: 'https://www.hedleyandbennett.com/' },
-      { name: 'AFTER', url: 'https://after.com' },
-      { name: 'ship7', url: 'https://ship7.com' },
-      { name: 'comicomi', url: 'https://befbeerug.com' },
-      { name: 'Atlas Fly Fishing', url: 'https://www.atlasflyfishing.com/' },
-      { name: 'ICON Products', url: 'https://www.iconathome.com' },
-      { name: 'Discipline Industries', url: 'https://discipline.industries' },
-      { name: 'Love & Pebble', url: 'https://loveandpebble.com' },
-      { name: 'TRUWILD', url: 'https://truwild.com' },
-      { name: 'KeepYourHomeIP', url: 'https://www.keepyourhomeip.com' },
-      { name: 'Flaus', url: 'https://goflaus.com/' },
-      { name: 'Lightopia', url: 'https://www.lightopia.com/' },
-      { name: 'Sermo', url: 'https://www.sermo.com/' },
-      { name: 'Talkroute', url: 'https://talkroute.com' },
-      { name: 'Ohora', url: 'https://ohora.com' },
-      { name: 'McCrea/s Candies', url: 'https://mccreascandies.com' },
-      { name: 'Quest Health', url: 'https://www.questhealth.com' },
-      { name: 'Tekto Knives', url: 'https://www.tektoknives.com' },
-      { name: 'HideMy.name', url: 'https://hide.mn' },
-      { name: 'Grade Potential', url: 'https://info.gradepotentialtutoring.com/' },
-      { name: 'Blu Dot', url: 'https://www.bludot.com' },
-      { name: 'Coterie', url: 'https://www.coterie.com' },
-      { name: 'HexClad Cookware', url: 'https://hexclad.com/' },
-      { name: 'byFood', url: 'https://www.byfood.com/' },
-      { name: 'Fjallraven Shop', url: 'https://fjallraven.com/' },
-      { name: 'CanCooker', url: 'https://www.cancooker.com' },
-      { name: 'Groomie', url: 'https://deals.getgroomieshaver.io/27ZKGGX2/25HZHR9/' },
-      { name: 'The Happy Planner', url: 'https://thehappyplanner.com/' },
-      { name: 'ProAnabolics', url: 'https://www.proanabolics.com/' },
-      { name: 'Unreal Brands', url: 'https://unrealsnacks.com/' },
-      { name: 'Fitties', url: 'https://fitties.com' },
-      { name: 'Crunchyroll', url: 'https://store.crunchyroll.com' },
-      { name: 'Outer Impact', url: 'https://outerimpact.com/' },
-      { name: 'Mango Animate', url: 'https://mangoanimate.com/' },
-      { name: 'Vyond', url: 'https://www.vyond.com/' },
-      { name: 'CaddyDaddy', url: 'https://caddydaddygolf.com/' },
-      { name: 'ResBiotic', url: 'https://www.resbiotic.com' },
-      { name: 'Avenco', url: 'https://www.avencohome.com/' },
-      { name: 'Day 6 Bicycles', url: 'https://day6bikes.com/' },
-      { name: 'ICEMULE Coolers', url: 'https://icemulecoolers.com/' },
-      { name: 'Tire Streets', url: 'https://www.tirestreets.com' },
-      { name: 'Fever', url: 'https://feverup.com' },
-      { name: 'GSI Outdoor', url: 'https://gsioutdoors.com/' },
-      { name: 'Nantahala Outdoor Center', url: 'https://noc.com/' },
-      { name: 'Eventbrite', url: 'https://www.eventbrite.com/' },
-      { name: 'Online Check Writer', url: 'https://onlinecheckwriter.com/' },
-      { name: 'EarthHero', url: 'https://earthhero.com/' },
-      { name: 'SLNT', url: 'https://slnt.com' },
-      { name: 'Mars by GHC', url: 'https://www.marsghc.com' },
-      { name: 'Smile Zemi', url: 'https://www.smile-zemi.com/s/' },
-      { name: 'Ring Central', url: 'https://www.ringcentral.com/?BMID=AFF_PH_US' },
-      { name: 'Square', url: 'https://www.squareup.com/' },
-      { name: 'Voye Global', url: 'https://voyeglobal.com' },
-      { name: 'Outdoor Edge', url: 'https://www.outdooredge.com/' },
-      { name: 'Decodo', url: 'https://decodo.com' },
-      { name: 'Plano Outdoors', url: 'https://planooutdoors.com/' },
-      { name: 'Bimba y Lola', url: 'https://www.bimbaylola.com/us_en/' },
-      { name: 'VALLON', url: 'https://www.vallon.com' },
-      { name: 'Four Seasons At Home', url: 'https://shop.fourseasons.com/' },
-      { name: 'Highwood USA', url: 'https://highwood-usa.com/' },
-      { name: 'Citarella', url: 'https://www.citarella.com/' },
-      { name: 'Mark&Day', url: 'https://markandday.com/' },
-      { name: 'Dusit International', url: 'https://www.dusit.com' },
-      { name: 'Magic Madhouse', url: 'https://www.magicmadhouse.co.uk' },
-      { name: 'Musicnotes', url: 'https://www.musicnotes.com' },
-      { name: 'Gaia Herbs', url: 'https://www.gaiaherbs.com/' },
-      { name: 'Red Pocket Mobile', url: 'https://redpocket.com/' },
-      { name: 'Mike/s Bikes', url: 'https://mikesbikes.com/' },
-      { name: 'Spinnaker Boutique', url: 'https://www.spinnakerboutique.com/' },
-      { name: 'Bulletproof', url: 'https://shop.bulletproof.com/' },
-      { name: 'Hotel Collection', url: 'https://www.hotelcollection.com/' },
-      { name: 'Fit2Run', url: 'https://www.fit2run.com/' },
-      { name: 'Celestyal Cruises', url: 'https://celestyal.com/' },
-      { name: 'FutureLearn', url: 'https://www.futurelearn.com' },
-      { name: 'Naked Sundays', url: 'https://us.nakedsundays.com/' },
-      { name: 'Dr. Comfort', url: 'https://www.drcomfort.com/' },
-      { name: 'Ekster', url: 'https://www.ekster.com' },
-      { name: 'Blackstone Products', url: 'https://blackstoneproducts.com/' },
-      { name: 'Ipsy', url: 'https://www.ipsy.com' },
-      { name: 'mpix', url: 'https://www.mpix.com/' },
-      { name: 'Be Live Hotels', url: 'https://www.belivehotels.com/' },
-      { name: 'Renée Rouleau', url: 'https://www.reneerouleau.com/' },
-      { name: 'Super73', url: 'https://super73.com/' },
-      { name: 'NAPA', url: 'https://www.napaonline.com/' },
-      { name: 'Frank Darling', url: 'https://frankdarling.com/' },
-      { name: 'True Religion', url: 'https://www.truereligion.com/' },
-      { name: 'SRW', url: 'https://scienceresearchwellness.com/' },
-      { name: 'eRank', url: 'https://erank.com/' },
-      { name: 'Garden Goods Direct', url: 'https://gardengoodsdirect.com/' },
-      { name: 'Vrai', url: 'https://www.vrai.com/' },
-      { name: 'Harper Wilde', url: 'https://harperwilde.com' },
-      { name: 'Moussy', url: 'https://moussy-global.com/' },
-      { name: 'Munch', url: 'https://www.getmunch.com/' },
-      { name: 'Saily', url: 'https://saily.com' },
-      { name: 'SlumberPod', url: 'https://www.slumberpod.com/' },
-      { name: 'Freedom Off-Road', url: 'https://www.freedomoffroadusa.com' },
-      { name: 'The Coastal Vibe', url: 'https://thecoastalvibeshop.com/' },
-      { name: 'myFICO', url: 'https://www.myfico.com/' },
-      { name: 'RapidPure', url: 'https://www.rapidpurewater.com/' },
-      { name: 'Spines', url: 'https://spines.com' },
-      { name: 'Groove', url: 'https://getyourgroove.com' },
-      { name: 'Lavazza', url: 'https://www.lavazzausa.com/en' },
-      { name: 'Penelope Chilvers', url: 'https://penelopechilvers.com/' },
-      { name: 'Lekato', url: 'https://Lekatodeal.com' },
-      { name: 'Guzzini', url: 'https://guzzini.com/' },
-      { name: 'Ranavat', url: 'https://www.ranavat.com/' },
-      { name: 'Dadalogy Bedding Collection', url: 'https://www.dadalogy.com' },
-      { name: 'SIN Eyewear', url: 'https://sineyewear.com.au/' },
-      { name: 'Prodigy', url: 'https://www.prodigygame.com/main-en/' },
-      { name: 'King of Christmas', url: 'https://www.kingofchristmas.com/' },
-      { name: 'Hill House Home', url: 'https://www.hillhousehome.com/' },
-      { name: 'Diamond Art Club', url: 'https://www.diamondartclub.com/' },
-      { name: 'DoorLoop', url: 'https://doorloop.com' },
-      { name: 'Fissler', url: 'https://fissler.com/' },
-      { name: 'Little Tikes', url: 'https://www.littletikes.com/' },
-      { name: 'Sleeplay', url: 'https://sleeplay.com' },
       { name: 'Portals Parfums', url: 'https://portalsparfums.com' },
       { name: 'tonies', url: 'https://us.tonies.com' },
       { name: 'GBC', url: 'https://www.gbc.com/' },
@@ -10020,12 +9903,18 @@ test.describe('Website Availability Checker', () => {
             const resultsBaseDir = path.join(process.cwd(), 'test-results');
             const dateDir = path.join(resultsBaseDir, dateFolder);
             
-            // Ensure directories exist
+            // Ensure directories exist (preserve existing files)
             if (!fs.existsSync(resultsBaseDir)) {
               fs.mkdirSync(resultsBaseDir, { recursive: true });
+              console.log(`📁 Created results base directory: ${resultsBaseDir}`);
             }
             if (!fs.existsSync(dateDir)) {
               fs.mkdirSync(dateDir, { recursive: true });
+              console.log(`📁 Created date directory: ${dateDir}`);
+            } else {
+              // Check existing files in date directory
+              const existingFiles = fs.readdirSync(dateDir).filter(file => file.endsWith('.txt'));
+              console.log(`📁 Date directory exists with ${existingFiles.length} existing files: ${existingFiles.join(', ')}`);
             }
             
             let fileContent = '';
@@ -10243,35 +10132,32 @@ test.describe('Website Availability Checker', () => {
             fileContent += 'End of Report\n';
             
             try {
-              // First try browser download
-              try {
-                await page.evaluate((content, fileName) => {
-                  const blob = new Blob([content], { type: 'text/plain' });
-                  const url = window.URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = fileName;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  window.URL.revokeObjectURL(url);
-                }, fileContent, filename);
-                
-                console.log(`📁 Results file downloaded via browser: ${filename}`);
-              } catch (browserError) {
-                console.log(`⚠️ Browser download failed: ${browserError.message}`);
-                console.log('📁 Attempting Node.js file write...');
-                
-                // Fallback to Node.js file system - write to date directory
-                const filePath = path.join(dateDir, filename);
-                fs.writeFileSync(filePath, fileContent, 'utf8');
-                
-                console.log(`📁 Results saved to: ${filePath}`);
+              // Write directly to organized date directory (skip browser download to avoid conflicts)
+              const filePath = path.join(dateDir, filename);
+              
+              // Ensure unique filename if file already exists
+              let finalFilePath = filePath;
+              let counter = 1;
+              while (fs.existsSync(finalFilePath)) {
+                const nameWithoutExt = filename.replace('.txt', '');
+                const uniqueFilename = `${nameWithoutExt}-${counter}.txt`;
+                finalFilePath = path.join(dateDir, uniqueFilename);
+                counter++;
+                console.log(`⚠️ File ${filename} exists, trying ${uniqueFilename}`);
               }
+              
+              fs.writeFileSync(finalFilePath, fileContent, 'utf8');
+              
+              // Verify file was written and check directory contents
+              const finalFiles = fs.readdirSync(dateDir).filter(file => file.endsWith('.txt'));
+              console.log(`📁 Results saved to: ${finalFilePath}`);
+              console.log(`📊 Total files in date directory: ${finalFiles.length} (${finalFiles.join(', ')})`);
+              
+              const actualFilename = path.basename(finalFilePath);
               
               console.log(`📊 File contains ${checkedWebsites.length} tested merchants`);
               console.log(`✅ ${successfulWebsites.length} successful, 🚨 ${unavailableWebsites.length} flagged`);
-              return filename;
+              return actualFilename;
             } catch (error) {
               console.log(`❌ All download methods failed: ${error.message}`);
               console.log('📝 File content preview (first 500 chars):');
@@ -10301,12 +10187,18 @@ test.describe('Website Availability Checker', () => {
               const resultsBaseDir = path.join(process.cwd(), 'test-results');
               const dateDir = path.join(resultsBaseDir, dateFolder);
               
-              // Ensure directories exist
+              // Ensure directories exist (preserve existing files)
               if (!fs.existsSync(resultsBaseDir)) {
                 fs.mkdirSync(resultsBaseDir, { recursive: true });
+                console.log(`📁 Created results base directory: ${resultsBaseDir}`);
               }
               if (!fs.existsSync(dateDir)) {
                 fs.mkdirSync(dateDir, { recursive: true });
+                console.log(`📁 Created date directory: ${dateDir}`);
+              } else {
+                // Check existing files in date directory
+                const existingFiles = fs.readdirSync(dateDir).filter(file => file.endsWith('.txt'));
+                console.log(`📁 Date directory exists with ${existingFiles.length} existing files: ${existingFiles.join(', ')}`);
               }
               
               let fileContent = '';
@@ -10395,14 +10287,30 @@ test.describe('Website Availability Checker', () => {
               fileContent += '='.repeat(80) + '\n';
               fileContent += 'End of Report\n';
               
-              // Write to date directory
+              // Write to date directory with unique filename
               const filePath = path.join(dateDir, filename);
-              fs.writeFileSync(filePath, fileContent, 'utf8');
               
-              console.log(`📁 Results saved to: ${filePath}`);
+              // Ensure unique filename if file already exists
+              let finalFilePath = filePath;
+              let counter = 1;
+              while (fs.existsSync(finalFilePath)) {
+                const nameWithoutExt = filename.replace('.txt', '');
+                const uniqueFilename = `${nameWithoutExt}-${counter}.txt`;
+                finalFilePath = path.join(dateDir, uniqueFilename);
+                counter++;
+                console.log(`⚠️ File ${filename} exists, trying ${uniqueFilename}`);
+              }
+              
+              fs.writeFileSync(finalFilePath, fileContent, 'utf8');
+              
+              // Verify file was written and check directory contents
+              const finalFiles = fs.readdirSync(dateDir).filter(file => file.endsWith('.txt'));
+              const actualFilename = path.basename(finalFilePath);
+              console.log(`📁 Results saved to: ${finalFilePath}`);
+              console.log(`📊 Total files in date directory: ${finalFiles.length} (${finalFiles.join(', ')})`);
               console.log(`📊 File contains ${checkedWebsites.length} tested merchants`);
               console.log(`✅ ${successfulWebsites.length} successful, 🚨 ${unavailableWebsites.length} flagged`);
-              return filename;
+              return actualFilename;
             } catch (error) {
               console.log(`❌ Failed to save results file: ${error.message}`);
               return null;

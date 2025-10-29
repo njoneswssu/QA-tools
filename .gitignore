@@ -17,8 +17,8 @@ ENV/
 env.bak/
 venv.bak/
 
-# Playwright
-test-results/
+# Playwright (use custom output directory to avoid conflicts)
+playwright-test-results/
 playwright-report/
 playwright/.cache/
 
@@ -54,9 +54,7 @@ Thumbs.db
 logs/
 *.log
 
-# Test results and temporary files
-test-results*/
-merchant-test-results-*.txt
+# Temporary files (but allow our custom test-results directory)
 *.tmp
 *.temp
 
