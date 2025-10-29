@@ -1,4 +1,14 @@
 const { test, expect, chromium } = require('@playwright/test');
+const path = require('path');
+
+// Database integration
+let dbModule;
+try {
+  dbModule = require(path.join(__dirname, '..', 'database', 'init_db'));
+} catch (error) {
+  console.log('Database module not found, results will only be saved to console/file');
+  dbModule = null;
+}
 
 test.describe('Website Availability Checker', () => {
   test('Check websites for unavailability messages with manual review', async () => {
@@ -10117,6 +10127,49 @@ test.describe('Website Availability Checker', () => {
           let checkedCount = 0;
           let userPassedWebsites = [];
           const totalWebsites = websites.length;
+
+          // Database session management
+          const sessionId = `session-${new Date().toISOString().replace(/[:.]/g, '-')}`;
+          let dbSessionCreated = false;
+          
+          if (dbModule) {
+            try {
+              await dbModule.createTestSession(sessionId, 'Automated website availability test');
+              dbSessionCreated = true;
+              console.log(`📊 Database session created: ${sessionId}`);
+            } catch (error) {
+              console.log(`⚠️ Failed to create database session: ${error.message}`);
+            }
+          }
+
+          // Function to save merchant result to database
+          async function saveMerchantToDatabase(website, status, reason, errorPattern = null, duration = null) {
+            if (!dbModule || !dbSessionCreated) return;
+            
+            try {
+              const testData = {
+                session_id: sessionId,
+                merchant_name: website.name,
+                merchant_url: website.url,
+                merchant_id: null, // Will be populated if we can match with master data
+                app_id: null,
+                primary_category: null,
+                parent_category: null,
+                max_rate: null,
+                max_rate_kind: null,
+                test_status: status,
+                test_result: reason,
+                error_pattern: errorPattern,
+                test_duration_ms: duration,
+                is_user_passed: status === 'user_passed',
+                detailed_analysis: reason
+              };
+              
+              await dbModule.saveMerchantTestResult(testData);
+            } catch (error) {
+              console.log(`⚠️ Failed to save to database: ${error.message}`);
+            }
+          }
           
           // Function to display running list of flagged sites
           function displayRunningFlaggedList() {
@@ -10841,6 +10894,9 @@ test.describe('Website Availability Checker', () => {
                     reason: 'User manually passed',
                     checkedAt: new Date().toISOString()
                   });
+
+                  // Save to database
+                  await saveMerchantToDatabase(website, 'user_passed', 'User manually passed');
                   
                   // Track that this was user-passed
                   userPassedWebsites.push({
@@ -11756,6 +11812,9 @@ test.describe('Website Availability Checker', () => {
                     reason: `Business model detected: ${detectedModel}`,
                     checkedAt: new Date().toISOString()
                   });
+
+                  // Save to database
+                  await saveMerchantToDatabase(website, 'success', `Business model detected: ${detectedModel}`);
                   
                   // Add website to checked list before skipping
                   checkedWebsites.push({
@@ -12411,6 +12470,9 @@ test.describe('Website Availability Checker', () => {
                     url: website.url,
                     pattern: `${errorType}: ${error.message.split('\n')[0]}`
                   });
+
+                  // Save to database
+                  await saveMerchantToDatabase(website, 'flagged', `Error: ${errorType}`, errorType);
                   
                   // Display running list
                   displayRunningFlaggedList();
@@ -12603,6 +12665,23 @@ test.describe('Website Availability Checker', () => {
             console.log('✅ All websites appear to be available!');
           }
           
+          // Update database session with final results
+          if (dbModule && dbSessionCreated) {
+            try {
+              await dbModule.updateTestSession(sessionId, {
+                completed_at: new Date().toISOString(),
+                total_merchants: checkedCount,
+                successful_merchants: successfulWebsites.length,
+                flagged_merchants: unavailableWebsites.length,
+                user_passed_merchants: userPassedWebsites.length,
+                status: 'completed'
+              });
+              console.log(`📊 Database session updated: ${sessionId}`);
+            } catch (error) {
+              console.log(`⚠️ Failed to update database session: ${error.message}`);
+            }
+          }
+
           // Final comprehensive summary
           console.log('\n' + '📈'.repeat(50));
           console.log('📈 COMPREHENSIVE TEST RESULTS');
@@ -12613,6 +12692,11 @@ test.describe('Website Availability Checker', () => {
           
           if (userPassedWebsites.length > 0) {
             console.log(`👤 User-Passed Websites: ${userPassedWebsites.length}`);
+          }
+
+          if (dbSessionCreated) {
+            console.log(`💾 Results saved to database session: ${sessionId}`);
+            console.log(`🌐 View results at: http://localhost:3000`);
           }
           
           console.log('');

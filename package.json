@@ -1,31 +1,33 @@
 {
-  "name": "ulta-automation-playwright",
+  "name": "merchant-test-dashboard",
   "version": "1.0.0",
-  "description": "Ulta automation with CitiShop extension using Playwright",
-  "main": "UltaAutomation1.spec.js",
-  "extensionDependencies": [
-    "vscode.git"
-  ],
+  "description": "Dashboard for viewing merchant website test results",
+  "main": "server.js",
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:debug": "playwright test --debug",
-    "install:browsers": "playwright install chromium"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "init-db": "node database/init_db.js",
+    "populate-merchants": "node database/populate_merchants.js",
+    "setup": "npm install && npm run init-db && npm run populate-merchants"
   },
   "keywords": [
-    "playwright",
-    "automation",
+    "merchant",
     "testing",
-    "ulta",
-    "citishop"
+    "dashboard",
+    "playwright",
+    "automation"
   ],
-  "author": "Neil",
+  "author": "",
   "license": "MIT",
-  "devDependencies": {
-    "@playwright/test": "^1.40.0"
-  },
   "dependencies": {
-    "dotenv": "^17.2.1"
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
-  
 }
