@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "CitiShop Merchant Tester",
+  "version": "1.0.0",
+  "description": "Dynamic merchant testing for CitiShop automation with input validation against CitiList database",
+  
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "tabGroups",
+    "downloads",
+    "windows"
+  ],
+  
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js", "floating-crouton.js"],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "CitiShop Merchant Tester",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["popup.html", "popup.css", "merchant-list.json", "merchant-list-edge.json", "citiList.txt"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

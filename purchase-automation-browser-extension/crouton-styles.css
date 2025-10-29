@@ -1,0 +1,292 @@
+/* Purchase Automation Crouton Styles */
+/* Injected into websites to style the floating crouton */
+
+#purchase-automation-crouton {
+    position: fixed !important;
+    top: 50% !important;
+    left: 20px !important;
+    transform: translateY(-50%) !important;
+    width: 350px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    z-index: 2147483647 !important; /* Maximum z-index */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    color: white !important;
+    user-select: none !important;
+    backdrop-filter: blur(10px) !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+
+#purchase-automation-crouton * {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: inherit !important;
+    color: inherit !important;
+}
+
+#purchase-automation-crouton .crouton-header {
+    background: rgba(255, 255, 255, 0.08) !important;
+    padding: 16px 20px !important;
+    border-radius: 16px 16px 0 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    cursor: default !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+#purchase-automation-crouton .crouton-header h3 {
+    margin: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: white !important;
+}
+
+#purchase-automation-crouton .minimize-btn {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: none !important;
+    color: white !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background 0.2s !important;
+    z-index: 2147483648 !important;
+    position: relative !important;
+}
+
+#purchase-automation-crouton .minimize-btn:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+#purchase-automation-crouton .minimize-btn:active {
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+#purchase-automation-crouton .crouton-content {
+    padding: 20px !important;
+    display: block !important;
+    background: transparent !important;
+}
+
+#purchase-automation-crouton .form-group {
+    margin-bottom: 12px !important;
+}
+
+#purchase-automation-crouton .form-group:last-child {
+    margin-bottom: 0 !important;
+}
+
+#purchase-automation-crouton .form-group label {
+    display: block !important;
+    margin-bottom: 6px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    opacity: 0.95 !important;
+    color: white !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+#purchase-automation-crouton .form-group input {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    font-size: 14px !important;
+    box-sizing: border-box !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+#purchase-automation-crouton .form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+#purchase-automation-crouton .form-group input:focus {
+    outline: none !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+#purchase-automation-crouton .price-range {
+    display: flex !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+}
+
+#purchase-automation-crouton .price-range .form-group {
+    flex: 1 !important;
+    margin-bottom: 0 !important;
+}
+
+#purchase-automation-crouton #start-automation-btn {
+    width: 100% !important;
+    padding: 14px 20px !important;
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin: 16px 0 12px 0 !important;
+    display: block !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+#purchase-automation-crouton #start-automation-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+    background: linear-gradient(135deg, #059669, #047857) !important;
+}
+
+#purchase-automation-crouton #start-automation-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+#purchase-automation-crouton .status-display {
+    margin-top: 12px !important;
+    padding: 12px 16px !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    min-height: 20px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    text-align: center !important;
+    display: block !important;
+    clear: both !important;
+    backdrop-filter: blur(10px) !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+#purchase-automation-crouton .status-display.info {
+    background: rgba(52, 152, 219, 0.2) !important;
+    border-left: 3px solid #3498db !important;
+}
+
+#purchase-automation-crouton .status-display.success {
+    background: rgba(46, 204, 113, 0.2) !important;
+    border-left: 3px solid #2ecc71 !important;
+}
+
+#purchase-automation-crouton .status-display.error {
+    background: rgba(231, 76, 60, 0.2) !important;
+    border-left: 3px solid #e74c3c !important;
+}
+
+#purchase-automation-crouton .results-display {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 6px !important;
+    padding: 12px !important;
+    margin-top: 8px !important;
+}
+
+#purchase-automation-crouton .results-display h4 {
+    margin: 0 0 8px 0 !important;
+    font-size: 14px !important;
+    color: #2ecc71 !important;
+}
+
+#purchase-automation-crouton .result-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-bottom: 4px !important;
+    font-size: 11px !important;
+}
+
+#purchase-automation-crouton .result-item:last-child {
+    margin-bottom: 0 !important;
+}
+
+#purchase-automation-crouton .result-item .label {
+    opacity: 0.8 !important;
+    color: white !important;
+}
+
+#purchase-automation-crouton .result-item .value {
+    font-weight: 600 !important;
+    color: white !important;
+    word-break: break-all !important;
+    max-width: 60% !important;
+    text-align: right !important;
+}
+
+#purchase-automation-crouton .result-item .value.total {
+    color: #f39c12 !important;
+    font-size: 12px !important;
+}
+
+/* Ensure the crouton stays on top of everything */
+#purchase-automation-crouton {
+    position: fixed !important;
+    z-index: 2147483647 !important;
+}
+
+/* Prevent website styles from affecting our crouton */
+#purchase-automation-crouton,
+#purchase-automation-crouton * {
+    all: unset !important;
+}
+
+/* Re-apply our styles after unsetting */
+#purchase-automation-crouton {
+    position: fixed !important;
+    top: 50% !important;
+    left: 20px !important;
+    transform: translateY(-50%) !important;
+    width: 380px !important;
+    max-width: calc(100vw - 40px) !important;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    z-index: 2147483647 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    color: white !important;
+    user-select: none !important;
+    backdrop-filter: blur(20px) !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    display: block !important;
+    overflow: visible !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    #purchase-automation-crouton {
+        width: 300px !important;
+        left: 10px !important;
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #purchase-automation-crouton {
+        width: calc(100vw - 20px) !important;
+        left: 10px !important;
+        top: 20px !important;
+        transform: none !important;
+    }
+}

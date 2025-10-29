@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test SENS.AI and Peak Design Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .merchant-details {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .merchant-details h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .merchant-details p {
+            margin: 5px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Test SENS.AI and Peak Design Fix</h1>
+        <p>This test verifies that SENS.AI and Peak Design no longer incorrectly match to Sephora</p>
+        
+        <div id="testResults"></div>
+        
+        <button onclick="runTests()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            🧪 Run Tests
+        </button>
+    </div>
+
+    <script>
+        // Updated merchant data (from merchant-converter.html)
+        const merchantData = [
+            { name: 'Sephora', url: 'https://www.sephora.com/' },
+            { name: 'SENS.AI', url: 'https://sens.ai/' },
+            { name: 'Peak Design', url: 'https://www.peakdesign.com/' },
+            { name: 'LifeLock', url: 'https://www.lifelock.com/' },
+            { name: 'Amazon', url: 'https://www.amazon.com/' },
+            { name: 'Target', url: 'https://www.target.com/' },
+        ];
+
+        // Updated merchant ID mapping (from merchant-converter.html)
+        const merchantIdMap = {
+            'sephora': '5520001',
+            'sens.ai': '999001', // Placeholder - needs real MAdmin ID
+            'peak design': '999002', // Placeholder - needs real MAdmin ID
+            'lifelock': '7159',
+            'amazon': '5520010',
+            'target': '5520020',
+        };
+
+        // Simplified findMerchant function (key parts from merchant-converter.html)
+        function findMerchant(searchName) {
+            if (!searchName || typeof searchName !== 'string') return null;
+            
+            const cleanSearchName = searchName.toLowerCase().trim();
+            let found = null;
+
+            // Priority 1: Exact match (case-insensitive)
+            found = merchantData.find(merchant => 
+                merchant.name.toLowerCase() === cleanSearchName
+            );
+            
+            if (found) return found;
+
+            // Priority 2: Normalized exact match
+            const normalizedSearch = cleanSearchName.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+            found = merchantData.find(merchant => {
+                const normalizedMerchant = merchant.name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+                return normalizedMerchant === normalizedSearch;
+            });
+
+            if (found) return found;
+
+            // Priority 5.5: Merchant name appears in search string
+            if (!found && cleanSearchName.length >= 5) {
+                found = merchantData.find(merchant => {
+                    const merchantNameClean = merchant.name.toLowerCase().replace(/\\'/g, "'");
+                    const merchantRegex = new RegExp('\\b' + merchantNameClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+                    return merchantRegex.test(cleanSearchName);
+                });
+            }
+
+            // If still no match, return null (don't fall back to fuzzy matching for this test)
+            return found;
+        }
+
+        // Get merchant ID function
+        function getMerchantId(merchantName) {
+            if (!merchantName) return null;
+            const normalizedName = merchantName.toLowerCase().trim();
+            return merchantIdMap[normalizedName] || null;
+        }
+
+        function runTests() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '';
+            
+            const testCases = [
+                {
+                    name: 'SENS.AI exact match',
+                    input: 'SENS.AI',
+                    expectedName: 'SENS.AI',
+                    expectedId: '999001',
+                    shouldNotBe: 'Sephora'
+                },
+                {
+                    name: 'SENS.AI case insensitive',
+                    input: 'sens.ai',
+                    expectedName: 'SENS.AI',
+                    expectedId: '999001',
+                    shouldNotBe: 'Sephora'
+                },
+                {
+                    name: 'Peak Design exact match',
+                    input: 'Peak Design',
+                    expectedName: 'Peak Design',
+                    expectedId: '999002',
+                    shouldNotBe: 'Sephora'
+                },
+                {
+                    name: 'Peak Design case insensitive',
+                    input: 'peak design',
+                    expectedName: 'Peak Design',
+                    expectedId: '999002',
+                    shouldNotBe: 'Sephora'
+                },
+                {
+                    name: 'Sephora should still match correctly',
+                    input: 'Sephora',
+                    expectedName: 'Sephora',
+                    expectedId: '5520001',
+                    shouldNotBe: null
+                }
+            ];
+
+            testCases.forEach((testCase, index) => {
+                const result = findMerchant(testCase.input);
+                const merchantId = result ? getMerchantId(result.name) : null;
+                
+                const isNameCorrect = result && result.name === testCase.expectedName;
+                const isIdCorrect = merchantId === testCase.expectedId;
+                const isNotIncorrectMatch = !result || result.name !== testCase.shouldNotBe;
+                const isSuccess = isNameCorrect && isIdCorrect && isNotIncorrectMatch;
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+                
+                resultDiv.innerHTML = `
+                    <h3>Test ${index + 1}: ${testCase.name}</h3>
+                    <div class="merchant-details">
+                        <h4>Input:</h4>
+                        <p>"${testCase.input}"</p>
+                        
+                        <h4>Expected:</h4>
+                        <p>Name: "${testCase.expectedName}"</p>
+                        <p>ID: "${testCase.expectedId}"</p>
+                        <p>Should NOT be: "${testCase.shouldNotBe}"</p>
+                        
+                        <h4>Actual:</h4>
+                        <p>Name: "${result ? result.name : 'null'}" ${isNameCorrect ? '✅' : '❌'}</p>
+                        <p>ID: "${merchantId || 'null'}" ${isIdCorrect ? '✅' : '❌'}</p>
+                        <p>Not incorrect match: ${isNotIncorrectMatch ? '✅' : '❌'}</p>
+                        
+                        <h4>Status:</h4>
+                        <p><strong>${isSuccess ? '✅ PASS' : '❌ FAIL'}</strong></p>
+                        
+                        ${result ? `
+                        <h4>Full Merchant Object:</h4>
+                        <p>{ name: "${result.name}", url: "${result.url}" }</p>
+                        ` : ''}
+                        
+                        ${!isNotIncorrectMatch ? `
+                        <h4>⚠️ CRITICAL ISSUE:</h4>
+                        <p style="color: #dc3545;">This merchant is still incorrectly matching to "${result.name}"!</p>
+                        ` : ''}
+                    </div>
+                `;
+                
+                resultsDiv.appendChild(resultDiv);
+            });
+
+            // Summary
+            const passedTests = testCases.filter((testCase, index) => {
+                const result = findMerchant(testCase.input);
+                const merchantId = result ? getMerchantId(result.name) : null;
+                const isNameCorrect = result && result.name === testCase.expectedName;
+                const isIdCorrect = merchantId === testCase.expectedId;
+                const isNotIncorrectMatch = !result || result.name !== testCase.shouldNotBe;
+                return isNameCorrect && isIdCorrect && isNotIncorrectMatch;
+            }).length;
+
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = `test-result ${passedTests === testCases.length ? 'success' : 'error'}`;
+            summaryDiv.innerHTML = `
+                <h3>📊 Test Summary</h3>
+                <p><strong>${passedTests}/${testCases.length} tests passed</strong></p>
+                ${passedTests === testCases.length ? 
+                    '<p>🎉 All tests passed! SENS.AI and Peak Design are no longer incorrectly matching to Sephora.</p>' : 
+                    '<p>⚠️ Some tests failed. These merchants need real MAdmin IDs from the database.</p>'
+                }
+                <p><strong>Next Step:</strong> Replace placeholder IDs (999001, 999002) with real MAdmin IDs from the database.</p>
+            `;
+            resultsDiv.appendChild(summaryDiv);
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

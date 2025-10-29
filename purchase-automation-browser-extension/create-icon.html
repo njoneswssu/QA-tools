@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Purchase Automation Icon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .icon-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .icon-size {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Purchase Automation Extension Icons</h1>
+    <p>Click "Generate Icons" to create the extension icons, then right-click each canvas to save as PNG.</p>
+    
+    <button onclick="generateIcons()">Generate Icons</button>
+    <button onclick="downloadAll()">Download All Icons</button>
+    
+    <div class="icon-container">
+        <div class="icon-size">
+            <h3>16x16</h3>
+            <canvas id="icon16" width="16" height="16"></canvas>
+            <br>
+            <button onclick="downloadIcon('icon16', 'icon16.png')">Download</button>
+        </div>
+        
+        <div class="icon-size">
+            <h3>32x32</h3>
+            <canvas id="icon32" width="32" height="32"></canvas>
+            <br>
+            <button onclick="downloadIcon('icon32', 'icon32.png')">Download</button>
+        </div>
+        
+        <div class="icon-size">
+            <h3>48x48</h3>
+            <canvas id="icon48" width="48" height="48"></canvas>
+            <br>
+            <button onclick="downloadIcon('icon48', 'icon48.png')">Download</button>
+        </div>
+        
+        <div class="icon-size">
+            <h3>128x128</h3>
+            <canvas id="icon128" width="128" height="128"></canvas>
+            <br>
+            <button onclick="downloadIcon('icon128', 'icon128.png')">Download</button>
+        </div>
+    </div>
+
+    <script>
+        function drawShoppingCartIcon(ctx, size) {
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Set up scaling
+            const scale = size / 128;
+            ctx.scale(scale, scale);
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 128, 128);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // Draw background circle
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(64, 64, 60, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw shopping cart
+            ctx.strokeStyle = 'white';
+            ctx.fillStyle = 'white';
+            ctx.lineWidth = 3;
+            
+            // Cart body
+            ctx.beginPath();
+            ctx.moveTo(25, 45);
+            ctx.lineTo(30, 45);
+            ctx.lineTo(35, 75);
+            ctx.lineTo(85, 75);
+            ctx.lineTo(90, 45);
+            ctx.lineTo(105, 45);
+            ctx.stroke();
+            
+            // Cart handle
+            ctx.beginPath();
+            ctx.moveTo(25, 45);
+            ctx.lineTo(25, 35);
+            ctx.lineTo(30, 35);
+            ctx.stroke();
+            
+            // Cart wheels
+            ctx.beginPath();
+            ctx.arc(45, 85, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(75, 85, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add automation symbol (gear)
+            ctx.save();
+            ctx.translate(75, 35);
+            ctx.scale(0.3, 0.3);
+            
+            // Draw gear
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI) / 4;
+                const x1 = Math.cos(angle) * 15;
+                const y1 = Math.sin(angle) * 15;
+                const x2 = Math.cos(angle + Math.PI / 8) * 10;
+                const y2 = Math.sin(angle + Math.PI / 8) * 10;
+                const x3 = Math.cos(angle + Math.PI / 4) * 15;
+                const y3 = Math.sin(angle + Math.PI / 4) * 15;
+                
+                if (i === 0) ctx.moveTo(x1, y1);
+                ctx.lineTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.lineTo(x3, y3);
+            }
+            ctx.closePath();
+            ctx.fill();
+            
+            // Gear center
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(0, 0, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.restore();
+            
+            // Reset transform
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+        
+        function generateIcons() {
+            const sizes = [16, 32, 48, 128];
+            
+            sizes.forEach(size => {
+                const canvas = document.getElementById(`icon${size}`);
+                const ctx = canvas.getContext('2d');
+                drawShoppingCartIcon(ctx, size);
+            });
+        }
+        
+        function downloadIcon(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        function downloadAll() {
+            const sizes = [16, 32, 48, 128];
+            sizes.forEach(size => {
+                setTimeout(() => {
+                    downloadIcon(`icon${size}`, `icon${size}.png`);
+                }, size * 10); // Stagger downloads
+            });
+        }
+        
+        // Generate icons on page load
+        window.onload = generateIcons;
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "ulta-automation-playwright",
+  "version": "1.0.0",
+  "description": "Ulta automation with CitiShop extension using Playwright",
+  "main": "UltaAutomation1.spec.js",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "install:browsers": "playwright install chromium"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "testing",
+    "ulta",
+    "citishop"
+  ],
+  "author": "Neil",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1"
+  }
+  
+}

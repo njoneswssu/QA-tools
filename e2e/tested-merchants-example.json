@@ -1,0 +1,21 @@
+{
+  "merchants": [
+    {
+      "name": "Example Store",
+      "url": "https://example.com",
+      "status": "available",
+      "reason": "functional e-commerce detection",
+      "timestamp": 1696377600000,
+      "date": "2024-10-03T12:00:00.000Z"
+    },
+    {
+      "name": "Another Store", 
+      "url": "https://another-example.com",
+      "status": "unavailable",
+      "reason": "critical unavailability message",
+      "timestamp": 1696377700000,
+      "date": "2024-10-03T12:01:40.000Z"
+    }
+  ],
+  "lastUpdated": "2024-10-03T12:01:40.000Z"
+}

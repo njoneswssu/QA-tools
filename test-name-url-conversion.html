@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Name+URL Conversion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        .input-example {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        .output-example {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔄 Test Name+URL Conversion</h1>
+        <p>This test verifies that the merchant converter can handle name+URL pairs and convert them to JavaScript format.</p>
+        
+        <h3>📝 Input Format Examples:</h3>
+        <div class="input-example">Photobook	https://www.photobookamerica.com/
+@Peak Design	https://www.peakdesign.com/
+SENS.AI    https://sens.ai/
+Shopify		https://www.shopify.com/</div>
+        
+        <div id="testResults"></div>
+        
+        <button onclick="runTests()">🧪 Run Name+URL Conversion Tests</button>
+    </div>
+
+    <script>
+        // Simulate the enhanced parseInput function from merchant-converter.html
+        function parseInput(input) {
+            const trimmedInput = input.trim();
+            
+            // Check if input contains name+URL pairs (tab or multiple spaces separated)
+            if (trimmedInput.includes('\t') || /\s{2,}https?:\/\//.test(trimmedInput)) {
+                try {
+                    const lines = trimmedInput.split('\n').filter(line => line.trim());
+                    const nameUrlPairs = [];
+                    
+                    for (const line of lines) {
+                        // Split by tab or multiple spaces followed by URL
+                        let parts;
+                        if (line.includes('\t')) {
+                            parts = line.split('\t');
+                        } else {
+                            // Split by multiple spaces before URL
+                            parts = line.split(/\s{2,}(?=https?:\/\/)/);
+                        }
+                        
+                        if (parts.length >= 2) {
+                            const name = parts[0].trim().replace(/^@/, ''); // Remove @ prefix if present
+                            const url = parts[1].trim();
+                            
+                            if (name && url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                                nameUrlPairs.push({ name, url });
+                                console.log(`📝 Parsed name+URL pair: "${name}" -> "${url}"`);
+                            }
+                        }
+                    }
+                    
+                    if (nameUrlPairs.length > 0) {
+                        return {
+                            type: 'nameurl',
+                            merchantNames: nameUrlPairs.map(pair => pair.name),
+                            originalObjects: nameUrlPairs,
+                            nameUrlPairs: nameUrlPairs
+                        };
+                    }
+                } catch (error) {
+                    console.log('Failed to parse as name+URL pairs, continuing with other parsers');
+                }
+            }
+            
+            // Fallback to regular parsing
+            const merchantNames = trimmedInput.split(',').map(name => name.trim()).filter(name => name.length > 0);
+            return {
+                type: 'names',
+                merchantNames: merchantNames,
+                originalObjects: null
+            };
+        }
+
+        // Simulate the JavaScript conversion function
+        function convertToJavaScript(parsedInput) {
+            const results = [];
+            
+            // Special handling for name+URL pairs
+            if (parsedInput.type === 'nameurl' && parsedInput.nameUrlPairs) {
+                console.log('🔄 Processing name+URL pairs directly to JavaScript format');
+                
+                for (const pair of parsedInput.nameUrlPairs) {
+                    // Use the provided name and URL directly
+                    const escapedName = pair.name.replace(/'/g, "\\'");
+                    const jsObject = `{ name: '${escapedName}', url: '${pair.url}' },`;
+                    results.push(jsObject);
+                    console.log(`✅ Converted name+URL pair: ${pair.name} -> ${pair.url}`);
+                }
+            } else {
+                // Regular processing would go here
+                for (const name of parsedInput.merchantNames) {
+                    const jsObject = `{ name: '${name}', url: 'https://www.${name.toLowerCase().replace(/[^\w]/g, '')}.com' },`;
+                    results.push(jsObject);
+                }
+            }
+            
+            return results.join('\n');
+        }
+
+        function runTests() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '';
+            
+            const testCases = [
+                {
+                    name: 'Tab-separated name+URL',
+                    input: 'Photobook\thttps://www.photobookamerica.com/',
+                    expectedType: 'nameurl',
+                    expectedOutput: "{ name: 'Photobook', url: 'https://www.photobookamerica.com/' },"
+                },
+                {
+                    name: 'Multiple spaces name+URL',
+                    input: 'Peak Design    https://www.peakdesign.com/',
+                    expectedType: 'nameurl',
+                    expectedOutput: "{ name: 'Peak Design', url: 'https://www.peakdesign.com/' },"
+                },
+                {
+                    name: 'Name with @ prefix',
+                    input: '@SENS.AI\thttps://sens.ai/',
+                    expectedType: 'nameurl',
+                    expectedOutput: "{ name: 'SENS.AI', url: 'https://sens.ai/' },"
+                },
+                {
+                    name: 'Multiple name+URL pairs',
+                    input: 'Shopify\thttps://www.shopify.com/\nEtsy\thttps://www.etsy.com/',
+                    expectedType: 'nameurl',
+                    expectedOutput: "{ name: 'Shopify', url: 'https://www.shopify.com/' },\n{ name: 'Etsy', url: 'https://www.etsy.com/' },"
+                },
+                {
+                    name: 'Mixed tab and spaces',
+                    input: 'Amazon\thttps://www.amazon.com/\nTarget    https://www.target.com/',
+                    expectedType: 'nameurl',
+                    expectedOutput: "{ name: 'Amazon', url: 'https://www.amazon.com/' },\n{ name: 'Target', url: 'https://www.target.com/' },"
+                }
+            ];
+
+            let passedTests = 0;
+
+            testCases.forEach((testCase, index) => {
+                try {
+                    const parsed = parseInput(testCase.input);
+                    const jsOutput = convertToJavaScript(parsed);
+                    
+                    const isTypeCorrect = parsed.type === testCase.expectedType;
+                    const isOutputCorrect = jsOutput === testCase.expectedOutput;
+                    const isSuccess = isTypeCorrect && isOutputCorrect;
+                    
+                    if (isSuccess) passedTests++;
+                    
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+                    
+                    resultDiv.innerHTML = `
+                        <h3>Test ${index + 1}: ${testCase.name}</h3>
+                        <p><strong>Status:</strong> ${isSuccess ? '✅ PASS' : '❌ FAIL'}</p>
+                        
+                        <h4>Input:</h4>
+                        <div class="input-example">${testCase.input.replace(/\t/g, '→').replace(/\n/g, '\\n\n')}</div>
+                        
+                        <h4>Parsed Type:</h4>
+                        <p>Expected: <code>${testCase.expectedType}</code> | Actual: <code>${parsed.type}</code> ${isTypeCorrect ? '✅' : '❌'}</p>
+                        
+                        ${parsed.nameUrlPairs ? `
+                        <h4>Parsed Pairs:</h4>
+                        <div class="input-example">${parsed.nameUrlPairs.map(p => `"${p.name}" -> "${p.url}"`).join('\n')}</div>
+                        ` : ''}
+                        
+                        <h4>JavaScript Output:</h4>
+                        <div class="output-example">${jsOutput}</div>
+                        
+                        <h4>Expected Output:</h4>
+                        <div class="output-example">${testCase.expectedOutput}</div>
+                        
+                        <p><strong>Output Match:</strong> ${isOutputCorrect ? '✅ Correct' : '❌ Incorrect'}</p>
+                    `;
+                    
+                    resultsDiv.appendChild(resultDiv);
+                    
+                } catch (error) {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = `
+                        <h3>Test ${index + 1}: ${testCase.name}</h3>
+                        <p><strong>Status:</strong> ❌ ERROR</p>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    `;
+                    resultsDiv.appendChild(resultDiv);
+                }
+            });
+
+            // Add summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = `test-result ${passedTests === testCases.length ? 'success' : 'error'}`;
+            summaryDiv.innerHTML = `
+                <h3>📊 Test Summary</h3>
+                <p><strong>${passedTests}/${testCases.length} tests passed</strong></p>
+                ${passedTests === testCases.length ? 
+                    '<p>🎉 All tests passed! Name+URL conversion is working correctly.</p>' : 
+                    '<p>⚠️ Some tests failed. Check the individual test results above.</p>'
+                }
+                <h4>✅ Features Tested:</h4>
+                <ul>
+                    <li>Tab-separated name+URL parsing</li>
+                    <li>Multiple spaces name+URL parsing</li>
+                    <li>@ prefix removal</li>
+                    <li>Multiple pairs on separate lines</li>
+                    <li>Mixed tab and space formats</li>
+                    <li>Direct JavaScript object generation</li>
+                </ul>
+            `;
+            resultsDiv.appendChild(summaryDiv);
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 500);
+        });
+    </script>
+</body>
+</html>

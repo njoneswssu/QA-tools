@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Ad Blocker",
+  "version": "1.7",
+  "description": "Block YouTube ads automatically with popup controls and counter",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://www.youtube.com/*",
+    "*://youtube.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*", "*://youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube Ad Blocker"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

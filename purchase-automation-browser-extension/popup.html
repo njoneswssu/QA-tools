@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Automation</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <header class="popup-header">
+            <h1>🛒 Purchase Automation</h1>
+            <p>Automate test purchases and extract order details</p>
+        </header>
+
+        <main class="popup-content">
+            <!-- Status Section -->
+            <div class="section">
+                <h2>📊 Status</h2>
+                <div id="status-display" class="status-display">
+                    Ready to start automation...
+                </div>
+                <div id="current-website" class="current-website"></div>
+            </div>
+
+            <!-- Merchant Selection -->
+            <div class="section">
+                <h2>🏪 Target Merchants</h2>
+                <div class="form-group">
+                    <label for="merchant-input">Enter merchant websites (one per line):</label>
+                    <textarea id="merchant-input" placeholder="amazon.com&#10;ebay.com&#10;walmart.com&#10;target.com" rows="4"></textarea>
+                </div>
+                <button id="save-merchants-btn" class="btn btn-primary">
+                    💾 Save Merchants
+                </button>
+                <button id="start-testing-btn" class="btn btn-success" disabled>
+                    🚀 Start Testing
+                </button>
+            </div>
+
+            <!-- Current Status -->
+            <div class="section">
+                <h2>📊 Current Status</h2>
+                <div class="merchant-status" id="merchant-status">
+                    Select merchants first, then navigate to a target website
+                </div>
+                <div id="saved-merchants-display" class="saved-merchants-display" style="display: none;">
+                    <h4>📋 Saved Merchants:</h4>
+                    <div id="merchants-list" class="merchants-list">
+                        <!-- Merchant links will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Session Statistics -->
+            <div class="section">
+                <h2>📈 Session Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-attempts">0</div>
+                        <div class="stat-label">Attempts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="successful-purchases">0</div>
+                        <div class="stat-label">Success</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="failed-attempts">0</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="average-price">$0.00</div>
+                        <div class="stat-label">Avg Price</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase Results -->
+            <div class="section">
+                <h2>🛍️ Purchase Results</h2>
+                <div id="merchant-results" class="merchant-results">
+                    <div class="no-results">No results yet</div>
+                </div>
+                <div id="merchant-detail-view" class="merchant-detail-view" style="display: none;">
+                    <div class="detail-header">
+                        <button id="back-to-merchants-btn" class="btn-back">← Back to Merchants</button>
+                        <h3 id="detail-merchant-name"></h3>
+                    </div>
+                    <div id="merchant-detail-content" class="detail-content">
+                        <!-- Order details will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="section">
+                <h2>💾 Data</h2>
+                <div class="button-row">
+                    <button id="export-results-btn" class="btn btn-secondary" disabled>
+                        💾 Export Results
+                    </button>
+                    <button id="clear-data-btn" class="btn btn-danger">
+                        🗑️ Clear Data
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="popup-footer">
+            <div class="footer-content">
+                <span>v1.0.0</span>
+                <span id="connection-status" class="connection-status">🟢 Ready</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 All Purchase Results</h2>
+                <button class="close-btn" id="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="results-table">
+                    <div class="table-header">
+                        <div class="column-header">Website</div>
+                        <div class="column-header">Category</div>
+                        <div class="column-header">Price</div>
+                        <div class="column-header">Tax</div>
+                        <div class="column-header">Fees</div>
+                        <div class="column-header">Total</div>
+                    </div>
+                    <div id="all-results-body" class="table-body">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

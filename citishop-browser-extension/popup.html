@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitiShop Merchant Tester</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="icon">🏪</span>
+                <h1>CitiShop Tester</h1>
+            </div>
+            <div class="version">v2.0.0</div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Merchant Input Section -->
+            <section class="input-section">
+                <h2>📝 Enter Merchants to Test</h2>
+                <p class="instruction">
+                    Enter merchant names (comma-separated or one per line)
+                </p>
+                
+                <div class="input-container">
+                    <textarea 
+                        id="merchantInput" 
+                        placeholder="e.g., Ulta, Best Buy, Macy's&#10;or one per line:&#10;ISA Professional&#10;Dr Ho's&#10;NeilQA"
+                        rows="5"
+                    ></textarea>
+                    
+                    <div class="button-row">
+                        <button id="validateBtn" class="btn btn-primary">
+                            ✅ Validate
+                        </button>
+                        <button id="sampleBtn" class="btn btn-secondary">
+                            📋 Sample
+                        </button>
+                        <button id="clearBtn" class="btn btn-tertiary">
+                            🗑️ Clear
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h3>🔍 Validation Results</h3>
+                    <button id="downloadTableBtn" class="btn btn-download">📄 Download Table</button>
+                </div>
+                
+                <div class="results-grid">
+                    <div class="found-box">
+                        <div class="found-header">
+                            <h4 class="success">✅ Found (<span id="foundCount">0</span>)</h4>
+                            <div class="merchant-search">
+                                <div class="search-input-container">
+                                    <input type="text" id="merchantSearchInput" placeholder="Search merchants..." class="search-input" autocomplete="off">
+                                    <div class="search-autocomplete" id="searchAutocomplete" style="display: none;"></div>
+                                </div>
+                                <button id="searchMerchantBtn" class="btn btn-search">🔍</button>
+                            </div>
+                        </div>
+                        <div class="validation-status-counts" id="validationStatusCounts" style="display: none;">
+                            <div class="status-row-top">
+                                <div class="status-count successful">
+                                    <span class="status-icon">✅</span>
+                                    <span class="status-label">Successful:</span>
+                                    <span class="status-number" id="validationSuccessfulCount">0</span>
+                                </div>
+                                <div class="status-count flagged">
+                                    <span class="status-icon">🚩</span>
+                                    <span class="status-label">Flagged:</span>
+                                    <span class="status-number" id="validationFlaggedCount">0</span>
+                                </div>
+                            </div>
+                            <div class="status-row-bottom">
+                                <div class="status-count tested">
+                                    <span class="status-icon">🧪</span>
+                                    <span class="status-label">Tested:</span>
+                                    <span class="status-number" id="validationTestedCount">0/0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="merchant-list" id="foundList"></div>
+                    </div>
+                    
+                    <div class="not-found-box" id="notFoundBox" style="display: none;">
+                        <h4 class="error">❌ Not Found (<span id="notFoundCount">0</span>)</h4>
+                        <div class="merchant-list" id="notFoundList"></div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Generated Code Section -->
+            <section class="code-section" id="codeSection" style="display: none;">
+                <h3>📄 Generated Test Code</h3>
+                <p class="code-instruction">
+                    Copy this code and replace the websites array in your test file:
+                </p>
+                
+                <div class="code-container">
+                    <pre id="generatedCode"></pre>
+                    <button id="copyCodeBtn" class="btn btn-copy">📋 Copy Code</button>
+                </div>
+                
+                <div class="code-actions">
+                    <button id="downloadBtn" class="btn btn-secondary">
+                        💾 Download File
+                    </button>
+                    <button id="newTestBtn" class="btn btn-primary">
+                        🔄 New Test
+                    </button>
+                </div>
+            </section>
+
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="#" id="helpBtn">❓ Help</a>
+                <a href="#" id="aboutBtn">ℹ️ About</a>
+                <a href="#" id="settingsBtn">⚙️ Settings</a>
+                <a href="#" id="keepOpenBtn" class="keep-open-btn" title="Pin extension to current tab (stays visible)">📌 Pin to Tab</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p id="loadingText">Loading...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast" id="toast" style="display: none;">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Modal Title</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="modalConfirmBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Twitch Ad Blocker",
+  "version": "1.1",
+  "description": "Block Twitch ads that randomly appear during livestreams with advanced detection",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://www.twitch.tv/*",
+    "*://twitch.tv/*",
+    "*://*.twitch.tv/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://www.twitch.tv/*", "*://twitch.tv/*", "*://*.twitch.tv/*"],
+      "js": ["content-minimal.js"],
+      "css": ["styles-minimal.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Twitch Ad Blocker"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

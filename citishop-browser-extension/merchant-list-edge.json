@@ -1,0 +1,7008 @@
+{
+  "version": "2.0.0-small",
+  "generatedAt": "2025-09-15T14:50:55.194Z",
+  "source": "/Users/neiljones/Documents/playwrightautomation/e2e/citiList.txt",
+  "totalMerchants": 1000,
+  "merchants": [
+    {
+      "name": "Ulta",
+      "url": "https://www.ulta.com/",
+      "id": "ulta",
+      "source": "citiList.txt",
+      "lineNumber": 2
+    },
+    {
+      "name": "Best Buy",
+      "url": "https://www.bestbuy.com/",
+      "id": "best-buy",
+      "source": "citiList.txt",
+      "lineNumber": 3
+    },
+    {
+      "name": "Kohl's",
+      "url": "https://www.kohls.com/",
+      "id": "kohl-s",
+      "source": "citiList.txt",
+      "lineNumber": 4
+    },
+    {
+      "name": "Macy's",
+      "url": "https://www.macys.com/",
+      "id": "macy-s",
+      "source": "citiList.txt",
+      "lineNumber": 5
+    },
+    {
+      "name": "Sephora",
+      "url": "https://www.sephora.com/",
+      "id": "sephora",
+      "source": "citiList.txt",
+      "lineNumber": 6
+    },
+    {
+      "name": "StubHub",
+      "url": "https://www.stubhub.com/",
+      "id": "stubhub",
+      "source": "citiList.txt",
+      "lineNumber": 7
+    },
+    {
+      "name": "LL Bean",
+      "url": "https://www.llbean.com/",
+      "id": "ll-bean",
+      "source": "citiList.txt",
+      "lineNumber": 8
+    },
+    {
+      "name": "Gap",
+      "url": "https://www.gap.com/",
+      "id": "gap",
+      "source": "citiList.txt",
+      "lineNumber": 9
+    },
+    {
+      "name": "Total Wine",
+      "url": "https://www.totalwine.com/",
+      "id": "total-wine",
+      "source": "citiList.txt",
+      "lineNumber": 10
+    },
+    {
+      "name": "PetSafe",
+      "url": "https://www.petsafe.com/",
+      "id": "petsafe",
+      "source": "citiList.txt",
+      "lineNumber": 11
+    },
+    {
+      "name": "PetSmart",
+      "url": "https://www.petsmart.com/",
+      "id": "petsmart",
+      "source": "citiList.txt",
+      "lineNumber": 12
+    },
+    {
+      "name": "Dick's",
+      "url": "https://www.dickssportinggoods.com/",
+      "id": "dick-s",
+      "source": "citiList.txt",
+      "lineNumber": 13
+    },
+    {
+      "name": "TEVA",
+      "url": "https://www.teva.com/",
+      "id": "teva",
+      "source": "citiList.txt",
+      "lineNumber": 14
+    },
+    {
+      "name": "ASICS",
+      "url": "https://www.asics.com/",
+      "id": "asics",
+      "source": "citiList.txt",
+      "lineNumber": 15
+    },
+    {
+      "name": "Old Navy",
+      "url": "https://www.oldnavy.com/",
+      "id": "old-navy",
+      "source": "citiList.txt",
+      "lineNumber": 16
+    },
+    {
+      "name": "Crocs",
+      "url": "https://www.crocs.com/",
+      "id": "crocs",
+      "source": "citiList.txt",
+      "lineNumber": 17
+    },
+    {
+      "name": "Bombas",
+      "url": "https://www.bombas.com/",
+      "id": "bombas",
+      "source": "citiList.txt",
+      "lineNumber": 18
+    },
+    {
+      "name": "Saks Fifth Avenue",
+      "url": "https://www.saksfifthavenue.com/",
+      "id": "saks-fifth-avenue",
+      "source": "citiList.txt",
+      "lineNumber": 19
+    },
+    {
+      "name": "Solo Stove",
+      "url": "https://www.solostove.com/",
+      "id": "solo-stove",
+      "source": "citiList.txt",
+      "lineNumber": 20
+    },
+    {
+      "name": "KitchenAid",
+      "url": "https://www.kitchenaid.com/",
+      "id": "kitchenaid",
+      "source": "citiList.txt",
+      "lineNumber": 21
+    },
+    {
+      "name": "Laplink",
+      "url": "https://www.laplink.com/",
+      "id": "laplink",
+      "source": "citiList.txt",
+      "lineNumber": 22
+    },
+    {
+      "name": "LEGO",
+      "url": "https://www.lego.com/",
+      "id": "lego",
+      "source": "citiList.txt",
+      "lineNumber": 23
+    },
+    {
+      "name": "Verizon",
+      "url": "https://www.verizon.com",
+      "id": "verizon",
+      "source": "citiList.txt",
+      "lineNumber": 24
+    },
+    {
+      "name": "Philo",
+      "url": "https://www.philo.com",
+      "id": "philo",
+      "source": "citiList.txt",
+      "lineNumber": 25
+    },
+    {
+      "name": "89th + Madison",
+      "url": "https://89thandmadison.com/",
+      "id": "89th-madison",
+      "source": "citiList.txt",
+      "lineNumber": 26
+    },
+    {
+      "name": "525 America",
+      "url": "https://www.525america.com/",
+      "id": "525-america",
+      "source": "citiList.txt",
+      "lineNumber": 27
+    },
+    {
+      "name": "Drop",
+      "url": "https://drop.com/",
+      "id": "drop",
+      "source": "citiList.txt",
+      "lineNumber": 28
+    },
+    {
+      "name": "RAVPower",
+      "url": "https://www.ravpower.com/",
+      "id": "ravpower",
+      "source": "citiList.txt",
+      "lineNumber": 29
+    },
+    {
+      "name": "Memory Cross Inc.",
+      "url": "https://www.memorycross.com",
+      "id": "memory-cross-inc",
+      "source": "citiList.txt",
+      "lineNumber": 30
+    },
+    {
+      "name": "Enjoy Flowers",
+      "url": "https://www.enjoyflowers.com/",
+      "id": "enjoy-flowers",
+      "source": "citiList.txt",
+      "lineNumber": 31
+    },
+    {
+      "name": "80eighty, llc",
+      "url": "https://80eighty.com",
+      "id": "80eighty-llc",
+      "source": "citiList.txt",
+      "lineNumber": 32
+    },
+    {
+      "name": "Rothy\u2019s",
+      "url": "https://rothys.com",
+      "id": "rothy-s",
+      "source": "citiList.txt",
+      "lineNumber": 33
+    },
+    {
+      "name": "JEGS",
+      "url": "https://www.jegs.com/",
+      "id": "jegs",
+      "source": "citiList.txt",
+      "lineNumber": 34
+    },
+    {
+      "name": "ILoveDooney",
+      "url": "https://www.ilovedooney.com",
+      "id": "ilovedooney",
+      "source": "citiList.txt",
+      "lineNumber": 35
+    },
+    {
+      "name": "Misook",
+      "url": "https://www.misook.com/",
+      "id": "misook",
+      "source": "citiList.txt",
+      "lineNumber": 36
+    },
+    {
+      "name": "Natural Vitality",
+      "url": "https://www.betteryourhealth.com/naturalvitality/",
+      "id": "natural-vitality",
+      "source": "citiList.txt",
+      "lineNumber": 37
+    },
+    {
+      "name": "Pureology",
+      "url": "https://www.Pureology.com",
+      "id": "pureology",
+      "source": "citiList.txt",
+      "lineNumber": 38
+    },
+    {
+      "name": "Instacart",
+      "url": "https://www.instacart.com/",
+      "id": "instacart",
+      "source": "citiList.txt",
+      "lineNumber": 39
+    },
+    {
+      "name": "Capri-Blue",
+      "url": "https://www.capri-blue.com",
+      "id": "capri-blue",
+      "source": "citiList.txt",
+      "lineNumber": 40
+    },
+    {
+      "name": "PIKOLINOS",
+      "url": "https://www.pikolinos.com",
+      "id": "pikolinos",
+      "source": "citiList.txt",
+      "lineNumber": 41
+    },
+    {
+      "name": "kut from the kloth",
+      "url": "https://kutfromthekloth.com/",
+      "id": "kut-from-the-kloth",
+      "source": "citiList.txt",
+      "lineNumber": 42
+    },
+    {
+      "name": "Graf Lantz",
+      "url": "https://graflantz.com/",
+      "id": "graf-lantz",
+      "source": "citiList.txt",
+      "lineNumber": 43
+    },
+    {
+      "name": "Zero Breeze",
+      "url": "https://www.zerobreeze.com/",
+      "id": "zero-breeze",
+      "source": "citiList.txt",
+      "lineNumber": 44
+    },
+    {
+      "name": "AnyPromo",
+      "url": "https://www.anypromo.com?utm_source=AFC&utm_medium=IR&glppc=1",
+      "id": "anypromo",
+      "source": "citiList.txt",
+      "lineNumber": 45
+    },
+    {
+      "name": "ShoppingBookmarks.com",
+      "url": "https://www.shoppingbookmarks.com",
+      "id": "shoppingbookmarks-com",
+      "source": "citiList.txt",
+      "lineNumber": 46
+    },
+    {
+      "name": "Shark Clean",
+      "url": "https://www.sharkclean.com",
+      "id": "shark-clean",
+      "source": "citiList.txt",
+      "lineNumber": 47
+    },
+    {
+      "name": "Fuse Reel",
+      "url": "https://www.fusereel.com",
+      "id": "fuse-reel",
+      "source": "citiList.txt",
+      "lineNumber": 48
+    },
+    {
+      "name": "LYFE Fuel",
+      "url": "https://lyfefuel.com/",
+      "id": "lyfe-fuel",
+      "source": "citiList.txt",
+      "lineNumber": 49
+    },
+    {
+      "name": "Sunshine Jewelry",
+      "url": "https://www.sunshinejewelry.com",
+      "id": "sunshine-jewelry",
+      "source": "citiList.txt",
+      "lineNumber": 50
+    },
+    {
+      "name": "Jrroses.com",
+      "url": "https://www.jrroses.com",
+      "id": "jrroses-com",
+      "source": "citiList.txt",
+      "lineNumber": 51
+    },
+    {
+      "name": "MagicWorldOnline",
+      "url": "https://www.magicworldonline.com",
+      "id": "magicworldonline",
+      "source": "citiList.txt",
+      "lineNumber": 52
+    },
+    {
+      "name": "J Renee",
+      "url": "https://jrenee.com/",
+      "id": "j-renee",
+      "source": "citiList.txt",
+      "lineNumber": 53
+    },
+    {
+      "name": "Ingrid & Isabel",
+      "url": "https://ingridandisabel.com",
+      "id": "ingrid-isabel",
+      "source": "citiList.txt",
+      "lineNumber": 54
+    },
+    {
+      "name": "Wet n Wild",
+      "url": "https://www.wetnwildbeauty.com",
+      "id": "wet-n-wild",
+      "source": "citiList.txt",
+      "lineNumber": 55
+    },
+    {
+      "name": "Zealios",
+      "url": "https://teamzealios.com",
+      "id": "zealios",
+      "source": "citiList.txt",
+      "lineNumber": 56
+    },
+    {
+      "name": "Karen Kane",
+      "url": "https://www.karenkane.com/",
+      "id": "karen-kane",
+      "source": "citiList.txt",
+      "lineNumber": 57
+    },
+    {
+      "name": "SFERRA Fine Linens",
+      "url": "https://sferra.com",
+      "id": "sferra-fine-linens",
+      "source": "citiList.txt",
+      "lineNumber": 58
+    },
+    {
+      "name": "Joyoshare",
+      "url": "https://www.joyoshare.com",
+      "id": "joyoshare",
+      "source": "citiList.txt",
+      "lineNumber": 59
+    },
+    {
+      "name": "Zadig & Voltaire",
+      "url": "https://us.zadig-et-voltaire.com",
+      "id": "zadig-voltaire",
+      "source": "citiList.txt",
+      "lineNumber": 60
+    },
+    {
+      "name": "Xpand Inc.",
+      "url": "https://www.xpandlaces.com",
+      "id": "xpand-inc",
+      "source": "citiList.txt",
+      "lineNumber": 61
+    },
+    {
+      "name": "Hipstik\u00ae Legwear",
+      "url": "https://hipstiks.com",
+      "id": "hipstik-legwear",
+      "source": "citiList.txt",
+      "lineNumber": 62
+    },
+    {
+      "name": "Madda Fella",
+      "url": "https://maddafella.com/",
+      "id": "madda-fella",
+      "source": "citiList.txt",
+      "lineNumber": 63
+    },
+    {
+      "name": "Arhaus",
+      "url": "https://www.arhaus.com/",
+      "id": "arhaus",
+      "source": "citiList.txt",
+      "lineNumber": 64
+    },
+    {
+      "name": "American Blinds",
+      "url": "https://www.americanblinds.com",
+      "id": "american-blinds",
+      "source": "citiList.txt",
+      "lineNumber": 65
+    },
+    {
+      "name": "True Religion",
+      "url": "https://www.truereligion.com/",
+      "id": "true-religion",
+      "source": "citiList.txt",
+      "lineNumber": 66
+    },
+    {
+      "name": "Genie Traveler",
+      "url": "https://genietraveler.com/",
+      "id": "genie-traveler",
+      "source": "citiList.txt",
+      "lineNumber": 67
+    },
+    {
+      "name": "VitalSleep",
+      "url": "https://www.vitalsleep.com",
+      "id": "vitalsleep",
+      "source": "citiList.txt",
+      "lineNumber": 68
+    },
+    {
+      "name": "English4Today",
+      "url": "https://www.english4today.com",
+      "id": "english4today",
+      "source": "citiList.txt",
+      "lineNumber": 69
+    },
+    {
+      "name": "AlwaysWebHosting.com",
+      "url": "https://alwayswebhosting.com",
+      "id": "alwayswebhosting-com",
+      "source": "citiList.txt",
+      "lineNumber": 70
+    },
+    {
+      "name": "Antix Clothing",
+      "url": "https://www.iloveantix.com",
+      "id": "antix-clothing",
+      "source": "citiList.txt",
+      "lineNumber": 71
+    },
+    {
+      "name": "beek",
+      "url": "https://www.beekshop.com/",
+      "id": "beek",
+      "source": "citiList.txt",
+      "lineNumber": 72
+    },
+    {
+      "name": "NakedWines.com",
+      "url": "https://us.nakedwines.com",
+      "id": "nakedwines-com",
+      "source": "citiList.txt",
+      "lineNumber": 73
+    },
+    {
+      "name": "Campus Protein",
+      "url": "https://www.campusprotein.com",
+      "id": "campus-protein",
+      "source": "citiList.txt",
+      "lineNumber": 74
+    },
+    {
+      "name": "Herbivore Botanicals",
+      "url": "https://www.herbivorebotanicals.com/",
+      "id": "herbivore-botanicals",
+      "source": "citiList.txt",
+      "lineNumber": 75
+    },
+    {
+      "name": "Borghese",
+      "url": "https://Borghese.com",
+      "id": "borghese",
+      "source": "citiList.txt",
+      "lineNumber": 76
+    },
+    {
+      "name": "Physicians Formula",
+      "url": "https://www.physiciansformula.com/",
+      "id": "physicians-formula",
+      "source": "citiList.txt",
+      "lineNumber": 77
+    },
+    {
+      "name": "Ecco Bella",
+      "url": "https://www.eccobella.com/",
+      "id": "ecco-bella",
+      "source": "citiList.txt",
+      "lineNumber": 78
+    },
+    {
+      "name": "Paddywax",
+      "url": "https://paddywax.com/",
+      "id": "paddywax",
+      "source": "citiList.txt",
+      "lineNumber": 79
+    },
+    {
+      "name": "Kimera Koffee",
+      "url": "https://kimerakoffee.com",
+      "id": "kimera-koffee",
+      "source": "citiList.txt",
+      "lineNumber": 80
+    },
+    {
+      "name": "Tubby Todd Bath Co",
+      "url": "https://www.tubbytodd.com",
+      "id": "tubby-todd-bath-co",
+      "source": "citiList.txt",
+      "lineNumber": 81
+    },
+    {
+      "name": "CPR Test Center",
+      "url": "https://www.cprtestcenter.com",
+      "id": "cpr-test-center",
+      "source": "citiList.txt",
+      "lineNumber": 82
+    },
+    {
+      "name": "Kbeads",
+      "url": "https://kbeads.com/",
+      "id": "kbeads",
+      "source": "citiList.txt",
+      "lineNumber": 83
+    },
+    {
+      "name": "Gear Infusion",
+      "url": "https://www.GearInfusion.com",
+      "id": "gear-infusion",
+      "source": "citiList.txt",
+      "lineNumber": 84
+    },
+    {
+      "name": "Ming Wang Knits",
+      "url": "https://mingwang.com/",
+      "id": "ming-wang-knits",
+      "source": "citiList.txt",
+      "lineNumber": 85
+    },
+    {
+      "name": "Beebeecraft",
+      "url": "https://www.beebeecraft.com",
+      "id": "beebeecraft",
+      "source": "citiList.txt",
+      "lineNumber": 86
+    },
+    {
+      "name": "Coupon Surfer",
+      "url": "https://www.couponsurfer.com",
+      "id": "coupon-surfer",
+      "source": "citiList.txt",
+      "lineNumber": 87
+    },
+    {
+      "name": "HostNed Web Hosting",
+      "url": "https://www.hostned.com",
+      "id": "hostned-web-hosting",
+      "source": "citiList.txt",
+      "lineNumber": 88
+    },
+    {
+      "name": "Foot Cardigan",
+      "url": "https://footcardigan.com",
+      "id": "foot-cardigan",
+      "source": "citiList.txt",
+      "lineNumber": 89
+    },
+    {
+      "name": "Portable Oxygen Depot",
+      "url": "https://info.portableoxygendepot.com/sas/",
+      "id": "portable-oxygen-depot",
+      "source": "citiList.txt",
+      "lineNumber": 90
+    },
+    {
+      "name": "EasySMX Co., Ltd",
+      "url": "https://www.easysmx.com",
+      "id": "easysmx-co-ltd",
+      "source": "citiList.txt",
+      "lineNumber": 91
+    },
+    {
+      "name": "StickerShoppe.com",
+      "url": "https://www.stickershoppe.com",
+      "id": "stickershoppe-com",
+      "source": "citiList.txt",
+      "lineNumber": 92
+    },
+    {
+      "name": "Mukha Yoga",
+      "url": "https://www.mukhayoga.com/",
+      "id": "mukha-yoga",
+      "source": "citiList.txt",
+      "lineNumber": 93
+    },
+    {
+      "name": "Gobi Heat",
+      "url": "https://gobiheat.com",
+      "id": "gobi-heat",
+      "source": "citiList.txt",
+      "lineNumber": 94
+    },
+    {
+      "name": "Swanson Health",
+      "url": "https://www.swansonvitamins.com",
+      "id": "swanson-health",
+      "source": "citiList.txt",
+      "lineNumber": 95
+    },
+    {
+      "name": "Sullen Clothing",
+      "url": "https://www.sullenclothing.com/",
+      "id": "sullen-clothing",
+      "source": "citiList.txt",
+      "lineNumber": 96
+    },
+    {
+      "name": "Diabetes Store",
+      "url": "https://www.diabetesstore.com",
+      "id": "diabetes-store",
+      "source": "citiList.txt",
+      "lineNumber": 97
+    },
+    {
+      "name": "Golf Avenue",
+      "url": "https://www.golfavenue.com",
+      "id": "golf-avenue",
+      "source": "citiList.txt",
+      "lineNumber": 98
+    },
+    {
+      "name": "KIND Snacks",
+      "url": "https://www.kindsnacks.com/",
+      "id": "kind-snacks",
+      "source": "citiList.txt",
+      "lineNumber": 99
+    },
+    {
+      "name": "VENN Skincare",
+      "url": "https://www.vennskincare.com",
+      "id": "venn-skincare",
+      "source": "citiList.txt",
+      "lineNumber": 100
+    },
+    {
+      "name": "Zeelool",
+      "url": "https://de.zeelool.com",
+      "id": "zeelool",
+      "source": "citiList.txt",
+      "lineNumber": 101
+    },
+    {
+      "name": "www.beachsissi.com",
+      "url": "https://www.beachsissi.com",
+      "id": "www-beachsissi-com",
+      "source": "citiList.txt",
+      "lineNumber": 102
+    },
+    {
+      "name": "K&F Concept",
+      "url": "https://www.kentfaith.com",
+      "id": "k-f-concept",
+      "source": "citiList.txt",
+      "lineNumber": 103
+    },
+    {
+      "name": "Rodd & Gunn",
+      "url": "https://www.roddandgunn.com/us",
+      "id": "rodd-gunn",
+      "source": "citiList.txt",
+      "lineNumber": 104
+    },
+    {
+      "name": "Boundary Supply",
+      "url": "https://boundarysupply.com",
+      "id": "boundary-supply",
+      "source": "citiList.txt",
+      "lineNumber": 105
+    },
+    {
+      "name": "Proenza Schouler LLC",
+      "url": "https://proenzaschouler.com",
+      "id": "proenza-schouler-llc",
+      "source": "citiList.txt",
+      "lineNumber": 106
+    },
+    {
+      "name": "Elie Tahari",
+      "url": "https://www.elietahari.com/",
+      "id": "elie-tahari",
+      "source": "citiList.txt",
+      "lineNumber": 107
+    },
+    {
+      "name": "Lasfit",
+      "url": "https://www.lasfit.com",
+      "id": "lasfit",
+      "source": "citiList.txt",
+      "lineNumber": 108
+    },
+    {
+      "name": "Daily Greatness",
+      "url": "https://www.dailygreatness.co",
+      "id": "daily-greatness",
+      "source": "citiList.txt",
+      "lineNumber": 109
+    },
+    {
+      "name": "SmithH\u00f6nig",
+      "url": "https://www.smithhonig.com",
+      "id": "smithh-nig",
+      "source": "citiList.txt",
+      "lineNumber": 110
+    },
+    {
+      "name": "Prodigy",
+      "url": "https://www.prodigygame.com/main-en/",
+      "id": "prodigy",
+      "source": "citiList.txt",
+      "lineNumber": 111
+    },
+    {
+      "name": "Clarks Botanicals",
+      "url": "https://clarksbotanicals.com",
+      "id": "clarks-botanicals",
+      "source": "citiList.txt",
+      "lineNumber": 112
+    },
+    {
+      "name": "Sideshow",
+      "url": "https://sideshow.com",
+      "id": "sideshow",
+      "source": "citiList.txt",
+      "lineNumber": 113
+    },
+    {
+      "name": "Evan Evans Tours",
+      "url": "https://evanevanstours.com/",
+      "id": "evan-evans-tours",
+      "source": "citiList.txt",
+      "lineNumber": 114
+    },
+    {
+      "name": "1Password",
+      "url": "https://1password.com/",
+      "id": "1password",
+      "source": "citiList.txt",
+      "lineNumber": 115
+    },
+    {
+      "name": "Wherelight",
+      "url": "https://www.wherelight.com/",
+      "id": "wherelight",
+      "source": "citiList.txt",
+      "lineNumber": 116
+    },
+    {
+      "name": "Dansko",
+      "url": "https://www.dansko.com/",
+      "id": "dansko",
+      "source": "citiList.txt",
+      "lineNumber": 117
+    },
+    {
+      "name": "Mini Mioche",
+      "url": "https://www.minimioche.com/",
+      "id": "mini-mioche",
+      "source": "citiList.txt",
+      "lineNumber": 118
+    },
+    {
+      "name": "Stella McCartney",
+      "url": "https://stellamccartney.com/",
+      "id": "stella-mccartney",
+      "source": "citiList.txt",
+      "lineNumber": 119
+    },
+    {
+      "name": "Cashmere in Love",
+      "url": "https://www.cashmereinlove.com",
+      "id": "cashmere-in-love",
+      "source": "citiList.txt",
+      "lineNumber": 120
+    },
+    {
+      "name": "Niccolo Hotels",
+      "url": "https://www.niccolohotels.com",
+      "id": "niccolo-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 121
+    },
+    {
+      "name": "OnePlus",
+      "url": "https://www.oneplus.com",
+      "id": "oneplus",
+      "source": "citiList.txt",
+      "lineNumber": 122
+    },
+    {
+      "name": "SimpleTire",
+      "url": "https://simpletire.com/",
+      "id": "simpletire",
+      "source": "citiList.txt",
+      "lineNumber": 123
+    },
+    {
+      "name": "Flat Tummy Co",
+      "url": "https://flattummyco.com/",
+      "id": "flat-tummy-co",
+      "source": "citiList.txt",
+      "lineNumber": 124
+    },
+    {
+      "name": "TESVOR",
+      "url": "https://www.tesvor.com/",
+      "id": "tesvor",
+      "source": "citiList.txt",
+      "lineNumber": 125
+    },
+    {
+      "name": "Compex",
+      "url": "https://www.compex.com/",
+      "id": "compex",
+      "source": "citiList.txt",
+      "lineNumber": 126
+    },
+    {
+      "name": "Theory Apparel",
+      "url": "https://theory.com/",
+      "id": "theory-apparel",
+      "source": "citiList.txt",
+      "lineNumber": 127
+    },
+    {
+      "name": "Allbirds",
+      "url": "https://www.allbirds.com/",
+      "id": "allbirds",
+      "source": "citiList.txt",
+      "lineNumber": 128
+    },
+    {
+      "name": "Focus Factor",
+      "url": "https://www.focusfactor.com/",
+      "id": "focus-factor",
+      "source": "citiList.txt",
+      "lineNumber": 129
+    },
+    {
+      "name": "Delphinus",
+      "url": "https://delphinusworld.com",
+      "id": "delphinus",
+      "source": "citiList.txt",
+      "lineNumber": 130
+    },
+    {
+      "name": "Vince",
+      "url": "https://www.vince.com",
+      "id": "vince",
+      "source": "citiList.txt",
+      "lineNumber": 131
+    },
+    {
+      "name": "Culture Kings",
+      "url": "https://www.culturekings.com",
+      "id": "culture-kings",
+      "source": "citiList.txt",
+      "lineNumber": 132
+    },
+    {
+      "name": "NatraCure",
+      "url": "https://natracure.com",
+      "id": "natracure",
+      "source": "citiList.txt",
+      "lineNumber": 133
+    },
+    {
+      "name": "Fifthroom.com",
+      "url": "https://www.fifthroom.com/",
+      "id": "fifthroom-com",
+      "source": "citiList.txt",
+      "lineNumber": 134
+    },
+    {
+      "name": "Dometic",
+      "url": "https://dometic.com/",
+      "id": "dometic",
+      "source": "citiList.txt",
+      "lineNumber": 135
+    },
+    {
+      "name": "Ashampoo",
+      "url": "https://www.ashampoo.com/",
+      "id": "ashampoo",
+      "source": "citiList.txt",
+      "lineNumber": 136
+    },
+    {
+      "name": "Trek Bicycle",
+      "url": "https://www.trekbikes.com",
+      "id": "trek-bicycle",
+      "source": "citiList.txt",
+      "lineNumber": 137
+    },
+    {
+      "name": "Logitech G",
+      "url": "https://www.logitechg.com",
+      "id": "logitech-g",
+      "source": "citiList.txt",
+      "lineNumber": 138
+    },
+    {
+      "name": "Matador",
+      "url": "https://www.matadorequipment.com/",
+      "id": "matador",
+      "source": "citiList.txt",
+      "lineNumber": 139
+    },
+    {
+      "name": "Scala Hosting",
+      "url": "https://www.scalahosting.com/",
+      "id": "scala-hosting",
+      "source": "citiList.txt",
+      "lineNumber": 140
+    },
+    {
+      "name": "Cotton On",
+      "url": "https://cottonon.com/US",
+      "id": "cotton-on",
+      "source": "citiList.txt",
+      "lineNumber": 141
+    },
+    {
+      "name": "Kiss My Keto",
+      "url": "https://kissmyketo.com",
+      "id": "kiss-my-keto",
+      "source": "citiList.txt",
+      "lineNumber": 142
+    },
+    {
+      "name": "LogoMix",
+      "url": "https://logomaker.com",
+      "id": "logomix",
+      "source": "citiList.txt",
+      "lineNumber": 143
+    },
+    {
+      "name": "Heat Holders",
+      "url": "https://heatholders.com",
+      "id": "heat-holders",
+      "source": "citiList.txt",
+      "lineNumber": 144
+    },
+    {
+      "name": "MOXXOR",
+      "url": "https://www.moxdirect.com",
+      "id": "moxxor",
+      "source": "citiList.txt",
+      "lineNumber": 145
+    },
+    {
+      "name": "Taylor Stitch",
+      "url": "https://www.taylorstitch.com",
+      "id": "taylor-stitch",
+      "source": "citiList.txt",
+      "lineNumber": 146
+    },
+    {
+      "name": "MAPS.com",
+      "url": "https://www.maps.com",
+      "id": "maps-com",
+      "source": "citiList.txt",
+      "lineNumber": 147
+    },
+    {
+      "name": "Wine On Sale",
+      "url": "https://wineonsale.com/",
+      "id": "wine-on-sale",
+      "source": "citiList.txt",
+      "lineNumber": 148
+    },
+    {
+      "name": "Jambu",
+      "url": "https://jambu.com/",
+      "id": "jambu",
+      "source": "citiList.txt",
+      "lineNumber": 149
+    },
+    {
+      "name": "eDreams",
+      "url": "https://www.edreams.net/",
+      "id": "edreams",
+      "source": "citiList.txt",
+      "lineNumber": 150
+    },
+    {
+      "name": "John Robshaw",
+      "url": "https://johnrobshaw.com",
+      "id": "john-robshaw",
+      "source": "citiList.txt",
+      "lineNumber": 151
+    },
+    {
+      "name": "Hamilton Beach",
+      "url": "https://www.hamiltonbeach.com",
+      "id": "hamilton-beach",
+      "source": "citiList.txt",
+      "lineNumber": 152
+    },
+    {
+      "name": "Nobis",
+      "url": "https://nobis.com",
+      "id": "nobis",
+      "source": "citiList.txt",
+      "lineNumber": 153
+    },
+    {
+      "name": "Vinyl Me, Please",
+      "url": "https://www.vinylmeplease.com",
+      "id": "vinyl-me-please",
+      "source": "citiList.txt",
+      "lineNumber": 154
+    },
+    {
+      "name": "Ooni",
+      "url": "https://ooni.com/",
+      "id": "ooni",
+      "source": "citiList.txt",
+      "lineNumber": 155
+    },
+    {
+      "name": "JUMPER Premium Threads",
+      "url": "https://jumperthreads.com",
+      "id": "jumper-premium-threads",
+      "source": "citiList.txt",
+      "lineNumber": 156
+    },
+    {
+      "name": "Skinnydip",
+      "url": "https://www.skinnydiplondon.com/",
+      "id": "skinnydip",
+      "source": "citiList.txt",
+      "lineNumber": 157
+    },
+    {
+      "name": "Title Nine",
+      "url": "https://www.titlenine.com/",
+      "id": "title-nine",
+      "source": "citiList.txt",
+      "lineNumber": 158
+    },
+    {
+      "name": "Fashion Fabrics Club",
+      "url": "https://www.fashionfabricsclub.com",
+      "id": "fashion-fabrics-club",
+      "source": "citiList.txt",
+      "lineNumber": 159
+    },
+    {
+      "name": "Sea New York",
+      "url": "https://sea-ny.com/",
+      "id": "sea-new-york",
+      "source": "citiList.txt",
+      "lineNumber": 160
+    },
+    {
+      "name": "Melinda Maria",
+      "url": "https://melindamaria.com",
+      "id": "melinda-maria",
+      "source": "citiList.txt",
+      "lineNumber": 161
+    },
+    {
+      "name": "Belkin",
+      "url": "https://www.belkin.com/",
+      "id": "belkin",
+      "source": "citiList.txt",
+      "lineNumber": 162
+    },
+    {
+      "name": "Aera",
+      "url": "https://www.aeraforhome.com",
+      "id": "aera",
+      "source": "citiList.txt",
+      "lineNumber": 163
+    },
+    {
+      "name": "Bonjour Global Development Limited",
+      "url": "https://www.bonjourglobal.com",
+      "id": "bonjour-global-development-limited",
+      "source": "citiList.txt",
+      "lineNumber": 164
+    },
+    {
+      "name": "World Nutrition Inc.",
+      "url": "https://worldnutrition.net/",
+      "id": "world-nutrition-inc",
+      "source": "citiList.txt",
+      "lineNumber": 165
+    },
+    {
+      "name": "Carolina Biological Supply Company",
+      "url": "https://www.carolina.com/",
+      "id": "carolina-biological-supply-company",
+      "source": "citiList.txt",
+      "lineNumber": 166
+    },
+    {
+      "name": "RVshare",
+      "url": "https://rvshare.com",
+      "id": "rvshare",
+      "source": "citiList.txt",
+      "lineNumber": 167
+    },
+    {
+      "name": "Gantri",
+      "url": "https://www.gantri.com/",
+      "id": "gantri",
+      "source": "citiList.txt",
+      "lineNumber": 168
+    },
+    {
+      "name": "4seating.com",
+      "url": "https://www.4seating.com",
+      "id": "4seating-com",
+      "source": "citiList.txt",
+      "lineNumber": 169
+    },
+    {
+      "name": "York Nordic",
+      "url": "https://www.yorknordic.com",
+      "id": "york-nordic",
+      "source": "citiList.txt",
+      "lineNumber": 170
+    },
+    {
+      "name": "Pvolve",
+      "url": "https://www.pvolve.com/",
+      "id": "pvolve",
+      "source": "citiList.txt",
+      "lineNumber": 171
+    },
+    {
+      "name": "BannerBuzz",
+      "url": "https://www.bannerbuzz.com",
+      "id": "bannerbuzz",
+      "source": "citiList.txt",
+      "lineNumber": 172
+    },
+    {
+      "name": "This Works Cosmetics",
+      "url": "https://www.thisworks.com/",
+      "id": "this-works-cosmetics",
+      "source": "citiList.txt",
+      "lineNumber": 173
+    },
+    {
+      "name": "Ivy Robes",
+      "url": "https://www.ivyrobes.com",
+      "id": "ivy-robes",
+      "source": "citiList.txt",
+      "lineNumber": 174
+    },
+    {
+      "name": "Aimee Kestenberg",
+      "url": "https://aimeekestenberg.com/",
+      "id": "aimee-kestenberg",
+      "source": "citiList.txt",
+      "lineNumber": 175
+    },
+    {
+      "name": "TOK Beauty",
+      "url": "https://www.tokbeauty.com",
+      "id": "tok-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 176
+    },
+    {
+      "name": "Brightech",
+      "url": "https://brightech.com/",
+      "id": "brightech",
+      "source": "citiList.txt",
+      "lineNumber": 177
+    },
+    {
+      "name": "Surfshark",
+      "url": "https://www.surfshark.com",
+      "id": "surfshark",
+      "source": "citiList.txt",
+      "lineNumber": 178
+    },
+    {
+      "name": "Dr. Comfort",
+      "url": "https://www.drcomfort.com/",
+      "id": "dr-comfort",
+      "source": "citiList.txt",
+      "lineNumber": 179
+    },
+    {
+      "name": "Blue Coolers",
+      "url": "https://www.bluecoolers.com",
+      "id": "blue-coolers",
+      "source": "citiList.txt",
+      "lineNumber": 180
+    },
+    {
+      "name": "Lucyd",
+      "url": "https://lucyd.co",
+      "id": "lucyd",
+      "source": "citiList.txt",
+      "lineNumber": 181
+    },
+    {
+      "name": "Survey Junkie",
+      "url": "https://www.surveyjunkie.com",
+      "id": "survey-junkie",
+      "source": "citiList.txt",
+      "lineNumber": 182
+    },
+    {
+      "name": "Online StarMap",
+      "url": "https://onlinestarmap.com",
+      "id": "online-starmap",
+      "source": "citiList.txt",
+      "lineNumber": 183
+    },
+    {
+      "name": "Antonioli",
+      "url": "https://www.antonioli.eu",
+      "id": "antonioli",
+      "source": "citiList.txt",
+      "lineNumber": 184
+    },
+    {
+      "name": "ShopSonix",
+      "url": "https://shopsonix.com/",
+      "id": "shopsonix",
+      "source": "citiList.txt",
+      "lineNumber": 185
+    },
+    {
+      "name": "Smalls",
+      "url": "https://www.smalls.com/",
+      "id": "smalls",
+      "source": "citiList.txt",
+      "lineNumber": 186
+    },
+    {
+      "name": "Mindvalley",
+      "url": "https://www.mindvalley.com",
+      "id": "mindvalley",
+      "source": "citiList.txt",
+      "lineNumber": 187
+    },
+    {
+      "name": "Grosche International Inc.",
+      "url": "https://grosche.ca",
+      "id": "grosche-international-inc",
+      "source": "citiList.txt",
+      "lineNumber": 188
+    },
+    {
+      "name": "Wholesale Chess",
+      "url": "https://www.wholesalechess.com/",
+      "id": "wholesale-chess",
+      "source": "citiList.txt",
+      "lineNumber": 189
+    },
+    {
+      "name": "Elevation Lab",
+      "url": "https://www.elevationlab.com",
+      "id": "elevation-lab",
+      "source": "citiList.txt",
+      "lineNumber": 190
+    },
+    {
+      "name": "CodaKid",
+      "url": "https://codakid.com",
+      "id": "codakid",
+      "source": "citiList.txt",
+      "lineNumber": 191
+    },
+    {
+      "name": "PrivacyPolicies.com",
+      "url": "https://privacypolicies.com",
+      "id": "privacypolicies-com",
+      "source": "citiList.txt",
+      "lineNumber": 192
+    },
+    {
+      "name": "Chirp",
+      "url": "https://www.gochirp.com",
+      "id": "chirp",
+      "source": "citiList.txt",
+      "lineNumber": 193
+    },
+    {
+      "name": "Savory Spice Shop",
+      "url": "https://www.savoryspiceshop.com/",
+      "id": "savory-spice-shop",
+      "source": "citiList.txt",
+      "lineNumber": 194
+    },
+    {
+      "name": "Takeya USA",
+      "url": "https://www.takeyausa.com",
+      "id": "takeya-usa",
+      "source": "citiList.txt",
+      "lineNumber": 195
+    },
+    {
+      "name": "Culinary Teas",
+      "url": "https://www.culinaryteas.com",
+      "id": "culinary-teas",
+      "source": "citiList.txt",
+      "lineNumber": 196
+    },
+    {
+      "name": "Brandless",
+      "url": "https://brandless.com",
+      "id": "brandless",
+      "source": "citiList.txt",
+      "lineNumber": 197
+    },
+    {
+      "name": "Bemz",
+      "url": "https://bemz.com/en-us",
+      "id": "bemz",
+      "source": "citiList.txt",
+      "lineNumber": 198
+    },
+    {
+      "name": "EatWith",
+      "url": "https://www.eatwith.com/?c=USD",
+      "id": "eatwith",
+      "source": "citiList.txt",
+      "lineNumber": 199
+    },
+    {
+      "name": "Chico's",
+      "url": "https://www.chicos.com",
+      "id": "chico-s",
+      "source": "citiList.txt",
+      "lineNumber": 200
+    },
+    {
+      "name": "MAGIX & VEGAS Creative Software",
+      "url": "https://www.magix.com",
+      "id": "magix-vegas-creative-software",
+      "source": "citiList.txt",
+      "lineNumber": 201
+    },
+    {
+      "name": "Kammok",
+      "url": "https://kammok.com/",
+      "id": "kammok",
+      "source": "citiList.txt",
+      "lineNumber": 202
+    },
+    {
+      "name": "FreshDirect",
+      "url": "https://www.freshdirect.com/index.jsp",
+      "id": "freshdirect",
+      "source": "citiList.txt",
+      "lineNumber": 203
+    },
+    {
+      "name": "Rossignol",
+      "url": "https://www.rossignol.com/us-en/",
+      "id": "rossignol",
+      "source": "citiList.txt",
+      "lineNumber": 204
+    },
+    {
+      "name": "ANINE BING",
+      "url": "https://www.aninebing.com/",
+      "id": "anine-bing",
+      "source": "citiList.txt",
+      "lineNumber": 205
+    },
+    {
+      "name": "Mukzin",
+      "url": "https://shop.mukzin.com/",
+      "id": "mukzin",
+      "source": "citiList.txt",
+      "lineNumber": 206
+    },
+    {
+      "name": "Especially Yours",
+      "url": "https://www.especiallyyours.com/",
+      "id": "especially-yours",
+      "source": "citiList.txt",
+      "lineNumber": 207
+    },
+    {
+      "name": "HelloMolly",
+      "url": "https://www.hellomolly.com/us/",
+      "id": "hellomolly",
+      "source": "citiList.txt",
+      "lineNumber": 208
+    },
+    {
+      "name": "JumpSport",
+      "url": "https://JumpSport.com",
+      "id": "jumpsport",
+      "source": "citiList.txt",
+      "lineNumber": 209
+    },
+    {
+      "name": "CookUnity",
+      "url": "https://www.cookunity.com",
+      "id": "cookunity",
+      "source": "citiList.txt",
+      "lineNumber": 210
+    },
+    {
+      "name": "MyHeritage",
+      "url": "https://www.myheritage.com",
+      "id": "myheritage",
+      "source": "citiList.txt",
+      "lineNumber": 211
+    },
+    {
+      "name": "Qunol",
+      "url": "https://www.qunol.com/",
+      "id": "qunol",
+      "source": "citiList.txt",
+      "lineNumber": 212
+    },
+    {
+      "name": "H10 Hotels",
+      "url": "https://www.h10hotels.com",
+      "id": "h10-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 213
+    },
+    {
+      "name": "Corinthia",
+      "url": "https://www.corinthia.com",
+      "id": "corinthia",
+      "source": "citiList.txt",
+      "lineNumber": 214
+    },
+    {
+      "name": "Chatrium Hotels",
+      "url": "https://www.chatrium.com",
+      "id": "chatrium-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 215
+    },
+    {
+      "name": "Dusit International",
+      "url": "https://www.dusit.com",
+      "id": "dusit-international",
+      "source": "citiList.txt",
+      "lineNumber": 216
+    },
+    {
+      "name": "Lebua Hotels",
+      "url": "https://www.lebua.com",
+      "id": "lebua-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 217
+    },
+    {
+      "name": "Onyx Hospitality",
+      "url": "https://www.onyx-hospitality.com",
+      "id": "onyx-hospitality",
+      "source": "citiList.txt",
+      "lineNumber": 218
+    },
+    {
+      "name": "Be Live Hotels",
+      "url": "https://www.belivehotels.com/",
+      "id": "be-live-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 219
+    },
+    {
+      "name": "Oberoi Hotels",
+      "url": "https://www.oberoihotels.com/",
+      "id": "oberoi-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 220
+    },
+    {
+      "name": "Trident Hotels",
+      "url": "https://www.tridenthotels.com/",
+      "id": "trident-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 221
+    },
+    {
+      "name": "Back Support Systems INC",
+      "url": "https://backsupportsystems.com",
+      "id": "back-support-systems-inc",
+      "source": "citiList.txt",
+      "lineNumber": 222
+    },
+    {
+      "name": "Pedro Shoes",
+      "url": "https://www.pedroshoes.com",
+      "id": "pedro-shoes",
+      "source": "citiList.txt",
+      "lineNumber": 223
+    },
+    {
+      "name": "illesteva",
+      "url": "https://illesteva.com/",
+      "id": "illesteva",
+      "source": "citiList.txt",
+      "lineNumber": 224
+    },
+    {
+      "name": "Mignon Faget",
+      "url": "https://www.mignonfaget.com/",
+      "id": "mignon-faget",
+      "source": "citiList.txt",
+      "lineNumber": 225
+    },
+    {
+      "name": "Dell Home & Home Office",
+      "url": "https://www.dell.com/en-us/shop",
+      "id": "dell-home-home-office",
+      "source": "citiList.txt",
+      "lineNumber": 226
+    },
+    {
+      "name": "Gabriel & Co.",
+      "url": "https://www.gabrielny.com/",
+      "id": "gabriel-co",
+      "source": "citiList.txt",
+      "lineNumber": 227
+    },
+    {
+      "name": "Lensabl - The Online Optometrist",
+      "url": "https://www.lensabl.com",
+      "id": "lensabl-the-online-optometrist",
+      "source": "citiList.txt",
+      "lineNumber": 228
+    },
+    {
+      "name": "Cox Communications",
+      "url": "https://www.cox.com/residential/home.html",
+      "id": "cox-communications",
+      "source": "citiList.txt",
+      "lineNumber": 229
+    },
+    {
+      "name": "photowhoa",
+      "url": "https://photowhoa.com",
+      "id": "photowhoa",
+      "source": "citiList.txt",
+      "lineNumber": 230
+    },
+    {
+      "name": "Leam",
+      "url": "https://www.leam.com/en_en/",
+      "id": "leam",
+      "source": "citiList.txt",
+      "lineNumber": 231
+    },
+    {
+      "name": "Driftaway Coffee",
+      "url": "https://driftaway.coffee",
+      "id": "driftaway-coffee",
+      "source": "citiList.txt",
+      "lineNumber": 232
+    },
+    {
+      "name": "Glarry Music",
+      "url": "https://www.glarrymusic.com/?utm_source=SAS",
+      "id": "glarry-music",
+      "source": "citiList.txt",
+      "lineNumber": 233
+    },
+    {
+      "name": "MelodySusie",
+      "url": "https://www.melodysusie.com",
+      "id": "melodysusie",
+      "source": "citiList.txt",
+      "lineNumber": 234
+    },
+    {
+      "name": "Dior Beauty",
+      "url": "https://www.dior.com/en_us/beauty",
+      "id": "dior-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 235
+    },
+    {
+      "name": "MaXpeedingrods",
+      "url": "https://www.maxpeedingrods.com",
+      "id": "maxpeedingrods",
+      "source": "citiList.txt",
+      "lineNumber": 236
+    },
+    {
+      "name": "Three Dots",
+      "url": "https://www.threedots.com/",
+      "id": "three-dots",
+      "source": "citiList.txt",
+      "lineNumber": 237
+    },
+    {
+      "name": "Whiskers Laces",
+      "url": "https://www.whiskerslaces.com",
+      "id": "whiskers-laces",
+      "source": "citiList.txt",
+      "lineNumber": 238
+    },
+    {
+      "name": "Ode \u00e0 la Rose",
+      "url": "https://www.odealarose.com/",
+      "id": "ode-la-rose",
+      "source": "citiList.txt",
+      "lineNumber": 239
+    },
+    {
+      "name": "Nurx",
+      "url": "https://www.nurx.com",
+      "id": "nurx",
+      "source": "citiList.txt",
+      "lineNumber": 240
+    },
+    {
+      "name": "Attitude Living",
+      "url": "https://attitudeliving.com/",
+      "id": "attitude-living",
+      "source": "citiList.txt",
+      "lineNumber": 241
+    },
+    {
+      "name": "UrbanStems",
+      "url": "https://urbanstems.com/",
+      "id": "urbanstems",
+      "source": "citiList.txt",
+      "lineNumber": 242
+    },
+    {
+      "name": "Lux Decor Collection",
+      "url": "https://luxdecorcollection.com",
+      "id": "lux-decor-collection",
+      "source": "citiList.txt",
+      "lineNumber": 243
+    },
+    {
+      "name": "310 Nutrition",
+      "url": "https://310nutrition.com/",
+      "id": "310-nutrition",
+      "source": "citiList.txt",
+      "lineNumber": 244
+    },
+    {
+      "name": "Forza Sports",
+      "url": "https://www.forzasports.com",
+      "id": "forza-sports",
+      "source": "citiList.txt",
+      "lineNumber": 245
+    },
+    {
+      "name": "Brooklyn Brew Shop",
+      "url": "https://brooklynbrewshop.com",
+      "id": "brooklyn-brew-shop",
+      "source": "citiList.txt",
+      "lineNumber": 246
+    },
+    {
+      "name": "Eric Javits",
+      "url": "https://ericjavits.com",
+      "id": "eric-javits",
+      "source": "citiList.txt",
+      "lineNumber": 247
+    },
+    {
+      "name": "Gainful",
+      "url": "https://www.gainful.com",
+      "id": "gainful",
+      "source": "citiList.txt",
+      "lineNumber": 248
+    },
+    {
+      "name": "Derek Rose",
+      "url": "https://www.derek-rose.com",
+      "id": "derek-rose",
+      "source": "citiList.txt",
+      "lineNumber": 249
+    },
+    {
+      "name": "Felina Intimates",
+      "url": "https://www.felina.com",
+      "id": "felina-intimates",
+      "source": "citiList.txt",
+      "lineNumber": 250
+    },
+    {
+      "name": "Beachly",
+      "url": "https://beachly.com",
+      "id": "beachly",
+      "source": "citiList.txt",
+      "lineNumber": 251
+    },
+    {
+      "name": "ESR Gear",
+      "url": "https://www.esrtech.com/",
+      "id": "esr-gear",
+      "source": "citiList.txt",
+      "lineNumber": 252
+    },
+    {
+      "name": "YourMechanic",
+      "url": "https://www.yourmechanic.com",
+      "id": "yourmechanic",
+      "source": "citiList.txt",
+      "lineNumber": 253
+    },
+    {
+      "name": "The Winston Box",
+      "url": "https://www.thewinstonbox.com",
+      "id": "the-winston-box",
+      "source": "citiList.txt",
+      "lineNumber": 254
+    },
+    {
+      "name": "Splash Wines",
+      "url": "https://www.splashwines.com",
+      "id": "splash-wines",
+      "source": "citiList.txt",
+      "lineNumber": 255
+    },
+    {
+      "name": "Tenorshare",
+      "url": "https://www.tenorshare.com",
+      "id": "tenorshare",
+      "source": "citiList.txt",
+      "lineNumber": 256
+    },
+    {
+      "name": "ergonofis",
+      "url": "https://ergonofis.com/",
+      "id": "ergonofis",
+      "source": "citiList.txt",
+      "lineNumber": 257
+    },
+    {
+      "name": "MorningSave",
+      "url": "https://morningsave.com/",
+      "id": "morningsave",
+      "source": "citiList.txt",
+      "lineNumber": 258
+    },
+    {
+      "name": "OneClass",
+      "url": "https://oneclass.com",
+      "id": "oneclass",
+      "source": "citiList.txt",
+      "lineNumber": 259
+    },
+    {
+      "name": "Lancer Skincare",
+      "url": "https://www.lancerskincare.com/",
+      "id": "lancer-skincare",
+      "source": "citiList.txt",
+      "lineNumber": 260
+    },
+    {
+      "name": "Presetpro",
+      "url": "https://presetpro.com",
+      "id": "presetpro",
+      "source": "citiList.txt",
+      "lineNumber": 261
+    },
+    {
+      "name": "Mapiful",
+      "url": "https://www.mapiful.com",
+      "id": "mapiful",
+      "source": "citiList.txt",
+      "lineNumber": 262
+    },
+    {
+      "name": "Kogalla",
+      "url": "https://kogalla.com/",
+      "id": "kogalla",
+      "source": "citiList.txt",
+      "lineNumber": 263
+    },
+    {
+      "name": "Raymond Weil",
+      "url": "https://www.raymond-weil.us",
+      "id": "raymond-weil",
+      "source": "citiList.txt",
+      "lineNumber": 264
+    },
+    {
+      "name": "Great Wolf Lodge",
+      "url": "https://www.greatwolf.com",
+      "id": "great-wolf-lodge",
+      "source": "citiList.txt",
+      "lineNumber": 265
+    },
+    {
+      "name": "MyMedic",
+      "url": "https://mymedic.com/",
+      "id": "mymedic",
+      "source": "citiList.txt",
+      "lineNumber": 266
+    },
+    {
+      "name": "Rack Room Shoes",
+      "url": "https://www.rackroomshoes.com",
+      "id": "rack-room-shoes",
+      "source": "citiList.txt",
+      "lineNumber": 267
+    },
+    {
+      "name": "Forsake",
+      "url": "https://forsake.com",
+      "id": "forsake",
+      "source": "citiList.txt",
+      "lineNumber": 268
+    },
+    {
+      "name": "HealthLabs",
+      "url": "https://www.healthlabs.com",
+      "id": "healthlabs",
+      "source": "citiList.txt",
+      "lineNumber": 269
+    },
+    {
+      "name": "MTN OPS",
+      "url": "https://mtnops.com/",
+      "id": "mtn-ops",
+      "source": "citiList.txt",
+      "lineNumber": 270
+    },
+    {
+      "name": "SageFinds",
+      "url": "https://www.sagefinds.com/",
+      "id": "sagefinds",
+      "source": "citiList.txt",
+      "lineNumber": 271
+    },
+    {
+      "name": "Moon Juice",
+      "url": "https://moonjuice.com/",
+      "id": "moon-juice",
+      "source": "citiList.txt",
+      "lineNumber": 272
+    },
+    {
+      "name": "Nebula",
+      "url": "https://us.seenebula.com",
+      "id": "nebula",
+      "source": "citiList.txt",
+      "lineNumber": 273
+    },
+    {
+      "name": "Tanya Taylor",
+      "url": "https://www.tanyataylor.com",
+      "id": "tanya-taylor",
+      "source": "citiList.txt",
+      "lineNumber": 274
+    },
+    {
+      "name": "The Mad Optimist",
+      "url": "https://www.themadoptimist.com/",
+      "id": "the-mad-optimist",
+      "source": "citiList.txt",
+      "lineNumber": 275
+    },
+    {
+      "name": "Touchland",
+      "url": "https://www.touchland.com",
+      "id": "touchland",
+      "source": "citiList.txt",
+      "lineNumber": 276
+    },
+    {
+      "name": "Cymbiotika",
+      "url": "https://cymbiotika.com",
+      "id": "cymbiotika",
+      "source": "citiList.txt",
+      "lineNumber": 277
+    },
+    {
+      "name": "Jimmy Choo",
+      "url": "https://us.jimmychoo.com",
+      "id": "jimmy-choo",
+      "source": "citiList.txt",
+      "lineNumber": 278
+    },
+    {
+      "name": "IntellaSphere",
+      "url": "https://www.intellasphere.com",
+      "id": "intellasphere",
+      "source": "citiList.txt",
+      "lineNumber": 279
+    },
+    {
+      "name": "Dr. Kellyann",
+      "url": "https://www.drkellyann.com",
+      "id": "dr-kellyann",
+      "source": "citiList.txt",
+      "lineNumber": 280
+    },
+    {
+      "name": "Troy Bilt",
+      "url": "https://www.troybilt.com/",
+      "id": "troy-bilt",
+      "source": "citiList.txt",
+      "lineNumber": 281
+    },
+    {
+      "name": "SiO Beauty",
+      "url": "https://www.siobeauty.com/",
+      "id": "sio-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 282
+    },
+    {
+      "name": "SPOT",
+      "url": "https://www.findmespot.com/",
+      "id": "spot",
+      "source": "citiList.txt",
+      "lineNumber": 283
+    },
+    {
+      "name": "Brochu Walker",
+      "url": "https://www.brochuwalker.com/",
+      "id": "brochu-walker",
+      "source": "citiList.txt",
+      "lineNumber": 284
+    },
+    {
+      "name": "Big Feet Pajama Co",
+      "url": "https://bigfeetpjs.com",
+      "id": "big-feet-pajama-co",
+      "source": "citiList.txt",
+      "lineNumber": 285
+    },
+    {
+      "name": "S&S Worldwide",
+      "url": "https://www.ssww.com/",
+      "id": "s-s-worldwide",
+      "source": "citiList.txt",
+      "lineNumber": 286
+    },
+    {
+      "name": "Hostinger",
+      "url": "https://www.hostinger.com/",
+      "id": "hostinger",
+      "source": "citiList.txt",
+      "lineNumber": 287
+    },
+    {
+      "name": "Rugs USA",
+      "url": "https://rugsusa.com",
+      "id": "rugs-usa",
+      "source": "citiList.txt",
+      "lineNumber": 288
+    },
+    {
+      "name": "Chess Bazaar",
+      "url": "https://www.chessbazaar.com",
+      "id": "chess-bazaar",
+      "source": "citiList.txt",
+      "lineNumber": 289
+    },
+    {
+      "name": "Sand & Sky",
+      "url": "https://www.sandandsky.com",
+      "id": "sand-sky",
+      "source": "citiList.txt",
+      "lineNumber": 290
+    },
+    {
+      "name": "Orgain",
+      "url": "https://www.orgain.com",
+      "id": "orgain",
+      "source": "citiList.txt",
+      "lineNumber": 291
+    },
+    {
+      "name": "AirportParking.com",
+      "url": "https://www.AirportParking.com",
+      "id": "airportparking-com",
+      "source": "citiList.txt",
+      "lineNumber": 292
+    },
+    {
+      "name": "Dynanic Inc",
+      "url": "https://ultimea.com",
+      "id": "dynanic-inc",
+      "source": "citiList.txt",
+      "lineNumber": 293
+    },
+    {
+      "name": "Tata Harper",
+      "url": "https://www.tataharperskincare.com",
+      "id": "tata-harper",
+      "source": "citiList.txt",
+      "lineNumber": 294
+    },
+    {
+      "name": "getspeks",
+      "url": "https://getspeks.com/",
+      "id": "getspeks",
+      "source": "citiList.txt",
+      "lineNumber": 295
+    },
+    {
+      "name": "Allure Beauty Box",
+      "url": "https://allurebeautybox.com/",
+      "id": "allure-beauty-box",
+      "source": "citiList.txt",
+      "lineNumber": 296
+    },
+    {
+      "name": "aRes Travel",
+      "url": "https://reservations.arestravel.com/site/welcome/14966/discount-attractions-tickets-hotels-packages",
+      "id": "ares-travel",
+      "source": "citiList.txt",
+      "lineNumber": 297
+    },
+    {
+      "name": "Arka",
+      "url": "https://www.arka.com/",
+      "id": "arka",
+      "source": "citiList.txt",
+      "lineNumber": 298
+    },
+    {
+      "name": "Base Blu",
+      "url": "https://www.baseblu.com/",
+      "id": "base-blu",
+      "source": "citiList.txt",
+      "lineNumber": 299
+    },
+    {
+      "name": "Vous Vitamin",
+      "url": "https://www.vousvitamin.com/",
+      "id": "vous-vitamin",
+      "source": "citiList.txt",
+      "lineNumber": 300
+    },
+    {
+      "name": "Beyond Polish",
+      "url": "https://www.beyondpolish.com/",
+      "id": "beyond-polish",
+      "source": "citiList.txt",
+      "lineNumber": 301
+    },
+    {
+      "name": "Bizchair",
+      "url": "https://www.bizchair.com",
+      "id": "bizchair",
+      "source": "citiList.txt",
+      "lineNumber": 302
+    },
+    {
+      "name": "Blenders Eyewear",
+      "url": "https://www.blenderseyewear.com",
+      "id": "blenders-eyewear",
+      "source": "citiList.txt",
+      "lineNumber": 303
+    },
+    {
+      "name": "Wilson Family of Brands",
+      "url": "https://www.wilson.com/en-us/",
+      "id": "wilson-family-of-brands",
+      "source": "citiList.txt",
+      "lineNumber": 304
+    },
+    {
+      "name": "Blue Sky",
+      "url": "https://www.bluesky.com/",
+      "id": "blue-sky",
+      "source": "citiList.txt",
+      "lineNumber": 305
+    },
+    {
+      "name": "DiscountFilterStore.com",
+      "url": "https://discountfilterstore.com",
+      "id": "discountfilterstore-com",
+      "source": "citiList.txt",
+      "lineNumber": 306
+    },
+    {
+      "name": "Bulletproof",
+      "url": "https://shop.bulletproof.com/",
+      "id": "bulletproof",
+      "source": "citiList.txt",
+      "lineNumber": 307
+    },
+    {
+      "name": "Cle De Peau Beaute",
+      "url": "https://cledepeaubeaute.com",
+      "id": "cle-de-peau-beaute",
+      "source": "citiList.txt",
+      "lineNumber": 308
+    },
+    {
+      "name": "Copper Cow Coffee",
+      "url": "https://coppercowcoffee.com/",
+      "id": "copper-cow-coffee",
+      "source": "citiList.txt",
+      "lineNumber": 309
+    },
+    {
+      "name": "Eagle Creek",
+      "url": "https://www.eaglecreek.com",
+      "id": "eagle-creek",
+      "source": "citiList.txt",
+      "lineNumber": 310
+    },
+    {
+      "name": "EM Cosmetics",
+      "url": "https://www.emcosmetics.com/",
+      "id": "em-cosmetics",
+      "source": "citiList.txt",
+      "lineNumber": 311
+    },
+    {
+      "name": "Fax It Fast",
+      "url": "https://www.faxitfast.com",
+      "id": "fax-it-fast",
+      "source": "citiList.txt",
+      "lineNumber": 312
+    },
+    {
+      "name": "Falconeri",
+      "url": "https://us.falconeri.com",
+      "id": "falconeri",
+      "source": "citiList.txt",
+      "lineNumber": 313
+    },
+    {
+      "name": "1-800 CONTACTS",
+      "url": "https://www.1800contacts.com/",
+      "id": "1-800-contacts",
+      "source": "citiList.txt",
+      "lineNumber": 314
+    },
+    {
+      "name": "A Pup Above",
+      "url": "https://www.apupabove.com",
+      "id": "a-pup-above",
+      "source": "citiList.txt",
+      "lineNumber": 315
+    },
+    {
+      "name": "JuJuBe",
+      "url": "https://jujube.com",
+      "id": "jujube",
+      "source": "citiList.txt",
+      "lineNumber": 316
+    },
+    {
+      "name": "JD Sports",
+      "url": "https://www.jdsports.com",
+      "id": "jd-sports",
+      "source": "citiList.txt",
+      "lineNumber": 317
+    },
+    {
+      "name": "iVisa",
+      "url": "https://www.ivisa.com/",
+      "id": "ivisa",
+      "source": "citiList.txt",
+      "lineNumber": 318
+    },
+    {
+      "name": "Current/Elliott",
+      "url": "https://www.currentelliott.com/",
+      "id": "current-elliott",
+      "source": "citiList.txt",
+      "lineNumber": 319
+    },
+    {
+      "name": "LastPass",
+      "url": "https://www.lastpass.com/select-personal-plan",
+      "id": "lastpass",
+      "source": "citiList.txt",
+      "lineNumber": 320
+    },
+    {
+      "name": "Maidenform",
+      "url": "https://maidenform.com",
+      "id": "maidenform",
+      "source": "citiList.txt",
+      "lineNumber": 321
+    },
+    {
+      "name": "Marc Jacobs",
+      "url": "https://www.marcjacobs.com/",
+      "id": "marc-jacobs",
+      "source": "citiList.txt",
+      "lineNumber": 322
+    },
+    {
+      "name": "Athletic Propulsion Labs",
+      "url": "https://www.athleticpropulsionlabs.com/",
+      "id": "athletic-propulsion-labs",
+      "source": "citiList.txt",
+      "lineNumber": 323
+    },
+    {
+      "name": "MIRA Safety",
+      "url": "https://www.mirasafety.com/",
+      "id": "mira-safety",
+      "source": "citiList.txt",
+      "lineNumber": 324
+    },
+    {
+      "name": "Ignatius Press",
+      "url": "https://www.ignatius.com",
+      "id": "ignatius-press",
+      "source": "citiList.txt",
+      "lineNumber": 325
+    },
+    {
+      "name": "Fender",
+      "url": "https://www.fender.com/en-US/start",
+      "id": "fender",
+      "source": "citiList.txt",
+      "lineNumber": 326
+    },
+    {
+      "name": "NYX Professional Makeup",
+      "url": "https://www.nyxcosmetics.com",
+      "id": "nyx-professional-makeup",
+      "source": "citiList.txt",
+      "lineNumber": 327
+    },
+    {
+      "name": "Nourage",
+      "url": "https://nourage.com/",
+      "id": "nourage",
+      "source": "citiList.txt",
+      "lineNumber": 328
+    },
+    {
+      "name": "Funjet",
+      "url": "https://funjet.com",
+      "id": "funjet",
+      "source": "citiList.txt",
+      "lineNumber": 329
+    },
+    {
+      "name": "SanDisk",
+      "url": "https://shop.sandisk.com",
+      "id": "sandisk",
+      "source": "citiList.txt",
+      "lineNumber": 330
+    },
+    {
+      "name": "Kayak",
+      "url": "https://www.kayak.com/",
+      "id": "kayak",
+      "source": "citiList.txt",
+      "lineNumber": 331
+    },
+    {
+      "name": "Square Off",
+      "url": "https://squareoffnow.com/",
+      "id": "square-off",
+      "source": "citiList.txt",
+      "lineNumber": 332
+    },
+    {
+      "name": "LensCrafters",
+      "url": "https://www.lenscrafters.com/",
+      "id": "lenscrafters",
+      "source": "citiList.txt",
+      "lineNumber": 333
+    },
+    {
+      "name": "Camper",
+      "url": "https://www.camper.com",
+      "id": "camper",
+      "source": "citiList.txt",
+      "lineNumber": 334
+    },
+    {
+      "name": "Denby",
+      "url": "https://www.denbypottery.com/en-us/",
+      "id": "denby",
+      "source": "citiList.txt",
+      "lineNumber": 335
+    },
+    {
+      "name": "Hungryroot",
+      "url": "https://www.hungryroot.com/",
+      "id": "hungryroot",
+      "source": "citiList.txt",
+      "lineNumber": 336
+    },
+    {
+      "name": "Carbon38",
+      "url": "https://www.carbon38.com",
+      "id": "carbon38",
+      "source": "citiList.txt",
+      "lineNumber": 337
+    },
+    {
+      "name": "Shipito",
+      "url": "https://www.shipito.com",
+      "id": "shipito",
+      "source": "citiList.txt",
+      "lineNumber": 338
+    },
+    {
+      "name": "J. Jill",
+      "url": "https://www.jjill.com",
+      "id": "j-jill",
+      "source": "citiList.txt",
+      "lineNumber": 339
+    },
+    {
+      "name": "23andMe",
+      "url": "https://www.23andme.com",
+      "id": "23andme",
+      "source": "citiList.txt",
+      "lineNumber": 340
+    },
+    {
+      "name": "Jenni Kayne",
+      "url": "https://www.jennikayne.com/",
+      "id": "jenni-kayne",
+      "source": "citiList.txt",
+      "lineNumber": 341
+    },
+    {
+      "name": "Rawlings",
+      "url": "https://www.rawlings.com/",
+      "id": "rawlings",
+      "source": "citiList.txt",
+      "lineNumber": 342
+    },
+    {
+      "name": "Bokksu",
+      "url": "https://www.bokksu.com/",
+      "id": "bokksu",
+      "source": "citiList.txt",
+      "lineNumber": 343
+    },
+    {
+      "name": "Erno Laszlo",
+      "url": "https://www.ernolaszlo.com/",
+      "id": "erno-laszlo",
+      "source": "citiList.txt",
+      "lineNumber": 344
+    },
+    {
+      "name": "Wacoal",
+      "url": "https://www.wacoal-america.com",
+      "id": "wacoal",
+      "source": "citiList.txt",
+      "lineNumber": 345
+    },
+    {
+      "name": "Momondo",
+      "url": "https://www.momondo.com/",
+      "id": "momondo",
+      "source": "citiList.txt",
+      "lineNumber": 346
+    },
+    {
+      "name": "Yarnspirations",
+      "url": "https://www.yarnspirations.com/",
+      "id": "yarnspirations",
+      "source": "citiList.txt",
+      "lineNumber": 347
+    },
+    {
+      "name": "Just Thrive",
+      "url": "https://justthrivehealth.com",
+      "id": "just-thrive",
+      "source": "citiList.txt",
+      "lineNumber": 348
+    },
+    {
+      "name": "BURST Oral Care",
+      "url": "https://www.burstoralcare.com/",
+      "id": "burst-oral-care",
+      "source": "citiList.txt",
+      "lineNumber": 349
+    },
+    {
+      "name": "Outdoor Voices",
+      "url": "https://www.outdoorvoices.com",
+      "id": "outdoor-voices",
+      "source": "citiList.txt",
+      "lineNumber": 350
+    },
+    {
+      "name": "Tuft & Needle",
+      "url": "https://www.tuftandneedle.com/",
+      "id": "tuft-needle",
+      "source": "citiList.txt",
+      "lineNumber": 351
+    },
+    {
+      "name": "Puracy",
+      "url": "https://puracy.com/",
+      "id": "puracy",
+      "source": "citiList.txt",
+      "lineNumber": 352
+    },
+    {
+      "name": "American Fighter",
+      "url": "https://www.americanfighter.com/",
+      "id": "american-fighter",
+      "source": "citiList.txt",
+      "lineNumber": 353
+    },
+    {
+      "name": "Etihad Airways",
+      "url": "https://www.etihad.com/en-ae/",
+      "id": "etihad-airways",
+      "source": "citiList.txt",
+      "lineNumber": 354
+    },
+    {
+      "name": "MakeUp Eraser",
+      "url": "https://makeuperaser.com/",
+      "id": "makeup-eraser",
+      "source": "citiList.txt",
+      "lineNumber": 355
+    },
+    {
+      "name": "FarmRio",
+      "url": "https://www.farmrio.com/",
+      "id": "farmrio",
+      "source": "citiList.txt",
+      "lineNumber": 356
+    },
+    {
+      "name": "Proton",
+      "url": "https://proton.me",
+      "id": "proton",
+      "source": "citiList.txt",
+      "lineNumber": 357
+    },
+    {
+      "name": "Bedrosians Tile & Stone",
+      "url": "https://www.bedrosians.com",
+      "id": "bedrosians-tile-stone",
+      "source": "citiList.txt",
+      "lineNumber": 358
+    },
+    {
+      "name": "Stylevana",
+      "url": "https://www.stylevana.com",
+      "id": "stylevana",
+      "source": "citiList.txt",
+      "lineNumber": 359
+    },
+    {
+      "name": "Ekster",
+      "url": "https://www.ekster.com",
+      "id": "ekster",
+      "source": "citiList.txt",
+      "lineNumber": 360
+    },
+    {
+      "name": "Edible Arrangements",
+      "url": "https://www.ediblearrangements.com",
+      "id": "edible-arrangements",
+      "source": "citiList.txt",
+      "lineNumber": 361
+    },
+    {
+      "name": "FLOWERBX",
+      "url": "https://www.flowerbx.com",
+      "id": "flowerbx",
+      "source": "citiList.txt",
+      "lineNumber": 362
+    },
+    {
+      "name": "Gigi Pip",
+      "url": "https://www.gigipip.com/",
+      "id": "gigi-pip",
+      "source": "citiList.txt",
+      "lineNumber": 363
+    },
+    {
+      "name": "Positive Grid",
+      "url": "https://positivegrid.com",
+      "id": "positive-grid",
+      "source": "citiList.txt",
+      "lineNumber": 364
+    },
+    {
+      "name": "Udacity",
+      "url": "https://udacity.com",
+      "id": "udacity",
+      "source": "citiList.txt",
+      "lineNumber": 365
+    },
+    {
+      "name": "Stellar",
+      "url": "https://www.stellarinfo.com/",
+      "id": "stellar",
+      "source": "citiList.txt",
+      "lineNumber": 366
+    },
+    {
+      "name": "Benetton",
+      "url": "https://us.benetton.com",
+      "id": "benetton",
+      "source": "citiList.txt",
+      "lineNumber": 367
+    },
+    {
+      "name": "Superdry",
+      "url": "https://superdry.com",
+      "id": "superdry",
+      "source": "citiList.txt",
+      "lineNumber": 368
+    },
+    {
+      "name": "Busbud",
+      "url": "https://www.busbud.com",
+      "id": "busbud",
+      "source": "citiList.txt",
+      "lineNumber": 369
+    },
+    {
+      "name": "The Double F",
+      "url": "https://www.thedoublef.com",
+      "id": "the-double-f",
+      "source": "citiList.txt",
+      "lineNumber": 370
+    },
+    {
+      "name": "eibabo.com global",
+      "url": "https://www.eibabo.com",
+      "id": "eibabo-com-global",
+      "source": "citiList.txt",
+      "lineNumber": 371
+    },
+    {
+      "name": "Organic Baby Food",
+      "url": "https://www.organicbabyfood24.de/",
+      "id": "organic-baby-food",
+      "source": "citiList.txt",
+      "lineNumber": 372
+    },
+    {
+      "name": "VyprVPN",
+      "url": "https://www.vyprvpn.com/refer",
+      "id": "vyprvpn",
+      "source": "citiList.txt",
+      "lineNumber": 373
+    },
+    {
+      "name": "Jack Rogers",
+      "url": "https://www.jackrogersusa.com/",
+      "id": "jack-rogers",
+      "source": "citiList.txt",
+      "lineNumber": 374
+    },
+    {
+      "name": "Stutterheim",
+      "url": "https://stutterheim.com/",
+      "id": "stutterheim",
+      "source": "citiList.txt",
+      "lineNumber": 375
+    },
+    {
+      "name": "Molly Bracken",
+      "url": "https://www.mollybracken.com",
+      "id": "molly-bracken",
+      "source": "citiList.txt",
+      "lineNumber": 376
+    },
+    {
+      "name": "DAVIDsTEA",
+      "url": "https://www.davidstea.com/us_en/home/",
+      "id": "davidstea",
+      "source": "citiList.txt",
+      "lineNumber": 377
+    },
+    {
+      "name": "Sandro",
+      "url": "https://us.sandro-paris.com/",
+      "id": "sandro",
+      "source": "citiList.txt",
+      "lineNumber": 378
+    },
+    {
+      "name": "Tungsten Automation",
+      "url": "https://www.tungstenautomation.com/eg/aff/productivity",
+      "id": "tungsten-automation",
+      "source": "citiList.txt",
+      "lineNumber": 379
+    },
+    {
+      "name": "Replacements",
+      "url": "https://www.replacements.com/",
+      "id": "replacements",
+      "source": "citiList.txt",
+      "lineNumber": 380
+    },
+    {
+      "name": "Charles & Keith",
+      "url": "https://www.charleskeith.com/us",
+      "id": "charles-keith",
+      "source": "citiList.txt",
+      "lineNumber": 381
+    },
+    {
+      "name": "Harper Wilde",
+      "url": "https://harperwilde.com",
+      "id": "harper-wilde",
+      "source": "citiList.txt",
+      "lineNumber": 382
+    },
+    {
+      "name": "Education.com",
+      "url": "https://www.education.com/",
+      "id": "education-com",
+      "source": "citiList.txt",
+      "lineNumber": 383
+    },
+    {
+      "name": "Original Resorts",
+      "url": "https://www.original-group.com",
+      "id": "original-resorts",
+      "source": "citiList.txt",
+      "lineNumber": 384
+    },
+    {
+      "name": "Mrs Wordsmith",
+      "url": "https://mrswordsmith.com",
+      "id": "mrs-wordsmith",
+      "source": "citiList.txt",
+      "lineNumber": 385
+    },
+    {
+      "name": "Plaza Premium",
+      "url": "https://www.plazapremiumlounge.com",
+      "id": "plaza-premium",
+      "source": "citiList.txt",
+      "lineNumber": 386
+    },
+    {
+      "name": "Constance Hotels",
+      "url": "https://www.constancehotels.com/en/",
+      "id": "constance-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 387
+    },
+    {
+      "name": "A Sight For Sport Eyes",
+      "url": "https://www.sporteyes.com/",
+      "id": "a-sight-for-sport-eyes",
+      "source": "citiList.txt",
+      "lineNumber": 388
+    },
+    {
+      "name": "Hotel Xcaret",
+      "url": "https://www.hotelxcaret.com/en/",
+      "id": "hotel-xcaret",
+      "source": "citiList.txt",
+      "lineNumber": 389
+    },
+    {
+      "name": "Swiss BelHotel International",
+      "url": "https://swiss-belhotel.com",
+      "id": "swiss-belhotel-international",
+      "source": "citiList.txt",
+      "lineNumber": 390
+    },
+    {
+      "name": "Minor Hotels",
+      "url": "https://www.minorhotels.com/en/avani/",
+      "id": "minor-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 391
+    },
+    {
+      "name": "Holiday Taxis",
+      "url": "https://www.holidaytaxis.com/en/",
+      "id": "holiday-taxis",
+      "source": "citiList.txt",
+      "lineNumber": 392
+    },
+    {
+      "name": "MegaSeats",
+      "url": "https://www.megaseats.com/",
+      "id": "megaseats",
+      "source": "citiList.txt",
+      "lineNumber": 393
+    },
+    {
+      "name": "Wellah",
+      "url": "https://wellah.com/",
+      "id": "wellah",
+      "source": "citiList.txt",
+      "lineNumber": 394
+    },
+    {
+      "name": "Hero Cosmetics",
+      "url": "https://www.herocosmetics.us/",
+      "id": "hero-cosmetics",
+      "source": "citiList.txt",
+      "lineNumber": 395
+    },
+    {
+      "name": "Freewaters",
+      "url": "https://freewaters.com/",
+      "id": "freewaters",
+      "source": "citiList.txt",
+      "lineNumber": 396
+    },
+    {
+      "name": "Ethiopian Airlines",
+      "url": "https://www.ethiopianairlines.com/AA/EN",
+      "id": "ethiopian-airlines",
+      "source": "citiList.txt",
+      "lineNumber": 397
+    },
+    {
+      "name": "Sleep and Beyond",
+      "url": "https://www.sleepandbeyond.com",
+      "id": "sleep-and-beyond",
+      "source": "citiList.txt",
+      "lineNumber": 398
+    },
+    {
+      "name": "Aosom",
+      "url": "https://www.aosom.com",
+      "id": "aosom",
+      "source": "citiList.txt",
+      "lineNumber": 399
+    },
+    {
+      "name": "AnimalPak",
+      "url": "https://www.animalpak.com/",
+      "id": "animalpak",
+      "source": "citiList.txt",
+      "lineNumber": 400
+    },
+    {
+      "name": "Karen Millen",
+      "url": "https://www.karenmillen.com/us",
+      "id": "karen-millen",
+      "source": "citiList.txt",
+      "lineNumber": 401
+    },
+    {
+      "name": "Monbento",
+      "url": "https://us.monbento.com/en/",
+      "id": "monbento",
+      "source": "citiList.txt",
+      "lineNumber": 402
+    },
+    {
+      "name": "E3 Foods",
+      "url": "https://goenergyfoods.myshopify.com/",
+      "id": "e3-foods",
+      "source": "citiList.txt",
+      "lineNumber": 403
+    },
+    {
+      "name": "Weston Supply",
+      "url": "https://westonbrands.com/",
+      "id": "weston-supply",
+      "source": "citiList.txt",
+      "lineNumber": 404
+    },
+    {
+      "name": "Troomy",
+      "url": "https://troomy.com",
+      "id": "troomy",
+      "source": "citiList.txt",
+      "lineNumber": 405
+    },
+    {
+      "name": "Lovisa",
+      "url": "https://www.lovisa.com/",
+      "id": "lovisa",
+      "source": "citiList.txt",
+      "lineNumber": 406
+    },
+    {
+      "name": "Endura",
+      "url": "https://us.endurasport.com/",
+      "id": "endura",
+      "source": "citiList.txt",
+      "lineNumber": 407
+    },
+    {
+      "name": "Foray Golf",
+      "url": "https://www.foraygolf.com/",
+      "id": "foray-golf",
+      "source": "citiList.txt",
+      "lineNumber": 408
+    },
+    {
+      "name": "GP Filter",
+      "url": "https://gpfilter.com",
+      "id": "gp-filter",
+      "source": "citiList.txt",
+      "lineNumber": 409
+    },
+    {
+      "name": "Bourbon and Boweties",
+      "url": "https://www.bourbonandboweties.com/",
+      "id": "bourbon-and-boweties",
+      "source": "citiList.txt",
+      "lineNumber": 410
+    },
+    {
+      "name": "UENI",
+      "url": "https://ueni.com",
+      "id": "ueni",
+      "source": "citiList.txt",
+      "lineNumber": 411
+    },
+    {
+      "name": "NordPass",
+      "url": "https://nordpass.com/",
+      "id": "nordpass",
+      "source": "citiList.txt",
+      "lineNumber": 412
+    },
+    {
+      "name": "CuriosityStream",
+      "url": "https://curiositystream.com/",
+      "id": "curiositystream",
+      "source": "citiList.txt",
+      "lineNumber": 413
+    },
+    {
+      "name": "Lumin",
+      "url": "https://www.Luminskin.com",
+      "id": "lumin",
+      "source": "citiList.txt",
+      "lineNumber": 414
+    },
+    {
+      "name": "Baked by Melissa",
+      "url": "https://www.bakedbymelissa.com/",
+      "id": "baked-by-melissa",
+      "source": "citiList.txt",
+      "lineNumber": 415
+    },
+    {
+      "name": "Spring Step Shoes",
+      "url": "https://www.springstepshoes.com/",
+      "id": "spring-step-shoes",
+      "source": "citiList.txt",
+      "lineNumber": 416
+    },
+    {
+      "name": "Voiply",
+      "url": "https://www.voiply.com",
+      "id": "voiply",
+      "source": "citiList.txt",
+      "lineNumber": 417
+    },
+    {
+      "name": "MyFonts",
+      "url": "https://www.myfonts.com",
+      "id": "myfonts",
+      "source": "citiList.txt",
+      "lineNumber": 418
+    },
+    {
+      "name": "FinditParts",
+      "url": "https://www.finditparts.com/",
+      "id": "finditparts",
+      "source": "citiList.txt",
+      "lineNumber": 419
+    },
+    {
+      "name": "Travelpro",
+      "url": "https://www.travelpro.com",
+      "id": "travelpro",
+      "source": "citiList.txt",
+      "lineNumber": 420
+    },
+    {
+      "name": "ProLon",
+      "url": "https://prolonlife.com",
+      "id": "prolon",
+      "source": "citiList.txt",
+      "lineNumber": 421
+    },
+    {
+      "name": "Opencare",
+      "url": "https://www.opencare.com",
+      "id": "opencare",
+      "source": "citiList.txt",
+      "lineNumber": 422
+    },
+    {
+      "name": "Try The World",
+      "url": "https://www.trytheworld.com",
+      "id": "try-the-world",
+      "source": "citiList.txt",
+      "lineNumber": 423
+    },
+    {
+      "name": "quip",
+      "url": "https://www.getquip.com",
+      "id": "quip",
+      "source": "citiList.txt",
+      "lineNumber": 424
+    },
+    {
+      "name": "IFCHIC",
+      "url": "https://www.ifchic.com",
+      "id": "ifchic",
+      "source": "citiList.txt",
+      "lineNumber": 425
+    },
+    {
+      "name": "Monica + Andy",
+      "url": "https://monicaandandy.com",
+      "id": "monica-andy",
+      "source": "citiList.txt",
+      "lineNumber": 426
+    },
+    {
+      "name": "TodayTix",
+      "url": "https://www.todaytix.com",
+      "id": "todaytix",
+      "source": "citiList.txt",
+      "lineNumber": 427
+    },
+    {
+      "name": "Zwilling",
+      "url": "https://www.zwilling.com/us/",
+      "id": "zwilling",
+      "source": "citiList.txt",
+      "lineNumber": 428
+    },
+    {
+      "name": "VAIO",
+      "url": "https://us.vaio.com",
+      "id": "vaio",
+      "source": "citiList.txt",
+      "lineNumber": 429
+    },
+    {
+      "name": "B12",
+      "url": "https://www.b12.io/",
+      "id": "b12",
+      "source": "citiList.txt",
+      "lineNumber": 430
+    },
+    {
+      "name": "Otherland",
+      "url": "https://www.otherland.com/",
+      "id": "otherland",
+      "source": "citiList.txt",
+      "lineNumber": 431
+    },
+    {
+      "name": "Lifeline Skincare",
+      "url": "https://www.lifelineskincare.com/",
+      "id": "lifeline-skincare",
+      "source": "citiList.txt",
+      "lineNumber": 432
+    },
+    {
+      "name": "Batteries Plus",
+      "url": "https://www.batteriesplus.com/",
+      "id": "batteries-plus",
+      "source": "citiList.txt",
+      "lineNumber": 433
+    },
+    {
+      "name": "Piedmontese",
+      "url": "https://www.piedmontese.com/",
+      "id": "piedmontese",
+      "source": "citiList.txt",
+      "lineNumber": 434
+    },
+    {
+      "name": "Free Fly Apparel",
+      "url": "https://freeflyapparel.com/",
+      "id": "free-fly-apparel",
+      "source": "citiList.txt",
+      "lineNumber": 435
+    },
+    {
+      "name": "The Supplies Shops",
+      "url": "https://www.suppliesshops.com",
+      "id": "the-supplies-shops",
+      "source": "citiList.txt",
+      "lineNumber": 436
+    },
+    {
+      "name": "Pop Market",
+      "url": "https://www.popmarket.com/",
+      "id": "pop-market",
+      "source": "citiList.txt",
+      "lineNumber": 437
+    },
+    {
+      "name": "Mount-It",
+      "url": "https://www.mount-it.com",
+      "id": "mount-it",
+      "source": "citiList.txt",
+      "lineNumber": 438
+    },
+    {
+      "name": "Dana Rebecca Designs",
+      "url": "https://www.danarebeccadesigns.com/",
+      "id": "dana-rebecca-designs",
+      "source": "citiList.txt",
+      "lineNumber": 439
+    },
+    {
+      "name": "IWA Wine",
+      "url": "https://www.iwawine.com/",
+      "id": "iwa-wine",
+      "source": "citiList.txt",
+      "lineNumber": 440
+    },
+    {
+      "name": "Nimble",
+      "url": "https://www.gonimble.com/",
+      "id": "nimble",
+      "source": "citiList.txt",
+      "lineNumber": 441
+    },
+    {
+      "name": "Gerber Childrenswear",
+      "url": "https://www.gerberchildrenswear.com",
+      "id": "gerber-childrenswear",
+      "source": "citiList.txt",
+      "lineNumber": 442
+    },
+    {
+      "name": "Altra Running",
+      "url": "https://www.altrarunning.com",
+      "id": "altra-running",
+      "source": "citiList.txt",
+      "lineNumber": 443
+    },
+    {
+      "name": "Muck Boots",
+      "url": "https://www.muckbootcompany.com",
+      "id": "muck-boots",
+      "source": "citiList.txt",
+      "lineNumber": 444
+    },
+    {
+      "name": "Apparis",
+      "url": "https://apparis.com/",
+      "id": "apparis",
+      "source": "citiList.txt",
+      "lineNumber": 445
+    },
+    {
+      "name": "Blissworld",
+      "url": "https://www.blissworld.com/",
+      "id": "blissworld",
+      "source": "citiList.txt",
+      "lineNumber": 446
+    },
+    {
+      "name": "Elwood Clothing",
+      "url": "https://www.elwoodclothing.com/",
+      "id": "elwood-clothing",
+      "source": "citiList.txt",
+      "lineNumber": 447
+    },
+    {
+      "name": "AGMES",
+      "url": "https://agmesnyc.com/",
+      "id": "agmes",
+      "source": "citiList.txt",
+      "lineNumber": 448
+    },
+    {
+      "name": "Toner Buzz",
+      "url": "https://www.tonerbuzz.com",
+      "id": "toner-buzz",
+      "source": "citiList.txt",
+      "lineNumber": 449
+    },
+    {
+      "name": "Bridelily",
+      "url": "https://bridelily.com/",
+      "id": "bridelily",
+      "source": "citiList.txt",
+      "lineNumber": 450
+    },
+    {
+      "name": "Castlery",
+      "url": "https://www.castlery.com/us",
+      "id": "castlery",
+      "source": "citiList.txt",
+      "lineNumber": 451
+    },
+    {
+      "name": "Cub Cadet",
+      "url": "https://www.cubcadet.com/",
+      "id": "cub-cadet",
+      "source": "citiList.txt",
+      "lineNumber": 452
+    },
+    {
+      "name": "Texas Superfood",
+      "url": "https://texassuperfood.com",
+      "id": "texas-superfood",
+      "source": "citiList.txt",
+      "lineNumber": 453
+    },
+    {
+      "name": "Engine DIY",
+      "url": "https://www.enginediy.com",
+      "id": "engine-diy",
+      "source": "citiList.txt",
+      "lineNumber": 454
+    },
+    {
+      "name": "Tucann",
+      "url": "https://www.tucann.com",
+      "id": "tucann",
+      "source": "citiList.txt",
+      "lineNumber": 455
+    },
+    {
+      "name": "Iron Studios",
+      "url": "https://ironstudios.com",
+      "id": "iron-studios",
+      "source": "citiList.txt",
+      "lineNumber": 456
+    },
+    {
+      "name": "SwimZip",
+      "url": "https://www.SwimZip.com",
+      "id": "swimzip",
+      "source": "citiList.txt",
+      "lineNumber": 457
+    },
+    {
+      "name": "Sleepon",
+      "url": "https://sleeponhealth.com/",
+      "id": "sleepon",
+      "source": "citiList.txt",
+      "lineNumber": 458
+    },
+    {
+      "name": "Termly",
+      "url": "https://termly.io",
+      "id": "termly",
+      "source": "citiList.txt",
+      "lineNumber": 459
+    },
+    {
+      "name": "HOKA",
+      "url": "https://www.hoka.com/en/us/",
+      "id": "hoka",
+      "source": "citiList.txt",
+      "lineNumber": 460
+    },
+    {
+      "name": "Vitrazza",
+      "url": "https://www.vitrazza.com",
+      "id": "vitrazza",
+      "source": "citiList.txt",
+      "lineNumber": 461
+    },
+    {
+      "name": "Tacticalxmen.com",
+      "url": "https://www.tacticalxmen.com",
+      "id": "tacticalxmen-com",
+      "source": "citiList.txt",
+      "lineNumber": 462
+    },
+    {
+      "name": "Stirlingkit",
+      "url": "https://www.stirlingkit.com",
+      "id": "stirlingkit",
+      "source": "citiList.txt",
+      "lineNumber": 463
+    },
+    {
+      "name": "Each & Every",
+      "url": "https://www.eachandevery.com",
+      "id": "each-every",
+      "source": "citiList.txt",
+      "lineNumber": 464
+    },
+    {
+      "name": "Posture Pump",
+      "url": "https://posturepump.com",
+      "id": "posture-pump",
+      "source": "citiList.txt",
+      "lineNumber": 465
+    },
+    {
+      "name": "DODOcase",
+      "url": "https://www.dodocase.com",
+      "id": "dodocase",
+      "source": "citiList.txt",
+      "lineNumber": 466
+    },
+    {
+      "name": "Cheerble",
+      "url": "https://www.cheerble.com/",
+      "id": "cheerble",
+      "source": "citiList.txt",
+      "lineNumber": 467
+    },
+    {
+      "name": "Biblestore.com",
+      "url": "https://www.biblestore.com",
+      "id": "biblestore-com",
+      "source": "citiList.txt",
+      "lineNumber": 468
+    },
+    {
+      "name": "Toad & Co",
+      "url": "https://www.toadandco.com",
+      "id": "toad-co",
+      "source": "citiList.txt",
+      "lineNumber": 469
+    },
+    {
+      "name": "NeuroGum",
+      "url": "https://neurogum.com/",
+      "id": "neurogum",
+      "source": "citiList.txt",
+      "lineNumber": 470
+    },
+    {
+      "name": "ManyChat",
+      "url": "https://manychat.com/",
+      "id": "manychat",
+      "source": "citiList.txt",
+      "lineNumber": 471
+    },
+    {
+      "name": "Brother",
+      "url": "https://www.brother-usa.com",
+      "id": "brother",
+      "source": "citiList.txt",
+      "lineNumber": 472
+    },
+    {
+      "name": "DeleteMe",
+      "url": "https://joindeleteme.com",
+      "id": "deleteme",
+      "source": "citiList.txt",
+      "lineNumber": 473
+    },
+    {
+      "name": "Linky",
+      "url": "https://www.linkyinnovation.com",
+      "id": "linky",
+      "source": "citiList.txt",
+      "lineNumber": 474
+    },
+    {
+      "name": "Cliq",
+      "url": "https://www.CliqProducts.com",
+      "id": "cliq",
+      "source": "citiList.txt",
+      "lineNumber": 475
+    },
+    {
+      "name": "Fresh Meal Plan",
+      "url": "https://www.freshmealplan.com/",
+      "id": "fresh-meal-plan",
+      "source": "citiList.txt",
+      "lineNumber": 476
+    },
+    {
+      "name": "Edgewell",
+      "url": "https://edgewell.com",
+      "id": "edgewell",
+      "source": "citiList.txt",
+      "lineNumber": 477
+    },
+    {
+      "name": "Sportsman's Warehouse",
+      "url": "https://www.sportsmans.com/",
+      "id": "sportsman-s-warehouse",
+      "source": "citiList.txt",
+      "lineNumber": 478
+    },
+    {
+      "name": "Victrola",
+      "url": "https://victrola.com",
+      "id": "victrola",
+      "source": "citiList.txt",
+      "lineNumber": 479
+    },
+    {
+      "name": "Luseta Beauty",
+      "url": "https://www.lusetabeauty.com",
+      "id": "luseta-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 480
+    },
+    {
+      "name": "Jobber",
+      "url": "https://www.getjobber.com",
+      "id": "jobber",
+      "source": "citiList.txt",
+      "lineNumber": 481
+    },
+    {
+      "name": "Overnight Glasses",
+      "url": "https://www.OvernightGlasses.com",
+      "id": "overnight-glasses",
+      "source": "citiList.txt",
+      "lineNumber": 482
+    },
+    {
+      "name": "United Apparels",
+      "url": "https://www.shieldapparels.com",
+      "id": "united-apparels",
+      "source": "citiList.txt",
+      "lineNumber": 483
+    },
+    {
+      "name": "LOOMY Home",
+      "url": "https://loomyhome.com",
+      "id": "loomy-home",
+      "source": "citiList.txt",
+      "lineNumber": 484
+    },
+    {
+      "name": "DealFuel",
+      "url": "https://dealfuel.com",
+      "id": "dealfuel",
+      "source": "citiList.txt",
+      "lineNumber": 485
+    },
+    {
+      "name": "Hero Health",
+      "url": "https://herohealth.com",
+      "id": "hero-health",
+      "source": "citiList.txt",
+      "lineNumber": 486
+    },
+    {
+      "name": "Dodow",
+      "url": "https://deals.getdodow.io/27ZKGGX2/WD19RT/",
+      "id": "dodow",
+      "source": "citiList.txt",
+      "lineNumber": 487
+    },
+    {
+      "name": "Bully Beds",
+      "url": "https://bullybeds.com",
+      "id": "bully-beds",
+      "source": "citiList.txt",
+      "lineNumber": 488
+    },
+    {
+      "name": "Filenow",
+      "url": "https://www.filenow.com",
+      "id": "filenow",
+      "source": "citiList.txt",
+      "lineNumber": 489
+    },
+    {
+      "name": "Tayst Coffee",
+      "url": "https://tayst.com",
+      "id": "tayst-coffee",
+      "source": "citiList.txt",
+      "lineNumber": 490
+    },
+    {
+      "name": "TeeChip",
+      "url": "https://teechip.com",
+      "id": "teechip",
+      "source": "citiList.txt",
+      "lineNumber": 491
+    },
+    {
+      "name": "Hometown Apparel",
+      "url": "https://www.hometownapparel.com",
+      "id": "hometown-apparel",
+      "source": "citiList.txt",
+      "lineNumber": 492
+    },
+    {
+      "name": "Eternity Modern",
+      "url": "https://eternitymodern.com",
+      "id": "eternity-modern",
+      "source": "citiList.txt",
+      "lineNumber": 493
+    },
+    {
+      "name": "ChappyWrap",
+      "url": "https://chappywrap.com/",
+      "id": "chappywrap",
+      "source": "citiList.txt",
+      "lineNumber": 494
+    },
+    {
+      "name": "Watens Filter",
+      "url": "https://www.watens.com/?aid=5",
+      "id": "watens-filter",
+      "source": "citiList.txt",
+      "lineNumber": 495
+    },
+    {
+      "name": "ViscoSoft",
+      "url": "https://viscosoft.com/",
+      "id": "viscosoft",
+      "source": "citiList.txt",
+      "lineNumber": 496
+    },
+    {
+      "name": "PROVEN Skincare",
+      "url": "https://www.provenskincare.com/",
+      "id": "proven-skincare",
+      "source": "citiList.txt",
+      "lineNumber": 497
+    },
+    {
+      "name": "Bakerly",
+      "url": "https://bakerly.com/",
+      "id": "bakerly",
+      "source": "citiList.txt",
+      "lineNumber": 498
+    },
+    {
+      "name": "Reel Paper",
+      "url": "https://www.reelpaper.com",
+      "id": "reel-paper",
+      "source": "citiList.txt",
+      "lineNumber": 499
+    },
+    {
+      "name": "Belly Sleep",
+      "url": "https://bellysleep.com",
+      "id": "belly-sleep",
+      "source": "citiList.txt",
+      "lineNumber": 500
+    },
+    {
+      "name": "Sardel",
+      "url": "https://www.sardelkitchen.com",
+      "id": "sardel",
+      "source": "citiList.txt",
+      "lineNumber": 501
+    },
+    {
+      "name": "Evenflo Baby",
+      "url": "https://www.evenflo.com",
+      "id": "evenflo-baby",
+      "source": "citiList.txt",
+      "lineNumber": 502
+    },
+    {
+      "name": "Plant People",
+      "url": "https://plantpeople.co/",
+      "id": "plant-people",
+      "source": "citiList.txt",
+      "lineNumber": 503
+    },
+    {
+      "name": "BedInABox",
+      "url": "https://bedinabox.com",
+      "id": "bedinabox",
+      "source": "citiList.txt",
+      "lineNumber": 504
+    },
+    {
+      "name": "Subset",
+      "url": "https://WearSubset.com",
+      "id": "subset",
+      "source": "citiList.txt",
+      "lineNumber": 505
+    },
+    {
+      "name": "Assouline",
+      "url": "https://www.assouline.com/",
+      "id": "assouline",
+      "source": "citiList.txt",
+      "lineNumber": 506
+    },
+    {
+      "name": "Envato Placeit",
+      "url": "https://placeit.net",
+      "id": "envato-placeit",
+      "source": "citiList.txt",
+      "lineNumber": 507
+    },
+    {
+      "name": "SaveAround",
+      "url": "https://www.savearound.com",
+      "id": "savearound",
+      "source": "citiList.txt",
+      "lineNumber": 508
+    },
+    {
+      "name": "Stormdesire",
+      "url": "https://Www.stormdesire.com",
+      "id": "stormdesire",
+      "source": "citiList.txt",
+      "lineNumber": 509
+    },
+    {
+      "name": "TicketSmarter",
+      "url": "https://www.ticketsmarter.com/",
+      "id": "ticketsmarter",
+      "source": "citiList.txt",
+      "lineNumber": 510
+    },
+    {
+      "name": "Because Market",
+      "url": "https://becausemarket.com",
+      "id": "because-market",
+      "source": "citiList.txt",
+      "lineNumber": 511
+    },
+    {
+      "name": "Miracle",
+      "url": "https://www.miraclebrand.co",
+      "id": "miracle",
+      "source": "citiList.txt",
+      "lineNumber": 512
+    },
+    {
+      "name": "shop-olivia",
+      "url": "https://shop-olivia.com/",
+      "id": "shop-olivia",
+      "source": "citiList.txt",
+      "lineNumber": 513
+    },
+    {
+      "name": "IGK Hair",
+      "url": "https://www.igkhair.com/",
+      "id": "igk-hair",
+      "source": "citiList.txt",
+      "lineNumber": 514
+    },
+    {
+      "name": "Renpho",
+      "url": "https://www.renpho.com",
+      "id": "renpho",
+      "source": "citiList.txt",
+      "lineNumber": 515
+    },
+    {
+      "name": "Ibex",
+      "url": "https://ibex.com/",
+      "id": "ibex",
+      "source": "citiList.txt",
+      "lineNumber": 516
+    },
+    {
+      "name": "Zoma",
+      "url": "https://zomasleep.com",
+      "id": "zoma",
+      "source": "citiList.txt",
+      "lineNumber": 517
+    },
+    {
+      "name": "Reviv3 Procare Company",
+      "url": "https://reviveprocare.com/",
+      "id": "reviv3-procare-company",
+      "source": "citiList.txt",
+      "lineNumber": 518
+    },
+    {
+      "name": "Alpyn Beauty",
+      "url": "https://alpynbeauty.com",
+      "id": "alpyn-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 519
+    },
+    {
+      "name": "Carex Health Brands",
+      "url": "https://carex.com",
+      "id": "carex-health-brands",
+      "source": "citiList.txt",
+      "lineNumber": 520
+    },
+    {
+      "name": "Perdue Farms",
+      "url": "https://www.perduefarms.com",
+      "id": "perdue-farms",
+      "source": "citiList.txt",
+      "lineNumber": 521
+    },
+    {
+      "name": "barkev's",
+      "url": "https://www.barkevs.com/",
+      "id": "barkev-s",
+      "source": "citiList.txt",
+      "lineNumber": 522
+    },
+    {
+      "name": "Sock It To Me",
+      "url": "https://www.sockittome.com",
+      "id": "sock-it-to-me",
+      "source": "citiList.txt",
+      "lineNumber": 523
+    },
+    {
+      "name": "eat2explore",
+      "url": "https://www.eat2explore.com",
+      "id": "eat2explore",
+      "source": "citiList.txt",
+      "lineNumber": 524
+    },
+    {
+      "name": "Pacinos Signature Line",
+      "url": "https://pacinosproducts.com",
+      "id": "pacinos-signature-line",
+      "source": "citiList.txt",
+      "lineNumber": 525
+    },
+    {
+      "name": "LOCKSMITH KEYLESS",
+      "url": "https://www.LocksmithKeyless.com",
+      "id": "locksmith-keyless",
+      "source": "citiList.txt",
+      "lineNumber": 526
+    },
+    {
+      "name": "Ben's Natural Health",
+      "url": "https://www.bensnaturalhealth.com",
+      "id": "ben-s-natural-health",
+      "source": "citiList.txt",
+      "lineNumber": 527
+    },
+    {
+      "name": "Lipogen Products",
+      "url": "https://www.lipogenbio.com",
+      "id": "lipogen-products",
+      "source": "citiList.txt",
+      "lineNumber": 528
+    },
+    {
+      "name": "Diamond Mattress",
+      "url": "https://www.diamondmattress.com/",
+      "id": "diamond-mattress",
+      "source": "citiList.txt",
+      "lineNumber": 529
+    },
+    {
+      "name": "Ultimate Paleo Protein",
+      "url": "https://ultimatepaleoprotein.com/",
+      "id": "ultimate-paleo-protein",
+      "source": "citiList.txt",
+      "lineNumber": 530
+    },
+    {
+      "name": "Strength Genesis",
+      "url": "https://www.strengthgenesis.com",
+      "id": "strength-genesis",
+      "source": "citiList.txt",
+      "lineNumber": 531
+    },
+    {
+      "name": "Ben Soleimani",
+      "url": "https://bensoleimani.com",
+      "id": "ben-soleimani",
+      "source": "citiList.txt",
+      "lineNumber": 532
+    },
+    {
+      "name": "TRANYA",
+      "url": "https://shop.tranya.com",
+      "id": "tranya",
+      "source": "citiList.txt",
+      "lineNumber": 533
+    },
+    {
+      "name": "Blues Hog",
+      "url": "https://www.blueshog.com",
+      "id": "blues-hog",
+      "source": "citiList.txt",
+      "lineNumber": 534
+    },
+    {
+      "name": "One Bed",
+      "url": "https://theonebed.com",
+      "id": "one-bed",
+      "source": "citiList.txt",
+      "lineNumber": 535
+    },
+    {
+      "name": "The Chef & The Dish",
+      "url": "https://www.thechefandthedish.com",
+      "id": "the-chef-the-dish",
+      "source": "citiList.txt",
+      "lineNumber": 536
+    },
+    {
+      "name": "Amerisleep",
+      "url": "https://amerisleep.com",
+      "id": "amerisleep",
+      "source": "citiList.txt",
+      "lineNumber": 537
+    },
+    {
+      "name": "Grand Canyon West",
+      "url": "https://www.grandcanyonwest.com",
+      "id": "grand-canyon-west",
+      "source": "citiList.txt",
+      "lineNumber": 538
+    },
+    {
+      "name": "AffordableBlinds.com",
+      "url": "https://affordableblinds.com",
+      "id": "affordableblinds-com",
+      "source": "citiList.txt",
+      "lineNumber": 539
+    },
+    {
+      "name": "ForeverMissed",
+      "url": "https://www.forevermissed.com",
+      "id": "forevermissed",
+      "source": "citiList.txt",
+      "lineNumber": 540
+    },
+    {
+      "name": "outdazl",
+      "url": "https://www.outdazl.com/",
+      "id": "outdazl",
+      "source": "citiList.txt",
+      "lineNumber": 541
+    },
+    {
+      "name": "SweetNight",
+      "url": "https://www.sweetnight.com/",
+      "id": "sweetnight",
+      "source": "citiList.txt",
+      "lineNumber": 542
+    },
+    {
+      "name": "Balance of Nature",
+      "url": "https://balanceofnature.com",
+      "id": "balance-of-nature",
+      "source": "citiList.txt",
+      "lineNumber": 543
+    },
+    {
+      "name": "microbattery",
+      "url": "https://www.microbattery.com",
+      "id": "microbattery",
+      "source": "citiList.txt",
+      "lineNumber": 544
+    },
+    {
+      "name": "The Dad Hoodie",
+      "url": "https://thedadhoodie.com/",
+      "id": "the-dad-hoodie",
+      "source": "citiList.txt",
+      "lineNumber": 545
+    },
+    {
+      "name": "AutoPartsToys",
+      "url": "https://autopartstoys.com",
+      "id": "autopartstoys",
+      "source": "citiList.txt",
+      "lineNumber": 546
+    },
+    {
+      "name": "Basepaws",
+      "url": "https://www.basepaws.com",
+      "id": "basepaws",
+      "source": "citiList.txt",
+      "lineNumber": 547
+    },
+    {
+      "name": "OnPay",
+      "url": "https://onpay.com/",
+      "id": "onpay",
+      "source": "citiList.txt",
+      "lineNumber": 548
+    },
+    {
+      "name": "GTHIC",
+      "url": "https://gthic.com/",
+      "id": "gthic",
+      "source": "citiList.txt",
+      "lineNumber": 549
+    },
+    {
+      "name": "Embryolisse",
+      "url": "https://us.embryolisse.com",
+      "id": "embryolisse",
+      "source": "citiList.txt",
+      "lineNumber": 550
+    },
+    {
+      "name": "White Lotus Home",
+      "url": "https://www.whitelotushome.com",
+      "id": "white-lotus-home",
+      "source": "citiList.txt",
+      "lineNumber": 551
+    },
+    {
+      "name": "Rootine",
+      "url": "https://rootine.co/",
+      "id": "rootine",
+      "source": "citiList.txt",
+      "lineNumber": 552
+    },
+    {
+      "name": "Ettika",
+      "url": "https://www.ettika.com",
+      "id": "ettika",
+      "source": "citiList.txt",
+      "lineNumber": 553
+    },
+    {
+      "name": "ayamayaoutdoor",
+      "url": "https://ayamaya.com",
+      "id": "ayamayaoutdoor",
+      "source": "citiList.txt",
+      "lineNumber": 554
+    },
+    {
+      "name": "Mosaic Foods",
+      "url": "https://www.mosaicfoods.com/",
+      "id": "mosaic-foods",
+      "source": "citiList.txt",
+      "lineNumber": 555
+    },
+    {
+      "name": "SomMailier",
+      "url": "https://www.sommailier.com",
+      "id": "sommailier",
+      "source": "citiList.txt",
+      "lineNumber": 556
+    },
+    {
+      "name": "Whitestone Dome",
+      "url": "https://www.whitestonedome.com",
+      "id": "whitestone-dome",
+      "source": "citiList.txt",
+      "lineNumber": 557
+    },
+    {
+      "name": "Bloomist",
+      "url": "https://bloomist.com/",
+      "id": "bloomist",
+      "source": "citiList.txt",
+      "lineNumber": 558
+    },
+    {
+      "name": "My Gift Stop",
+      "url": "https://www.mygiftstop.com",
+      "id": "my-gift-stop",
+      "source": "citiList.txt",
+      "lineNumber": 559
+    },
+    {
+      "name": "Infinity Pillow",
+      "url": "https://infinitypillow.co",
+      "id": "infinity-pillow",
+      "source": "citiList.txt",
+      "lineNumber": 560
+    },
+    {
+      "name": "capucinne.com",
+      "url": "https://www.capucinne.com/",
+      "id": "capucinne-com",
+      "source": "citiList.txt",
+      "lineNumber": 561
+    },
+    {
+      "name": "Spencer Barnes",
+      "url": "https://sbla.com",
+      "id": "spencer-barnes",
+      "source": "citiList.txt",
+      "lineNumber": 562
+    },
+    {
+      "name": "OLIVE YOUNG",
+      "url": "https://global.oliveyoung.com/",
+      "id": "olive-young",
+      "source": "citiList.txt",
+      "lineNumber": 563
+    },
+    {
+      "name": "Silk and Sonder",
+      "url": "https://www.silkandsonder.com/",
+      "id": "silk-and-sonder",
+      "source": "citiList.txt",
+      "lineNumber": 564
+    },
+    {
+      "name": "ScanMyPhotos",
+      "url": "https://www.scanmyphotos.com",
+      "id": "scanmyphotos",
+      "source": "citiList.txt",
+      "lineNumber": 565
+    },
+    {
+      "name": "LED Technologies",
+      "url": "https://ledtechnologies.com",
+      "id": "led-technologies",
+      "source": "citiList.txt",
+      "lineNumber": 566
+    },
+    {
+      "name": "Wildhorn Outfitters",
+      "url": "https://www.wildhornoutfitters.com/",
+      "id": "wildhorn-outfitters",
+      "source": "citiList.txt",
+      "lineNumber": 567
+    },
+    {
+      "name": "Delilah Home",
+      "url": "https://delilahhome.com/",
+      "id": "delilah-home",
+      "source": "citiList.txt",
+      "lineNumber": 568
+    },
+    {
+      "name": "Latex Mattress Factory",
+      "url": "https://www.LatexMattressFactory.com",
+      "id": "latex-mattress-factory",
+      "source": "citiList.txt",
+      "lineNumber": 569
+    },
+    {
+      "name": "Helloice",
+      "url": "https://www.helloice.com",
+      "id": "helloice",
+      "source": "citiList.txt",
+      "lineNumber": 570
+    },
+    {
+      "name": "StarBackdrop",
+      "url": "https://www.starbackdrops.com",
+      "id": "starbackdrop",
+      "source": "citiList.txt",
+      "lineNumber": 571
+    },
+    {
+      "name": "auxito",
+      "url": "https://auxito.com",
+      "id": "auxito",
+      "source": "citiList.txt",
+      "lineNumber": 572
+    },
+    {
+      "name": "Weleda",
+      "url": "https://www.weleda.com/",
+      "id": "weleda",
+      "source": "citiList.txt",
+      "lineNumber": 573
+    },
+    {
+      "name": "Vitabrid",
+      "url": "https://vitabrid.com",
+      "id": "vitabrid",
+      "source": "citiList.txt",
+      "lineNumber": 574
+    },
+    {
+      "name": "LUCY PARIS",
+      "url": "https://www.lucyparis.com",
+      "id": "lucy-paris",
+      "source": "citiList.txt",
+      "lineNumber": 575
+    },
+    {
+      "name": "adidas",
+      "url": "https://www.adidas.com/us/",
+      "id": "adidas",
+      "source": "citiList.txt",
+      "lineNumber": 576
+    },
+    {
+      "name": "Tiptrans",
+      "url": "https://www.tiptrans.com",
+      "id": "tiptrans",
+      "source": "citiList.txt",
+      "lineNumber": 577
+    },
+    {
+      "name": "SAINT OWEN",
+      "url": "https://www.saintowen.com/",
+      "id": "saint-owen",
+      "source": "citiList.txt",
+      "lineNumber": 578
+    },
+    {
+      "name": "Jeff Wan",
+      "url": "https://www.jeffwan.com",
+      "id": "jeff-wan",
+      "source": "citiList.txt",
+      "lineNumber": 579
+    },
+    {
+      "name": "Alteya",
+      "url": "https://alteyaorganics.com",
+      "id": "alteya",
+      "source": "citiList.txt",
+      "lineNumber": 580
+    },
+    {
+      "name": "PortraitFlip",
+      "url": "https://www.portraitflip.com/",
+      "id": "portraitflip",
+      "source": "citiList.txt",
+      "lineNumber": 581
+    },
+    {
+      "name": "tuft and paw",
+      "url": "https://tuftandpaw.com",
+      "id": "tuft-and-paw",
+      "source": "citiList.txt",
+      "lineNumber": 582
+    },
+    {
+      "name": "DOKODEMO",
+      "url": "https://dokodemo.world/en/",
+      "id": "dokodemo",
+      "source": "citiList.txt",
+      "lineNumber": 583
+    },
+    {
+      "name": "Otofonix",
+      "url": "https://www.otofonix.com",
+      "id": "otofonix",
+      "source": "citiList.txt",
+      "lineNumber": 584
+    },
+    {
+      "name": "LOFTEK",
+      "url": "https://www.loftek.us/",
+      "id": "loftek",
+      "source": "citiList.txt",
+      "lineNumber": 585
+    },
+    {
+      "name": "Gaby's Bags",
+      "url": "https://www.gabysbags.com",
+      "id": "gaby-s-bags",
+      "source": "citiList.txt",
+      "lineNumber": 586
+    },
+    {
+      "name": "Rabbies Tours",
+      "url": "https://www.rabbies.com/en",
+      "id": "rabbies-tours",
+      "source": "citiList.txt",
+      "lineNumber": 587
+    },
+    {
+      "name": "The Birth Ball",
+      "url": "https://thebirthball.com",
+      "id": "the-birth-ball",
+      "source": "citiList.txt",
+      "lineNumber": 588
+    },
+    {
+      "name": "Simple Wishes",
+      "url": "https://www.simplewishes.com",
+      "id": "simple-wishes",
+      "source": "citiList.txt",
+      "lineNumber": 589
+    },
+    {
+      "name": "eFootwear.com",
+      "url": "https://www.efootwear.com",
+      "id": "efootwear-com",
+      "source": "citiList.txt",
+      "lineNumber": 590
+    },
+    {
+      "name": "Petite 'n Pretty",
+      "url": "https://www.petitenpretty.com",
+      "id": "petite-n-pretty",
+      "source": "citiList.txt",
+      "lineNumber": 591
+    },
+    {
+      "name": "ABBE Glasses",
+      "url": "https://www.abbeglasses.com/",
+      "id": "abbe-glasses",
+      "source": "citiList.txt",
+      "lineNumber": 592
+    },
+    {
+      "name": "Sheets & Giggles",
+      "url": "https://sheetsgiggles.com/",
+      "id": "sheets-giggles",
+      "source": "citiList.txt",
+      "lineNumber": 593
+    },
+    {
+      "name": "Fast Bar",
+      "url": "https://www.FastBar.com",
+      "id": "fast-bar",
+      "source": "citiList.txt",
+      "lineNumber": 594
+    },
+    {
+      "name": "DANIELLA SHEVEL, LLC",
+      "url": "https://www.daniellashevel.com/",
+      "id": "daniella-shevel-llc",
+      "source": "citiList.txt",
+      "lineNumber": 595
+    },
+    {
+      "name": "RockerMama",
+      "url": "https://readyrocker.com",
+      "id": "rockermama",
+      "source": "citiList.txt",
+      "lineNumber": 596
+    },
+    {
+      "name": "Vankyo",
+      "url": "https://ivankyo.com",
+      "id": "vankyo",
+      "source": "citiList.txt",
+      "lineNumber": 597
+    },
+    {
+      "name": "Hoffmaster",
+      "url": "https://www.hoffmaster.com/",
+      "id": "hoffmaster",
+      "source": "citiList.txt",
+      "lineNumber": 598
+    },
+    {
+      "name": "Cerebelly",
+      "url": "https://cerebelly.com",
+      "id": "cerebelly",
+      "source": "citiList.txt",
+      "lineNumber": 599
+    },
+    {
+      "name": "Hyalogic",
+      "url": "https://hyalogic.com",
+      "id": "hyalogic",
+      "source": "citiList.txt",
+      "lineNumber": 600
+    },
+    {
+      "name": "Drestige",
+      "url": "https://drestige.com/",
+      "id": "drestige",
+      "source": "citiList.txt",
+      "lineNumber": 601
+    },
+    {
+      "name": "Turboant",
+      "url": "https://www.turboant.com",
+      "id": "turboant",
+      "source": "citiList.txt",
+      "lineNumber": 602
+    },
+    {
+      "name": "Laguna Herbals",
+      "url": "https://www.lagunaherbals.com",
+      "id": "laguna-herbals",
+      "source": "citiList.txt",
+      "lineNumber": 603
+    },
+    {
+      "name": "X-sense",
+      "url": "https://www.x-sense.com/",
+      "id": "x-sense",
+      "source": "citiList.txt",
+      "lineNumber": 604
+    },
+    {
+      "name": "Giuseppe Zanotti",
+      "url": "https://www.giuseppezanotti.com/us",
+      "id": "giuseppe-zanotti",
+      "source": "citiList.txt",
+      "lineNumber": 605
+    },
+    {
+      "name": "Solgaard",
+      "url": "https://www.solgaard.co",
+      "id": "solgaard",
+      "source": "citiList.txt",
+      "lineNumber": 606
+    },
+    {
+      "name": "Content Development Pros",
+      "url": "https://www.contentdevelopmentpros.com",
+      "id": "content-development-pros",
+      "source": "citiList.txt",
+      "lineNumber": 607
+    },
+    {
+      "name": "Millesima",
+      "url": "https://www.millesima-usa.com/",
+      "id": "millesima",
+      "source": "citiList.txt",
+      "lineNumber": 608
+    },
+    {
+      "name": "Kindred Bravely",
+      "url": "https://www.kindredbravely.com",
+      "id": "kindred-bravely",
+      "source": "citiList.txt",
+      "lineNumber": 609
+    },
+    {
+      "name": "Mure and Grand",
+      "url": "https://mureandgrand.com/",
+      "id": "mure-and-grand",
+      "source": "citiList.txt",
+      "lineNumber": 610
+    },
+    {
+      "name": "Wish",
+      "url": "https://www.wish.com/",
+      "id": "wish",
+      "source": "citiList.txt",
+      "lineNumber": 611
+    },
+    {
+      "name": "FishUSA",
+      "url": "https://www.fishusa.com",
+      "id": "fishusa",
+      "source": "citiList.txt",
+      "lineNumber": 612
+    },
+    {
+      "name": "Fanatical",
+      "url": "https://www.fanatical.com",
+      "id": "fanatical",
+      "source": "citiList.txt",
+      "lineNumber": 613
+    },
+    {
+      "name": "PassFab",
+      "url": "https://www.passfab.com/",
+      "id": "passfab",
+      "source": "citiList.txt",
+      "lineNumber": 614
+    },
+    {
+      "name": "Woodland Direct",
+      "url": "https://www.woodlanddirect.com/",
+      "id": "woodland-direct",
+      "source": "citiList.txt",
+      "lineNumber": 615
+    },
+    {
+      "name": "Venchi",
+      "url": "https://us.venchi.com/",
+      "id": "venchi",
+      "source": "citiList.txt",
+      "lineNumber": 616
+    },
+    {
+      "name": "Woodcraft",
+      "url": "https://www.woodcraft.com",
+      "id": "woodcraft",
+      "source": "citiList.txt",
+      "lineNumber": 617
+    },
+    {
+      "name": "ZAPAKA",
+      "url": "https://zapaka.com",
+      "id": "zapaka",
+      "source": "citiList.txt",
+      "lineNumber": 618
+    },
+    {
+      "name": "Segway",
+      "url": "https://store.segway.com/",
+      "id": "segway",
+      "source": "citiList.txt",
+      "lineNumber": 619
+    },
+    {
+      "name": "Koio",
+      "url": "https://www.koio.co/",
+      "id": "koio",
+      "source": "citiList.txt",
+      "lineNumber": 620
+    },
+    {
+      "name": "Calista Tools",
+      "url": "https://calistatools.com/",
+      "id": "calista-tools",
+      "source": "citiList.txt",
+      "lineNumber": 621
+    },
+    {
+      "name": "Graham & Brown",
+      "url": "https://www.grahambrown.com/",
+      "id": "graham-brown",
+      "source": "citiList.txt",
+      "lineNumber": 622
+    },
+    {
+      "name": "IBEROSTAR",
+      "url": "https://www.iberostar.com",
+      "id": "iberostar",
+      "source": "citiList.txt",
+      "lineNumber": 623
+    },
+    {
+      "name": "Best Bully Sticks",
+      "url": "https://www.bestbullysticks.com",
+      "id": "best-bully-sticks",
+      "source": "citiList.txt",
+      "lineNumber": 624
+    },
+    {
+      "name": "House of Marley",
+      "url": "https://thehouseofmarley.com",
+      "id": "house-of-marley",
+      "source": "citiList.txt",
+      "lineNumber": 625
+    },
+    {
+      "name": "Relief Factor",
+      "url": "https://www.relieffactor.com",
+      "id": "relief-factor",
+      "source": "citiList.txt",
+      "lineNumber": 626
+    },
+    {
+      "name": "WelleCo",
+      "url": "https://www.welleco.com",
+      "id": "welleco",
+      "source": "citiList.txt",
+      "lineNumber": 627
+    },
+    {
+      "name": "Officine Generale Global",
+      "url": "https://www.officinegenerale.com",
+      "id": "officine-generale-global",
+      "source": "citiList.txt",
+      "lineNumber": 628
+    },
+    {
+      "name": "Europcar",
+      "url": "https://www.europcar.com/",
+      "id": "europcar",
+      "source": "citiList.txt",
+      "lineNumber": 629
+    },
+    {
+      "name": "Coopers Cask Coffee",
+      "url": "https://www.cooperscoffeeco.com",
+      "id": "coopers-cask-coffee",
+      "source": "citiList.txt",
+      "lineNumber": 630
+    },
+    {
+      "name": "Tail Activewear",
+      "url": "https://www.tailactivewear.com",
+      "id": "tail-activewear",
+      "source": "citiList.txt",
+      "lineNumber": 631
+    },
+    {
+      "name": "Anycubic",
+      "url": "https://www.anycubic.com",
+      "id": "anycubic",
+      "source": "citiList.txt",
+      "lineNumber": 632
+    },
+    {
+      "name": "Circus NY",
+      "url": "https://www.circusny.com/",
+      "id": "circus-ny",
+      "source": "citiList.txt",
+      "lineNumber": 633
+    },
+    {
+      "name": "Gate Video Smart Lock",
+      "url": "https://getgate.com/",
+      "id": "gate-video-smart-lock",
+      "source": "citiList.txt",
+      "lineNumber": 634
+    },
+    {
+      "name": "Blizzard Gear Store",
+      "url": "https://gear.blizzard.com/",
+      "id": "blizzard-gear-store",
+      "source": "citiList.txt",
+      "lineNumber": 635
+    },
+    {
+      "name": "Prime Party",
+      "url": "https://www.PrimeParty.com",
+      "id": "prime-party",
+      "source": "citiList.txt",
+      "lineNumber": 636
+    },
+    {
+      "name": "Hofdeco",
+      "url": "https://www.hofdeco.com",
+      "id": "hofdeco",
+      "source": "citiList.txt",
+      "lineNumber": 637
+    },
+    {
+      "name": "Green Motion",
+      "url": "https://greenmotion.com/",
+      "id": "green-motion",
+      "source": "citiList.txt",
+      "lineNumber": 638
+    },
+    {
+      "name": "eibmarkt",
+      "url": "https://eibmarkt.com/en/index.html",
+      "id": "eibmarkt",
+      "source": "citiList.txt",
+      "lineNumber": 639
+    },
+    {
+      "name": "AlignerCo",
+      "url": "https://www.alignerco.com",
+      "id": "alignerco",
+      "source": "citiList.txt",
+      "lineNumber": 640
+    },
+    {
+      "name": "Golf Galaxy",
+      "url": "https://www.golfgalaxy.com/",
+      "id": "golf-galaxy",
+      "source": "citiList.txt",
+      "lineNumber": 641
+    },
+    {
+      "name": "Beadpark",
+      "url": "https://www.beadpark.com",
+      "id": "beadpark",
+      "source": "citiList.txt",
+      "lineNumber": 642
+    },
+    {
+      "name": "ASTR The Label",
+      "url": "https://www.astrthelabel.com",
+      "id": "astr-the-label",
+      "source": "citiList.txt",
+      "lineNumber": 643
+    },
+    {
+      "name": "Eileen Fisher",
+      "url": "https://eileenfisher.com",
+      "id": "eileen-fisher",
+      "source": "citiList.txt",
+      "lineNumber": 644
+    },
+    {
+      "name": "Game On!",
+      "url": "https://gameonlures.com/",
+      "id": "game-on",
+      "source": "citiList.txt",
+      "lineNumber": 645
+    },
+    {
+      "name": "Chamaripa",
+      "url": "https://www.chamaripashoes.com/",
+      "id": "chamaripa",
+      "source": "citiList.txt",
+      "lineNumber": 646
+    },
+    {
+      "name": "Redfora",
+      "url": "https://www.redfora.com",
+      "id": "redfora",
+      "source": "citiList.txt",
+      "lineNumber": 647
+    },
+    {
+      "name": "MissFox",
+      "url": "https://www.missfoxshop.com",
+      "id": "missfox",
+      "source": "citiList.txt",
+      "lineNumber": 648
+    },
+    {
+      "name": "Alpacka Raft",
+      "url": "https://www.alpackaraft.com/",
+      "id": "alpacka-raft",
+      "source": "citiList.txt",
+      "lineNumber": 649
+    },
+    {
+      "name": "Allume",
+      "url": "https://www.allume.co/",
+      "id": "allume",
+      "source": "citiList.txt",
+      "lineNumber": 650
+    },
+    {
+      "name": "ALPAKA",
+      "url": "https://alpakagear.com/",
+      "id": "alpaka",
+      "source": "citiList.txt",
+      "lineNumber": 651
+    },
+    {
+      "name": "Wine Insiders",
+      "url": "https://wineinsiders.com/",
+      "id": "wine-insiders",
+      "source": "citiList.txt",
+      "lineNumber": 652
+    },
+    {
+      "name": "Beam",
+      "url": "https://shopbeam.com/",
+      "id": "beam",
+      "source": "citiList.txt",
+      "lineNumber": 653
+    },
+    {
+      "name": "At Your Pace",
+      "url": "https://atyourpaceonline.com",
+      "id": "at-your-pace",
+      "source": "citiList.txt",
+      "lineNumber": 654
+    },
+    {
+      "name": "California Cowboy",
+      "url": "https://shop.californiacowboy.com/",
+      "id": "california-cowboy",
+      "source": "citiList.txt",
+      "lineNumber": 655
+    },
+    {
+      "name": "Camp Chef",
+      "url": "https://www.campchef.com/",
+      "id": "camp-chef",
+      "source": "citiList.txt",
+      "lineNumber": 656
+    },
+    {
+      "name": "Blue Thunder Technologies",
+      "url": "https://www.bluethundertechnologies.com/",
+      "id": "blue-thunder-technologies",
+      "source": "citiList.txt",
+      "lineNumber": 657
+    },
+    {
+      "name": "Briogeo Hair",
+      "url": "https://www.briogeohair.com",
+      "id": "briogeo-hair",
+      "source": "citiList.txt",
+      "lineNumber": 658
+    },
+    {
+      "name": "Club Ride Apparel",
+      "url": "https://www.clubrideapparel.com/",
+      "id": "club-ride-apparel",
+      "source": "citiList.txt",
+      "lineNumber": 659
+    },
+    {
+      "name": "ColourPop",
+      "url": "https://colourpop.com",
+      "id": "colourpop",
+      "source": "citiList.txt",
+      "lineNumber": 660
+    },
+    {
+      "name": "Cult Gaia",
+      "url": "https://cultgaia.com",
+      "id": "cult-gaia",
+      "source": "citiList.txt",
+      "lineNumber": 661
+    },
+    {
+      "name": "Coolmuster",
+      "url": "https://www.coolmuster.com/",
+      "id": "coolmuster",
+      "source": "citiList.txt",
+      "lineNumber": 662
+    },
+    {
+      "name": "HOMER Learn-to-Read Program",
+      "url": "https://www.learnwithhomer.com/",
+      "id": "homer-learn-to-read-program",
+      "source": "citiList.txt",
+      "lineNumber": 663
+    },
+    {
+      "name": "Cardboard Cutout Standees",
+      "url": "https://www.cardboardcutoutstandees.com",
+      "id": "cardboard-cutout-standees",
+      "source": "citiList.txt",
+      "lineNumber": 664
+    },
+    {
+      "name": "Alchemy Bicycles",
+      "url": "https://alchemybikes.com/",
+      "id": "alchemy-bicycles",
+      "source": "citiList.txt",
+      "lineNumber": 665
+    },
+    {
+      "name": "Armoire Style",
+      "url": "https://armoire.style",
+      "id": "armoire-style",
+      "source": "citiList.txt",
+      "lineNumber": 666
+    },
+    {
+      "name": "Boxraw",
+      "url": "https://boxraw.com/",
+      "id": "boxraw",
+      "source": "citiList.txt",
+      "lineNumber": 667
+    },
+    {
+      "name": "Codecademy",
+      "url": "https://www.codecademy.com/",
+      "id": "codecademy",
+      "source": "citiList.txt",
+      "lineNumber": 668
+    },
+    {
+      "name": "DIFF eyewear",
+      "url": "https://diffeyewear.com",
+      "id": "diff-eyewear",
+      "source": "citiList.txt",
+      "lineNumber": 669
+    },
+    {
+      "name": "Dooxi",
+      "url": "https://www.dooxi.com",
+      "id": "dooxi",
+      "source": "citiList.txt",
+      "lineNumber": 670
+    },
+    {
+      "name": "Drive-In Autosound",
+      "url": "https://driveinautosound.com/",
+      "id": "drive-in-autosound",
+      "source": "citiList.txt",
+      "lineNumber": 671
+    },
+    {
+      "name": "DMOS",
+      "url": "https://dmosproshoveltools.com/",
+      "id": "dmos",
+      "source": "citiList.txt",
+      "lineNumber": 672
+    },
+    {
+      "name": "Dr. Jart+",
+      "url": "https://us.drjart.com/",
+      "id": "dr-jart",
+      "source": "citiList.txt",
+      "lineNumber": 673
+    },
+    {
+      "name": "Easyship",
+      "url": "https://www.easyship.com",
+      "id": "easyship",
+      "source": "citiList.txt",
+      "lineNumber": 674
+    },
+    {
+      "name": "Earth Shoes",
+      "url": "https://earthshoes.com/",
+      "id": "earth-shoes",
+      "source": "citiList.txt",
+      "lineNumber": 675
+    },
+    {
+      "name": "EMP Shield",
+      "url": "https://www.empshield.com/",
+      "id": "emp-shield",
+      "source": "citiList.txt",
+      "lineNumber": 676
+    },
+    {
+      "name": "Fenty Beauty",
+      "url": "https://www.fentybeauty.com",
+      "id": "fenty-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 677
+    },
+    {
+      "name": "BowlersMart",
+      "url": "https://www.bowlersmart.com/",
+      "id": "bowlersmart",
+      "source": "citiList.txt",
+      "lineNumber": 678
+    },
+    {
+      "name": "Gardener's Supply Company",
+      "url": "https://www.gardeners.com/",
+      "id": "gardener-s-supply-company",
+      "source": "citiList.txt",
+      "lineNumber": 679
+    },
+    {
+      "name": "Geologie",
+      "url": "https://geologie.com",
+      "id": "geologie",
+      "source": "citiList.txt",
+      "lineNumber": 680
+    },
+    {
+      "name": "Saranoni Luxury Blankets",
+      "url": "https://www.saranoni.com",
+      "id": "saranoni-luxury-blankets",
+      "source": "citiList.txt",
+      "lineNumber": 681
+    },
+    {
+      "name": "Nature's Mace",
+      "url": "https://naturesmace.com/",
+      "id": "nature-s-mace",
+      "source": "citiList.txt",
+      "lineNumber": 682
+    },
+    {
+      "name": "1771 Living",
+      "url": "https://www.residenthome.com/",
+      "id": "1771-living",
+      "source": "citiList.txt",
+      "lineNumber": 683
+    },
+    {
+      "name": "Gaudenzi Boutique",
+      "url": "https://www.gaudenziboutique.com",
+      "id": "gaudenzi-boutique",
+      "source": "citiList.txt",
+      "lineNumber": 684
+    },
+    {
+      "name": "Nectar Sunglasses",
+      "url": "https://www.nectarsunglasses.com",
+      "id": "nectar-sunglasses",
+      "source": "citiList.txt",
+      "lineNumber": 685
+    },
+    {
+      "name": "Frontier Communications",
+      "url": "https://www.frontier.com/",
+      "id": "frontier-communications",
+      "source": "citiList.txt",
+      "lineNumber": 686
+    },
+    {
+      "name": "Weblium",
+      "url": "https://weblium.com",
+      "id": "weblium",
+      "source": "citiList.txt",
+      "lineNumber": 687
+    },
+    {
+      "name": "Deep Sentinel Home Security",
+      "url": "https://www.deepsentinel.com",
+      "id": "deep-sentinel-home-security",
+      "source": "citiList.txt",
+      "lineNumber": 688
+    },
+    {
+      "name": "Darwin\u2019s Natural Pet Products",
+      "url": "https://www.darwinspet.com",
+      "id": "darwin-s-natural-pet-products",
+      "source": "citiList.txt",
+      "lineNumber": 689
+    },
+    {
+      "name": "MASAMI",
+      "url": "https://www.lovemasami.com",
+      "id": "masami",
+      "source": "citiList.txt",
+      "lineNumber": 690
+    },
+    {
+      "name": "Rotita",
+      "url": "https://www.rotita.com",
+      "id": "rotita",
+      "source": "citiList.txt",
+      "lineNumber": 691
+    },
+    {
+      "name": "ProWritingAid",
+      "url": "https://prowritingaid.com",
+      "id": "prowritingaid",
+      "source": "citiList.txt",
+      "lineNumber": 692
+    },
+    {
+      "name": "MiracleCord",
+      "url": "https://miraclecord.com/",
+      "id": "miraclecord",
+      "source": "citiList.txt",
+      "lineNumber": 693
+    },
+    {
+      "name": "RSS Podcast Hosting",
+      "url": "https://rss.com",
+      "id": "rss-podcast-hosting",
+      "source": "citiList.txt",
+      "lineNumber": 694
+    },
+    {
+      "name": "Tenikle, LLC",
+      "url": "https://www.tenikle.com",
+      "id": "tenikle-llc",
+      "source": "citiList.txt",
+      "lineNumber": 695
+    },
+    {
+      "name": "Shutterfly",
+      "url": "https://www.shutterfly.com",
+      "id": "shutterfly",
+      "source": "citiList.txt",
+      "lineNumber": 696
+    },
+    {
+      "name": "Vesgantti",
+      "url": "https://vesgantti.com",
+      "id": "vesgantti",
+      "source": "citiList.txt",
+      "lineNumber": 697
+    },
+    {
+      "name": "YouMail",
+      "url": "https://www.youmail.com",
+      "id": "youmail",
+      "source": "citiList.txt",
+      "lineNumber": 698
+    },
+    {
+      "name": "Blinkist",
+      "url": "https://www.blinkist.com/",
+      "id": "blinkist",
+      "source": "citiList.txt",
+      "lineNumber": 699
+    },
+    {
+      "name": "Skillshare",
+      "url": "https://skillshare.com/",
+      "id": "skillshare",
+      "source": "citiList.txt",
+      "lineNumber": 700
+    },
+    {
+      "name": "Victorinox",
+      "url": "https://www.victorinox.com/us/en/",
+      "id": "victorinox",
+      "source": "citiList.txt",
+      "lineNumber": 701
+    },
+    {
+      "name": "Rural Haze",
+      "url": "https://www.ruralhaze.com",
+      "id": "rural-haze",
+      "source": "citiList.txt",
+      "lineNumber": 702
+    },
+    {
+      "name": "Sixity Auto",
+      "url": "https://www.sixityauto.com/",
+      "id": "sixity-auto",
+      "source": "citiList.txt",
+      "lineNumber": 703
+    },
+    {
+      "name": "John Elliott",
+      "url": "https://johnelliott.com",
+      "id": "john-elliott",
+      "source": "citiList.txt",
+      "lineNumber": 704
+    },
+    {
+      "name": "Nektony",
+      "url": "https://nektony.com",
+      "id": "nektony",
+      "source": "citiList.txt",
+      "lineNumber": 705
+    },
+    {
+      "name": "Jayson Home",
+      "url": "https://www.jaysonhome.com",
+      "id": "jayson-home",
+      "source": "citiList.txt",
+      "lineNumber": 706
+    },
+    {
+      "name": "Peacock Alley",
+      "url": "https://www.peacockalley.com/",
+      "id": "peacock-alley",
+      "source": "citiList.txt",
+      "lineNumber": 707
+    },
+    {
+      "name": "SeaVees",
+      "url": "https://seavees.com",
+      "id": "seavees",
+      "source": "citiList.txt",
+      "lineNumber": 708
+    },
+    {
+      "name": "LA Police Gear",
+      "url": "https://lapolicegear.com",
+      "id": "la-police-gear",
+      "source": "citiList.txt",
+      "lineNumber": 709
+    },
+    {
+      "name": "Tier1Water.com",
+      "url": "https://www.tier1water.com",
+      "id": "tier1water-com",
+      "source": "citiList.txt",
+      "lineNumber": 710
+    },
+    {
+      "name": "Sharp Home Appliances",
+      "url": "https://shop.sharpusa.com/",
+      "id": "sharp-home-appliances",
+      "source": "citiList.txt",
+      "lineNumber": 711
+    },
+    {
+      "name": "Survivor Filter",
+      "url": "https://www.survivorfilter.com/",
+      "id": "survivor-filter",
+      "source": "citiList.txt",
+      "lineNumber": 712
+    },
+    {
+      "name": "Onnit",
+      "url": "https://www.onnit.com",
+      "id": "onnit",
+      "source": "citiList.txt",
+      "lineNumber": 713
+    },
+    {
+      "name": "Kassatex",
+      "url": "https://kassatex.com",
+      "id": "kassatex",
+      "source": "citiList.txt",
+      "lineNumber": 714
+    },
+    {
+      "name": "Putterball Game",
+      "url": "https://putterballgame.com",
+      "id": "putterball-game",
+      "source": "citiList.txt",
+      "lineNumber": 715
+    },
+    {
+      "name": "Toynk Toys",
+      "url": "https://www.toynk.com",
+      "id": "toynk-toys",
+      "source": "citiList.txt",
+      "lineNumber": 716
+    },
+    {
+      "name": "Trident Fly Fishing",
+      "url": "https://tridentflyfishing.com",
+      "id": "trident-fly-fishing",
+      "source": "citiList.txt",
+      "lineNumber": 717
+    },
+    {
+      "name": "The Farmer's Dog",
+      "url": "https://www.thefarmersdog.com",
+      "id": "the-farmer-s-dog",
+      "source": "citiList.txt",
+      "lineNumber": 718
+    },
+    {
+      "name": "VienneMilano",
+      "url": "https://viennemilano.com/",
+      "id": "viennemilano",
+      "source": "citiList.txt",
+      "lineNumber": 719
+    },
+    {
+      "name": "Plants.com",
+      "url": "https://plants.com",
+      "id": "plants-com",
+      "source": "citiList.txt",
+      "lineNumber": 720
+    },
+    {
+      "name": "Vintage Tub & Bath",
+      "url": "https://www.vintagetub.com",
+      "id": "vintage-tub-bath",
+      "source": "citiList.txt",
+      "lineNumber": 721
+    },
+    {
+      "name": "Republic of Durable Goods",
+      "url": "https://republicofdurablegoods.com/",
+      "id": "republic-of-durable-goods",
+      "source": "citiList.txt",
+      "lineNumber": 722
+    },
+    {
+      "name": "Huk Performance Fishing",
+      "url": "https://huk.com",
+      "id": "huk-performance-fishing",
+      "source": "citiList.txt",
+      "lineNumber": 723
+    },
+    {
+      "name": "Nathan Sports",
+      "url": "https://www.nathansports.com",
+      "id": "nathan-sports",
+      "source": "citiList.txt",
+      "lineNumber": 724
+    },
+    {
+      "name": "Petal & Pup",
+      "url": "https://petalandpup.com",
+      "id": "petal-pup",
+      "source": "citiList.txt",
+      "lineNumber": 725
+    },
+    {
+      "name": "PK Grills",
+      "url": "https://pkgrills.com",
+      "id": "pk-grills",
+      "source": "citiList.txt",
+      "lineNumber": 726
+    },
+    {
+      "name": "Vitamin A Swim",
+      "url": "https://www.vitaminaswim.com",
+      "id": "vitamin-a-swim",
+      "source": "citiList.txt",
+      "lineNumber": 727
+    },
+    {
+      "name": "Solo New York",
+      "url": "https://solo-ny.com/",
+      "id": "solo-new-york",
+      "source": "citiList.txt",
+      "lineNumber": 728
+    },
+    {
+      "name": "SCUBAPRO",
+      "url": "https://www.scubapro.com/",
+      "id": "scubapro",
+      "source": "citiList.txt",
+      "lineNumber": 729
+    },
+    {
+      "name": "Mondaine",
+      "url": "https://mondaine.com/",
+      "id": "mondaine",
+      "source": "citiList.txt",
+      "lineNumber": 730
+    },
+    {
+      "name": "Rumpl",
+      "url": "https://www.rumpl.com",
+      "id": "rumpl",
+      "source": "citiList.txt",
+      "lineNumber": 731
+    },
+    {
+      "name": "Visible",
+      "url": "https://www.visible.com",
+      "id": "visible",
+      "source": "citiList.txt",
+      "lineNumber": 732
+    },
+    {
+      "name": "Pacifica Beauty",
+      "url": "https://www.pacificabeauty.com/",
+      "id": "pacifica-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 733
+    },
+    {
+      "name": "MPB",
+      "url": "https://www.mpb.com/en-us/",
+      "id": "mpb",
+      "source": "citiList.txt",
+      "lineNumber": 734
+    },
+    {
+      "name": "Louisiana Grills",
+      "url": "https://louisiana-grills.com",
+      "id": "louisiana-grills",
+      "source": "citiList.txt",
+      "lineNumber": 735
+    },
+    {
+      "name": "Pet Supermarket",
+      "url": "https://www.petsupermarket.com/",
+      "id": "pet-supermarket",
+      "source": "citiList.txt",
+      "lineNumber": 736
+    },
+    {
+      "name": "Leset",
+      "url": "https://leset.com/",
+      "id": "leset",
+      "source": "citiList.txt",
+      "lineNumber": 737
+    },
+    {
+      "name": "ZitSticka",
+      "url": "https://zitsticka.com",
+      "id": "zitsticka",
+      "source": "citiList.txt",
+      "lineNumber": 738
+    },
+    {
+      "name": "Pit Boss Grills",
+      "url": "https://pitboss-grills.com",
+      "id": "pit-boss-grills",
+      "source": "citiList.txt",
+      "lineNumber": 739
+    },
+    {
+      "name": "Max Warehouse",
+      "url": "https://www.maxwarehouse.com",
+      "id": "max-warehouse",
+      "source": "citiList.txt",
+      "lineNumber": 740
+    },
+    {
+      "name": "Gymboree",
+      "url": "https://www.gymboree.com",
+      "id": "gymboree",
+      "source": "citiList.txt",
+      "lineNumber": 741
+    },
+    {
+      "name": "Stags Leap",
+      "url": "https://www.stagsleap.com/",
+      "id": "stags-leap",
+      "source": "citiList.txt",
+      "lineNumber": 742
+    },
+    {
+      "name": "iMobie",
+      "url": "https://www.imobie.com",
+      "id": "imobie",
+      "source": "citiList.txt",
+      "lineNumber": 743
+    },
+    {
+      "name": "IG Charcoal BBQ",
+      "url": "https://igbbq.com/",
+      "id": "ig-charcoal-bbq",
+      "source": "citiList.txt",
+      "lineNumber": 744
+    },
+    {
+      "name": "IceTrends",
+      "url": "https://www.icerings.com",
+      "id": "icetrends",
+      "source": "citiList.txt",
+      "lineNumber": 745
+    },
+    {
+      "name": "The Laundress",
+      "url": "https://thelaundress.com",
+      "id": "the-laundress",
+      "source": "citiList.txt",
+      "lineNumber": 746
+    },
+    {
+      "name": "VersedSkin.com",
+      "url": "https://versedskin.com/",
+      "id": "versedskin-com",
+      "source": "citiList.txt",
+      "lineNumber": 747
+    },
+    {
+      "name": "White Duck Outdoors",
+      "url": "https://www.whiteduckoutdoors.com",
+      "id": "white-duck-outdoors",
+      "source": "citiList.txt",
+      "lineNumber": 748
+    },
+    {
+      "name": "Smarter Nutrition",
+      "url": "https://smarternutrition.com/",
+      "id": "smarter-nutrition",
+      "source": "citiList.txt",
+      "lineNumber": 749
+    },
+    {
+      "name": "italkpet.com",
+      "url": "https://www.italkpet.com",
+      "id": "italkpet-com",
+      "source": "citiList.txt",
+      "lineNumber": 750
+    },
+    {
+      "name": "Majestic Pet Products, Inc.",
+      "url": "https://www.majesticpet.com",
+      "id": "majestic-pet-products-inc",
+      "source": "citiList.txt",
+      "lineNumber": 751
+    },
+    {
+      "name": "MaxBone",
+      "url": "https://www.maxbone.com",
+      "id": "maxbone",
+      "source": "citiList.txt",
+      "lineNumber": 752
+    },
+    {
+      "name": "Duke Cannon Supply Co.",
+      "url": "https://dukecannon.com",
+      "id": "duke-cannon-supply-co",
+      "source": "citiList.txt",
+      "lineNumber": 753
+    },
+    {
+      "name": "Vintage Gentlemen",
+      "url": "https://www.thevintagegentlemen.com",
+      "id": "vintage-gentlemen",
+      "source": "citiList.txt",
+      "lineNumber": 754
+    },
+    {
+      "name": "Garrett Leight",
+      "url": "https://www.garrettleight.com",
+      "id": "garrett-leight",
+      "source": "citiList.txt",
+      "lineNumber": 755
+    },
+    {
+      "name": "WJD Exclusives",
+      "url": "https://www.wjdexclusives.com",
+      "id": "wjd-exclusives",
+      "source": "citiList.txt",
+      "lineNumber": 756
+    },
+    {
+      "name": "Ruff Greens",
+      "url": "https://www.ruffgreens.com",
+      "id": "ruff-greens",
+      "source": "citiList.txt",
+      "lineNumber": 757
+    },
+    {
+      "name": "The Hues",
+      "url": "https://www.thehues.com",
+      "id": "the-hues",
+      "source": "citiList.txt",
+      "lineNumber": 758
+    },
+    {
+      "name": "Jowissa",
+      "url": "https://www.jowissa.com",
+      "id": "jowissa",
+      "source": "citiList.txt",
+      "lineNumber": 759
+    },
+    {
+      "name": "Vevor",
+      "url": "https://www.vevor.com",
+      "id": "vevor",
+      "source": "citiList.txt",
+      "lineNumber": 760
+    },
+    {
+      "name": "cobeads",
+      "url": "https://www.cobeads.com/",
+      "id": "cobeads",
+      "source": "citiList.txt",
+      "lineNumber": 761
+    },
+    {
+      "name": "DedCool",
+      "url": "https://dedcool.com/",
+      "id": "dedcool",
+      "source": "citiList.txt",
+      "lineNumber": 762
+    },
+    {
+      "name": "wisp",
+      "url": "https://hellowisp.com/",
+      "id": "wisp",
+      "source": "citiList.txt",
+      "lineNumber": 763
+    },
+    {
+      "name": "Lumen",
+      "url": "https://www.lumen.me/",
+      "id": "lumen",
+      "source": "citiList.txt",
+      "lineNumber": 764
+    },
+    {
+      "name": "Pet Honesty",
+      "url": "https://www.pethonesty.com/",
+      "id": "pet-honesty",
+      "source": "citiList.txt",
+      "lineNumber": 765
+    },
+    {
+      "name": "Bookemon",
+      "url": "https://www.bookemon.com",
+      "id": "bookemon",
+      "source": "citiList.txt",
+      "lineNumber": 766
+    },
+    {
+      "name": "Yaheetech",
+      "url": "https://www.yaheetech.shop/",
+      "id": "yaheetech",
+      "source": "citiList.txt",
+      "lineNumber": 767
+    },
+    {
+      "name": "Patchwork Pet",
+      "url": "https://www.patchworkpet.com",
+      "id": "patchwork-pet",
+      "source": "citiList.txt",
+      "lineNumber": 768
+    },
+    {
+      "name": "Nootkas",
+      "url": "https://nootkas.com",
+      "id": "nootkas",
+      "source": "citiList.txt",
+      "lineNumber": 769
+    },
+    {
+      "name": "Callie's Hot Little Biscuit",
+      "url": "https://calliesbiscuits.com",
+      "id": "callie-s-hot-little-biscuit",
+      "source": "citiList.txt",
+      "lineNumber": 770
+    },
+    {
+      "name": "Meat N' Bone",
+      "url": "https://meatnbone.com/",
+      "id": "meat-n-bone",
+      "source": "citiList.txt",
+      "lineNumber": 771
+    },
+    {
+      "name": "WUBEN LIGHT",
+      "url": "https://www.wubenlight.com",
+      "id": "wuben-light",
+      "source": "citiList.txt",
+      "lineNumber": 772
+    },
+    {
+      "name": "UnderGents",
+      "url": "https://www.undergents.com",
+      "id": "undergents",
+      "source": "citiList.txt",
+      "lineNumber": 773
+    },
+    {
+      "name": "Conscious Step",
+      "url": "https://consciousstep.com/",
+      "id": "conscious-step",
+      "source": "citiList.txt",
+      "lineNumber": 774
+    },
+    {
+      "name": "Rexing",
+      "url": "https://www.rexingusa.com/",
+      "id": "rexing",
+      "source": "citiList.txt",
+      "lineNumber": 775
+    },
+    {
+      "name": "Name Stories",
+      "url": "https://namestories.com",
+      "id": "name-stories",
+      "source": "citiList.txt",
+      "lineNumber": 776
+    },
+    {
+      "name": "Bulova",
+      "url": "https://www.bulova.com/us/en/",
+      "id": "bulova",
+      "source": "citiList.txt",
+      "lineNumber": 777
+    },
+    {
+      "name": "niid",
+      "url": "https://www.niid.com/",
+      "id": "niid",
+      "source": "citiList.txt",
+      "lineNumber": 778
+    },
+    {
+      "name": "Sage",
+      "url": "https://www.sage.com",
+      "id": "sage",
+      "source": "citiList.txt",
+      "lineNumber": 779
+    },
+    {
+      "name": "Joseph Joseph",
+      "url": "https://us.josephjoseph.com/",
+      "id": "joseph-joseph",
+      "source": "citiList.txt",
+      "lineNumber": 780
+    },
+    {
+      "name": "Dr. Martens",
+      "url": "https://www.drmartens.com/us/en/",
+      "id": "dr-martens",
+      "source": "citiList.txt",
+      "lineNumber": 781
+    },
+    {
+      "name": "Fresh",
+      "url": "https://www.fresh.com/US/home",
+      "id": "fresh",
+      "source": "citiList.txt",
+      "lineNumber": 782
+    },
+    {
+      "name": "Cudoo",
+      "url": "https://cudoo.com",
+      "id": "cudoo",
+      "source": "citiList.txt",
+      "lineNumber": 783
+    },
+    {
+      "name": "TransparentRx",
+      "url": "https://pharmacybenefitinstitute.com",
+      "id": "transparentrx",
+      "source": "citiList.txt",
+      "lineNumber": 784
+    },
+    {
+      "name": "Hunkemoller",
+      "url": "https://www.hunkemoller.com",
+      "id": "hunkemoller",
+      "source": "citiList.txt",
+      "lineNumber": 785
+    },
+    {
+      "name": "Charles Tyrwhitt",
+      "url": "https://www.charlestyrwhitt.com/us",
+      "id": "charles-tyrwhitt",
+      "source": "citiList.txt",
+      "lineNumber": 786
+    },
+    {
+      "name": "Everyplate",
+      "url": "https://www.everyplate.com",
+      "id": "everyplate",
+      "source": "citiList.txt",
+      "lineNumber": 787
+    },
+    {
+      "name": "Economy Bookings",
+      "url": "https://www.economybookings.com/",
+      "id": "economy-bookings",
+      "source": "citiList.txt",
+      "lineNumber": 788
+    },
+    {
+      "name": "34 Heritage",
+      "url": "https://34heritage.com",
+      "id": "34-heritage",
+      "source": "citiList.txt",
+      "lineNumber": 789
+    },
+    {
+      "name": "MiniTool",
+      "url": "https://www.minitool.com",
+      "id": "minitool",
+      "source": "citiList.txt",
+      "lineNumber": 790
+    },
+    {
+      "name": "F1 Store",
+      "url": "https://f1store.formula1.com/",
+      "id": "f1-store",
+      "source": "citiList.txt",
+      "lineNumber": 791
+    },
+    {
+      "name": "Blinc",
+      "url": "https://farsedakis.com/",
+      "id": "blinc",
+      "source": "citiList.txt",
+      "lineNumber": 792
+    },
+    {
+      "name": "AL DUCA D'AOSTA",
+      "url": "https://www.alducadaosta.com",
+      "id": "al-duca-d-aosta",
+      "source": "citiList.txt",
+      "lineNumber": 793
+    },
+    {
+      "name": "ModaDiAndrea",
+      "url": "https://modadiandrea.com/en/",
+      "id": "modadiandrea",
+      "source": "citiList.txt",
+      "lineNumber": 794
+    },
+    {
+      "name": "one.com",
+      "url": "https://www.one.com/en/",
+      "id": "one-com",
+      "source": "citiList.txt",
+      "lineNumber": 795
+    },
+    {
+      "name": "Short Par 4",
+      "url": "https://www.shortpar4.com/",
+      "id": "short-par-4",
+      "source": "citiList.txt",
+      "lineNumber": 796
+    },
+    {
+      "name": "Glenmuir",
+      "url": "https://www.glenmuir.com/",
+      "id": "glenmuir",
+      "source": "citiList.txt",
+      "lineNumber": 797
+    },
+    {
+      "name": "Cabin Zero",
+      "url": "https://www.cabinzero.com/",
+      "id": "cabin-zero",
+      "source": "citiList.txt",
+      "lineNumber": 798
+    },
+    {
+      "name": "Spectrum Collections",
+      "url": "https://www.spectrumcollections.com/",
+      "id": "spectrum-collections",
+      "source": "citiList.txt",
+      "lineNumber": 799
+    },
+    {
+      "name": "Alexandre Birman",
+      "url": "https://alexandrebirman.com/",
+      "id": "alexandre-birman",
+      "source": "citiList.txt",
+      "lineNumber": 800
+    },
+    {
+      "name": "Gunny Sack and Co",
+      "url": "https://gunnysackandco.com",
+      "id": "gunny-sack-and-co",
+      "source": "citiList.txt",
+      "lineNumber": 801
+    },
+    {
+      "name": "Flagshirt",
+      "url": "https://theflagshirt.com/",
+      "id": "flagshirt",
+      "source": "citiList.txt",
+      "lineNumber": 802
+    },
+    {
+      "name": "Day Owl",
+      "url": "http://dayowl.com/",
+      "id": "day-owl",
+      "source": "citiList.txt",
+      "lineNumber": 803
+    },
+    {
+      "name": "ZENTS",
+      "url": "https://www.zents.com",
+      "id": "zents",
+      "source": "citiList.txt",
+      "lineNumber": 804
+    },
+    {
+      "name": "1thrive",
+      "url": "https://1thrive.com",
+      "id": "1thrive",
+      "source": "citiList.txt",
+      "lineNumber": 805
+    },
+    {
+      "name": "Eu Natural",
+      "url": "https://www.EuNatural.com",
+      "id": "eu-natural",
+      "source": "citiList.txt",
+      "lineNumber": 806
+    },
+    {
+      "name": "Link Interactive",
+      "url": "https://www.linkinteractive.com/go/sas/",
+      "id": "link-interactive",
+      "source": "citiList.txt",
+      "lineNumber": 807
+    },
+    {
+      "name": "Measure and Made",
+      "url": "https://www.measureandmade.com",
+      "id": "measure-and-made",
+      "source": "citiList.txt",
+      "lineNumber": 808
+    },
+    {
+      "name": "Bluefin SUP",
+      "url": "https://www.bluefinsupboards.us",
+      "id": "bluefin-sup",
+      "source": "citiList.txt",
+      "lineNumber": 809
+    },
+    {
+      "name": "Laguna Beach Textile",
+      "url": "https://lagunabeachtextileco.com",
+      "id": "laguna-beach-textile",
+      "source": "citiList.txt",
+      "lineNumber": 810
+    },
+    {
+      "name": "IMMUNOCORP",
+      "url": "https://www.immunocorp.com",
+      "id": "immunocorp",
+      "source": "citiList.txt",
+      "lineNumber": 811
+    },
+    {
+      "name": "EMMIOL",
+      "url": "https://www.emmiol.com",
+      "id": "emmiol",
+      "source": "citiList.txt",
+      "lineNumber": 812
+    },
+    {
+      "name": "Lily & Roo",
+      "url": "https://www.lilyandroo.com/",
+      "id": "lily-roo",
+      "source": "citiList.txt",
+      "lineNumber": 813
+    },
+    {
+      "name": "PeaTos",
+      "url": "https://PeaTos.com",
+      "id": "peatos",
+      "source": "citiList.txt",
+      "lineNumber": 814
+    },
+    {
+      "name": "UGREEN GROUP",
+      "url": "https://www.ugreen.com",
+      "id": "ugreen-group",
+      "source": "citiList.txt",
+      "lineNumber": 815
+    },
+    {
+      "name": "Turtle Wax",
+      "url": "https://www.turtlewax.com/",
+      "id": "turtle-wax",
+      "source": "citiList.txt",
+      "lineNumber": 816
+    },
+    {
+      "name": "Tropeaka",
+      "url": "https://www.tropeaka.com/",
+      "id": "tropeaka",
+      "source": "citiList.txt",
+      "lineNumber": 817
+    },
+    {
+      "name": "Ultimate Ears",
+      "url": "https://www.ultimateears.com/",
+      "id": "ultimate-ears",
+      "source": "citiList.txt",
+      "lineNumber": 818
+    },
+    {
+      "name": "Parcel ABC",
+      "url": "https://www.parcelabc.com",
+      "id": "parcel-abc",
+      "source": "citiList.txt",
+      "lineNumber": 819
+    },
+    {
+      "name": "Kissed Earth",
+      "url": "https://kissedearth.com/",
+      "id": "kissed-earth",
+      "source": "citiList.txt",
+      "lineNumber": 820
+    },
+    {
+      "name": "The Well Store",
+      "url": "https://www.thewellstore.com.au/",
+      "id": "the-well-store",
+      "source": "citiList.txt",
+      "lineNumber": 821
+    },
+    {
+      "name": "Oral B",
+      "url": "https://oralb.com/",
+      "id": "oral-b",
+      "source": "citiList.txt",
+      "lineNumber": 822
+    },
+    {
+      "name": "My Haircare & Beauty",
+      "url": "https://www.myhaircare.com.au/",
+      "id": "my-haircare-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 823
+    },
+    {
+      "name": "Olive",
+      "url": "https://olive.com",
+      "id": "olive",
+      "source": "citiList.txt",
+      "lineNumber": 824
+    },
+    {
+      "name": "MadamSew",
+      "url": "https://www.madamsew.com",
+      "id": "madamsew",
+      "source": "citiList.txt",
+      "lineNumber": 825
+    },
+    {
+      "name": "2XU",
+      "url": "https://us.2xu.com/",
+      "id": "2xu",
+      "source": "citiList.txt",
+      "lineNumber": 826
+    },
+    {
+      "name": "Perfumes Club",
+      "url": "https://www.perfumesclub.us/",
+      "id": "perfumes-club",
+      "source": "citiList.txt",
+      "lineNumber": 827
+    },
+    {
+      "name": "Helly Hansen",
+      "url": "https://www.hellyhansen.com/",
+      "id": "helly-hansen",
+      "source": "citiList.txt",
+      "lineNumber": 828
+    },
+    {
+      "name": "Fever",
+      "url": "https://feverup.com",
+      "id": "fever",
+      "source": "citiList.txt",
+      "lineNumber": 829
+    },
+    {
+      "name": "Bondi Sands",
+      "url": "https://www.bondisands.com",
+      "id": "bondi-sands",
+      "source": "citiList.txt",
+      "lineNumber": 830
+    },
+    {
+      "name": "Altitude-Sports",
+      "url": "https://www.altitude-sports.com",
+      "id": "altitude-sports",
+      "source": "citiList.txt",
+      "lineNumber": 831
+    },
+    {
+      "name": "Chow Sang Sang Jewellery",
+      "url": "https://www.chowsangsang.com/",
+      "id": "chow-sang-sang-jewellery",
+      "source": "citiList.txt",
+      "lineNumber": 832
+    },
+    {
+      "name": "Pineapples Palms Too",
+      "url": "https://www.pineapplespalms.com/",
+      "id": "pineapples-palms-too",
+      "source": "citiList.txt",
+      "lineNumber": 833
+    },
+    {
+      "name": "Ameliorate",
+      "url": "https://us.ameliorate.com",
+      "id": "ameliorate",
+      "source": "citiList.txt",
+      "lineNumber": 834
+    },
+    {
+      "name": "Ariat",
+      "url": "https://www.ariat.com",
+      "id": "ariat",
+      "source": "citiList.txt",
+      "lineNumber": 835
+    },
+    {
+      "name": "Babor",
+      "url": "https://us.babor.com",
+      "id": "babor",
+      "source": "citiList.txt",
+      "lineNumber": 836
+    },
+    {
+      "name": "Belleek Pottery",
+      "url": "https://us.belleek.com",
+      "id": "belleek-pottery",
+      "source": "citiList.txt",
+      "lineNumber": 837
+    },
+    {
+      "name": "Billini",
+      "url": "https://us-billini.com/",
+      "id": "billini",
+      "source": "citiList.txt",
+      "lineNumber": 838
+    },
+    {
+      "name": "Bright Star Kids",
+      "url": "https://brightstarlabels.com",
+      "id": "bright-star-kids",
+      "source": "citiList.txt",
+      "lineNumber": 839
+    },
+    {
+      "name": "Christophe Robin",
+      "url": "https://www.christopherobin.com",
+      "id": "christophe-robin",
+      "source": "citiList.txt",
+      "lineNumber": 840
+    },
+    {
+      "name": "Clarins",
+      "url": "https://www.clarinsusa.com/",
+      "id": "clarins",
+      "source": "citiList.txt",
+      "lineNumber": 841
+    },
+    {
+      "name": "Club L London",
+      "url": "https://www.clubllondon.us",
+      "id": "club-l-london",
+      "source": "citiList.txt",
+      "lineNumber": 842
+    },
+    {
+      "name": "Casper",
+      "url": "https://www.casper.com",
+      "id": "casper",
+      "source": "citiList.txt",
+      "lineNumber": 843
+    },
+    {
+      "name": "Decathlon",
+      "url": "https://www.decathlon.com",
+      "id": "decathlon",
+      "source": "citiList.txt",
+      "lineNumber": 844
+    },
+    {
+      "name": "Diptyque",
+      "url": "https://diptyqueparis.com",
+      "id": "diptyque",
+      "source": "citiList.txt",
+      "lineNumber": 845
+    },
+    {
+      "name": "Duke + Dexter",
+      "url": "https://dukeanddexter.com/",
+      "id": "duke-dexter",
+      "source": "citiList.txt",
+      "lineNumber": 846
+    },
+    {
+      "name": "Spafinder.com",
+      "url": "https://www.spafinder.com/buy-gift-cards",
+      "id": "spafinder-com",
+      "source": "citiList.txt",
+      "lineNumber": 847
+    },
+    {
+      "name": "Outschool",
+      "url": "https://www.outschool.com/",
+      "id": "outschool",
+      "source": "citiList.txt",
+      "lineNumber": 848
+    },
+    {
+      "name": "InboxDollars",
+      "url": "https://inboxdollars.com/",
+      "id": "inboxdollars",
+      "source": "citiList.txt",
+      "lineNumber": 849
+    },
+    {
+      "name": "The Luxury Closet",
+      "url": "https://theluxurycloset.com",
+      "id": "the-luxury-closet",
+      "source": "citiList.txt",
+      "lineNumber": 850
+    },
+    {
+      "name": "Janie and Jack",
+      "url": "https://www.janieandjack.com",
+      "id": "janie-and-jack",
+      "source": "citiList.txt",
+      "lineNumber": 851
+    },
+    {
+      "name": "Prep Expert",
+      "url": "https://prepexpert.com",
+      "id": "prep-expert",
+      "source": "citiList.txt",
+      "lineNumber": 852
+    },
+    {
+      "name": "Flackers",
+      "url": "https://flackers.com",
+      "id": "flackers",
+      "source": "citiList.txt",
+      "lineNumber": 853
+    },
+    {
+      "name": "RepairSmith",
+      "url": "https://www.autonationmobileservice.com/",
+      "id": "repairsmith",
+      "source": "citiList.txt",
+      "lineNumber": 854
+    },
+    {
+      "name": "Cabeau Inc",
+      "url": "https://cabeau.com/",
+      "id": "cabeau-inc",
+      "source": "citiList.txt",
+      "lineNumber": 855
+    },
+    {
+      "name": "KT Tape",
+      "url": "https://www.kttape.com/",
+      "id": "kt-tape",
+      "source": "citiList.txt",
+      "lineNumber": 856
+    },
+    {
+      "name": "Routledge",
+      "url": "https://www.routledge.com/",
+      "id": "routledge",
+      "source": "citiList.txt",
+      "lineNumber": 857
+    },
+    {
+      "name": "Brick House",
+      "url": "https://www.brickhousenutrition.com",
+      "id": "brick-house",
+      "source": "citiList.txt",
+      "lineNumber": 858
+    },
+    {
+      "name": "CitizenM",
+      "url": "https://www.citizenm.com/",
+      "id": "citizenm",
+      "source": "citiList.txt",
+      "lineNumber": 859
+    },
+    {
+      "name": "Sixt",
+      "url": "https://www.sixt.com/",
+      "id": "sixt",
+      "source": "citiList.txt",
+      "lineNumber": 860
+    },
+    {
+      "name": "Kobo",
+      "url": "https://www.kobo.com/us/en",
+      "id": "kobo",
+      "source": "citiList.txt",
+      "lineNumber": 861
+    },
+    {
+      "name": "tarte cosmetics",
+      "url": "https://www.tartecosmetics.com",
+      "id": "tarte-cosmetics",
+      "source": "citiList.txt",
+      "lineNumber": 862
+    },
+    {
+      "name": "Seed",
+      "url": "https://seed.com",
+      "id": "seed",
+      "source": "citiList.txt",
+      "lineNumber": 863
+    },
+    {
+      "name": "Shu Uemura",
+      "url": "https://www.shuuemuraartofhair-usa.com/",
+      "id": "shu-uemura",
+      "source": "citiList.txt",
+      "lineNumber": 864
+    },
+    {
+      "name": "ecobee",
+      "url": "https://www.ecobee.com/",
+      "id": "ecobee",
+      "source": "citiList.txt",
+      "lineNumber": 865
+    },
+    {
+      "name": "U Beauty",
+      "url": "https://ubeauty.com/",
+      "id": "u-beauty",
+      "source": "citiList.txt",
+      "lineNumber": 866
+    },
+    {
+      "name": "Silverlight",
+      "url": "https://silverlight.store/",
+      "id": "silverlight",
+      "source": "citiList.txt",
+      "lineNumber": 867
+    },
+    {
+      "name": "Greats",
+      "url": "https://www.greats.com/",
+      "id": "greats",
+      "source": "citiList.txt",
+      "lineNumber": 868
+    },
+    {
+      "name": "Ren\u00e9e Rouleau",
+      "url": "https://www.reneerouleau.com/",
+      "id": "ren-e-rouleau",
+      "source": "citiList.txt",
+      "lineNumber": 869
+    },
+    {
+      "name": "PureWine",
+      "url": "https://www.drinkpurewine.com",
+      "id": "purewine",
+      "source": "citiList.txt",
+      "lineNumber": 870
+    },
+    {
+      "name": "Hello Bello",
+      "url": "https://hellobello.com",
+      "id": "hello-bello",
+      "source": "citiList.txt",
+      "lineNumber": 871
+    },
+    {
+      "name": "Carmen Sol",
+      "url": "https://carmensol.com/",
+      "id": "carmen-sol",
+      "source": "citiList.txt",
+      "lineNumber": 872
+    },
+    {
+      "name": "Kryptek",
+      "url": "https://kryptek.com",
+      "id": "kryptek",
+      "source": "citiList.txt",
+      "lineNumber": 873
+    },
+    {
+      "name": "Midland Radio",
+      "url": "https://midlandusa.com/",
+      "id": "midland-radio",
+      "source": "citiList.txt",
+      "lineNumber": 874
+    },
+    {
+      "name": "Notch",
+      "url": "https://notchgear.com/",
+      "id": "notch",
+      "source": "citiList.txt",
+      "lineNumber": 875
+    },
+    {
+      "name": "Allposters.com",
+      "url": "https://www.allposters.com",
+      "id": "allposters-com",
+      "source": "citiList.txt",
+      "lineNumber": 876
+    },
+    {
+      "name": "Art.com",
+      "url": "https://www.art.com/",
+      "id": "art-com",
+      "source": "citiList.txt",
+      "lineNumber": 877
+    },
+    {
+      "name": "Kipling",
+      "url": "https://www.kipling-usa.com",
+      "id": "kipling",
+      "source": "citiList.txt",
+      "lineNumber": 878
+    },
+    {
+      "name": "BabyBj\u00f6rn",
+      "url": "https://www.babybjorn.com/",
+      "id": "babybj-rn",
+      "source": "citiList.txt",
+      "lineNumber": 879
+    },
+    {
+      "name": "Mobile Edge",
+      "url": "https://www.mobileedge.com/",
+      "id": "mobile-edge",
+      "source": "citiList.txt",
+      "lineNumber": 880
+    },
+    {
+      "name": "sass & bide",
+      "url": "https://www.sassandbide.com",
+      "id": "sass-bide",
+      "source": "citiList.txt",
+      "lineNumber": 881
+    },
+    {
+      "name": "PRITCH London",
+      "url": "https://www.pritchlondon.com/",
+      "id": "pritch-london",
+      "source": "citiList.txt",
+      "lineNumber": 882
+    },
+    {
+      "name": "MBAETZ-SHOES",
+      "url": "https://www.mbaetz.com",
+      "id": "mbaetz-shoes",
+      "source": "citiList.txt",
+      "lineNumber": 883
+    },
+    {
+      "name": "Gametime",
+      "url": "https://gametime.co",
+      "id": "gametime",
+      "source": "citiList.txt",
+      "lineNumber": 884
+    },
+    {
+      "name": "Lenses For Less",
+      "url": "https://www.lensesforless.com",
+      "id": "lenses-for-less",
+      "source": "citiList.txt",
+      "lineNumber": 885
+    },
+    {
+      "name": "Hugo Coffee Roasters",
+      "url": "https://hugo.coffee",
+      "id": "hugo-coffee-roasters",
+      "source": "citiList.txt",
+      "lineNumber": 886
+    },
+    {
+      "name": "The Happy Planner",
+      "url": "https://thehappyplanner.com/",
+      "id": "the-happy-planner",
+      "source": "citiList.txt",
+      "lineNumber": 887
+    },
+    {
+      "name": "Little English",
+      "url": "https://www.littleenglish.com/",
+      "id": "little-english",
+      "source": "citiList.txt",
+      "lineNumber": 888
+    },
+    {
+      "name": "MKF Collection",
+      "url": "https://mkfcollection.com",
+      "id": "mkf-collection",
+      "source": "citiList.txt",
+      "lineNumber": 889
+    },
+    {
+      "name": "BodyGuardz",
+      "url": "https://bodyguardz.com",
+      "id": "bodyguardz",
+      "source": "citiList.txt",
+      "lineNumber": 890
+    },
+    {
+      "name": "Jennifer Behr LLC",
+      "url": "https://www.jenniferbehr.com",
+      "id": "jennifer-behr-llc",
+      "source": "citiList.txt",
+      "lineNumber": 891
+    },
+    {
+      "name": "Marisa Peer",
+      "url": "https://www.marisapeer.com",
+      "id": "marisa-peer",
+      "source": "citiList.txt",
+      "lineNumber": 892
+    },
+    {
+      "name": "Stahls'",
+      "url": "https://www.stahls.com",
+      "id": "stahls",
+      "source": "citiList.txt",
+      "lineNumber": 893
+    },
+    {
+      "name": "Peace Out Skincare",
+      "url": "https://peaceoutskincare.com/",
+      "id": "peace-out-skincare",
+      "source": "citiList.txt",
+      "lineNumber": 894
+    },
+    {
+      "name": "American Leather Co.",
+      "url": "https://www.americanleatherco.com/",
+      "id": "american-leather-co",
+      "source": "citiList.txt",
+      "lineNumber": 895
+    },
+    {
+      "name": "Pale Blue",
+      "url": "https://paleblueearth.com/",
+      "id": "pale-blue",
+      "source": "citiList.txt",
+      "lineNumber": 896
+    },
+    {
+      "name": "Henry Rose",
+      "url": "https://henryrose.com/",
+      "id": "henry-rose",
+      "source": "citiList.txt",
+      "lineNumber": 897
+    },
+    {
+      "name": "RestoraPet",
+      "url": "https://restorapet.com",
+      "id": "restorapet",
+      "source": "citiList.txt",
+      "lineNumber": 898
+    },
+    {
+      "name": "Dominique Cosmetics",
+      "url": "https://www.dominiquecosmetics.com",
+      "id": "dominique-cosmetics",
+      "source": "citiList.txt",
+      "lineNumber": 899
+    },
+    {
+      "name": "Dainese",
+      "url": "https://www.dainese.com/us/en",
+      "id": "dainese",
+      "source": "citiList.txt",
+      "lineNumber": 900
+    },
+    {
+      "name": "Banila Co",
+      "url": "https://banilausa.com",
+      "id": "banila-co",
+      "source": "citiList.txt",
+      "lineNumber": 901
+    },
+    {
+      "name": "Quicksilver Scientific",
+      "url": "https://www.quicksilverscientific.com",
+      "id": "quicksilver-scientific",
+      "source": "citiList.txt",
+      "lineNumber": 902
+    },
+    {
+      "name": "Kohler",
+      "url": "https://www.kohler.com",
+      "id": "kohler",
+      "source": "citiList.txt",
+      "lineNumber": 903
+    },
+    {
+      "name": "L'Artisan Parfumeur",
+      "url": "https://www.artisanparfumeur.com/us/en_US/",
+      "id": "l-artisan-parfumeur",
+      "source": "citiList.txt",
+      "lineNumber": 904
+    },
+    {
+      "name": "Saramonic",
+      "url": "https://saramonicusa.com",
+      "id": "saramonic",
+      "source": "citiList.txt",
+      "lineNumber": 905
+    },
+    {
+      "name": "HP",
+      "url": "https://www.hp.com/us-en/shop",
+      "id": "hp",
+      "source": "citiList.txt",
+      "lineNumber": 906
+    },
+    {
+      "name": "Pamela Love",
+      "url": "https://pamelalove.com",
+      "id": "pamela-love",
+      "source": "citiList.txt",
+      "lineNumber": 907
+    },
+    {
+      "name": "Capillus",
+      "url": "https://www.capillus.com/",
+      "id": "capillus",
+      "source": "citiList.txt",
+      "lineNumber": 908
+    },
+    {
+      "name": "Lungolivigno Fashion",
+      "url": "https://lungolivignofashion.com",
+      "id": "lungolivigno-fashion",
+      "source": "citiList.txt",
+      "lineNumber": 909
+    },
+    {
+      "name": "BeautyBio",
+      "url": "https://beautybio.com/",
+      "id": "beautybio",
+      "source": "citiList.txt",
+      "lineNumber": 910
+    },
+    {
+      "name": "White Fox Boutique",
+      "url": "https://www.whitefoxboutique.com/",
+      "id": "white-fox-boutique",
+      "source": "citiList.txt",
+      "lineNumber": 911
+    },
+    {
+      "name": "S&B Watches",
+      "url": "https://www.smithandbradley.com/",
+      "id": "s-b-watches",
+      "source": "citiList.txt",
+      "lineNumber": 912
+    },
+    {
+      "name": "The Beauty Chef",
+      "url": "https://us.thebeautychef.com/",
+      "id": "the-beauty-chef",
+      "source": "citiList.txt",
+      "lineNumber": 913
+    },
+    {
+      "name": "Leor\u00eaver",
+      "url": "https://leorever.com/",
+      "id": "leor-ver",
+      "source": "citiList.txt",
+      "lineNumber": 914
+    },
+    {
+      "name": "Battery Tender",
+      "url": "https://www.batterytender.com",
+      "id": "battery-tender",
+      "source": "citiList.txt",
+      "lineNumber": 915
+    },
+    {
+      "name": "Seezona",
+      "url": "https://www.seezona.com",
+      "id": "seezona",
+      "source": "citiList.txt",
+      "lineNumber": 916
+    },
+    {
+      "name": "Grassland Beef",
+      "url": "https://grasslandbeef.com/",
+      "id": "grassland-beef",
+      "source": "citiList.txt",
+      "lineNumber": 917
+    },
+    {
+      "name": "BloomsyBox",
+      "url": "https://bloomsybox.com",
+      "id": "bloomsybox",
+      "source": "citiList.txt",
+      "lineNumber": 918
+    },
+    {
+      "name": "Zagg",
+      "url": "https://www.zagg.com",
+      "id": "zagg",
+      "source": "citiList.txt",
+      "lineNumber": 919
+    },
+    {
+      "name": "Waterdrop",
+      "url": "https://www.waterdropfilter.com/",
+      "id": "waterdrop",
+      "source": "citiList.txt",
+      "lineNumber": 920
+    },
+    {
+      "name": "365 Data Science",
+      "url": "https://365datascience.com",
+      "id": "365-data-science",
+      "source": "citiList.txt",
+      "lineNumber": 921
+    },
+    {
+      "name": "Mano's Wine",
+      "url": "https://www.manoswine.com",
+      "id": "mano-s-wine",
+      "source": "citiList.txt",
+      "lineNumber": 922
+    },
+    {
+      "name": "GreenPan",
+      "url": "https://www.greenpan.us",
+      "id": "greenpan",
+      "source": "citiList.txt",
+      "lineNumber": 923
+    },
+    {
+      "name": "Ocelot Market",
+      "url": "https://OcelotMarket.com",
+      "id": "ocelot-market",
+      "source": "citiList.txt",
+      "lineNumber": 924
+    },
+    {
+      "name": "Tampon Tribe",
+      "url": "https://tampontribe.com",
+      "id": "tampon-tribe",
+      "source": "citiList.txt",
+      "lineNumber": 925
+    },
+    {
+      "name": "Vaya",
+      "url": "https://vayasleep.com",
+      "id": "vaya",
+      "source": "citiList.txt",
+      "lineNumber": 926
+    },
+    {
+      "name": "Miko",
+      "url": "https://www.shopmiko.com",
+      "id": "miko",
+      "source": "citiList.txt",
+      "lineNumber": 927
+    },
+    {
+      "name": "Kiierr International LLC",
+      "url": "https://kiierr.com/",
+      "id": "kiierr-international-llc",
+      "source": "citiList.txt",
+      "lineNumber": 928
+    },
+    {
+      "name": "SloomooInstitute.com",
+      "url": "https://sloomooinstitute.com/",
+      "id": "sloomooinstitute-com",
+      "source": "citiList.txt",
+      "lineNumber": 929
+    },
+    {
+      "name": "UNice",
+      "url": "https://www.unice.com",
+      "id": "unice",
+      "source": "citiList.txt",
+      "lineNumber": 930
+    },
+    {
+      "name": "Next Day Contacts",
+      "url": "https://www.nextdaycontacts.com/",
+      "id": "next-day-contacts",
+      "source": "citiList.txt",
+      "lineNumber": 931
+    },
+    {
+      "name": "Neat",
+      "url": "https://www.neatapparel.com",
+      "id": "neat",
+      "source": "citiList.txt",
+      "lineNumber": 932
+    },
+    {
+      "name": "The Noli Shop",
+      "url": "https://www.thenolishop.com/",
+      "id": "the-noli-shop",
+      "source": "citiList.txt",
+      "lineNumber": 933
+    },
+    {
+      "name": "Alvantor Industry Co.,Ltd.",
+      "url": "https://www.alvantor.com",
+      "id": "alvantor-industry-co-ltd",
+      "source": "citiList.txt",
+      "lineNumber": 934
+    },
+    {
+      "name": "CAPTUR3D",
+      "url": "https://captur3d.com",
+      "id": "captur3d",
+      "source": "citiList.txt",
+      "lineNumber": 935
+    },
+    {
+      "name": "Lefeet",
+      "url": "https://www.lefeet.com",
+      "id": "lefeet",
+      "source": "citiList.txt",
+      "lineNumber": 936
+    },
+    {
+      "name": "Mens Tuxedo",
+      "url": "https://menstuxedousa.com/",
+      "id": "mens-tuxedo",
+      "source": "citiList.txt",
+      "lineNumber": 937
+    },
+    {
+      "name": "MUD\\WTR",
+      "url": "https://mudwtr.com",
+      "id": "mud-wtr",
+      "source": "citiList.txt",
+      "lineNumber": 938
+    },
+    {
+      "name": "Jerky Subscription",
+      "url": "https://www.jerkysubscription.com",
+      "id": "jerky-subscription",
+      "source": "citiList.txt",
+      "lineNumber": 939
+    },
+    {
+      "name": "EcoFlow",
+      "url": "https://us.ecoflow.com/",
+      "id": "ecoflow",
+      "source": "citiList.txt",
+      "lineNumber": 940
+    },
+    {
+      "name": "Concrete Sealers",
+      "url": "https://www.concretesealersusa.com",
+      "id": "concrete-sealers",
+      "source": "citiList.txt",
+      "lineNumber": 941
+    },
+    {
+      "name": "Kylea Health",
+      "url": "https://kyleahealth.com",
+      "id": "kylea-health",
+      "source": "citiList.txt",
+      "lineNumber": 942
+    },
+    {
+      "name": "Kare",
+      "url": "https://chairspeaker.com",
+      "id": "kare",
+      "source": "citiList.txt",
+      "lineNumber": 943
+    },
+    {
+      "name": "Stately",
+      "url": "https://www.statelymen.com",
+      "id": "stately",
+      "source": "citiList.txt",
+      "lineNumber": 944
+    },
+    {
+      "name": "360 Cookware",
+      "url": "https://www.360cookware.com",
+      "id": "360-cookware",
+      "source": "citiList.txt",
+      "lineNumber": 945
+    },
+    {
+      "name": "Poo~Pourri",
+      "url": "https://pourri.com/products/pot-pourri-high-hopes",
+      "id": "poo-pourri",
+      "source": "citiList.txt",
+      "lineNumber": 946
+    },
+    {
+      "name": "HoliFrog",
+      "url": "https://holifrog.com/",
+      "id": "holifrog",
+      "source": "citiList.txt",
+      "lineNumber": 947
+    },
+    {
+      "name": "AlloyWorks Store",
+      "url": "https://www.alloyworksplus.com/",
+      "id": "alloyworks-store",
+      "source": "citiList.txt",
+      "lineNumber": 948
+    },
+    {
+      "name": "Spermidine Life",
+      "url": "https://www.spermidinelife.us",
+      "id": "spermidine-life",
+      "source": "citiList.txt",
+      "lineNumber": 949
+    },
+    {
+      "name": "Eklexic",
+      "url": "https://eklexic.com",
+      "id": "eklexic",
+      "source": "citiList.txt",
+      "lineNumber": 950
+    },
+    {
+      "name": "Space Mask",
+      "url": "https://www.shopspacemask.com",
+      "id": "space-mask",
+      "source": "citiList.txt",
+      "lineNumber": 951
+    },
+    {
+      "name": "Ublins",
+      "url": "https://www.ublins.com/",
+      "id": "ublins",
+      "source": "citiList.txt",
+      "lineNumber": 952
+    },
+    {
+      "name": "The Sunscreen Company",
+      "url": "https://www.thesunscreencompany.com",
+      "id": "the-sunscreen-company",
+      "source": "citiList.txt",
+      "lineNumber": 953
+    },
+    {
+      "name": "Twinklens",
+      "url": "https://twinklens.com",
+      "id": "twinklens",
+      "source": "citiList.txt",
+      "lineNumber": 954
+    },
+    {
+      "name": "Wayrates",
+      "url": "https://www.wayrates.com/",
+      "id": "wayrates",
+      "source": "citiList.txt",
+      "lineNumber": 955
+    },
+    {
+      "name": "Tribesigns",
+      "url": "https://tribesigns.com/",
+      "id": "tribesigns",
+      "source": "citiList.txt",
+      "lineNumber": 956
+    },
+    {
+      "name": "Onlymaker",
+      "url": "https://www.onlymaker.com",
+      "id": "onlymaker",
+      "source": "citiList.txt",
+      "lineNumber": 957
+    },
+    {
+      "name": "mindbodygreen",
+      "url": "https://shop.mindbodygreen.com",
+      "id": "mindbodygreen",
+      "source": "citiList.txt",
+      "lineNumber": 958
+    },
+    {
+      "name": "Probelle",
+      "url": "https://www.pro-belle.com",
+      "id": "probelle",
+      "source": "citiList.txt",
+      "lineNumber": 959
+    },
+    {
+      "name": "Yoga Democracy",
+      "url": "https://yogademocracy.com",
+      "id": "yoga-democracy",
+      "source": "citiList.txt",
+      "lineNumber": 960
+    },
+    {
+      "name": "Tomasso Black",
+      "url": "https://tomassoblack.com",
+      "id": "tomasso-black",
+      "source": "citiList.txt",
+      "lineNumber": 961
+    },
+    {
+      "name": "Birdfy",
+      "url": "https://birdfy.com",
+      "id": "birdfy",
+      "source": "citiList.txt",
+      "lineNumber": 962
+    },
+    {
+      "name": "Skin And Senses",
+      "url": "https://www.skinandsenses.com",
+      "id": "skin-and-senses",
+      "source": "citiList.txt",
+      "lineNumber": 963
+    },
+    {
+      "name": "evolvetogether",
+      "url": "https://www.evolvetogether.com",
+      "id": "evolvetogether",
+      "source": "citiList.txt",
+      "lineNumber": 964
+    },
+    {
+      "name": "Marie Oliver",
+      "url": "https://www.marieoliver.com/",
+      "id": "marie-oliver",
+      "source": "citiList.txt",
+      "lineNumber": 965
+    },
+    {
+      "name": "Simply Straws",
+      "url": "https://www.simplystraws.com",
+      "id": "simply-straws",
+      "source": "citiList.txt",
+      "lineNumber": 966
+    },
+    {
+      "name": "OUFER BODY JEWELRY",
+      "url": "https://www.ouferbodyjewelry.com",
+      "id": "oufer-body-jewelry",
+      "source": "citiList.txt",
+      "lineNumber": 967
+    },
+    {
+      "name": "Laughland",
+      "url": "https://mylaughland.com",
+      "id": "laughland",
+      "source": "citiList.txt",
+      "lineNumber": 968
+    },
+    {
+      "name": "Areaware",
+      "url": "https://www.areaware.com",
+      "id": "areaware",
+      "source": "citiList.txt",
+      "lineNumber": 969
+    },
+    {
+      "name": "Colorado Craft Company",
+      "url": "https://www.coloradocraftcompany.com/",
+      "id": "colorado-craft-company",
+      "source": "citiList.txt",
+      "lineNumber": 970
+    },
+    {
+      "name": "KEYPER, LLC",
+      "url": "https://www.mykeyper.com",
+      "id": "keyper-llc",
+      "source": "citiList.txt",
+      "lineNumber": 971
+    },
+    {
+      "name": "zestt organics",
+      "url": "https://zesttorganics.com",
+      "id": "zestt-organics",
+      "source": "citiList.txt",
+      "lineNumber": 972
+    },
+    {
+      "name": "Sweave",
+      "url": "https://www.thelinen.company",
+      "id": "sweave",
+      "source": "citiList.txt",
+      "lineNumber": 973
+    },
+    {
+      "name": "Hobbymate Hobby",
+      "url": "https://hobbymatehobby.com",
+      "id": "hobbymate-hobby",
+      "source": "citiList.txt",
+      "lineNumber": 974
+    },
+    {
+      "name": "Quicken",
+      "url": "https://quicken.com",
+      "id": "quicken",
+      "source": "citiList.txt",
+      "lineNumber": 975
+    },
+    {
+      "name": "Coolwick",
+      "url": "https://www.coolwick.com/",
+      "id": "coolwick",
+      "source": "citiList.txt",
+      "lineNumber": 976
+    },
+    {
+      "name": "The New Paper",
+      "url": "https://thenewpaper.co/",
+      "id": "the-new-paper",
+      "source": "citiList.txt",
+      "lineNumber": 977
+    },
+    {
+      "name": "HIKERS Co.",
+      "url": "https://hikersco.com/",
+      "id": "hikers-co",
+      "source": "citiList.txt",
+      "lineNumber": 978
+    },
+    {
+      "name": "dr. Liza",
+      "url": "https://www.drlizashoes.com/",
+      "id": "dr-liza",
+      "source": "citiList.txt",
+      "lineNumber": 979
+    },
+    {
+      "name": "Urban Armor Gear",
+      "url": "https://www.urbanarmorgear.com",
+      "id": "urban-armor-gear",
+      "source": "citiList.txt",
+      "lineNumber": 980
+    },
+    {
+      "name": "Golden State Warriors Shop",
+      "url": "https://shop.warriors.com",
+      "id": "golden-state-warriors-shop",
+      "source": "citiList.txt",
+      "lineNumber": 981
+    },
+    {
+      "name": "Tenba",
+      "url": "https://www.tenba.com/en",
+      "id": "tenba",
+      "source": "citiList.txt",
+      "lineNumber": 982
+    },
+    {
+      "name": "Lola Products",
+      "url": "https://www.lolaproducts.com",
+      "id": "lola-products",
+      "source": "citiList.txt",
+      "lineNumber": 983
+    },
+    {
+      "name": "My Brand New Logo",
+      "url": "https://mybrandnewlogo.com",
+      "id": "my-brand-new-logo",
+      "source": "citiList.txt",
+      "lineNumber": 984
+    },
+    {
+      "name": "Miami Beach Bum",
+      "url": "https://miamibeachbum.com/",
+      "id": "miami-beach-bum",
+      "source": "citiList.txt",
+      "lineNumber": 985
+    },
+    {
+      "name": "NIPYATA!",
+      "url": "https://nipyata.com",
+      "id": "nipyata",
+      "source": "citiList.txt",
+      "lineNumber": 986
+    },
+    {
+      "name": "The Sis Kiss",
+      "url": "https://Www.thesiskiss.com",
+      "id": "the-sis-kiss",
+      "source": "citiList.txt",
+      "lineNumber": 987
+    },
+    {
+      "name": "Singing Machine",
+      "url": "https://www.singingmachine.com",
+      "id": "singing-machine",
+      "source": "citiList.txt",
+      "lineNumber": 988
+    },
+    {
+      "name": "JIGGY",
+      "url": "https://jiggypuzzles.com",
+      "id": "jiggy",
+      "source": "citiList.txt",
+      "lineNumber": 989
+    },
+    {
+      "name": "Sulina Shop",
+      "url": "https://www.sulinashop.com",
+      "id": "sulina-shop",
+      "source": "citiList.txt",
+      "lineNumber": 990
+    },
+    {
+      "name": "campark",
+      "url": "https://www.campark.net",
+      "id": "campark",
+      "source": "citiList.txt",
+      "lineNumber": 991
+    },
+    {
+      "name": "Hiboy",
+      "url": "https://www.hiboy.com/collections/discount",
+      "id": "hiboy",
+      "source": "citiList.txt",
+      "lineNumber": 992
+    },
+    {
+      "name": "Crave",
+      "url": "https://cravedirect.com/",
+      "id": "crave",
+      "source": "citiList.txt",
+      "lineNumber": 993
+    },
+    {
+      "name": "Tucketts Inc",
+      "url": "https://www.tucketts.com/",
+      "id": "tucketts-inc",
+      "source": "citiList.txt",
+      "lineNumber": 994
+    },
+    {
+      "name": "WPChill",
+      "url": "https://wp-modula.com",
+      "id": "wpchill",
+      "source": "citiList.txt",
+      "lineNumber": 995
+    },
+    {
+      "name": "Hcalory",
+      "url": "https://hcalory.com",
+      "id": "hcalory",
+      "source": "citiList.txt",
+      "lineNumber": 996
+    },
+    {
+      "name": "EcoKind Pet Treats",
+      "url": "https://www.ecokindpettreats.com",
+      "id": "ecokind-pet-treats",
+      "source": "citiList.txt",
+      "lineNumber": 997
+    },
+    {
+      "name": "Supermicro",
+      "url": "https://store.supermicro.com/",
+      "id": "supermicro",
+      "source": "citiList.txt",
+      "lineNumber": 998
+    },
+    {
+      "name": "AndaseaT",
+      "url": "https://www.andaseat.com/",
+      "id": "andaseat",
+      "source": "citiList.txt",
+      "lineNumber": 999
+    },
+    {
+      "name": "NN Hotels",
+      "url": "https://www.nnhotels.com/en",
+      "id": "nn-hotels",
+      "source": "citiList.txt",
+      "lineNumber": 1000
+    },
+    {
+      "name": "Maceoo Global",
+      "url": "https://Maceoo.com",
+      "id": "maceoo-global",
+      "source": "citiList.txt",
+      "lineNumber": 1001
+    }
+  ]
+}

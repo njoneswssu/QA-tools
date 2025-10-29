@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitch Ad Blocker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="icon48.png" alt="Twitch Ad Blocker" class="logo">
+      <h1>Twitch Ad Blocker</h1>
+    </div>
+    
+    <div class="stats-section">
+      <div class="stat-item">
+        <div class="stat-number" id="blockedCount">0</div>
+        <div class="stat-label">Ads Blocked</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-indicator" id="statusIndicator">●</div>
+        <div class="stat-label" id="statusText">Active</div>
+      </div>
+    </div>
+    
+    <div class="controls-section">
+      <div class="control-group">
+        <label class="toggle-switch">
+          <input type="checkbox" id="extensionEnabled" checked>
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Extension Enabled</span>
+        </label>
+      </div>
+      
+      <div class="control-group">
+        <label class="toggle-switch">
+          <input type="checkbox" id="twitchAdBlocking" checked>
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Block Twitch Ads</span>
+        </label>
+      </div>
+      
+      <div class="control-group">
+        <label class="toggle-switch">
+          <input type="checkbox" id="aggressiveMode">
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Aggressive Mode</span>
+        </label>
+        <div class="control-description">
+          Blocks more aggressively but may affect page performance
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-section">
+      <button id="manualBlock" class="action-button primary">
+        <span class="button-icon">🛡️</span>
+        Block Ads Now
+      </button>
+      
+      <button id="resetStats" class="action-button secondary">
+        <span class="button-icon">🔄</span>
+        Reset Counter
+      </button>
+      
+      <button id="debugVideo" class="action-button secondary">
+        <span class="button-icon">🔍</span>
+        Debug Video
+      </button>
+    </div>
+    
+    <div class="info-section">
+      <div class="info-item">
+        <strong>How it works:</strong>
+        <p>This extension detects and blocks ads that randomly appear during Twitch livestreams, including preroll, midroll, and display ads.</p>
+      </div>
+      
+      <div class="info-item">
+        <strong>Features:</strong>
+        <ul>
+          <li>Real-time ad detection during streams</li>
+          <li>Automatic ad skipping</li>
+          <li>Chat interaction protection</li>
+          <li>Minimal performance impact</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <div class="version">v1.0</div>
+      <div class="links">
+        <a href="#" id="helpLink">Help</a>
+        <span>•</span>
+        <a href="#" id="reportLink">Report Issue</a>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

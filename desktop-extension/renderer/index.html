@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitiShop Desktop Extension</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>
+                <span class="logo">🏪</span>
+                CitiShop Desktop Extension
+            </h1>
+            <p class="subtitle">Dynamic Merchant Testing Tool</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Merchant Input Section -->
+            <section class="merchant-input-section">
+                <h2>📝 Enter Merchants to Test</h2>
+                <p class="instruction">
+                    Enter merchant names separated by commas. Names will be validated against the CitiList database.
+                </p>
+                
+                <div class="input-container">
+                    <textarea 
+                        id="merchantInput" 
+                        placeholder="e.g., Ulta, Best Buy, Macy's, Sephora..."
+                        rows="4"
+                        cols="50"
+                    ></textarea>
+                    <div class="input-actions">
+                        <button id="validateBtn" class="btn btn-primary">
+                            ✅ Validate Merchants
+                        </button>
+                        <button id="loadSampleBtn" class="btn btn-secondary">
+                            📋 Load Sample
+                        </button>
+                        <button id="clearBtn" class="btn btn-tertiary">
+                            🗑️ Clear
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Validation Results -->
+            <section class="validation-section" id="validationSection" style="display: none;">
+                <h3>🔍 Validation Results</h3>
+                
+                <div class="results-container">
+                    <div class="found-merchants" id="foundMerchants">
+                        <h4 class="success-header">✅ Found Merchants (<span id="foundCount">0</span>)</h4>
+                        <ul id="foundList"></ul>
+                    </div>
+                    
+                    <div class="not-found-merchants" id="notFoundMerchants">
+                        <h4 class="error-header">❌ Not Found (<span id="notFoundCount">0</span>)</h4>
+                        <ul id="notFoundList"></ul>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="runTestBtn" class="btn btn-success" disabled>
+                        🚀 Run Test with Found Merchants
+                    </button>
+                    <button id="editBtn" class="btn btn-secondary">
+                        ✏️ Edit Input
+                    </button>
+                </div>
+            </section>
+
+            <!-- Test Execution Section -->
+            <section class="test-execution-section" id="testSection" style="display: none;">
+                <h3>🧪 Test Execution</h3>
+                
+                <div class="test-status" id="testStatus">
+                    <span class="status-indicator" id="statusIndicator">⏳</span>
+                    <span id="statusText">Preparing test...</span>
+                </div>
+
+                <div class="test-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0 / 0 merchants tested</span>
+                </div>
+
+                <div class="test-output">
+                    <h4>📊 Test Output</h4>
+                    <div class="output-container">
+                        <pre id="testOutput"></pre>
+                    </div>
+                </div>
+
+                <div class="test-actions">
+                    <button id="stopTestBtn" class="btn btn-danger">
+                        ⏹️ Stop Test
+                    </button>
+                    <button id="newTestBtn" class="btn btn-primary">
+                        🔄 New Test
+                    </button>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section class="stats-section">
+                <h3>📈 Session Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalMerchantsValidated">0</span>
+                        <span class="stat-label">Total Validated</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalTestsRun">0</span>
+                        <span class="stat-label">Tests Run</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="successRate">0%</span>
+                        <span class="stat-label">Success Rate</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>
+                CitiShop Desktop Extension v1.0.0 | 
+                <a href="#" id="aboutLink">About</a> | 
+                <a href="#" id="helpLink">Help</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loadingText">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="renderer.js"></script>
+</body>
+</html>

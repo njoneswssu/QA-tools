@@ -1,0 +1,252 @@
+/* Twitch Ad Blocker Content Styles */
+
+/* Notification styles */
+.twitch-ad-blocker-notification {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  background: #9146ff !important;
+  color: white !important;
+  padding: 12px 20px !important;
+  border-radius: 8px !important;
+  font-family: 'Roobert', 'Helvetica Neue', Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  z-index: 999999 !important;
+  box-shadow: 0 4px 20px rgba(145, 70, 255, 0.4) !important;
+  border: 2px solid #772ce8 !important;
+  opacity: 0 !important;
+  transform: translateX(100%) !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  pointer-events: none !important;
+  backdrop-filter: blur(10px) !important;
+  max-width: 300px !important;
+  word-wrap: break-word !important;
+}
+
+/* Animation states */
+.twitch-ad-blocker-notification.show {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+.twitch-ad-blocker-notification.hide {
+  opacity: 0 !important;
+  transform: translateX(100%) !important;
+}
+
+/* Hide blocked ad elements */
+[data-blocked="true"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0px !important;
+  width: 0px !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  pointer-events: none !important;
+}
+
+/* Specific Twitch ad hiding - DISABLED FOR DEBUG */
+/*
+.video-ads,
+.video-ad,
+.player-ad,
+.player-overlay-ad,
+.ads-overlay,
+.ad-overlay,
+.player-ad-notice,
+[data-a-target="player-ad-notice"],
+[data-a-target="ad-banner"],
+[data-test-selector="ad-banner"],
+.stream-ad,
+.live-ad,
+.preroll-ad,
+.midroll-ad,
+.postroll-ad,
+.promotion-banner,
+.sponsored-content,
+.tw-ad-banner,
+.tw-promotion,
+[data-a-target="promotion"],
+[data-a-target="sponsored"],
+.ad-banner,
+.ads-container,
+.advertisement,
+.promo-container,
+.sponsor-container {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0px !important;
+  width: 0px !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  pointer-events: none !important;
+}
+*/
+
+/* Enhanced ad blocking for elements with ad-related classes - DISABLED FOR DEBUG */
+/*
+[class*="ad-"]:not([data-a-target="video-player"]):not([class*="add"]):not([class*="admin"]):not([class*="advanced"]),
+[class*="ads-"]:not([class*="adds"]),
+[id*="ad-"]:not([id*="add"]):not([id*="admin"]),
+[class*="advertisement"],
+[class*="sponsor"]:not([class*="response"]),
+[class*="promo"]:not([class*="promote"]):not([class*="prompt"]),
+[data-a-target*="ad"]:not([data-a-target*="add"]):not([data-a-target*="admin"]):not([data-a-target="video-player"]):not([data-a-target*="video"]),
+[data-test-selector*="ad"]:not([data-test-selector*="add"]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0px !important;
+  width: 0px !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  pointer-events: none !important;
+}
+*/
+
+/* Protect important Twitch UI elements from being hidden */
+[data-a-target="video-player"],
+[data-a-target="player-controls"],
+[data-a-target="chat-input"],
+[data-a-target="search-input"],
+[data-a-target="top-nav"],
+[data-a-target="stream-title"],
+.video-player,
+.player-controls,
+.chat-input,
+.chat-container,
+.tw-textarea,
+.stream-info,
+.channel-info-content,
+.top-nav,
+.tw-search-input,
+input,
+textarea,
+form,
+[contenteditable] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  left: auto !important;
+  height: auto !important;
+  width: auto !important;
+  pointer-events: auto !important;
+}
+
+/* CRITICAL: Ensure main video player is ALWAYS visible - HIGHEST PRIORITY */
+video[data-a-target="video-player"],
+video.video-player,
+[data-a-target="video-player"] video,
+.video-player video,
+.video-player__container video,
+.player-video video,
+video[src*="twitch"],
+video[src*="hls"],
+video {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  height: auto !important;
+  width: auto !important;
+  pointer-events: auto !important;
+  transform: none !important;
+  margin: auto !important;
+  padding: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-width: auto !important;
+  min-height: auto !important;
+  z-index: auto !important;
+  clip: auto !important;
+  clip-path: none !important;
+  mask: none !important;
+  filter: none !important;
+}
+
+/* Protect video player containers */
+[data-a-target="video-player"],
+.video-player,
+.video-player__container,
+.player-video {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  height: auto !important;
+  width: auto !important;
+  pointer-events: auto !important;
+}
+
+/* Hide third-party ad networks */
+iframe[src*="doubleclick"],
+iframe[src*="googlesyndication"],
+iframe[src*="googleadservices"],
+iframe[src*="amazon-adsystem"],
+iframe[src*="adsystem.amazon"],
+img[src*="doubleclick"],
+img[src*="googlesyndication"],
+img[src*="googleadservices"],
+script[src*="doubleclick"],
+script[src*="googlesyndication"],
+script[src*="googleadservices"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0px !important;
+  width: 0px !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  pointer-events: none !important;
+}
+
+/* Responsive notification for smaller screens */
+@media (max-width: 768px) {
+  .twitch-ad-blocker-notification {
+    top: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    max-width: none !important;
+    font-size: 12px !important;
+    padding: 10px 16px !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .twitch-ad-blocker-notification {
+    background: #000000 !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .twitch-ad-blocker-notification {
+    transition: opacity 0.2s ease !important;
+    transform: none !important;
+  }
+  
+  .twitch-ad-blocker-notification.show {
+    transform: none !important;
+  }
+  
+  .twitch-ad-blocker-notification.hide {
+    transform: none !important;
+  }
+}

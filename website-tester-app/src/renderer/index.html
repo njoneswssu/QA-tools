@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Availability Tester</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🌐 Website Availability Tester</h1>
+                <p>Test multiple websites for availability and functionality</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2>📝 Merchant Input</h2>
+                    <div class="input-actions">
+                        <button id="loadWildlinkBtn" class="btn btn-primary">🌐 Load from Wildlink</button>
+                        <button id="syncMerchantsBtn" class="btn btn-success">🔄 Sync Merchants</button>
+                        <button id="madminBtn" class="btn btn-primary">🔧 MAdmin</button>
+                        <button id="resetBtn" class="btn btn-danger hidden">🔄 Reset Browser</button>
+                        <button id="importBtn" class="btn btn-secondary">📁 Import</button>
+                    </div>
+                </div>
+                
+                <!-- Wildlink Selection Panel -->
+                <div id="wildlinkPanel" class="wildlink-panel hidden">
+                    <div class="wildlink-controls">
+                        <div class="control-group">
+                            <label for="scraperBrowserSelect">Scraper Browser:</label>
+                            <select id="scraperBrowserSelect" class="form-select">
+                                <option value="chrome" selected>Google Chrome (Recommended)</option>
+                                <option value="chromium">Chromium</option>
+                                <option value="firefox">Firefox</option>
+                                <option value="webkit">Safari/WebKit</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="applicationSelect">Application:</label>
+                            <select id="applicationSelect" class="form-select">
+                                <option value="">Loading applications...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Browser (select one):</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="browserSelect" id="chromeRadio" value="chrome" checked>
+                                    <span>Chrome Extension</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="browserSelect" id="safariRadio" value="safari">
+                                    <span>Safari Extension</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="browserSelect" id="edgeRadio" value="edge">
+                                    <span>Edge Extension</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="browserSelect" id="mobileSafariRadio" value="mobile-safari">
+                                    <span>Mobile Safari Extension</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="wildlink-actions">
+                            <button id="loadMerchantsBtn" class="btn btn-success">📥 Load Merchants</button>
+                            <button id="cancelWildlinkBtn" class="btn btn-secondary">❌ Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <div id="wildlinkProgress" class="wildlink-progress hidden">
+                        <div class="progress-info">
+                            <div class="spinner-small"></div>
+                            <span id="wildlinkStatus">Loading applications...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <textarea 
+                        id="merchantInput" 
+                        placeholder="Enter merchants to test (one per line):&#10;&#10;Examples:&#10;• Store Name, https://example.com&#10;• Store Name - https://example.com&#10;• https://example.com&#10;• example.com&#10;• {&quot;name&quot;: &quot;Store Name&quot;, &quot;url&quot;: &quot;https://example.com&quot;}"
+                        rows="8"
+                    ></textarea>
+                    <div class="input-info">
+                        <span id="merchantCount">0 merchants</span>
+                        <span id="skipInfo" class="skip-info"></span>
+                    </div>
+                </div>
+                
+            </section>
+
+            <!-- Controls Section -->
+            <section class="controls-section">
+                
+                <div class="control-buttons">
+                    <button id="startBtn" class="btn btn-primary">▶️ Start Testing</button>
+                    <button id="pauseBtn" class="btn btn-warning" disabled>⏸️ Pause</button>
+                    <button id="resumeBtn" class="btn btn-success" disabled>▶️ Resume</button>
+                    <button id="stopBtn" class="btn btn-danger" disabled>⏹️ Stop</button>
+                    <button id="clearBtn" class="btn btn-secondary" onclick="clearTesting()" style="cursor: pointer;">🗑️ Clear</button>
+                </div>
+                
+                <div class="status-display">
+                    <div class="status-item">
+                        <span class="status-label">Status:</span>
+                        <span id="testStatus" class="status-value">Ready</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Current:</span>
+                        <span id="currentWebsite" class="status-value">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Section -->
+            <section class="progress-section">
+                <div class="section-header">
+                    <h2>📊 Testing Progress</h2>
+                    <button id="exportBtn" class="btn btn-secondary" disabled>💾 Export Results</button>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill"></div>
+                        </div>
+                        <span id="progressText" class="progress-text">0 / 0</span>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalTested">0</div>
+                            <div class="stat-label">Total Tested</div>
+                        </div>
+                        <div class="stat-card available clickable" onclick="switchToTab('available')" style="cursor: pointer;" title="Click to view Available results">
+                            <div class="stat-number" id="availableCount">0</div>
+                            <div class="stat-label">Available</div>
+                        </div>
+                        <div class="stat-card unavailable clickable" onclick="switchToTab('unavailable')" style="cursor: pointer;" title="Click to view Unavailable results">
+                            <div class="stat-number" id="unavailableCount">0</div>
+                            <div class="stat-label">Unavailable</div>
+                        </div>
+                        <div class="stat-card skipped clickable" onclick="switchToTab('no-test-link')" style="cursor: pointer;" title="Click to view No Test Link results">
+                            <div class="stat-number" id="skippedCount">0</div>
+                            <div class="stat-label">Skipped</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                <div class="section-header">
+                    <h2>📋 Test Results</h2>
+                    <div class="result-tabs">
+                        <button class="tab-btn active" data-tab="all" tabindex="0">All</button>
+                        <button class="tab-btn" data-tab="unavailable" tabindex="0">Unavailable</button>
+                        <button class="tab-btn" data-tab="available" tabindex="0">Available</button>
+                        <button class="tab-btn" data-tab="no-test-link" tabindex="0">No Test Link</button>
+                    </div>
+                </div>
+                
+                <!-- Search Bar for Results -->
+                <div class="search-container" style="margin: 10px 0; position: relative;">
+                    <input type="text" id="resultsSearch" placeholder="🔍 Search merchants..." 
+                           style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                    <div id="searchDropdown" class="search-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; max-height: 200px; overflow-y: auto; z-index: 1000;">
+                    </div>
+                </div>
+                
+                <!-- Copy All Button -->
+                <div class="copy-all-container" style="margin: 10px 0; text-align: right;">
+                    <button id="copyAllBtn" class="btn btn-outline-primary" onclick="copyAllCurrentTab()" style="display: none; cursor: pointer;" title="Copy all merchants from current tab">
+                        📋 Copy All <span id="copyAllLabel">Results</span>
+                    </button>
+                </div>
+                
+                <div class="results-container">
+                    <div id="resultsContent" class="results-content" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                        <div class="empty-state">
+                            <p>No test results yet. Start testing to see results here.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Status Bar -->
+        <footer class="status-bar">
+            <div class="status-bar-content">
+                <span id="statusMessage">Ready to test websites</span>
+                <span id="lastUpdate"></span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <button id="closeLoadingBtn" class="close-loading-btn" title="Close">&times;</button>
+            <div class="spinner"></div>
+            <p>Setting up browser...</p>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

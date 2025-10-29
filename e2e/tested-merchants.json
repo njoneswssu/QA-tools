@@ -1,0 +1,21 @@
+{
+  "merchants": [
+    {
+      "name": "Star Registration",
+      "url": "https://www.star-registration.com/",
+      "status": "available",
+      "reason": "functional e-commerce detection",
+      "timestamp": 1761312466436,
+      "date": "2025-10-24T13:27:46.436Z"
+    },
+    {
+      "name": "Green Chef",
+      "url": "https://www.greenchef.com",
+      "status": "available",
+      "reason": "functional e-commerce detection",
+      "timestamp": 1761312474037,
+      "date": "2025-10-24T13:27:54.037Z"
+    }
+  ],
+  "lastUpdated": "2025-10-24T13:27:54.037Z"
+}

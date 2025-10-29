@@ -1,0 +1,56 @@
+/* Twitch Ad Blocker - MINIMAL STYLES */
+
+/* Notification styles */
+.twitch-ad-blocker-notification {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  background: #9146ff !important;
+  color: white !important;
+  padding: 12px 20px !important;
+  border-radius: 8px !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+
+/* Hide elements marked as blocked by JavaScript */
+[data-blocked="true"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Target specific Twitch ad overlay selectors */
+[data-a-target="player-ad-notice"],
+.player-ad-notice,
+[data-test-selector="ad-banner"],
+.ads-overlay,
+.video-ads-overlay,
+.player-overlay-ad,
+.tw-flex-column .tw-pd-05,
+.player-overlay-background {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0px !important;
+  width: 0px !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* Additional ad blocking for text-based detection */
+*[data-blocked="true"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0px !important;
+  width: 0px !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
