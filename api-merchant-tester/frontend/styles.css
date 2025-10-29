@@ -217,6 +217,16 @@ body {
     transform: translateY(-1px);
 }
 
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
 /* Results Section */
 .results-section {
     background: white;

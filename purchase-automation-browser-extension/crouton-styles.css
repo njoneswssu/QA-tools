@@ -125,6 +125,34 @@
     transform: translateY(-1px) !important;
 }
 
+#purchase-automation-crouton .form-group select {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    font-size: 14px !important;
+    box-sizing: border-box !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    cursor: pointer !important;
+}
+
+#purchase-automation-crouton .form-group select:focus {
+    outline: none !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+#purchase-automation-crouton .form-group select option {
+    background: #4f46e5 !important;
+    color: white !important;
+    padding: 8px !important;
+}
+
 #purchase-automation-crouton .price-range {
     display: flex !important;
     gap: 6px !important;
@@ -137,11 +165,18 @@
     margin-bottom: 0 !important;
 }
 
-#purchase-automation-crouton #start-automation-btn {
-    width: calc(100% - 8px) !important;
+#purchase-automation-crouton .button-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin: 12px 4px 8px 4px !important;
+}
+
+#purchase-automation-crouton #start-automation-btn,
+#purchase-automation-crouton #stop-automation-btn {
+    width: 100% !important;
     max-width: 100% !important;
     padding: 12px 16px !important;
-    background: linear-gradient(135deg, #10b981, #059669) !important;
     border: none !important;
     border-radius: 10px !important;
     color: white !important;
@@ -149,9 +184,8 @@
     font-weight: 600 !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
-    margin: 12px 4px 8px 4px !important;
+    margin: 0 !important;
     display: block !important;
-    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.3px !important;
     box-sizing: border-box !important;
@@ -160,10 +194,26 @@
     white-space: nowrap !important;
 }
 
+#purchase-automation-crouton #start-automation-btn {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3) !important;
+}
+
+#purchase-automation-crouton #stop-automation-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3) !important;
+}
+
 #purchase-automation-crouton #start-automation-btn:hover {
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
     background: linear-gradient(135deg, #059669, #047857) !important;
+}
+
+#purchase-automation-crouton #stop-automation-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
 }
 
 #purchase-automation-crouton #start-automation-btn:disabled {

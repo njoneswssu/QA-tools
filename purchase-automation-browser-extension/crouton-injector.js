@@ -4,7 +4,39 @@
 let purchaseCroutonContainer = null;
 let isAutomationRunning = false;
 
+// Cleanup function to remove existing croutons
+function cleanupExistingCroutons() {
+    const existingCroutons = document.querySelectorAll('#purchase-automation-crouton');
+    existingCroutons.forEach(crouton => {
+        console.log('Removing existing crouton');
+        crouton.remove();
+    });
+    purchaseCroutonContainer = null;
+}
+
+// Listen for extension refresh/reload
+if (typeof chrome !== 'undefined' && chrome.runtime) {
+    chrome.runtime.onConnect.addListener(() => {
+        console.log('Extension reconnected - cleaning up croutons');
+        cleanupExistingCroutons();
+    });
+    
+    // Also listen for disconnect
+    try {
+        const port = chrome.runtime.connect();
+        port.onDisconnect.addListener(() => {
+            console.log('Extension disconnected - cleaning up croutons');
+            cleanupExistingCroutons();
+        });
+    } catch (error) {
+        console.log('Could not connect to extension runtime');
+    }
+}
+
 function initializePurchaseCrouton() {
+    // Always cleanup existing croutons first
+    cleanupExistingCroutons();
+    
     if (purchaseCroutonContainer) {
         return; // Already initialized
     }
@@ -24,8 +56,10 @@ function createPurchaseCrouton() {
         </div>
         <div class="crouton-content">
             <div class="form-group">
-                <label for="category-input">Category</label>
-                <input type="text" id="category-input" placeholder="Electronics, Clothing, Books..." />
+                <label for="category-select">Category</label>
+                <select id="category-select">
+                    <option value="">Loading categories...</option>
+                </select>
             </div>
             <div class="price-range">
                 <div class="form-group">
@@ -37,9 +71,14 @@ function createPurchaseCrouton() {
                     <input type="number" id="max-price" min="0" step="0.01" placeholder="100" />
                 </div>
             </div>
-            <button id="start-automation-btn">
-                🚀 Start Shopping
-            </button>
+            <div class="button-group">
+                <button id="start-automation-btn">
+                    🚀 Start Shopping
+                </button>
+                <button id="stop-automation-btn" style="display: none;">
+                    🛑 Stop Shopping
+                </button>
+            </div>
             <div id="automation-status" class="status-display">Ready to find the best deals...</div>
         </div>
     `;
@@ -51,6 +90,9 @@ function createPurchaseCrouton() {
     
     // Load default settings
     loadDefaultSettings();
+    
+    // Scrape and populate categories
+    scrapeAndPopulateCategories();
 }
 
 function setupEventListeners() {
@@ -59,29 +101,65 @@ function setupEventListeners() {
     // Minimize button
     const minimizeBtn = purchaseCroutonContainer.querySelector('.minimize-btn');
     if (minimizeBtn) {
-        minimizeBtn.addEventListener('click', function(e) {
+        // Remove any existing listeners first
+        minimizeBtn.replaceWith(minimizeBtn.cloneNode(true));
+        const newMinimizeBtn = purchaseCroutonContainer.querySelector('.minimize-btn');
+        
+        newMinimizeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             console.log('Minimize button clicked via event listener');
             toggleCrouton();
-        });
+        }, { once: false, passive: false });
         console.log('Minimize button event listener added');
     } else {
         console.error('Minimize button not found');
     }
     
-    // Start automation button
+    // Start automation button with debouncing
     const startBtn = purchaseCroutonContainer.querySelector('#start-automation-btn');
+    const stopBtn = purchaseCroutonContainer.querySelector('#stop-automation-btn');
+    
     if (startBtn) {
-        startBtn.addEventListener('click', function(e) {
+        // Remove any existing listeners first
+        startBtn.replaceWith(startBtn.cloneNode(true));
+        const newStartBtn = purchaseCroutonContainer.querySelector('#start-automation-btn');
+        
+        newStartBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            if (isAutomationRunning) {
+                console.log('Button click ignored - already processing');
+                return;
+            }
+            
             console.log('Start automation button clicked via event listener');
             startPurchaseAutomation();
-        });
+        }, { once: false, passive: false });
         console.log('Start automation button event listener added');
     } else {
         console.error('Start automation button not found');
+    }
+    
+    // Stop automation button
+    if (stopBtn) {
+        stopBtn.replaceWith(stopBtn.cloneNode(true));
+        const newStopBtn = purchaseCroutonContainer.querySelector('#stop-automation-btn');
+        
+        newStopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            console.log('Stop automation button clicked');
+            stopPurchaseAutomation();
+        }, { once: false, passive: false });
+        console.log('Stop automation button event listener added');
+    } else {
+        console.error('Stop automation button not found');
     }
 }
 
@@ -97,6 +175,134 @@ async function loadDefaultSettings() {
     } catch (error) {
         console.error('Failed to load default settings:', error);
     }
+}
+
+async function scrapeAndPopulateCategories() {
+    console.log('Scraping categories from website...');
+    const categorySelect = document.getElementById('category-select');
+    
+    if (!categorySelect) {
+        console.error('Category select element not found');
+        return;
+    }
+
+    try {
+        const categories = await scrapeWebsiteCategories();
+        console.log('Found categories:', categories);
+        
+        // Clear loading option
+        categorySelect.innerHTML = '';
+        
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select a category...';
+        categorySelect.appendChild(defaultOption);
+        
+        // Add scraped categories
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.name;
+            option.textContent = category.name;
+            option.title = category.href || '';
+            categorySelect.appendChild(option);
+        });
+        
+        console.log(`Populated ${categories.length} categories in dropdown`);
+        
+    } catch (error) {
+        console.error('Failed to scrape categories:', error);
+        categorySelect.innerHTML = '<option value="">No categories found</option>';
+    }
+}
+
+async function scrapeWebsiteCategories() {
+    const categories = new Set();
+    const categoryData = [];
+    
+    // Common selectors for e-commerce category navigation
+    const categorySelectors = [
+        // Main navigation
+        'nav a, .nav a, .navigation a',
+        '.menu a, .main-menu a',
+        '.category-nav a, .categories a',
+        '.navbar a, .nav-bar a',
+        
+        // Dropdown menus
+        '.dropdown-menu a, .dropdown a',
+        '.submenu a, .sub-menu a',
+        
+        // Sidebar categories
+        '.sidebar a, .side-nav a',
+        '.category-list a, .cat-list a',
+        
+        // Footer categories (sometimes useful)
+        '.footer-categories a, .footer-nav a',
+        
+        // Common e-commerce patterns
+        '[data-category], [data-cat]',
+        '.shop-category a, .product-category a',
+        '.department a, .dept a'
+    ];
+
+    console.log('Scanning page for category links...');
+    
+    for (const selector of categorySelectors) {
+        try {
+            const elements = document.querySelectorAll(selector);
+            console.log(`Found ${elements.length} elements with selector: ${selector}`);
+            
+            elements.forEach(element => {
+                const text = element.textContent.trim();
+                const href = element.href;
+                
+                // Filter out non-category links
+                const textLower = text.toLowerCase();
+                const excludedTerms = [
+                    'home', 'about', 'contact', 'login', 'account', 'cart', 'checkout',
+                    'help', 'support', 'faq', 'terms', 'privacy', 'policy', 'shipping',
+                    'returns', 'track', 'order', 'my account', 'sign in', 'sign up',
+                    'register', 'forgot', 'password', 'newsletter', 'subscribe',
+                    'main content', 'skip to', 'accessibility', 'site map', 'search',
+                    'menu', 'navigation', 'footer', 'header', 'sidebar', 'breadcrumb',
+                    'view all', 'see all', 'more', 'less', 'show', 'hide', 'toggle',
+                    'close', 'open', 'expand', 'collapse', 'back', 'next', 'previous'
+                ];
+                
+                const isValidCategory = text && 
+                    text.length >= 3 && 
+                    text.length <= 30 && 
+                    !excludedTerms.some(term => textLower.includes(term)) &&
+                    !href?.includes('mailto:') &&
+                    !href?.includes('tel:') &&
+                    !href?.includes('#') &&
+                    !href?.includes('javascript:') &&
+                    !categories.has(textLower) &&
+                    !/^\d+$/.test(text) && // Not just numbers
+                    !/^[^a-zA-Z]*$/.test(text); // Contains at least one letter
+                
+                if (isValidCategory) {
+                    
+                    categories.add(text.toLowerCase());
+                    categoryData.push({
+                        name: text,
+                        href: href,
+                        selector: selector
+                    });
+                }
+            });
+        } catch (error) {
+            console.log(`Error with selector ${selector}:`, error);
+        }
+    }
+    
+    // Sort categories alphabetically and limit to reasonable number
+    const sortedCategories = categoryData
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .slice(0, 20); // Limit to 20 categories
+    
+    console.log('Final category list:', sortedCategories);
+    return sortedCategories;
 }
 
 function toggleCrouton() {
@@ -138,25 +344,29 @@ function toggleCrouton() {
 }
 
 async function startPurchaseAutomation() {
-    console.log('Start automation button clicked');
+    console.log('startPurchaseAutomation function called');
     
     if (isAutomationRunning) {
-        console.log('Automation already running, returning');
+        console.log('Automation already running, returning early');
+        updateStatus('⚠️ Automation already in progress...', 'warning');
         return;
     }
+    
+    // Set flag immediately to prevent multiple calls
+    isAutomationRunning = true;
 
-    const categoryInput = document.getElementById('category-input');
+    const categorySelect = document.getElementById('category-select');
     const minPriceInput = document.getElementById('min-price');
     const maxPriceInput = document.getElementById('max-price');
     const startBtn = document.getElementById('start-automation-btn');
 
-    if (!categoryInput || !minPriceInput || !maxPriceInput || !startBtn) {
+    if (!categorySelect || !minPriceInput || !maxPriceInput || !startBtn) {
         console.error('Could not find required form elements');
         updateStatus('❌ Form elements not found', 'error');
         return;
     }
 
-    const category = categoryInput.value.trim();
+    const category = categorySelect.value.trim();
     const minPrice = parseFloat(minPriceInput.value) || 0;
     const maxPrice = parseFloat(maxPriceInput.value) || 1000;
 
@@ -164,16 +374,25 @@ async function startPurchaseAutomation() {
 
     if (!category) {
         updateStatus('❌ Please enter a category', 'error');
+        isAutomationRunning = false;
         return;
     }
 
     if (minPrice >= maxPrice) {
         updateStatus('❌ Min price must be less than max price', 'error');
+        isAutomationRunning = false;
         return;
     }
 
-    isAutomationRunning = true;
-    startBtn.disabled = true;
+    // Update button visibility
+    const startBtn = document.getElementById('start-automation-btn');
+    const stopBtn = document.getElementById('stop-automation-btn');
+    
+    if (startBtn && stopBtn) {
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'block';
+        stopBtn.disabled = false;
+    }
     
     try {
         updateStatus('🔍 Starting automation...', 'info');
@@ -196,9 +415,43 @@ async function startPurchaseAutomation() {
         console.error('Automation error:', error);
         updateStatus(`❌ Error: ${error.message}`, 'error');
     } finally {
+        console.log('Automation finished, cleaning up...');
         isAutomationRunning = false;
-        startBtn.disabled = false;
+        
+        // Restore button visibility
+        const startBtn = document.getElementById('start-automation-btn');
+        const stopBtn = document.getElementById('stop-automation-btn');
+        
+        if (startBtn && stopBtn) {
+            startBtn.style.display = 'block';
+            startBtn.disabled = false;
+            stopBtn.style.display = 'none';
+        }
     }
+}
+
+function stopPurchaseAutomation() {
+    console.log('Stopping automation...');
+    
+    if (!isAutomationRunning) {
+        console.log('No automation running to stop');
+        return;
+    }
+    
+    isAutomationRunning = false;
+    
+    // Restore button visibility
+    const startBtn = document.getElementById('start-automation-btn');
+    const stopBtn = document.getElementById('stop-automation-btn');
+    
+    if (startBtn && stopBtn) {
+        startBtn.style.display = 'block';
+        startBtn.disabled = false;
+        stopBtn.style.display = 'none';
+    }
+    
+    updateStatus('🛑 Automation stopped by user', 'warning');
+    console.log('Automation stopped successfully');
 }
 
 async function executeAutomationProcess(config) {
@@ -210,6 +463,7 @@ async function executeAutomationProcess(config) {
         updateStatus('🔍 Searching for category...', 'info');
         
         // Step 1: Find and navigate to category
+        if (!isAutomationRunning) throw new Error('Automation stopped');
         console.log('Looking for category:', category);
         const categoryFound = await findAndNavigateToCategory(category);
         console.log('Category found result:', categoryFound);
@@ -217,12 +471,14 @@ async function executeAutomationProcess(config) {
             throw new Error(`Category "${category}" not found on this website`);
         }
 
+        if (!isAutomationRunning) throw new Error('Automation stopped');
         await wait(2000); // Wait for page to load
         updateStatus('💰 Filtering by price...', 'info');
         
         // Step 2: Apply price filters and sort by price
         await applyPriceFiltersAndSort(minPrice, maxPrice);
 
+        if (!isAutomationRunning) throw new Error('Automation stopped');
         await wait(2000);
         updateStatus('🛍️ Finding product in price range...', 'info');
         
@@ -232,6 +488,7 @@ async function executeAutomationProcess(config) {
             throw new Error(`No products found between $${minPrice} and $${maxPrice}`);
         }
 
+        if (!isAutomationRunning) throw new Error('Automation stopped');
         updateStatus('🛒 Adding product to cart...', 'info');
         
         // Step 4: Add product to cart
@@ -268,41 +525,81 @@ async function executeAutomationProcess(config) {
 async function findAndNavigateToCategory(category) {
     console.log('findAndNavigateToCategory called with:', category);
     
-    // Try text-based search first
+    // First try to find exact match from our scraped categories
+    const categorySelect = document.getElementById('category-select');
+    let targetLink = null;
+    
+    if (categorySelect) {
+        const selectedOption = categorySelect.querySelector(`option[value="${category}"]`);
+        if (selectedOption && selectedOption.title) {
+            // We have the exact href from scraping
+            console.log('Using scraped category link:', selectedOption.title);
+            updateStatus(`🎯 Navigating to ${category}...`, 'info');
+            window.location.href = selectedOption.title;
+            return true;
+        }
+    }
+    
+    // Fallback to text-based search
     console.log('Searching through all links on the page...');
     const links = document.querySelectorAll('a');
     console.log(`Found ${links.length} links on the page`);
     
-    // Log first few links for debugging
-    const firstFewLinks = Array.from(links).slice(0, 10);
-    console.log('First 10 links on page:', firstFewLinks.map(link => ({
-        text: link.textContent.trim(),
-        href: link.href
-    })));
+    // Show status to user
+    updateStatus(`🔍 Scanning ${links.length} links for "${category}"...`, 'info');
+    await wait(500);
     
+    // Try exact match first
     for (const link of links) {
-        const linkText = link.textContent.toLowerCase().trim();
-        const categoryLower = category.toLowerCase();
-        
-        if (linkText.includes(categoryLower) || categoryLower.includes(linkText)) {
-            console.log('Found matching category link:', {
-                text: link.textContent,
-                href: link.href,
-                linkText: linkText,
-                categoryLower: categoryLower
-            });
-            
-            // Scroll into view and click
-            link.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            await wait(500);
-            link.click();
-            console.log('Clicked on category link');
-            return true;
+        const linkText = link.textContent.trim();
+        if (linkText.toLowerCase() === category.toLowerCase()) {
+            targetLink = link;
+            console.log('Found exact match:', linkText);
+            break;
         }
+    }
+    
+    // If no exact match, try partial matching
+    if (!targetLink) {
+        for (const link of links) {
+            const linkText = link.textContent.toLowerCase().trim();
+            const categoryLower = category.toLowerCase();
+            
+            if (linkText.includes(categoryLower) || categoryLower.includes(linkText)) {
+                targetLink = link;
+                console.log('Found partial match:', linkText);
+                break;
+            }
+        }
+    }
+    
+    if (targetLink) {
+        console.log('Found matching category link:', {
+            text: targetLink.textContent,
+            href: targetLink.href
+        });
+        
+        updateStatus(`✅ Found "${targetLink.textContent.trim()}" - clicking...`, 'info');
+        
+        // Highlight the link briefly
+        const originalStyle = targetLink.style.cssText;
+        targetLink.style.cssText += 'border: 3px solid #10b981 !important; background: rgba(16, 185, 129, 0.3) !important;';
+        
+        // Scroll into view and click
+        targetLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        await wait(1000);
+        
+        // Restore original style and click
+        targetLink.style.cssText = originalStyle;
+        targetLink.click();
+        
+        console.log('Clicked on category link');
+        updateStatus(`🚀 Navigating to ${targetLink.textContent.trim()}...`, 'info');
+        return true;
     }
 
     console.log('No direct category links found, trying search...');
-    // Try search functionality if category navigation fails
+    updateStatus(`🔍 No direct link found, trying search...`, 'info');
     return await searchForCategory(category);
 }
 

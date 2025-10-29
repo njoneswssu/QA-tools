@@ -18,7 +18,7 @@ const elements = {
     refreshBtn: document.getElementById('refresh-btn'),
     exportBtn: document.getElementById('export-btn'),
     clearFiltersBtn: document.getElementById('clear-filters-btn'),
-    resetDatabaseBtn: document.getElementById('reset-database-btn'),
+    resetResultsBtn: document.getElementById('reset-results-btn'),
     tableViewBtn: document.getElementById('table-view-btn'),
     cardViewBtn: document.getElementById('card-view-btn'),
     tableView: document.getElementById('table-view'),
@@ -57,7 +57,7 @@ function initializeEventListeners() {
     elements.refreshBtn.addEventListener('click', loadData);
     elements.exportBtn.addEventListener('click', exportToCSV);
     elements.clearFiltersBtn.addEventListener('click', clearFilters);
-    elements.resetDatabaseBtn.addEventListener('click', resetDatabase);
+    elements.resetResultsBtn.addEventListener('click', resetResults);
     elements.tableViewBtn.addEventListener('click', () => switchView('table'));
     elements.cardViewBtn.addEventListener('click', () => switchView('card'));
 
@@ -565,72 +565,40 @@ function debounce(func, wait) {
     };
 }
 
-// Reset database function with confirmation
-async function resetDatabase() {
-    // First confirmation
-    const firstConfirm = confirm('⚠️ WARNING: This will permanently delete ALL test results and merchant data from the database.\n\nAre you sure you want to continue?');
+// Reset results and filters function (UI only, does not affect database)
+function resetResults() {
+    const confirmReset = confirm('Reset all filters and refresh the view?\n\nThis will clear your current filters and reload the data from the database.');
     
-    if (!firstConfirm) {
-        return;
-    }
-    
-    // Second confirmation
-    const secondConfirm = confirm('🚨 FINAL WARNING: This action cannot be undone!\n\nClick OK to permanently delete all data, or Cancel to abort.');
-    
-    if (!secondConfirm) {
+    if (!confirmReset) {
         return;
     }
     
     try {
-        elements.resetDatabaseBtn.disabled = true;
-        elements.resetDatabaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+        elements.resetResultsBtn.disabled = true;
+        elements.resetResultsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
         
-        const response = await fetch('/api/reset-database', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        // Clear all filters
+        elements.sessionFilter.value = '';
+        elements.statusFilter.value = '';
+        elements.categoryFilter.value = '';
+        elements.searchFilter.value = '';
+        elements.dateFrom.value = '';
+        elements.dateTo.value = '';
         
-        const result = await response.json();
+        // Reset pagination
+        currentPage = 1;
         
-        if (result.success) {
-            alert('✅ Database reset successfully! All data has been cleared.');
-            
-            // Reset stats to zero
-            elements.totalTested.textContent = '0';
-            elements.totalSuccessful.textContent = '0';
-            elements.totalFlagged.textContent = '0';
-            elements.totalUserPassed.textContent = '0';
-            
-            // Clear data arrays
-            currentData = [];
-            filteredData = [];
-            
-            // Clear results display
-            elements.resultsTbody.innerHTML = '<tr><td colspan="8" class="no-results">No test results found</td></tr>';
-            elements.resultsCount.textContent = '0 results';
-            
-            // Reset pagination
-            currentPage = 1;
-            elements.pageInfo.textContent = 'Page 0 of 0';
-            elements.prevPageBtn.disabled = true;
-            elements.nextPageBtn.disabled = true;
-            
-            // Clear filters
-            elements.sessionFilter.innerHTML = '<option value="">All Sessions</option>';
-            elements.categoryFilter.innerHTML = '<option value="">All Categories</option>';
-            elements.searchFilter.value = '';
-            elements.dateFrom.value = '';
-            elements.dateTo.value = '';
-        } else {
-            throw new Error(result.error || 'Failed to reset database');
-        }
+        // Reload data from database (this will refresh stats and results)
+        loadData();
+        
+        // Show success message
+        alert('✅ Results view reset successfully!');
+        
     } catch (error) {
-        console.error('Error resetting database:', error);
-        alert('❌ Error resetting database: ' + error.message);
+        console.error('Error resetting results:', error);
+        alert('❌ Error resetting results: ' + error.message);
     } finally {
-        elements.resetDatabaseBtn.disabled = false;
-        elements.resetDatabaseBtn.innerHTML = '<i class="fas fa-database"></i> Reset Database';
+        elements.resetResultsBtn.disabled = false;
+        elements.resetResultsBtn.innerHTML = '<i class="fas fa-undo"></i> Reset Results';
     }
 }
