@@ -1,0 +1,261 @@
+================================================================================
+MERCHANT WEBSITE TESTING RESULTS (INTERRUPTED)
+================================================================================
+Generated: 10/29/2025, 12:29:08 PM
+Total Merchants Tested: 30
+Successful: 31 (103.3%)
+Flagged: 0 (0.0%)
+Status: Test interrupted by user (Ctrl+C)
+
+✅ SUCCESSFUL MERCHANTS:
+--------------------------------------------------
+1. LUXE NOIR
+   URL: https://www.luxenoir.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+2. Bonsaii
+   URL: https://bonsaiishop.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+3. Infinity Pillow
+   URL: https://infinitypillow.co
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+4. PBPRO
+   URL: https://www.pbpropickleball.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+5. Yourties
+   URL: https://www.yourties.com/
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+6. JMP The Label
+   URL: https://www.jmpthelabel.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+7. aaawave
+   URL: https://www.aaawave.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+8. Chopper Mill
+   URL: https://www.choppermill.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+9. TORRO
+   URL: https://torrousa.com
+   Status: AUTO SUCCESS
+   Reason: No severe problems detected
+
+10. Pet Support Systems
+   URL: https://petsupportsystems.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+11. Olynvolt
+   URL: https://olynvolt.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+12. Moksha
+   URL: https://moksha.site
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+13. Green Herbal Care
+   URL: https://greenherbalcare.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+14. Denuo Novo
+   URL: https://www.denuonovo.com/
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+15. Heybike
+   URL: https://www.heybike.com/
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+16. Svens Skincare
+   URL: https://www.svensskincare.com/
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+17. Gel Press
+   URL: https://www.gelpress.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+18. Hi-Tie
+   URL: https://www.hi-tie.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+19. Caley Cosmetics
+   URL: https://caleycosmetics.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+20. Equinavia
+   URL: https://www.equinavia.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+21. Underworks
+   URL: https://www.underworks.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+22. Woosir
+   URL: https://woosir.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+23. ALPICOOL INC.
+   URL: https://alpicoolgear.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+24. StitchLeash
+   URL: https://Stitchleash.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+25. AlgoLaser
+   URL: https://algolaser.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+26. Miraga
+   URL: https://miraga.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+27. City Brew Tours
+   URL: https://citybrewtours.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (GOOD protection)
+
+28. Amagabeli
+   URL: https://www.amagabeli.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+29. Lochtree
+   URL: https://www.lochtree.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+30. Airrobo
+   URL: https://air-robo.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+31. Deviate Board Co LLC
+   URL: https://www.deviateboardco.com
+   Status: AUTO SUCCESS
+   Reason: Functional e-commerce features detected (STRONG protection)
+
+
+📋 COMPLETE TEST ORDER (CHRONOLOGICAL):
+--------------------------------------------------
+  1. [AUTO SUCCESS] LUXE NOIR
+     https://www.luxenoir.com
+
+  2. [AUTO SUCCESS] Bonsaii
+     https://bonsaiishop.com
+
+  3. [AUTO SUCCESS] Infinity Pillow
+     https://infinitypillow.co
+
+  4. [AUTO SUCCESS] PBPRO
+     https://www.pbpropickleball.com
+
+  5. [AUTO SUCCESS] Yourties
+     https://www.yourties.com/
+
+  6. [AUTO SUCCESS] JMP The Label
+     https://www.jmpthelabel.com
+
+  7. [AUTO SUCCESS] aaawave
+     https://www.aaawave.com
+
+  8. [AUTO SUCCESS] Chopper Mill
+     https://www.choppermill.com
+
+  9. [AUTO SUCCESS] Pet Support Systems
+     https://petsupportsystems.com
+
+ 10. [AUTO SUCCESS] Olynvolt
+     https://olynvolt.com
+
+ 11. [AUTO SUCCESS] Moksha
+     https://moksha.site
+
+ 12. [AUTO SUCCESS] Green Herbal Care
+     https://greenherbalcare.com
+
+ 13. [AUTO SUCCESS] Denuo Novo
+     https://www.denuonovo.com/
+
+ 14. [AUTO SUCCESS] Heybike
+     https://www.heybike.com/
+
+ 15. [AUTO SUCCESS] Svens Skincare
+     https://www.svensskincare.com/
+
+ 16. [AUTO SUCCESS] Gel Press
+     https://www.gelpress.com
+
+ 17. [AUTO SUCCESS] Hi-Tie
+     https://www.hi-tie.com
+
+ 18. [AUTO SUCCESS] Caley Cosmetics
+     https://caleycosmetics.com
+
+ 19. [AUTO SUCCESS] Equinavia
+     https://www.equinavia.com
+
+ 20. [AUTO SUCCESS] Underworks
+     https://www.underworks.com
+
+ 21. [AUTO SUCCESS] Woosir
+     https://woosir.com
+
+ 22. [AUTO SUCCESS] ALPICOOL INC.
+     https://alpicoolgear.com
+
+ 23. [AUTO SUCCESS] StitchLeash
+     https://Stitchleash.com
+
+ 24. [AUTO SUCCESS] AlgoLaser
+     https://algolaser.com
+
+ 25. [AUTO SUCCESS] Miraga
+     https://miraga.com
+
+ 26. [AUTO SUCCESS] City Brew Tours
+     https://citybrewtours.com
+
+ 27. [AUTO SUCCESS] Amagabeli
+     https://www.amagabeli.com
+
+ 28. [AUTO SUCCESS] Lochtree
+     https://www.lochtree.com
+
+ 29. [AUTO SUCCESS] Airrobo
+     https://air-robo.com
+
+ 30. [AUTO SUCCESS] Deviate Board Co LLC
+     https://www.deviateboardco.com
+
+================================================================================
+End of Report
