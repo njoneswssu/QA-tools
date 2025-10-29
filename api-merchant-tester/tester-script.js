@@ -19,6 +19,12 @@ let testPaused = false;
 // DOM elements
 const elements = {
     apiData: document.getElementById('api-data'),
+    apiUrl: document.getElementById('api-url'),
+    fetchAllBtn: document.getElementById('fetch-all-btn'),
+    testApiBtn: document.getElementById('test-api-btn'),
+    fetchProgress: document.getElementById('fetch-progress'),
+    fetchProgressFill: document.getElementById('fetch-progress-fill'),
+    fetchStatus: document.getElementById('fetch-status'),
     appIdFilter: document.getElementById('app-id-filter'),
     categoryFilter: document.getElementById('category-filter'),
     merchantLimit: document.getElementById('merchant-limit'),
@@ -101,6 +107,8 @@ function initializeEventListeners() {
     elements.startTestBtn.addEventListener('click', startTest);
     elements.loadStoredBtn.addEventListener('click', loadStoredMerchants);
     elements.resetDatabaseBtn.addEventListener('click', handleDatabaseReset);
+    elements.fetchAllBtn.addEventListener('click', fetchAllPages);
+    elements.testApiBtn.addEventListener('click', testApiEndpoint);
     elements.pauseTestBtn.addEventListener('click', pauseTest);
     elements.resumeTestBtn.addEventListener('click', resumeTest);
     elements.clearLogBtn.addEventListener('click', clearLog);
@@ -155,11 +163,27 @@ function validateAndPreview() {
     
     try {
         // Check if this is multiple pages separated by ---
-        const pages = apiText.includes('---') ? 
-            apiText.split('---').map(page => page.trim()).filter(page => page.length > 0) :
-            [apiText];
+        let pages;
+        if (apiText.includes('---')) {
+            pages = apiText.split(/---+/).map(page => page.trim()).filter(page => page.length > 0);
+            addLogEntry(`🔍 Detected multi-page format with ${pages.length} pages`, 'info');
+        } else {
+            pages = [apiText];
+            addLogEntry(`🔍 Detected single-page format`, 'info');
+        }
+        
+        // Debug: Show first few characters of each page
+        pages.forEach((page, index) => {
+            const preview = page.substring(0, 100).replace(/\s+/g, ' ');
+            addLogEntry(`📄 Page ${index + 1} preview: ${preview}...`, 'info');
+        });
         
         addLogEntry(`📄 Processing ${pages.length} page(s) of data...`, 'info');
+        
+        // Check for large datasets
+        if (pages.length > 10) {
+            addLogEntry(`⚠️ Large dataset detected (${pages.length} pages) - this may take a moment...`, 'warning');
+        }
         
         let allMerchants = [];
         let totalCount = 0;
@@ -199,7 +223,7 @@ function validateAndPreview() {
                     pageSize = pageData.PageSize || 50;
                 }
                 
-                addLogEntry(`✅ Page ${i + 1}: ${pageData.Merchants.length} merchants processed`, 'success');
+                addLogEntry(`✅ Page ${i + 1}: ${pageData.Merchants.length} merchants processed (total so far: ${allMerchants.length})`, 'success');
                 
             } catch (error) {
                 throw new Error(`Page ${i + 1}: ${error.message}`);
@@ -218,13 +242,30 @@ function validateAndPreview() {
             TotalCount: allMerchants.length
         };
         
+        // Debug logging
+        console.log(`Multi-page processing complete:`, {
+            totalPages: pages.length,
+            totalMerchants: allMerchants.length,
+            merchantsDataLength: merchantsData.Merchants.length
+        });
+        
+        addLogEntry(`🔍 DEBUG: Processed ${pages.length} pages, found ${allMerchants.length} total merchants`, 'info');
+        
         // Auto-detect and set AppID if available
         autoDetectAppId(allMerchants);
         
         populateCategories();
+        
+        // Debug logging
+        console.log('About to call applyFiltersAndPreview with merchantsData:', merchantsData);
+        console.log('merchantsData.Merchants length:', merchantsData.Merchants.length);
+        
         applyFiltersAndPreview();
         elements.startTestBtn.disabled = false;
         elements.saveToDbBtn.disabled = false;
+        
+        // Additional debug
+        console.log('After applyFiltersAndPreview, filteredMerchants length:', filteredMerchants.length);
         
         // Show success message with details
         if (pages.length > 1) {
@@ -320,8 +361,14 @@ function populateCategories() {
 
 // Apply filters and update preview
 function applyFiltersAndPreview() {
-    if (!merchantsData) return;
+    console.log('applyFiltersAndPreview called, merchantsData:', merchantsData);
     
+    if (!merchantsData) {
+        console.log('No merchantsData available');
+        return;
+    }
+    
+    console.log('merchantsData.Merchants length:', merchantsData.Merchants.length);
     let merchants = [...merchantsData.Merchants];
     
     // Filter by App ID
@@ -339,12 +386,24 @@ function applyFiltersAndPreview() {
     // Apply limit
     const limitValue = elements.merchantLimit.value.trim();
     const limit = limitValue ? parseInt(limitValue) : null;
+    
+    // Debug logging
+    console.log(`Merchant limit debug:`, {
+        limitValue: limitValue,
+        limit: limit,
+        merchantsBeforeLimit: merchants.length,
+        totalMerchants: merchantsData.Merchants.length
+    });
+    
+    addLogEntry(`🔍 FILTER DEBUG: ${merchants.length} merchants after filters (from ${merchantsData.Merchants.length} total)`, 'info');
+    
     if (limit && limit > 0) {
         console.log(`Applying merchant limit: ${limit} (from ${merchants.length} merchants)`);
         merchants = merchants.slice(0, limit);
         addLogEntry(`📊 Applied limit: showing ${limit} of ${merchantsData.Merchants.length} total merchants`, 'info');
     } else {
         console.log(`No limit applied, showing all ${merchants.length} merchants`);
+        addLogEntry(`📊 Showing all ${merchants.length} merchants (no limit applied)`, 'info');
     }
     
     filteredMerchants = merchants;
@@ -893,52 +952,122 @@ function showWarning(message) {
 }
 
 function showNotification(message, type) {
-    // Simple notification system
+    // Remove any existing notifications of the same type to prevent overlap
+    const existingNotifications = document.querySelectorAll(`.notification.${type}`);
+    existingNotifications.forEach(notification => {
+        notification.style.animation = 'slideOut 0.2s ease-in forwards';
+        setTimeout(() => notification.remove(), 200);
+    });
+    
+    // Calculate position based on existing notifications
+    const allNotifications = document.querySelectorAll('.notification');
+    const topPosition = 20 + (allNotifications.length * 80); // Stack notifications 80px apart
+    
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.style.cssText = `
         position: fixed;
-        top: 20px;
+        top: ${topPosition}px;
         right: 20px;
         padding: 15px 20px;
-        border-radius: 8px;
+        border-radius: 12px;
         color: white;
         font-weight: 600;
-        z-index: 10000;
-        max-width: 400px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        animation: slideIn 0.3s ease-out;
+        z-index: ${10000 + allNotifications.length};
+        max-width: 450px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        animation: slideIn 0.4s ease-out;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        font-size: 0.95rem;
+        line-height: 1.4;
     `;
     
     if (type === 'success') {
-        notification.style.background = '#10b981';
+        notification.style.background = 'linear-gradient(135deg, #10b981, #059669)';
     } else if (type === 'error') {
-        notification.style.background = '#ef4444';
+        notification.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
     } else if (type === 'warning') {
-        notification.style.background = '#f59e0b';
+        notification.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
     } else {
-        notification.style.background = '#3b82f6';
+        notification.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
     }
     
-    notification.textContent = message;
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas ${getNotificationIcon(type)}" style="font-size: 1.1em;"></i>
+            <span style="flex: 1;">${message}</span>
+            <button onclick="this.closest('.notification').remove()" style="
+                background: none; 
+                border: none; 
+                color: white; 
+                cursor: pointer; 
+                padding: 0; 
+                margin-left: 10px;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
     document.body.appendChild(notification);
     
+    // Auto-remove after 4 seconds
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-in forwards';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
+        if (notification.parentElement) {
+            notification.style.animation = 'slideOut 0.3s ease-in forwards';
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    }, 4000);
+}
+
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success': return 'fa-check-circle';
+        case 'error': return 'fa-exclamation-circle';
+        case 'warning': return 'fa-exclamation-triangle';
+        case 'info': return 'fa-info-circle';
+        default: return 'fa-info-circle';
+    }
 }
 
 // Add CSS for notifications
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+        from { 
+            transform: translateX(100%) scale(0.9); 
+            opacity: 0; 
+        }
+        to { 
+            transform: translateX(0) scale(1); 
+            opacity: 1; 
+        }
     }
     @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
+        from { 
+            transform: translateX(0) scale(1); 
+            opacity: 1; 
+        }
+        to { 
+            transform: translateX(100%) scale(0.9); 
+            opacity: 0; 
+        }
+    }
+    
+    .notification {
+        transition: all 0.3s ease;
+    }
+    
+    .notification:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.2) !important;
     }
 `;
 document.head.appendChild(style);
@@ -1217,7 +1346,12 @@ function filterMerchants() {
 
 // Enhanced merchant list display
 function displayMerchantList(merchants) {
+    console.log('displayMerchantList called with merchants:', merchants);
+    console.log('merchants length:', merchants ? merchants.length : 'null/undefined');
+    console.log('elements.merchantPreview:', elements.merchantPreview);
+    
     if (!merchants || merchants.length === 0) {
+        console.log('No merchants to display, showing placeholder');
         elements.merchantPreview.innerHTML = `
             <div class="preview-placeholder">
                 <i class="fas fa-search"></i>
@@ -1248,8 +1382,10 @@ function displayMerchantList(merchants) {
         merchantList.appendChild(merchantItem);
     });
     
+    console.log('About to update merchantPreview with', merchants.length, 'merchants');
     elements.merchantPreview.innerHTML = '';
     elements.merchantPreview.appendChild(merchantList);
+    console.log('merchantPreview updated, innerHTML length:', elements.merchantPreview.innerHTML.length);
 }
 
 // Database reset with confirmation
@@ -1317,5 +1453,343 @@ async function handleDatabaseReset() {
         resetClickCount = 0;
         elements.resetDatabaseBtn.innerHTML = '<i class="fas fa-database"></i> Reset Database';
         elements.resetDatabaseBtn.style.background = '';
+    }
+}
+
+// Bulk API Fetching Functions
+// Smart URL correction function
+function suggestUrlCorrection(url) {
+    const suggestions = [];
+    
+    // Check for common page parameter patterns
+    const pagePatterns = [
+        { pattern: /pageNumber=\d+/i, replacement: 'pageNumber={page}', description: 'Replace pageNumber=1 with pageNumber={page}' },
+        { pattern: /page=\d+/i, replacement: 'page={page}', description: 'Replace page=1 with page={page}' },
+        { pattern: /pageNum=\d+/i, replacement: 'pageNum={page}', description: 'Replace pageNum=1 with pageNum={page}' },
+        { pattern: /p=\d+/i, replacement: 'p={page}', description: 'Replace p=1 with p={page}' },
+        { pattern: /offset=\d+/i, replacement: 'offset={offset}', description: 'Replace offset=0 with offset={offset} (calculated automatically)' }
+    ];
+    
+    for (const { pattern, replacement, description } of pagePatterns) {
+        if (pattern.test(url)) {
+            const correctedUrl = url.replace(pattern, replacement);
+            suggestions.push({
+                original: url.match(pattern)[0],
+                corrected: replacement,
+                fullUrl: correctedUrl,
+                description: description
+            });
+        }
+    }
+    
+    // Check for missing protocol
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        suggestions.push({
+            original: url,
+            corrected: `https://${url}`,
+            fullUrl: `https://${url}`,
+            description: 'Add HTTPS protocol'
+        });
+    }
+    
+    return suggestions;
+}
+
+async function testApiEndpoint() {
+    const apiUrl = elements.apiUrl.value.trim();
+    
+    if (!apiUrl) {
+        showError('Please enter an API URL first');
+        return;
+    }
+    
+    // Smart URL correction suggestions
+    if (!apiUrl.includes('{page}') && !apiUrl.includes('{offset}')) {
+        const suggestions = suggestUrlCorrection(apiUrl);
+        
+        if (suggestions.length > 0) {
+            const suggestion = suggestions[0]; // Use the first suggestion
+            const userConfirm = window.confirm(
+                `🔧 URL Correction Suggested:\n\n` +
+                `Current: ${suggestion.original}\n` +
+                `Suggested: ${suggestion.corrected}\n\n` +
+                `${suggestion.description}\n\n` +
+                `Apply this correction automatically?`
+            );
+            
+            if (userConfirm) {
+                elements.apiUrl.value = suggestion.fullUrl;
+                addLogEntry(`🔧 Auto-corrected URL: ${suggestion.description}`, 'success');
+                showSuccess(`URL corrected! ${suggestion.description}`);
+            } else {
+                showError('API URL must include {page} placeholder for bulk fetching');
+                return;
+            }
+        } else {
+            showError('API URL must include {page} placeholder (e.g., pageNumber={page})');
+            return;
+        }
+    }
+    
+    elements.testApiBtn.disabled = true;
+    elements.testApiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    
+    try {
+        addLogEntry('🧪 Testing API endpoint (page 1)...', 'info');
+        
+        const testUrl = apiUrl.replace('{page}', '1');
+        const response = await fetch(testUrl);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        // Validate response structure
+        if (!data.Merchants || !Array.isArray(data.Merchants)) {
+            throw new Error('Invalid response: Missing "Merchants" array');
+        }
+        
+        const totalCount = data.TotalCount || data.Merchants.length;
+        const pageSize = data.PageSize || data.Merchants.length;
+        const estimatedPages = Math.ceil(totalCount / pageSize);
+        
+        addLogEntry(`✅ API test successful!`, 'success');
+        addLogEntry(`📊 Found ${data.Merchants.length} merchants on page 1`, 'info');
+        addLogEntry(`📈 Estimated ${estimatedPages} total pages (${totalCount} merchants)`, 'info');
+        
+        showSuccess(`API test successful! Found ${totalCount} total merchants across ~${estimatedPages} pages`);
+        
+        // Show sample merchant
+        if (data.Merchants.length > 0) {
+            const sample = data.Merchants[0];
+            addLogEntry(`📋 Sample merchant: ${sample.MerchantName} (${sample.MerchantDomains?.[0] || 'No domain'})`, 'info');
+        }
+        
+    } catch (error) {
+        console.error('API test failed:', error);
+        addLogEntry(`❌ API test failed: ${error.message}`, 'error');
+        showError(`API test failed: ${error.message}`);
+    } finally {
+        elements.testApiBtn.disabled = false;
+        elements.testApiBtn.innerHTML = '<i class="fas fa-flask"></i> Test API (Page 1)';
+    }
+}
+
+async function fetchAllPages() {
+    const apiUrl = elements.apiUrl.value.trim();
+    
+    if (!apiUrl) {
+        showError('Please enter an API URL first');
+        return;
+    }
+    
+    if (!apiUrl.includes('{page}')) {
+        showError('API URL must include {page} placeholder');
+        return;
+    }
+    
+    // Disable buttons during fetch
+    elements.fetchAllBtn.disabled = true;
+    elements.testApiBtn.disabled = true;
+    elements.fetchAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
+    
+    // Show progress
+    elements.fetchProgress.style.display = 'block';
+    elements.fetchProgressFill.style.width = '0%';
+    elements.fetchStatus.textContent = 'Starting bulk fetch...';
+    
+    try {
+        addLogEntry('🚀 Starting bulk API fetch...', 'info');
+        
+        // First, get page 1 to determine total pages
+        const firstPageUrl = apiUrl.replace('{page}', '1');
+        const firstResponse = await fetch(firstPageUrl);
+        
+        if (!firstResponse.ok) {
+            throw new Error(`HTTP ${firstResponse.status}: ${firstResponse.statusText}`);
+        }
+        
+        const firstPageData = await firstResponse.json();
+        
+        if (!firstPageData.Merchants || !Array.isArray(firstPageData.Merchants)) {
+            throw new Error('Invalid response: Missing "Merchants" array');
+        }
+        
+        const totalCount = firstPageData.TotalCount || firstPageData.Merchants.length;
+        const pageSize = firstPageData.PageSize || firstPageData.Merchants.length;
+        const totalPages = Math.ceil(totalCount / pageSize);
+        
+        addLogEntry(`📊 Detected ${totalPages} pages with ${totalCount} total merchants`, 'info');
+        
+        if (totalPages > 500) {
+            const confirm = window.confirm(`This will fetch ${totalPages} pages (${totalCount} merchants). This may take several minutes. Continue?`);
+            if (!confirm) {
+                throw new Error('Fetch cancelled by user');
+            }
+        }
+        
+        // Collect all pages
+        const allPages = [JSON.stringify(firstPageData)];
+        let fetchedCount = firstPageData.Merchants.length;
+        
+        // Update progress
+        elements.fetchProgressFill.style.width = `${(1 / totalPages) * 100}%`;
+        elements.fetchStatus.textContent = `Fetched page 1 of ${totalPages} (${fetchedCount} merchants)`;
+        
+        // Fetch remaining pages in batches to avoid overwhelming the server
+        const batchSize = 5; // Fetch 5 pages at a time
+        
+        for (let startPage = 2; startPage <= totalPages; startPage += batchSize) {
+            const endPage = Math.min(startPage + batchSize - 1, totalPages);
+            const batchPromises = [];
+            
+            // Create batch of requests
+            for (let page = startPage; page <= endPage; page++) {
+                const pageUrl = apiUrl.replace('{page}', page.toString());
+                batchPromises.push(
+                    fetch(pageUrl)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Page ${page}: HTTP ${response.status}`);
+                            }
+                            return response.text(); // Get as text first
+                        })
+                        .then(text => {
+                            try {
+                                const data = JSON.parse(text);
+                                return { page, data, success: true };
+                            } catch (jsonError) {
+                                console.error(`Page ${page} JSON parse error:`, jsonError);
+                                addLogEntry(`⚠️ Page ${page}: JSON parse error - skipped`, 'warning');
+                                return { page, data: null, success: false, error: jsonError.message };
+                            }
+                        })
+                        .catch(error => {
+                            console.error(`Page ${page} fetch error:`, error);
+                            addLogEntry(`❌ Page ${page}: Fetch failed - skipped`, 'error');
+                            return { page, data: null, success: false, error: error.message };
+                        })
+                );
+            }
+            
+            // Wait for batch to complete
+            const batchResults = await Promise.all(batchPromises);
+            
+            // Process batch results
+            for (const result of batchResults) {
+                const { page, data, success } = result;
+                
+                if (!success || !data) {
+                    // Skip failed pages
+                    continue;
+                }
+                
+                if (!data.Merchants || !Array.isArray(data.Merchants)) {
+                    addLogEntry(`⚠️ Page ${page}: Invalid response format - skipped`, 'warning');
+                    continue;
+                }
+                
+                allPages.push(JSON.stringify(data));
+                fetchedCount += data.Merchants.length;
+                
+                // Update progress
+                const progress = (page / totalPages) * 100;
+                elements.fetchProgressFill.style.width = `${progress}%`;
+                elements.fetchStatus.textContent = `Fetched page ${page} of ${totalPages} (${fetchedCount} merchants)`;
+                
+                addLogEntry(`✅ Page ${page}: ${data.Merchants.length} merchants fetched (total: ${fetchedCount})`, 'success');
+            }
+            
+            // Small delay between batches to be nice to the server
+            if (endPage < totalPages) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+        
+        // Combine all pages with --- separator
+        const combinedData = allPages.join('\n---\n');
+        
+        // Don't put the raw data in the textarea - process it directly
+        addLogEntry('🔄 Processing fetched data...', 'info');
+        
+        // Process the combined data directly without using the textarea
+        try {
+            // Parse all pages and combine merchants
+            const allMerchants = [];
+            let totalCount = 0;
+            let pageSize = 50;
+            
+            for (const pageJson of allPages) {
+                const pageData = JSON.parse(pageJson);
+                if (pageData.Merchants && Array.isArray(pageData.Merchants)) {
+                    allMerchants.push(...pageData.Merchants);
+                    if (totalCount === 0) {
+                        totalCount = pageData.TotalCount || pageData.Merchants.length;
+                        pageSize = pageData.PageSize || 50;
+                    }
+                }
+            }
+            
+            // Create merchantsData directly
+            merchantsData = {
+                Merchants: allMerchants,
+                PageCount: 1,
+                PageSize: allMerchants.length,
+                TotalCount: allMerchants.length
+            };
+            
+            console.log('Direct processing - merchantsData:', merchantsData);
+            
+            // Auto-detect and set AppID
+            autoDetectAppId(allMerchants);
+            
+            // Populate categories
+            populateCategories();
+            
+            // Apply filters and display merchants
+            applyFiltersAndPreview();
+            
+            // Enable buttons
+            elements.startTestBtn.disabled = false;
+            elements.saveToDbBtn.disabled = false;
+            elements.saveToDbBtn.style.display = 'inline-flex';
+            
+            // Highlight the save button temporarily
+            elements.saveToDbBtn.style.animation = 'pulse 2s infinite';
+            setTimeout(() => {
+                elements.saveToDbBtn.style.animation = '';
+            }, 6000);
+            
+            addLogEntry(`✅ Successfully processed ${allMerchants.length} merchants for testing`, 'success');
+            showSuccess(`🎉 ${allMerchants.length} merchants loaded and ready! Click "Save to Database" to store them.`);
+            addLogEntry(`💾 Click "Save to Database" button to store these ${allMerchants.length} merchants`, 'info');
+            
+        } catch (processingError) {
+            console.error('Error processing fetched data:', processingError);
+            addLogEntry(`❌ Error processing fetched data: ${processingError.message}`, 'error');
+            showError(`Failed to process fetched data: ${processingError.message}`);
+        }
+        
+        elements.fetchStatus.textContent = `✅ Completed! Fetched ${fetchedCount} merchants from ${totalPages} pages`;
+        addLogEntry(`🎉 Bulk fetch completed! ${fetchedCount} merchants from ${totalPages} pages`, 'success');
+        showSuccess(`Successfully fetched ${fetchedCount} merchants from ${totalPages} pages!`);
+        
+    } catch (error) {
+        console.error('Bulk fetch failed:', error);
+        addLogEntry(`❌ Bulk fetch failed: ${error.message}`, 'error');
+        showError(`Bulk fetch failed: ${error.message}`);
+        elements.fetchStatus.textContent = `❌ Failed: ${error.message}`;
+    } finally {
+        // Re-enable buttons
+        elements.fetchAllBtn.disabled = false;
+        elements.testApiBtn.disabled = false;
+        elements.fetchAllBtn.innerHTML = '<i class="fas fa-download"></i> Fetch All Pages';
+        
+        // Hide progress after a delay
+        setTimeout(() => {
+            elements.fetchProgress.style.display = 'none';
+        }, 3000);
     }
 }

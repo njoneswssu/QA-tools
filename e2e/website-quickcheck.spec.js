@@ -10014,18 +10014,18 @@ test.describe('Website Availability Checker', () => {
             const dateFolder = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
             const filename = `merchant-test-results-${timestamp}.txt`;
             
-            // Create organized folder structure
+            // Create organized folder structure - by date only
             const fs = require('fs');
             const path = require('path');
             const resultsBaseDir = path.join(process.cwd(), 'test-results');
-            const sessionDir = path.join(resultsBaseDir, dateFolder, `session-${timestamp}`);
+            const dateDir = path.join(resultsBaseDir, dateFolder);
             
             // Ensure directories exist
             if (!fs.existsSync(resultsBaseDir)) {
               fs.mkdirSync(resultsBaseDir, { recursive: true });
             }
-            if (!fs.existsSync(sessionDir)) {
-              fs.mkdirSync(sessionDir, { recursive: true });
+            if (!fs.existsSync(dateDir)) {
+              fs.mkdirSync(dateDir, { recursive: true });
             }
             
             let fileContent = '';
@@ -10262,9 +10262,8 @@ test.describe('Website Availability Checker', () => {
                 console.log(`⚠️ Browser download failed: ${browserError.message}`);
                 console.log('📁 Attempting Node.js file write...');
                 
-                // Fallback to Node.js file system - write to organized session directory
-                // Write to organized session directory
-                const filePath = path.join(sessionDir, filename);
+                // Fallback to Node.js file system - write to date directory
+                const filePath = path.join(dateDir, filename);
                 fs.writeFileSync(filePath, fileContent, 'utf8');
                 
                 console.log(`📁 Results saved to: ${filePath}`);
@@ -10298,16 +10297,16 @@ test.describe('Website Availability Checker', () => {
               const dateFolder = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
               const filename = `merchant-test-results-${timestamp}.txt`;
               
-              // Create organized folder structure
+              // Create organized folder structure - by date only
               const resultsBaseDir = path.join(process.cwd(), 'test-results');
-              const sessionDir = path.join(resultsBaseDir, dateFolder, `session-${timestamp}`);
+              const dateDir = path.join(resultsBaseDir, dateFolder);
               
               // Ensure directories exist
               if (!fs.existsSync(resultsBaseDir)) {
                 fs.mkdirSync(resultsBaseDir, { recursive: true });
               }
-              if (!fs.existsSync(sessionDir)) {
-                fs.mkdirSync(sessionDir, { recursive: true });
+              if (!fs.existsSync(dateDir)) {
+                fs.mkdirSync(dateDir, { recursive: true });
               }
               
               let fileContent = '';
@@ -10396,8 +10395,8 @@ test.describe('Website Availability Checker', () => {
               fileContent += '='.repeat(80) + '\n';
               fileContent += 'End of Report\n';
               
-              // Write to organized session directory
-              const filePath = path.join(sessionDir, filename);
+              // Write to date directory
+              const filePath = path.join(dateDir, filename);
               fs.writeFileSync(filePath, fileContent, 'utf8');
               
               console.log(`📁 Results saved to: ${filePath}`);
@@ -10445,7 +10444,7 @@ test.describe('Website Availability Checker', () => {
           console.log('   ⏸️ Download when pausing (F8 or pause button)');
           console.log('   ✅ Download when test completes');
           console.log('   🚨 Download when test stops early (except browser closure)');
-          console.log('   💡 Files organized in: test-results/YYYY-MM-DD/session-TIMESTAMP/');
+          console.log('   💡 Files organized in: test-results/YYYY-MM-DD/');
           console.log('='.repeat(70));
           
           // Add pause instructions and setup

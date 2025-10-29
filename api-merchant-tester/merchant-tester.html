@@ -48,11 +48,40 @@ Page 2 JSON
 Page 3 JSON'
                         rows="12"
                     ></textarea>
-                    <div class="input-help">
-                        <i class="fas fa-info-circle"></i>
-                        Paste your complete merchant API response here. The system will automatically extract merchant information.
-                    </div>
+                <div class="input-help">
+                    <i class="fas fa-info-circle"></i>
+                    Paste your complete merchant API response here, or use bulk fetch below.
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label for="api-url">
+                    <i class="fas fa-link"></i> Bulk API Fetch (Optional)
+                </label>
+                <input 
+                    type="text" 
+                    id="api-url" 
+                    placeholder="https://your-api.com/merchants?page={page}&pageSize=50"
+                >
+                <div class="input-help">
+                    <i class="fas fa-magic"></i>
+                    Use {page} placeholder - system will fetch all pages automatically
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button type="button" id="fetch-all-btn" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Fetch All Pages
+                    </button>
+                    <button type="button" id="test-api-btn" class="btn btn-outline">
+                        <i class="fas fa-flask"></i> Test API (Page 1)
+                    </button>
+                </div>
+                <div id="fetch-progress" style="margin-top: 10px; display: none;">
+                    <div class="progress-bar">
+                        <div id="fetch-progress-fill" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <div id="fetch-status" class="fetch-status">Ready to fetch...</div>
+                </div>
+            </div>
 
                 <div class="filters-row">
                     <div class="form-group">
