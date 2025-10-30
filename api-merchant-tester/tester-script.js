@@ -29,6 +29,7 @@ const elements = {
     categoryFilter: document.getElementById('category-filter'),
     merchantLimit: document.getElementById('merchant-limit'),
     testName: document.getElementById('test-name'),
+    shuffleMerchants: document.getElementById('shuffle-merchants'),
     merchantPreview: document.getElementById('merchant-preview'),
     merchantSearch: document.getElementById('merchant-search'),
     statusFilter: document.getElementById('status-filter'),
@@ -143,6 +144,16 @@ function generateDefaultTestName() {
         day: 'numeric' 
     });
     elements.testName.value = `Merchant Test - ${dateStr}`;
+}
+
+// Shuffle array using Fisher-Yates algorithm
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
 }
 
 // Validate and preview API data
@@ -469,6 +480,15 @@ async function startTest() {
         current: 0
     };
     
+    // Shuffle merchants if option is enabled
+    let merchantsToTest = [...filteredMerchants]; // Create a copy
+    if (elements.shuffleMerchants.checked) {
+        merchantsToTest = shuffleArray(merchantsToTest);
+        addLogEntry('🔀 Merchants shuffled for random testing order', 'info');
+    } else {
+        addLogEntry('📋 Testing merchants in original order', 'info');
+    }
+    
     // Create test session
     const sessionName = elements.testName.value.trim() || 'API Merchant Test';
     try {
@@ -495,17 +515,17 @@ async function startTest() {
     
     // Start the actual testing
     isTestRunning = true;
-    runTest();
+    runTest(merchantsToTest);
 }
 
 // Run the test
-async function runTest() {
+async function runTest(merchantsToTest = filteredMerchants) {
     testStartTime = Date.now();
     updateStats();
     clearResultsLists();
     clearLog();
     
-    addLogEntry(`Starting test with ${filteredMerchants.length} merchants`, 'info');
+    addLogEntry(`Starting test with ${merchantsToTest.length} merchants`, 'info');
     
     try {
         // Trigger the actual Playwright test
@@ -515,7 +535,7 @@ async function runTest() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                merchants: filteredMerchants,
+                merchants: merchantsToTest,
                 sessionId: testSession.session_id,
                 testName: elements.testName.value.trim() || 'API Merchant Test'
             })
@@ -553,11 +573,27 @@ async function runTest() {
 
 // Poll for test results from the database
 async function pollForResults() {
-    const pollInterval = 2000; // Poll every 2 seconds
+    const pollInterval = 1500; // Poll every 1.5 seconds for more responsive updates
     let lastResultCount = 0;
+    let lastCurrentMerchant = '';
     
     const poll = async () => {
         try {
+            // Get current test session status
+            const sessionResponse = await fetch(`/api/sessions?session_id=${testSession.session_id}`);
+            if (sessionResponse.ok) {
+                const sessionData = await sessionResponse.json();
+                const currentSession = sessionData.find(s => s.session_id === testSession.session_id);
+                
+                // Update current merchant being tested
+                if (currentSession && currentSession.current_merchant && currentSession.current_merchant !== lastCurrentMerchant) {
+                    lastCurrentMerchant = currentSession.current_merchant;
+                    elements.currentMerchant.textContent = `Testing: ${currentSession.current_merchant}`;
+                    elements.currentUrl.textContent = currentSession.current_url || 'Loading...';
+                    addLogEntry(`🔍 Now testing: ${currentSession.current_merchant}`, 'info');
+                }
+            }
+            
             const response = await fetch(`/api/merchant-results?session_id=${testSession.session_id}&limit=1000`);
             if (response.ok) {
                 const data = await response.json();
@@ -568,20 +604,32 @@ async function pollForResults() {
                     const newResults = results.slice(lastResultCount);
                     newResults.forEach(result => {
                         const status = result.is_user_passed ? 'success' : result.test_status;
-                        const statusText = status === 'success' ? '✅' : '🚨';
-                        addLogEntry(`${statusText} ${result.merchant_name}: ${result.test_result}`, status === 'success' ? 'success' : 'error');
+                        const statusText = status === 'success' ? '✅' : (status === 'flagged' ? '🚨' : '⚠️');
+                        const domain = result.merchant_url ? result.merchant_url.replace('https://', '').replace('http://', '') : 'N/A';
+                        addLogEntry(`${statusText} ${result.merchant_name} (${domain}): ${result.test_result}`, status === 'success' ? 'success' : 'error');
                     });
                     
                     updateStatsFromResults(results);
                     updateResultsFromDatabase(results);
                     lastResultCount = results.length;
                     
-                    addLogEntry(`Progress: ${results.length}/${filteredMerchants.length} merchants tested`, 'info');
+                    // Enhanced progress logging with percentage
+                    const progress = Math.round((results.length / filteredMerchants.length) * 100);
+                    addLogEntry(`📊 Progress: ${results.length}/${filteredMerchants.length} merchants tested (${progress}%)`, 'info');
+                    
+                    // Show milestone messages
+                    if (results.length % 10 === 0 && results.length > 0) {
+                        const successful = results.filter(r => r.test_status === 'success' || r.is_user_passed).length;
+                        const successRate = Math.round((successful / results.length) * 100);
+                        addLogEntry(`🎯 Milestone: ${results.length} merchants completed! Success rate: ${successRate}%`, 'success');
+                    }
                 }
                 
                 // Check if test is complete
                 if (results.length >= filteredMerchants.length) {
-                    addLogEntry('Test completed successfully!', 'success');
+                    const successful = results.filter(r => r.test_status === 'success' || r.is_user_passed).length;
+                    const successRate = Math.round((successful / results.length) * 100);
+                    addLogEntry(`🎉 Test completed successfully! Final results: ${successful}/${results.length} successful (${successRate}%)`, 'success');
                     completeTest();
                     return;
                 }
@@ -591,6 +639,7 @@ async function pollForResults() {
             }
         } catch (error) {
             console.error('Error polling results:', error);
+            addLogEntry(`⚠️ Polling error: ${error.message}`, 'warning');
             setTimeout(poll, pollInterval);
         }
     };
@@ -624,7 +673,9 @@ function updateResultsFromDatabase(results) {
         
         const testResult = {
             status: result.is_user_passed ? 'success' : result.test_status,
-            reason: result.test_result || 'No reason provided'
+            reason: result.test_result || 'No reason provided',
+            screenshot_path: result.screenshot_path,
+            video_path: result.video_path
         };
         
         addResultToList(merchant, testResult);
@@ -767,11 +818,23 @@ function updateStats() {
 
 // Add result to appropriate list
 function addResultToList(merchant, result) {
+    // Create media icons if available
+    let mediaIcons = '';
+    if (result.screenshot_path) {
+        mediaIcons += `<i class="fas fa-camera media-icon screenshot-icon" title="View Screenshot" onclick="showMedia('${result.screenshot_path}', 'image')"></i>`;
+    }
+    if (result.video_path) {
+        mediaIcons += `<i class="fas fa-video media-icon video-icon" title="View Video" onclick="showMedia('${result.video_path}', 'video')"></i>`;
+    }
+    
     const resultHtml = `
         <div class="result-item ${result.status}">
             <div class="result-header">
                 <div class="result-name">${escapeHtml(merchant.MerchantName)}</div>
-                <div class="result-status ${result.status}">${result.status}</div>
+                <div class="result-actions">
+                    ${mediaIcons}
+                    <div class="result-status ${result.status}">${result.status}</div>
+                </div>
             </div>
             <div class="result-url">${merchant.MerchantDomains[0] ? `https://${merchant.MerchantDomains[0]}` : 'No domain'}</div>
             <div class="result-reason">${escapeHtml(result.reason)}</div>
@@ -796,6 +859,45 @@ function addResultToList(merchant, result) {
         elements.allList.innerHTML = '';
     }
     elements.allList.insertAdjacentHTML('afterbegin', resultHtml);
+}
+
+// Show media file in modal
+function showMedia(mediaPath, mediaType) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('media-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'media-modal';
+        modal.className = 'media-modal';
+        modal.innerHTML = `
+            <div class="media-modal-content">
+                <span class="media-modal-close">&times;</span>
+                <div class="media-container" id="media-container"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Add close functionality
+        modal.querySelector('.media-modal-close').onclick = () => {
+            modal.style.display = 'none';
+        };
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    }
+    
+    // Set media content
+    const container = modal.querySelector('#media-container');
+    if (mediaType === 'image') {
+        container.innerHTML = `<img src="/${mediaPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh;">`;
+    } else if (mediaType === 'video') {
+        container.innerHTML = `<video controls style="max-width: 100%; max-height: 80vh;"><source src="/${mediaPath}" type="video/webm"></video>`;
+    }
+    
+    // Show modal
+    modal.style.display = 'block';
 }
 
 // Clear results lists
@@ -1115,7 +1217,8 @@ function toggleAutoScroll() {
 // Merchant Storage Functions
 async function autoLoadStoredMerchants() {
     try {
-        const response = await fetch('/api/stored-merchants');
+        // Check if there are stored merchants without loading them all
+        const response = await fetch('/api/stored-merchants?limit=1');
         if (!response.ok) {
             // No stored merchants or error - this is fine for first load
             return;
@@ -1123,22 +1226,16 @@ async function autoLoadStoredMerchants() {
         
         const data = await response.json();
         
-        if (data.merchants && data.merchants.length > 0) {
-            addLogEntry(`Auto-loaded ${data.merchants.length} stored merchants from database`, 'success');
-            
-            // Set the API data
-            elements.apiData.value = JSON.stringify({ Merchants: data.merchants }, null, 2);
-            
-            // Trigger validation and preview
-            await validateAndPreview();
-            
-            addLogEntry('✅ Stored merchants loaded and ready for testing', 'success');
+        if (data.count > 0) {
+            // Show a notification that merchants are available instead of auto-loading
+            showInfo(`💾 ${data.count} stored merchants available. Click "Load Stored Merchants" to use them.`);
+            addLogEntry(`Found ${data.count} stored merchants in database`, 'info');
         } else {
             addLogEntry('No stored merchants found in database', 'info');
         }
     } catch (error) {
         // Silent fail for auto-load - don't spam the user on page load
-        console.log('Auto-load merchants failed (this is normal for first visit):', error.message);
+        console.log('Auto-load check failed (this is normal for first visit):', error.message);
     }
 }
 

@@ -174,6 +174,34 @@ body {
     color: #9ca3af;
 }
 
+/* Checkbox Group */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #667eea;
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #ffffff;
+    margin: 0;
+}
+
+.checkbox-group label i {
+    color: #667eea;
+}
+
 /* Filters Row */
 .filters-row {
     display: grid;
@@ -1117,87 +1145,158 @@ body {
 /* Terminal Log Styles */
 .terminal-log {
     margin: 30px 0;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 2px solid #333;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
 }
 
 .terminal-log h3 {
-    padding: 15px 20px;
+    padding: 12px 20px;
     margin: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
-    font-size: 1.1em;
+    background: linear-gradient(90deg, #2d3748 0%, #4a5568 100%);
+    color: #00ff00;
+    font-size: 1em;
+    font-family: 'Courier New', monospace;
     display: flex;
     align-items: center;
     gap: 10px;
+    border-bottom: 1px solid #444;
+    position: relative;
+}
+
+.terminal-log h3::before {
+    content: "●●●";
+    color: #ff5f56;
+    font-size: 1.2em;
+    margin-right: 10px;
 }
 
 .terminal-log h3 i {
-    color: #22c55e;
+    color: #00ff00;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
 }
 
 .log-container {
-    height: 300px;
+    height: 350px;
     overflow-y: auto;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.3);
-    font-family: 'Courier New', monospace;
-    font-size: 0.85em;
-    line-height: 1.4;
+    padding: 15px;
+    background: #000;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: #00ff00;
+    position: relative;
 }
 
 .log-container::-webkit-scrollbar {
-    width: 8px;
+    width: 12px;
 }
 
 .log-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    background: #111;
+    border-radius: 6px;
 }
 
 .log-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
+    background: #333;
+    border-radius: 6px;
+    border: 2px solid #111;
 }
 
 .log-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5);
+    background: #555;
 }
 
 .log-entry {
-    padding: 2px 0;
+    padding: 3px 0;
     display: flex;
-    gap: 10px;
+    gap: 15px;
     word-wrap: break-word;
+    border-left: 3px solid transparent;
+    padding-left: 10px;
+    transition: all 0.2s ease;
+}
+
+.log-entry:hover {
+    background: rgba(0, 255, 0, 0.05);
+    border-left-color: #00ff00;
 }
 
 .log-time {
-    color: #64748b;
-    font-weight: 600;
-    min-width: 80px;
+    color: #666;
+    font-weight: 700;
+    min-width: 90px;
     flex-shrink: 0;
+    font-size: 0.85em;
 }
 
 .log-message {
-    color: #e2e8f0;
+    color: #00ff00;
     flex: 1;
+    font-weight: 500;
+}
+
+.log-entry.success {
+    border-left-color: #22c55e;
 }
 
 .log-entry.success .log-message {
     color: #22c55e;
 }
 
+.log-entry.success .log-message::before {
+    content: "✓ ";
+    color: #22c55e;
+    font-weight: bold;
+}
+
+.log-entry.error {
+    border-left-color: #ef4444;
+}
+
 .log-entry.error .log-message {
     color: #ef4444;
+}
+
+.log-entry.error .log-message::before {
+    content: "✗ ";
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.log-entry.warning {
+    border-left-color: #f59e0b;
 }
 
 .log-entry.warning .log-message {
     color: #f59e0b;
 }
 
+.log-entry.warning .log-message::before {
+    content: "⚠ ";
+    color: #f59e0b;
+    font-weight: bold;
+}
+
+.log-entry.info {
+    border-left-color: #3b82f6;
+}
+
 .log-entry.info .log-message {
     color: #3b82f6;
+}
+
+.log-entry.info .log-message::before {
+    content: "ℹ ";
+    color: #3b82f6;
+    font-weight: bold;
 }
 
 .log-controls {
@@ -1226,4 +1325,90 @@ body {
     background: rgba(102, 126, 234, 0.2);
     border-color: #667eea;
     color: #667eea;
+}
+
+/* Media Icons and Modal Styles */
+.result-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.media-icon {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 1.1em;
+}
+
+.screenshot-icon {
+    color: #3b82f6;
+}
+
+.screenshot-icon:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: #1d4ed8;
+}
+
+.video-icon {
+    color: #ef4444;
+}
+
+.video-icon:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #dc2626;
+}
+
+.media-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.media-modal-content {
+    position: relative;
+    background: #1a1a1a;
+    margin: 2% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.media-modal-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    z-index: 1;
+}
+
+.media-modal-close:hover,
+.media-modal-close:focus {
+    color: #fff;
+}
+
+.media-container {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.media-container img,
+.media-container video {
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }

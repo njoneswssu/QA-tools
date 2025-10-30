@@ -13,6 +13,8 @@ app.use(express.json({ limit: '50mb' })); // Increased limit for large merchant 
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'frontend')));
 app.use('/tester', express.static(__dirname));
+// Serve media files (screenshots and videos)
+app.use('/media', express.static(path.join(__dirname, 'media')));
 
 // Serve the main HTML file
 app.get('/', (req, res) => {
@@ -360,9 +362,25 @@ app.get('/api/stored-merchants', async (req, res) => {
             };
         });
         
+        // If limit is 1, get the total count for the response
+        let totalCount = apiFormat.length;
+        if (parseInt(limit) === 1 && apiFormat.length > 0) {
+            const countQuery = app_id ? 
+                'SELECT COUNT(*) as total FROM merchant_master_data WHERE app_id = ?' :
+                'SELECT COUNT(*) as total FROM merchant_master_data';
+            const countParams = app_id ? [app_id] : [];
+            
+            totalCount = await new Promise((resolve, reject) => {
+                db.get(countQuery, countParams, (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row.total);
+                });
+            });
+        }
+        
         res.json({
             merchants: apiFormat,
-            count: apiFormat.length
+            count: totalCount
         });
     } catch (error) {
         console.error('Error fetching stored merchants:', error);

@@ -102,8 +102,49 @@ test.describe('API Merchant Tester - UI Generated', () => {
         }
       }
 
+      // Function to handle media files (screenshots and videos)
+      async function handleMediaFiles(website, testInfo) {
+        const mediaFiles = {};
+        const fs = require('fs');
+        const path = require('path');
+        
+        try {
+          // Create safe filename from merchant name
+          const safeFileName = website.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+          const timestamp = Date.now();
+          
+          // Handle screenshot
+          if (testInfo.attachments) {
+            const screenshot = testInfo.attachments.find(a => a.name === 'screenshot' && a.path);
+            if (screenshot && fs.existsSync(screenshot.path)) {
+              const screenshotName = \`\${safeFileName}_\${timestamp}.png\`;
+              const screenshotDest = path.join(__dirname, 'media', 'screenshots', screenshotName);
+              fs.copyFileSync(screenshot.path, screenshotDest);
+              mediaFiles.screenshot = \`media/screenshots/\${screenshotName}\`;
+              console.log(\`📸 Screenshot saved: \${mediaFiles.screenshot}\`);
+            }
+          }
+          
+          // Handle video
+          if (testInfo.attachments) {
+            const video = testInfo.attachments.find(a => a.name === 'video' && a.path);
+            if (video && fs.existsSync(video.path)) {
+              const videoName = \`\${safeFileName}_\${timestamp}.webm\`;
+              const videoDest = path.join(__dirname, 'media', 'videos', videoName);
+              fs.copyFileSync(video.path, videoDest);
+              mediaFiles.video = \`media/videos/\${videoName}\`;
+              console.log(\`🎥 Video saved: \${mediaFiles.video}\`);
+            }
+          }
+        } catch (error) {
+          console.log(\`⚠️ Failed to handle media files: \${error.message}\`);
+        }
+        
+        return mediaFiles;
+      }
+
       // Function to save merchant result to database
-      async function saveMerchantToDatabase(website, status, reason, errorPattern = null, duration = null) {
+      async function saveMerchantToDatabase(website, status, reason, errorPattern = null, duration = null, mediaFiles = {}) {
         if (!dbModule || !dbSessionCreated) return;
         
         try {
@@ -122,7 +163,9 @@ test.describe('API Merchant Tester - UI Generated', () => {
             error_pattern: errorPattern,
             test_duration_ms: duration,
             is_user_passed: status === 'user_passed',
-            detailed_analysis: reason
+            detailed_analysis: reason,
+            screenshot_path: mediaFiles.screenshot || null,
+            video_path: mediaFiles.video || null
           };
           
           await dbModule.saveMerchantTestResult(testData);
@@ -165,6 +208,13 @@ test.describe('API Merchant Tester - UI Generated', () => {
         console.log(\`\\n[\${checkedCount}/\${websites.length}] 📋 Testing: \${website.name}\`);
         console.log(\`🔗 URL: \${website.url}\`);
         console.log(\`📂 Category: \${website.primaryCategory}\`);
+        
+        // Update current merchant in database for real-time tracking
+        try {
+          await dbModule.updateCurrentMerchant(sessionId, website.name, website.url);
+        } catch (error) {
+          console.error('Failed to update current merchant:', error);
+        }
         
         // Add delay before starting each website test
         await page.waitForTimeout(1000);
@@ -447,13 +497,30 @@ test.describe('API Merchant Tester - UI Generated', () => {
             
             console.log(\`✅ SUCCESS: \${website.name} - \${successReason}\`);
             
+            // Capture screenshot of successful website
+            let mediaFiles = {};
+            try {
+              const fs = require('fs');
+              const path = require('path');
+              const safeFileName = website.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+              const timestamp = Date.now();
+              const screenshotName = \`\${safeFileName}_success_\${timestamp}.png\`;
+              const screenshotPath = path.join(__dirname, 'media', 'screenshots', screenshotName);
+              
+              await page.screenshot({ path: screenshotPath, fullPage: true });
+              mediaFiles.screenshot = \`media/screenshots/\${screenshotName}\`;
+              console.log(\`📸 Success screenshot saved: \${mediaFiles.screenshot}\`);
+            } catch (screenshotError) {
+              console.log(\`⚠️ Failed to capture success screenshot: \${screenshotError.message}\`);
+            }
+            
             successfulWebsites.push({
               name: website.name,
               url: website.url,
               reason: successReason
             });
 
-            await saveMerchantToDatabase(website, 'success', successReason, null, testDuration);
+            await saveMerchantToDatabase(website, 'success', successReason, null, testDuration, mediaFiles);
           }
 
           checkedWebsites.push({ name: website.name, url: website.url });
@@ -466,13 +533,30 @@ test.describe('API Merchant Tester - UI Generated', () => {
             errorType = 'timeout error';
           }
           
+          // Capture screenshot on error
+          let mediaFiles = {};
+          try {
+            const fs = require('fs');
+            const path = require('path');
+            const safeFileName = website.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+            const timestamp = Date.now();
+            const screenshotName = \`\${safeFileName}_error_\${timestamp}.png\`;
+            const screenshotPath = path.join(__dirname, 'media', 'screenshots', screenshotName);
+            
+            await page.screenshot({ path: screenshotPath, fullPage: true });
+            mediaFiles.screenshot = \`media/screenshots/\${screenshotName}\`;
+            console.log(\`📸 Error screenshot saved: \${mediaFiles.screenshot}\`);
+          } catch (screenshotError) {
+            console.log(\`⚠️ Failed to capture error screenshot: \${screenshotError.message}\`);
+          }
+          
           unavailableWebsites.push({
             name: website.name,
             url: website.url,
             pattern: \`\${errorType}: \${error.message.split('\\n')[0]}\`
           });
 
-          await saveMerchantToDatabase(website, 'flagged', \`Error: \${errorType}\`, errorType, Date.now() - testStartTime);
+          await saveMerchantToDatabase(website, 'flagged', \`Error: \${errorType}\`, errorType, Date.now() - testStartTime, mediaFiles);
           
           checkedWebsites.push({ name: website.name, url: website.url });
         }

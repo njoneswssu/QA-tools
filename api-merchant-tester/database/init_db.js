@@ -32,6 +32,8 @@ db.serialize(() => {
     flagged_merchants INTEGER DEFAULT 0,
     user_passed_merchants INTEGER DEFAULT 0,
     status TEXT DEFAULT 'running', -- running, completed, interrupted
+    current_merchant TEXT, -- currently testing merchant name
+    current_url TEXT, -- currently testing merchant URL
     notes TEXT
   )`);
 
@@ -54,6 +56,8 @@ db.serialize(() => {
     test_duration_ms INTEGER,
     is_user_passed BOOLEAN DEFAULT 0,
     detailed_analysis TEXT, -- enhanced description
+    screenshot_path TEXT, -- path to screenshot file
+    video_path TEXT, -- path to video file
     FOREIGN KEY (session_id) REFERENCES test_sessions (session_id)
   )`);
 
@@ -95,6 +99,32 @@ db.serialize(() => {
   db.run(`CREATE INDEX IF NOT EXISTS idx_merchant_master_data_name ON merchant_master_data (merchant_name)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_merchant_master_data_category ON merchant_master_data (primary_category)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_merchant_master_data_domains ON merchant_master_data (merchant_domains)`);
+
+  // Add new columns to existing test_sessions table (for backwards compatibility)
+  db.run(`ALTER TABLE test_sessions ADD COLUMN current_merchant TEXT`, (err) => {
+    if (err && !err.message.includes('duplicate column name')) {
+      console.error('Error adding current_merchant column:', err.message);
+    }
+  });
+  
+  db.run(`ALTER TABLE test_sessions ADD COLUMN current_url TEXT`, (err) => {
+    if (err && !err.message.includes('duplicate column name')) {
+      console.error('Error adding current_url column:', err.message);
+    }
+  });
+
+  // Add media file columns to existing merchant_test_results table
+  db.run(`ALTER TABLE merchant_test_results ADD COLUMN screenshot_path TEXT`, (err) => {
+    if (err && !err.message.includes('duplicate column name')) {
+      console.error('Error adding screenshot_path column:', err.message);
+    }
+  });
+  
+  db.run(`ALTER TABLE merchant_test_results ADD COLUMN video_path TEXT`, (err) => {
+    if (err && !err.message.includes('duplicate column name')) {
+      console.error('Error adding video_path column:', err.message);
+    }
+  });
 
   console.log('Database tables created successfully');
 });
@@ -225,8 +255,8 @@ function saveMerchantTestResult(data) {
       session_id, merchant_name, merchant_url, merchant_id, app_id,
       primary_category, parent_category, max_rate, max_rate_kind,
       test_status, test_result, error_pattern, test_duration_ms,
-      is_user_passed, detailed_analysis
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+      is_user_passed, detailed_analysis, screenshot_path, video_path
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
       data.session_id,
       data.merchant_name,
       data.merchant_url,
@@ -241,7 +271,9 @@ function saveMerchantTestResult(data) {
       data.error_pattern || null,
       data.test_duration_ms || null,
       data.is_user_passed ? 1 : 0,
-      data.detailed_analysis || null
+      data.detailed_analysis || null,
+      data.screenshot_path || null,
+      data.video_path || null
     ], function(err) {
       if (err) {
         reject(err);
@@ -387,6 +419,25 @@ function getDatabase() {
   return db;
 }
 
+// Function to update current merchant being tested
+function updateCurrentMerchant(sessionId, merchantName, merchantUrl) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `UPDATE test_sessions 
+       SET current_merchant = ?, current_url = ? 
+       WHERE session_id = ?`,
+      [merchantName, merchantUrl, sessionId],
+      function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      }
+    );
+  });
+}
+
 // Export database and functions
 module.exports = {
   db,
@@ -400,6 +451,7 @@ module.exports = {
   getStats,
   getCategories,
   getMerchantMasterData,
+  updateCurrentMerchant,
   dbPath
 };
 
