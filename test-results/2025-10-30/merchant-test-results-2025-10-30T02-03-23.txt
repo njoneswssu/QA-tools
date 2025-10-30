@@ -1,0 +1,4409 @@
+================================================================================
+MERCHANT WEBSITE TESTING RESULTS
+================================================================================
+Generated: 10/29/2025, 10:03:23 PM
+Total Merchants Tested: 365
+Successful: 357 (97.8%)
+Flagged: 8 (2.2%)
+
+✅ SUCCESSFUL MERCHANTS:
+--------------------------------------------------
+1. Portals Parfums
+   URL: https://portalsparfums.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:02:26 PM
+
+2. tonies
+   URL: https://us.tonies.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:02:48 PM
+
+3. GBC
+   URL: https://www.gbc.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:03:11 PM
+
+4. MAC Cosmetics
+   URL: https://www.maccosmetics.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:03:31 PM
+
+5. Stealth Trader
+   URL: https://stealthtrader.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Site loaded successfully with no critical issues detected.
+   Technical Status: Website loaded properly, displayed content appropriately, and showed
+   no signs of being offline, under maintenance, or experiencing technical difficulties.
+   Tested: 10/29/2025, 6:03:41 PM
+
+6. Fabletics
+   URL: https://www.fabletics.ca
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:04:04 PM
+
+7. PrivacyHawk
+   URL: https://www.privacyhawk.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:04:13 PM
+
+8. Vitamin A Swim
+   URL: https://www.vitaminaswim.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:04:35 PM
+
+9. Mela Vitamins
+   URL: https://melavitamins.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:04:56 PM
+
+10. Eat to Think
+   URL: https://www.eattothink.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:05:16 PM
+
+11. bmiMD (US)
+   URL: https://www.bmimd.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:05:36 PM
+
+12. Nightfox
+   URL: https://nightfoxstore.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:05:58 PM
+
+13. Belffin
+   URL: https://www.belffin.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:06:23 PM
+
+14. CheckCheck
+   URL: https://www.getcheckcheck.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:06:37 PM
+
+15. Flower of Life CBD
+   URL: https://folcbd.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:06:57 PM
+
+16. Mountain Racing Products
+   URL: https://www.mrpbike.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:07:21 PM
+
+17. HopeGoo
+   URL: https://www.hopegoo.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Automated system detected a legitimate business model.
+   Business Indicators: The site showed clear signs of being a functional business with
+   appropriate content patterns, pricing structures, and business functionality that
+   matched expected patterns for this type of commerce platform.
+   Tested: 10/29/2025, 6:07:39 PM
+
+18. Next Round
+   URL: https://nextroundgolf.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:07:53 PM
+
+19. Isla Capricho Homeware
+   URL: https://islacapricho.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:08:15 PM
+
+20. Venchi
+   URL: https://us.venchi.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:08:46 PM
+
+21. Oobli
+   URL: https://oobli.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:09:12 PM
+
+22. HUNK Menswear
+   URL: https://hunkmenswear.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:09:34 PM
+
+23. Westgate Reservations
+   URL: https://www.westgatereservations.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:09:47 PM
+
+24. Accomplishr (US
+   URL: https://accomplishr.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:09:57 PM
+
+25. Simply Nutrients
+   URL: https://simplynutrients.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:10:10 PM
+
+26. Sonora Inn
+   URL: https://thesonorainn.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:10:24 PM
+
+27. Karelias And Sons
+   URL: https://kareliasandsons.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:10:41 PM
+
+28. Alexandre Birman
+   URL: https://alexandrebirman.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:11:07 PM
+
+29. Chillhouse
+   URL: https://chillhouse.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:11:37 PM
+
+30. Ibagari Hotel
+   URL: https://www.ibagarihotel.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional hotel/accommodation booking website.
+   Booking Indicators: Site showed room availability, booking functionality, rate information,
+   reservation systems, and other hospitality industry features indicating active operations.
+   Tested: 10/29/2025, 6:11:53 PM
+
+31. Spectrum
+   URL: https://www.spectrum.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:12:05 PM
+
+32. Ave and Liv
+   URL: https://www.aveandliv.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:12:28 PM
+
+33. Innocruise
+   URL: https://innocruise.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:12:43 PM
+
+34. LuxenHome
+   URL: https://www.luxenhome.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:13:04 PM
+
+35. Edible Arrangements
+   URL: https://www.ediblearrangements.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:13:14 PM
+
+36. Manhattan Portage
+   URL: https://www.manhattanportage.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:13:40 PM
+
+37. Hatshopping
+   URL: https://www.hatshopping.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:13:54 PM
+
+38. The Builder Market - (US)
+   URL: https://thebuildermarket.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:14:04 PM
+
+39. Hovsco
+   URL: https://hovsco.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:14:31 PM
+
+40. Flytographer
+   URL: https://www.flytographer.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:14:51 PM
+
+41. Superalink
+   URL: https://www.superalink.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:15:02 PM
+
+42. Snapfon (US)
+   URL: https://www.snapfon.com/lp/50-off-new-customers/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:15:16 PM
+
+43. One Sol
+   URL: https://onesol.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:15:49 PM
+
+44. Smith Teamaker
+   URL: https://smithtea.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:16:18 PM
+
+45. Solace Bands
+   URL: https://solacebands.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:16:49 PM
+
+46. OIWAS SPORTS EQUIPMENT INC.
+   URL: https://www.oiwasbag.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:17:08 PM
+
+47. Cambio Roasters
+   URL: https://cambioroasters.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:17:27 PM
+
+48. Always Full
+   URL: https://alwaysfull.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:17:41 PM
+
+49. MyPhysicianPlan
+   URL: https://myphysicianplan.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:17:56 PM
+
+50. OakViva
+   URL: https://oakviva.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:18:12 PM
+
+51. Sportsmans Outdoor Superstore
+   URL: https://www.sportsmansoutdoorsuperstore.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:18:32 PM
+
+52. GuidingCross
+   URL: https://www.guidingcross.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:18:54 PM
+
+53. ShopRaise
+   URL: https://shopraise.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:19:03 PM
+
+54. Optics Force
+   URL: https://opticsforce.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:19:35 PM
+
+55. Vesync
+   URL: https://us.vesync.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:19:49 PM
+
+56. Satechi
+   URL: https://satechi.net
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:20:03 PM
+
+57. Classy Leather Bags
+   URL: https://classyleatherbags.com/?utm_source=classy&utm_medium=affiliates&utm_campaign=affiliates
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:20:23 PM
+
+58. Loveweld Permanent Jewelry (US)
+   URL: https://loveweld.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:20:40 PM
+
+59. Soru Jewels
+   URL: https://www.sorujewellery.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:21:02 PM
+
+60. Creative Arcades
+   URL: https://creative-arcades.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:21:21 PM
+
+61. Freeletics
+   URL: https://www.freeletics.com/en/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Site loaded successfully with no critical issues detected.
+   Technical Status: Website loaded properly, displayed content appropriately, and showed
+   no signs of being offline, under maintenance, or experiencing technical difficulties.
+   Tested: 10/29/2025, 6:21:30 PM
+
+62. AstroAI
+   URL: https://www.astroai.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:21:42 PM
+
+63. Husband Pillow
+   URL: https://www.husbandpillow.com/products/husband-pillow-big-bedrest-reading-support-bed-backrest-with-arms-dark-grey
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:23:21 PM
+
+64. Potensic
+   URL: https://store.potensic.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:23:40 PM
+
+65. Gooloo
+   URL: https://us.gooloo.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:24:00 PM
+
+66. Comfort Zone Skin
+   URL: https://us.comfortzoneskin.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:24:21 PM
+
+67. Thyseed(USA)
+   URL: https://www.thyseed.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:24:39 PM
+
+68. Petscosset
+   URL: https://petscosset.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:24:58 PM
+
+69. Winchester Pet
+   URL: https://worldofwinchester.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Website demonstrated active functionality and working features.
+   Functional Indicators: Site showed interactive elements, working navigation, content
+   loading properly, and other signs of a fully operational website.
+   Tested: 10/29/2025, 6:25:14 PM
+
+70. Riccar
+   URL: https://riccar.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:25:31 PM
+
+71. Magicshine
+   URL: https://magicshine.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:25:58 PM
+
+72. Pizzello
+   URL: https://pizzello.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:26:21 PM
+
+73. Badlands
+   URL: https://badlandsgear.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:26:50 PM
+
+74. Extremebeauty
+   URL: https://beaueye.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:27:15 PM
+
+75. BANDICAM COMPANY LLC
+   URL: https://www.bandicam.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:27:27 PM
+
+76. SUNSHINE ECOMMERCE LLC
+   URL: https://owleys.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:27:50 PM
+
+77. Pasturebird
+   URL: https://www.pasturebird.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:28:08 PM
+
+78. 360 Cookware
+   URL: https://www.360cookware.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:28:32 PM
+
+79. Fiido
+   URL: https://fiido.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:28:51 PM
+
+80. The Hemp Doctor
+   URL: https://thehempdoctor.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:29:22 PM
+
+81. PuppySpot LLC
+   URL: https://www.puppyspot.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:29:34 PM
+
+82. The Skinny Confidential
+   URL: https://shopskinnyconfidential.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:29:58 PM
+
+83. NOVAALAB
+   URL: https://novaalab.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:30:27 PM
+
+84. Gooseberry Intimates Ltd
+   URL: https://gooseberryintimates.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:30:55 PM
+
+85. BERLOOK
+   URL: https://www.berlook.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:31:20 PM
+
+86. Boston Institute Of Finance
+   URL: https://www.bostonifi.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:31:30 PM
+
+87. Inq Smart Pens
+   URL: https://inq.shop/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:31:47 PM
+
+88. Kaabo
+   URL: https://www.kaabousa.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:32:17 PM
+
+89. southfaces
+   URL: https://www.southfaces.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:32:38 PM
+
+90. Vosteed
+   URL: https://www.vosteed.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:33:07 PM
+
+91. Maxemblem
+   URL: https://maxemblem.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:33:27 PM
+
+92. Avara
+   URL: https://avarawell.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:33:53 PM
+
+93. Buddha Stones
+   URL: https://buddhastoneshop.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:34:16 PM
+
+94. Artizan Joyeria
+   URL: https://artizanjoyeria.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:34:44 PM
+
+95. Martin Dingman
+   URL: https://MartinDingman.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:35:05 PM
+
+96. Amerisleep
+   URL: https://amerisleep.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:35:28 PM
+
+97. Tabita Bags WW
+   URL: https://tabitabags.ch
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:35:53 PM
+
+98. Atlas One Fund
+   URL: https://atlasonefund.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:36:03 PM
+
+99. Shine Commerce
+   URL: https://shinecommerce.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:36:10 PM
+
+100. Rsscsports
+   URL: https://Rsscsports.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:36:32 PM
+
+101. Water Guru
+   URL: https://www.waterguru.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:36:47 PM
+
+102. ShedRx
+   URL: https://www.tryshed.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:37:07 PM
+
+103. TIJN Eyewear
+   URL: https://tijneyewear.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:37:22 PM
+
+104. SUNFLOW, Inc.
+   URL: https://getsunflow.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:37:46 PM
+
+105. LaMO
+   URL: https://mykos.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:38:10 PM
+
+106. WhiteWall
+   URL: https://www.whitewall.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:38:27 PM
+
+107. Simple Retro
+   URL: https://www.simpleretro.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:38:45 PM
+
+108. Cadence
+   URL: https://keepyourcadence.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:39:12 PM
+
+109. White Lotus Home
+   URL: https://www.whitelotushome.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:39:28 PM
+
+110. Bocomal
+   URL: https://www.bocomalfr.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:39:50 PM
+
+111. The James Brand
+   URL: https://thejamesbrand.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:40:15 PM
+
+112. KALM with Kava
+   URL: https://www.kalmwithkava.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:40:35 PM
+
+113. SWIRISE
+   URL: https://swirise.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:41:04 PM
+
+114. Astek
+   URL: https://astekhome.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:41:21 PM
+
+115. Wing Assistant
+   URL: https://wingassistant.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:41:32 PM
+
+116. Plumbing Sell
+   URL: https://plumbingsell.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:41:48 PM
+
+117. Conscious Step
+   URL: https://consciousstep.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:42:16 PM
+
+118. Segway
+   URL: https://us.navimow.segway.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:42:32 PM
+
+119. Callas Milano
+   URL: https://callasmilano.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:42:55 PM
+
+120. MegaFood
+   URL: https://www.megafood.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:43:20 PM
+
+121. Free the Ocean
+   URL: https://www.freetheocean.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:43:48 PM
+
+122. Dr.Prepare
+   URL: https://drprepare.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:44:15 PM
+
+123. The Baby/s Brew
+   URL: https://www.thebabysbrew.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:44:44 PM
+
+124. Embossed Graphics
+   URL: https://www.embossedgraphics.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:45:03 PM
+
+125. Tealerlab
+   URL: https://tealer-lab.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:45:35 PM
+
+126. GETPAIRR
+   URL: https://getpairr.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:45:58 PM
+
+127. Jessup Beauty
+   URL: https://www.jessupbeauty.com/collections/new-arrivals-sale
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:46:21 PM
+
+128. Bodega Cooler
+   URL: https://www.bodegacooler.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:46:44 PM
+
+129. Cuzen Matcha
+   URL: https://cuzenmatcha.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:46:59 PM
+
+130. KGORGE
+   URL: https://www.kgorge.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:47:29 PM
+
+131. Figue Acquisition, LLC
+   URL: https://Figue.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:47:50 PM
+
+132. Vous Vitamin
+   URL: https://www.vousvitamin.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:48:13 PM
+
+133. Relife
+   URL: https://relifesports.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:48:37 PM
+
+134. Fifthroom.com
+   URL: https://www.fifthroom.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:48:52 PM
+
+135. Silversal
+   URL: https://silversal.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:49:16 PM
+
+136. Luma Flame
+   URL: https://www.lumaflame.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:49:43 PM
+
+137. Potluck
+   URL: https://potluckmarket.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:49:56 PM
+
+138. TOTY
+   URL: https://toty.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:50:31 PM
+
+139. Vibe Alley
+   URL: https://www.vibealley.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:50:56 PM
+
+140. Flux Footwear
+   URL: https://Fluxfootwear.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:51:38 PM
+
+141. Sock It To Me
+   URL: https://www.sockittome.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:52:01 PM
+
+142. RationAle Brewing
+   URL: https://rationalebrewing.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:52:25 PM
+
+143. Dannico woodworks
+   URL: https://dannicowoodworks.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:52:48 PM
+
+144. Dazzlingrock
+   URL: https://www.dazzlingrock.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:53:06 PM
+
+145. Epicured
+   URL: https://www.epicured.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:53:29 PM
+
+146. Ultahost
+   URL: https://ultahost.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:53:44 PM
+
+147. Jovy
+   URL: https://www.jovyco.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:54:09 PM
+
+148. Aware House
+   URL: https://www.awarehouseshop.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:54:31 PM
+
+149. Posture Pump
+   URL: https://posturepump.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:54:57 PM
+
+150. MediaZilla
+   URL: https://mediazilla.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:55:19 PM
+
+151. JHY Design
+   URL: https://jhy-design.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:55:52 PM
+
+152. Magno Chocolates
+   URL: https://magnochocolates.us
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:56:03 PM
+
+153. Zoviz
+   URL: https://zoviz.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:56:28 PM
+
+154. AL-MAWARED NATURAL BEAUTY CARE PRODUCTS (RIVAGE)
+   URL: https://rivagecare.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:56:54 PM
+
+155. Curry and Paxton
+   URL: https://www.curryandpaxton.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:57:17 PM
+
+156. MAXPAWN Luxury
+   URL: https://maxpawn.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:57:36 PM
+
+157. Luv Clay LLC
+   URL: https://www.salvivglobal.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:57:53 PM
+
+158. Artra Laboratory
+   URL: https://artralab.hk
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:58:11 PM
+
+159. Bahimi
+   URL: https://bahimi.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:58:38 PM
+
+160. Cube Tracker
+   URL: https://www.CubeTracker.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:58:52 PM
+
+161. Inno Cn
+   URL: https://innocn.com/products
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:59:19 PM
+
+162. Flora Animalia
+   URL: https://floraanimalia.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 6:59:42 PM
+
+163. Calgee
+   URL: https://calgee.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:00:04 PM
+
+164. FUMECLEAR
+   URL: https://www.fumeclear.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:00:34 PM
+
+165. Mileseey
+   URL: https://www.mileseeygolf.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:01:01 PM
+
+166. TIZAG Inc.
+   URL: https://TIZAG.shop
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:01:17 PM
+
+167. ORPHEUS Skincare
+   URL: https://orpheus-skin.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:01:41 PM
+
+168. FooJun LLC
+   URL: https://www.greenleaflinens.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:02:16 PM
+
+169. LOFTEK
+   URL: https://www.loftek.us/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:02:35 PM
+
+170. Mowbi
+   URL: https://Mowbi.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:02:57 PM
+
+171. Charlie Bravo Delta
+   URL: https://charliebravodelta.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:03:19 PM
+
+172. ayamayaoutdoor
+   URL: https://ayamaya.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:03:39 PM
+
+173. Bengal Products
+   URL: https://www.bengal.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:03:59 PM
+
+174. FREESOO
+   URL: https://freesoo-auto.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:04:17 PM
+
+175. KAYGO
+   URL: https://kaygosafety.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:04:42 PM
+
+176. Vintage Souls
+   URL: https://vintagesouls.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:05:05 PM
+
+177. tethos
+   URL: https://www.societeaco.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:05:20 PM
+
+178. Vertra
+   URL: https://www.vertra.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:05:49 PM
+
+179. Raw Rev
+   URL: https://www.rawrev.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:06:16 PM
+
+180. Fig For Kids
+   URL: https://www.figforkids.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:06:33 PM
+
+181. Zhengzhou Auspicious Technology Co., Ltd
+   URL: https://www.rxmoore.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:07:00 PM
+
+182. NORDIC HUB
+   URL: https://primebotanicsbeauty.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:07:25 PM
+
+183. Chewy
+   URL: https://chewy.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Site loaded successfully with no critical issues detected.
+   Technical Status: Website loaded properly, displayed content appropriately, and showed
+   no signs of being offline, under maintenance, or experiencing technical difficulties.
+   Tested: 10/29/2025, 7:07:31 PM
+
+184. TV Lift Cabinet
+   URL: https://www.tvliftcabinet.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:07:58 PM
+
+185. Skincare Junkie
+   URL: https://www.skincarejunkie.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:08:25 PM
+
+186. Dorne
+   URL: https://www.dorne.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:08:55 PM
+
+187. 3Doodler
+   URL: https://the3doodler.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:09:18 PM
+
+188. Warfield & Grand
+   URL: https://warfieldandgrand.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:09:41 PM
+
+189. Bouquet Box
+   URL: https://www.bouquetbox.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:10:12 PM
+
+190. PINTRILL
+   URL: https://www.pintrill.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:10:31 PM
+
+191. EO Products
+   URL: https://www.eoproducts.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:11:02 PM
+
+192. Kiki Milk
+   URL: https://www.kikimilk.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:11:39 PM
+
+193. Any Hill
+   URL: https://www.anyhill.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:12:04 PM
+
+194. Freedom USA Sales
+   URL: https://freedomusasales.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:12:35 PM
+
+195. Megawheels
+   URL: https://megawheels.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:13:04 PM
+
+196. Alberto Nardoni
+   URL: https://albertonardoni.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:13:28 PM
+
+197. Olivenorma
+   URL: https://www.olivenorma.com/?utm_source=shareasale&utm_medium=shareasale
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:13:57 PM
+
+198. Bazyths
+   URL: https://bazyths.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:14:25 PM
+
+199. iCrimp Tools
+   URL: https://www.icrimptools.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:15:37 PM
+
+200. Real Dog Box
+   URL: https://real.dog/offers/free-meatballs
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:15:54 PM
+
+201. Wellco industry co,.ltd
+   URL: https://www.gardenport.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:16:42 PM
+
+202. NIPYATA!
+   URL: https://nipyata.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:17:10 PM
+
+203. Svala
+   URL: https://www.svala.co
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:17:52 PM
+
+204. Happy Paws
+   URL: https://HappyPaws.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:18:35 PM
+
+205. Little Poppy Co
+   URL: https://littlepoppyco.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:19:04 PM
+
+206. Republic of Durable Goods
+   URL: https://republicofdurablegoods.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:19:21 PM
+
+207. Melodie Music
+   URL: https://www.melod.ie
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:19:30 PM
+
+208. Kixies
+   URL: https://kixies.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:19:58 PM
+
+209. Cat Box Classics
+   URL: https://www.CatBoxClassics.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:20:33 PM
+
+210. Hot Springs Natural
+   URL: https://www.hotspringsnatural.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:20:57 PM
+
+211. So this Pure Beauty
+   URL: https://sothispurebeauty.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:21:12 PM
+
+212. Ecoer
+   URL: https://www.ecoerfashion.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:21:19 PM
+
+213. OttLite
+   URL: https://www.ottlite.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:21:35 PM
+
+214. RYL
+   URL: https://drinkryl.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:21:52 PM
+
+215. Mission MightyMe
+   URL: https://www.missionmightyme.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:22:15 PM
+
+216. Vankyo
+   URL: https://ivankyo.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:22:37 PM
+
+217. Braxley Bands
+   URL: https://braxleybands.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:22:55 PM
+
+218. MICHELLE WILHITE
+   URL: https://WWW.MICHELLEWILHITE.COM
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:23:15 PM
+
+219. Cayatch Posture Corrector
+   URL: https://www.cayatch.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:23:42 PM
+
+220. Gourmet Gift Basket Store
+   URL: https://www.gourmetgiftbasketstore.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:24:04 PM
+
+221. Motif Beauty (Skincare)
+   URL: https://motifskincare.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:24:31 PM
+
+222. Rainy Roses
+   URL: https://www.rainyroses.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:24:55 PM
+
+223. uMobix
+   URL: https://www.umobix.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:25:10 PM
+
+224. ZipGlove
+   URL: https://zip-glove.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:25:32 PM
+
+225. Canary Clean Products, LLC
+   URL: https://www.canarycleanco.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:25:57 PM
+
+226. Azova Inc.
+   URL: https://www.azova.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:26:20 PM
+
+227. Mint Clothing Boutiques
+   URL: https://www.shopmint.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:26:47 PM
+
+228. Sally Beauty
+   URL: https://www.sallybeauty.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:27:16 PM
+
+229. Fioboc
+   URL: https://www.fioboc.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:27:52 PM
+
+230. Rize Home
+   URL: https://rizehome.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:28:18 PM
+
+231. MONOCARBON
+   URL: https://www.monocarbontech.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:28:46 PM
+
+232. Orce Cosmetics
+   URL: https://www.orcecosmetics.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:29:02 PM
+
+233. Sheec Socks
+   URL: https://sheecsocks.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:29:27 PM
+
+234. Chaptex Group, LLC
+   URL: https://chaptex.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:29:51 PM
+
+235. Alex Apparel Group
+   URL: https://www.alexevenings.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:30:19 PM
+
+236. My Face Swimsuit
+   URL: https://myfaceswimsuit.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:30:44 PM
+
+237. DESERI
+   URL: https://www.deseri.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:31:12 PM
+
+238. Wild Spirit Fragrances
+   URL: https://www.wildspiritfragrances.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:31:36 PM
+
+239. Nuebiome
+   URL: https://www.nuebiome.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:32:14 PM
+
+240. Curtarra
+   URL: https://www.curtarra.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:32:59 PM
+
+241. Tru Luxe
+   URL: https://www.truluxejeans.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:33:18 PM
+
+242. Tera
+   URL: https://tera-innovation.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:33:44 PM
+
+243. Autio
+   URL: https://app.autio.com/partnerdeal?sv1=affiliate&sv_campaign_id=407399&awc=46327_1756240472_85ce96ba55577656e3d564806a47ff46
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:33:55 PM
+
+244. Wabi Whiffs
+   URL: https://www.WabiWhiffs.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:34:07 PM
+
+245. KillerPlayer
+   URL: https://killerplayer.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:34:25 PM
+
+246. Remote CoWorker
+   URL: https://remotecoworker.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:35:01 PM
+
+247. TrueMedX
+   URL: https://truemedx.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:35:17 PM
+
+248. Drag Society
+   URL: https://www.dragsociety.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:35:47 PM
+
+249. Yodolla
+   URL: https://yodolla.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:36:18 PM
+
+250. Land Guard
+   URL: https://landguardgarden.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:36:52 PM
+
+251. Lazy Seal Inc
+   URL: https://www.lazy-seal.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:37:23 PM
+
+252. Spongelle
+   URL: https://www.spongelle.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:37:58 PM
+
+253. Crave
+   URL: https://cravedirect.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:38:08 PM
+
+254. LubbDubb
+   URL: https://lubbdubb.io/home
+   Status: AUTO SUCCESS
+   Detailed Analysis: Site loaded successfully with no critical issues detected.
+   Technical Status: Website loaded properly, displayed content appropriately, and showed
+   no signs of being offline, under maintenance, or experiencing technical difficulties.
+   Tested: 10/29/2025, 7:38:15 PM
+
+255. Brodi Specialty Products Ltd.
+   URL: https://Www.Brodi.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:38:32 PM
+
+256. Hugo Coffee Roasters
+   URL: https://hugo.coffee
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:38:45 PM
+
+257. ARW Home
+   URL: https://arwhome.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:38:57 PM
+
+258. Lutec
+   URL: https://lutec-lighting.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:39:20 PM
+
+259. AirDroid
+   URL: https://www.airdroid.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:39:40 PM
+
+260. jace clinical solutions
+   URL: https://jaceclinicalsolutions.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Site loaded successfully with no critical issues detected.
+   Technical Status: Website loaded properly, displayed content appropriately, and showed
+   no signs of being offline, under maintenance, or experiencing technical difficulties.
+   Tested: 10/29/2025, 7:39:48 PM
+
+261. Saje Wellness
+   URL: https://www.saje.ca
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:40:23 PM
+
+262. WhatGeek
+   URL: https://www.whatgeek.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:40:45 PM
+
+263. FullyVital
+   URL: https://fullyvital.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:41:18 PM
+
+264. All Moringa
+   URL: https://allmoringatree.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:41:51 PM
+
+265. Dallas Designer Handbags
+   URL: https://www.dallasdesignerhandbags.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:42:24 PM
+
+266. Bioniq
+   URL: https://bioniq.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:42:40 PM
+
+267. Veefa
+   URL: https://www.veefabike.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:43:06 PM
+
+268. Snore Circle
+   URL: https://www.snorecircle.com/Snore-Circle-Smart-Anti-Snoring-Muscle-Stimulator-p825060.html
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:43:35 PM
+
+269. Attaché
+   URL: https://www.buyattache.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:43:55 PM
+
+270. ShowersPlus.com
+   URL: https://www.showersplus.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:44:11 PM
+
+271. Burlap & Barrel
+   URL: https://www.burlapandbarrel.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:44:42 PM
+
+272. PowerMarket
+   URL: https://dimension.powermarket.io/cadm.html
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:44:54 PM
+
+273. Kara Yoo Jewelry
+   URL: https://www.karayoo.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:45:18 PM
+
+274. Revgear
+   URL: https://www.revgear.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:45:43 PM
+
+275. GlocalMe
+   URL: https://store.glocalme.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:46:20 PM
+
+276. EFE GLASSES
+   URL: https://www.efeglasses.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:46:35 PM
+
+277. Spacejoy
+   URL: https://www.spacejoy.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:46:55 PM
+
+278. SeroVital
+   URL: https://www.serovital.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:47:24 PM
+
+279. L/Amour Des Pieds
+   URL: https://www.lamourdespieds.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:47:51 PM
+
+280. SHED RAIN
+   URL: https://shedrain.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:48:23 PM
+
+281. Foscam
+   URL: https://www.foscammall.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:48:49 PM
+
+282. BeBird
+   URL: https://bebird.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:49:07 PM
+
+283. Delilah Home
+   URL: https://Delilahhome.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:49:36 PM
+
+284. Mindless Labs
+   URL: https://shopmindless.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:50:06 PM
+
+285. JBW Watches
+   URL: https://jbw.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:50:32 PM
+
+286. Kiss Chacey
+   URL: https://kisschacey.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:50:58 PM
+
+287. Good Chop
+   URL: https://www.goodchop.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:51:07 PM
+
+288. ECCO
+   URL: https://us.ecco.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:51:30 PM
+
+289. ENNUE
+   URL: https://www.ennuestudio.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:51:56 PM
+
+290. EVELYN & KATE
+   URL: https://www.evelynandkate.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:52:23 PM
+
+291. ActivForce
+   URL: https://activforce.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:52:39 PM
+
+292. ExBrite Medicine Cabinets
+   URL: https://www.allsumhome.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:53:20 PM
+
+293. MacCase
+   URL: https://mac-case.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:53:48 PM
+
+294. Marmot
+   URL: https://www.marmot.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:54:02 PM
+
+295. Great Wolf Lodge
+   URL: https://www.greatwolf.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:54:14 PM
+
+296. Erno Laszlo
+   URL: https://www.ernolaszlo.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:54:58 PM
+
+297. DAVIDsTEA
+   URL: https://www.davidstea.com/us_en/home/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:55:40 PM
+
+298. Marc Jacobs
+   URL: https://www.marcjacobs.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:56:08 PM
+
+299. AGMES
+   URL: https://agmesnyc.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 7:56:34 PM
+
+300. Buck Knives
+   URL: https://www.buckknives.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:36:34 PM
+
+301. Fabric Insurance
+   URL: https://www.meetfabric.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:36:55 PM
+
+302. PNW Components
+   URL: https://www.pnwcomponents.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:37:19 PM
+
+303. BigRigVin
+   URL: https://bigrigvin.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:37:36 PM
+
+304. Areaware
+   URL: https://www.areaware.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:38:05 PM
+
+305. WriterAccess
+   URL: https://www.writeraccess.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:38:18 PM
+
+306. UnderPar
+   URL: https://www.underpar.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:38:27 PM
+
+307. SOG Knives and Tools
+   URL: https://sogknives.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:38:51 PM
+
+308. Cabin Zero
+   URL: https://www.cabinzero.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:39:26 PM
+
+309. Amanda Uprichard
+   URL: https://amandauprichard.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:39:59 PM
+
+310. No! Jeans
+   URL: https://nojeans.co/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:40:24 PM
+
+311. Mondaine
+   URL: https://mondaine.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:40:53 PM
+
+312. Cerebral
+   URL: https://cerebral.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:41:05 PM
+
+313. Pots and Pans
+   URL: https://www.potsandpans.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:41:22 PM
+
+314. Janie and Jack
+   URL: https://www.janieandjack.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:41:52 PM
+
+315. Support Pets
+   URL: https://www.supportpets.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:42:15 PM
+
+316. Bloch
+   URL: https://uk.blochworld.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:42:44 PM
+
+317. PureTree
+   URL: https://www.PureTree.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:43:18 PM
+
+318. Splice
+   URL: https://splice.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:43:50 PM
+
+319. Lumin
+   URL: https://www.Luminskin.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:44:26 PM
+
+320. MANSUR GAVRIEL
+   URL: https://www.mansurgavriel.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:44:53 PM
+
+321. localrent.com
+   URL: https://localrent.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:45:11 PM
+
+322. Sunday Riley
+   URL: https://sundayriley.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:45:36 PM
+
+323. Current
+   URL: https://current.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:46:12 PM
+
+324. Brightside
+   URL: https://www.brightside.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:46:26 PM
+
+325. Roc Skincare
+   URL: https://www.rocskincare.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:47:10 PM
+
+326. Sugar
+   URL: https://www.sugar.it/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:47:34 PM
+
+327. Metro Brazil
+   URL: https://metrobrazil.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:48:16 PM
+
+328. Clove Technology
+   URL: https://www.clove-technology.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:48:47 PM
+
+329. Wisdom Essentials
+   URL: https://wisdomessentials.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Site loaded successfully with no critical issues detected.
+   Technical Status: Website loaded properly, displayed content appropriately, and showed
+   no signs of being offline, under maintenance, or experiencing technical difficulties.
+   Tested: 10/29/2025, 9:48:58 PM
+
+330. Trainer Academy
+   URL: https://traineracademy.org/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:49:15 PM
+
+331. ecobee
+   URL: https://www.ecobee.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:49:31 PM
+
+332. Weleda
+   URL: https://www.weleda.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:50:00 PM
+
+333. Briogeo Hair
+   URL: https://www.briogeohair.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:50:38 PM
+
+334. Beam
+   URL: https://shopbeam.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:51:30 PM
+
+335. Meat! Your Maker
+   URL: https://www.meatyourmaker.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:52:08 PM
+
+336. T-H Marine Supplies
+   URL: https://thmarinesupplies.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:52:32 PM
+
+337. Tracie Martyn
+   URL: https://www.traciemartyn.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:53:25 PM
+
+338. Trusy Social
+   URL: https://go.trusy.co/start/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:53:35 PM
+
+339. BASSO
+   URL: https://basso.co
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:54:17 PM
+
+340. Darkest Fox
+   URL: https://www.darkestfox.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Site loaded successfully with no critical issues detected.
+   Technical Status: Website loaded properly, displayed content appropriately, and showed
+   no signs of being offline, under maintenance, or experiencing technical difficulties.
+   Tested: 10/29/2025, 9:54:29 PM
+
+341. Sentiments Express
+   URL: https://int.sentimentsexpress.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:55:02 PM
+
+342. Carve Designs
+   URL: https://www.carvedesigns.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:55:59 PM
+
+343. Glamood
+   URL: https://www.glamood.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:56:18 PM
+
+344. VENN Skincare
+   URL: https://www.vennskincare.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:56:54 PM
+
+345. VigorLabs
+   URL: https://www.vigorlabs.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:57:10 PM
+
+346. Mustela
+   URL: https://www.mustelausa.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:57:45 PM
+
+347. At Home
+   URL: https://www.athome.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Site loaded successfully with no critical issues detected.
+   Technical Status: Website loaded properly, displayed content appropriately, and showed
+   no signs of being offline, under maintenance, or experiencing technical difficulties.
+   Tested: 10/29/2025, 9:57:52 PM
+
+348. LifeSpan Fitness
+   URL: https://www.lifespanfitness.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:58:39 PM
+
+349. Shaw/s
+   URL: https://www.shaws.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:59:12 PM
+
+350. GoToConnect
+   URL: https://www.goto.com/connect
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:59:27 PM
+
+351. Test My Allergy
+   URL: https://www.testmyallergy.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 9:59:59 PM
+
+352. Byrna
+   URL: https://byrna.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 10:00:38 PM
+
+353. Harry/s
+   URL: https://www.harrys.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 10:01:09 PM
+
+354. Sanitas Skincare
+   URL: https://sanitas-skincare.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 10:01:48 PM
+
+355. Moda Operandi
+   URL: https://www.ModaOperandi.com
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 10:02:11 PM
+
+356. UKLASH
+   URL: https://www.uklash.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 10:02:35 PM
+
+357. Magpul
+   URL: https://www.magpul.com/
+   Status: AUTO SUCCESS
+   Detailed Analysis: Functional e-commerce website with active shopping capabilities.
+   E-commerce Indicators: Site displayed working shopping cart, product pricing, purchase
+   buttons, checkout functionality, and other signs of an active online store.
+   Tested: 10/29/2025, 10:03:14 PM
+
+
+🚨 FLAGGED MERCHANTS (REQUIRE REVIEW):
+--------------------------------------------------
+1. Flash.co
+   URL: https://us.flash.co/
+   Issue: DNS resolution failed: page.goto: net::ERR_NAME_NOT_RESOLVED at https://us.flash.co/
+   Detailed Analysis: Domain name could not be resolved to an IP address.
+   DNS Issue: This suggests the domain may be expired, misconfigured, or the DNS servers
+   are not responding. The domain may no longer be active or properly configured.
+   Recommendation: Manual verification recommended to confirm actual site status and determine
+   if this represents a temporary issue or permanent unavailability.
+
+2. Bikinies
+   URL: https://www.bikinies.com
+   Issue: store is currently unavailable
+   Detailed Analysis: store is currently unavailable
+   Assessment: The automated system detected an issue that requires manual review to determine
+   if the website is genuinely unavailable or if this represents a false positive detection.
+   Recommendation: Manual verification recommended to confirm actual site status and determine
+   if this represents a temporary issue or permanent unavailability.
+
+3. Thousandshores
+   URL: https://www.tribitaudio.com
+   Issue: timeout error - site did not load within 30 seconds: page.goto: Timeout 30000ms exceeded.
+   Detailed Analysis: Website failed to load within the 30-second timeout period.
+   Technical Issue: The site either took too long to respond, has server performance issues,
+   or may be experiencing technical difficulties. This could indicate the site is down,
+   overloaded, or has connectivity problems that prevent normal access.
+   Recommendation: Manual verification recommended to confirm actual site status and determine
+   if this represents a temporary issue or permanent unavailability.
+
+4. Giant Teddy
+   URL: https://Giantteddy.com
+   Issue: DNS resolution failed: page.goto: net::ERR_NAME_NOT_RESOLVED at https://giantteddy.com/
+   Detailed Analysis: Domain name could not be resolved to an IP address.
+   DNS Issue: This suggests the domain may be expired, misconfigured, or the DNS servers
+   are not responding. The domain may no longer be active or properly configured.
+   Recommendation: Manual verification recommended to confirm actual site status and determine
+   if this represents a temporary issue or permanent unavailability.
+
+5. Unidragon
+   URL: https://p.unidragon.com
+   Issue: DNS resolution failed: page.goto: net::ERR_NAME_NOT_RESOLVED at https://p.unidragon.com/
+   Detailed Analysis: Domain name could not be resolved to an IP address.
+   DNS Issue: This suggests the domain may be expired, misconfigured, or the DNS servers
+   are not responding. The domain may no longer be active or properly configured.
+   Recommendation: Manual verification recommended to confirm actual site status and determine
+   if this represents a temporary issue or permanent unavailability.
+
+6. SageFinds
+   URL: https://www.sagefinds.com/
+   Issue: minimal content - likely unavailable
+   Detailed Analysis: Website loaded with very little content, suggesting it may be inactive.
+   Content Issue: The site displayed minimal or placeholder content, which may indicate
+   an incomplete setup, abandoned website, or technical issues preventing proper content loading.
+   Recommendation: Manual verification recommended to confirm actual site status and determine
+   if this represents a temporary issue or permanent unavailability.
+
+7. Edgewell
+   URL: https://edgewell.com
+   Issue: timeout error - site did not load within 30 seconds: page.goto: Timeout 30000ms exceeded.
+   Detailed Analysis: Website failed to load within the 30-second timeout period.
+   Technical Issue: The site either took too long to respond, has server performance issues,
+   or may be experiencing technical difficulties. This could indicate the site is down,
+   overloaded, or has connectivity problems that prevent normal access.
+   Recommendation: Manual verification recommended to confirm actual site status and determine
+   if this represents a temporary issue or permanent unavailability.
+
+8. SellHound
+   URL: https://www.sellhound.com
+   Issue: DNS resolution failed: page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.sellhound.com/
+   Detailed Analysis: Domain name could not be resolved to an IP address.
+   DNS Issue: This suggests the domain may be expired, misconfigured, or the DNS servers
+   are not responding. The domain may no longer be active or properly configured.
+   Recommendation: Manual verification recommended to confirm actual site status and determine
+   if this represents a temporary issue or permanent unavailability.
+
+
+📋 COMPLETE TEST ORDER (CHRONOLOGICAL):
+--------------------------------------------------
+  1. [AUTO SUCCESS] Portals Parfums
+     https://portalsparfums.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+  2. [AUTO SUCCESS] tonies
+     https://us.tonies.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+  3. [AUTO SUCCESS] GBC
+     https://www.gbc.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+  4. [AUTO SUCCESS] MAC Cosmetics
+     https://www.maccosmetics.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+  5. [AUTO SUCCESS] Stealth Trader
+     https://stealthtrader.com/
+     Reason: No severe problems detected
+
+  6. [AUTO SUCCESS] Fabletics
+     https://www.fabletics.ca
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+  7. [AUTO SUCCESS] PrivacyHawk
+     https://www.privacyhawk.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+  8. [AUTO SUCCESS] Vitamin A Swim
+     https://www.vitaminaswim.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+  9. [AUTO SUCCESS] Mela Vitamins
+     https://melavitamins.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 10. [AUTO SUCCESS] Eat to Think
+     https://www.eattothink.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 11. [AUTO SUCCESS] bmiMD (US)
+     https://www.bmimd.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 12. [AUTO SUCCESS] Nightfox
+     https://nightfoxstore.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 13. [AUTO SUCCESS] Belffin
+     https://www.belffin.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 14. [AUTO SUCCESS] CheckCheck
+     https://www.getcheckcheck.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+ 15. [AUTO SUCCESS] Flower of Life CBD
+     https://folcbd.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 16. [AUTO SUCCESS] Mountain Racing Products
+     https://www.mrpbike.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 17. [AUTO SUCCESS] HopeGoo
+     https://www.hopegoo.com/
+     Reason: Business model detected: travel
+
+ 18. [AUTO SUCCESS] Next Round
+     https://nextroundgolf.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 19. [AUTO SUCCESS] Isla Capricho Homeware
+     https://islacapricho.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 20. [AUTO SUCCESS] Venchi
+     https://us.venchi.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 21. [AUTO SUCCESS] Oobli
+     https://oobli.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 22. [AUTO SUCCESS] HUNK Menswear
+     https://hunkmenswear.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 23. [AUTO SUCCESS] Westgate Reservations
+     https://www.westgatereservations.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 24. [AUTO SUCCESS] Accomplishr (US
+     https://accomplishr.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 25. [AUTO SUCCESS] Simply Nutrients
+     https://simplynutrients.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 26. [AUTO SUCCESS] Sonora Inn
+     https://thesonorainn.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 27. [AUTO SUCCESS] Karelias And Sons
+     https://kareliasandsons.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 28. [AUTO SUCCESS] Alexandre Birman
+     https://alexandrebirman.com/
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+ 29. [AUTO SUCCESS] Chillhouse
+     https://chillhouse.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 30. [AUTO SUCCESS] Ibagari Hotel
+     https://www.ibagarihotel.com/
+     Reason: Functional hotel booking features detected (STRONG protection)
+
+ 31. [AUTO SUCCESS] Spectrum
+     https://www.spectrum.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 32. [AUTO SUCCESS] Ave and Liv
+     https://www.aveandliv.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 33. [AUTO SUCCESS] Innocruise
+     https://innocruise.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 34. [AUTO SUCCESS] LuxenHome
+     https://www.luxenhome.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 35. [AUTO SUCCESS] Edible Arrangements
+     https://www.ediblearrangements.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 36. [AUTO SUCCESS] Manhattan Portage
+     https://www.manhattanportage.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 37. [AUTO SUCCESS] Hatshopping
+     https://www.hatshopping.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 38. [AUTO SUCCESS] The Builder Market - (US)
+     https://thebuildermarket.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 39. [FLAGGED] Flash.co
+     https://us.flash.co/
+     Issue: DNS resolution failed: page.goto: net::ERR_NAME_NOT_RESOLVED at https://us.flash.co/
+
+ 40. [AUTO SUCCESS] Hovsco
+     https://hovsco.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 41. [AUTO SUCCESS] Flytographer
+     https://www.flytographer.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 42. [AUTO SUCCESS] Superalink
+     https://www.superalink.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 43. [AUTO SUCCESS] Snapfon (US)
+     https://www.snapfon.com/lp/50-off-new-customers/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 44. [AUTO SUCCESS] One Sol
+     https://onesol.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 45. [AUTO SUCCESS] Smith Teamaker
+     https://smithtea.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 46. [AUTO SUCCESS] Solace Bands
+     https://solacebands.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 47. [AUTO SUCCESS] OIWAS SPORTS EQUIPMENT INC.
+     https://www.oiwasbag.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 48. [AUTO SUCCESS] Cambio Roasters
+     https://cambioroasters.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 49. [AUTO SUCCESS] Always Full
+     https://alwaysfull.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 50. [AUTO SUCCESS] MyPhysicianPlan
+     https://myphysicianplan.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 51. [AUTO SUCCESS] OakViva
+     https://oakviva.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 52. [AUTO SUCCESS] Sportsmans Outdoor Superstore
+     https://www.sportsmansoutdoorsuperstore.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 53. [AUTO SUCCESS] GuidingCross
+     https://www.guidingcross.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 54. [AUTO SUCCESS] ShopRaise
+     https://shopraise.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+ 55. [FLAGGED] Bikinies
+     https://www.bikinies.com
+     Issue: store is currently unavailable
+
+ 56. [AUTO SUCCESS] Optics Force
+     https://opticsforce.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 57. [AUTO SUCCESS] Vesync
+     https://us.vesync.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 58. [AUTO SUCCESS] Satechi
+     https://satechi.net
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 59. [AUTO SUCCESS] Classy Leather Bags
+     https://classyleatherbags.com/?utm_source=classy&utm_medium=affiliates&utm_campaign=affiliates
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 60. [AUTO SUCCESS] Loveweld Permanent Jewelry (US)
+     https://loveweld.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 61. [AUTO SUCCESS] Soru Jewels
+     https://www.sorujewellery.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 62. [AUTO SUCCESS] Creative Arcades
+     https://creative-arcades.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 63. [AUTO SUCCESS] Freeletics
+     https://www.freeletics.com/en/
+     Reason: No severe problems detected
+
+ 64. [AUTO SUCCESS] AstroAI
+     https://www.astroai.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 65. [FLAGGED] Thousandshores
+     https://www.tribitaudio.com
+     Issue: timeout error - site did not load within 30 seconds: page.goto: Timeout 30000ms exceeded.
+
+ 66. [AUTO SUCCESS] Husband Pillow
+     https://www.husbandpillow.com/products/husband-pillow-big-bedrest-reading-support-bed-backrest-with-arms-dark-grey
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 67. [AUTO SUCCESS] Potensic
+     https://store.potensic.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 68. [AUTO SUCCESS] Gooloo
+     https://us.gooloo.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 69. [AUTO SUCCESS] Comfort Zone Skin
+     https://us.comfortzoneskin.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 70. [AUTO SUCCESS] Thyseed(USA)
+     https://www.thyseed.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 71. [AUTO SUCCESS] Petscosset
+     https://petscosset.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 72. [AUTO SUCCESS] Winchester Pet
+     https://worldofwinchester.com
+     Reason: Has functional features
+
+ 73. [AUTO SUCCESS] Riccar
+     https://riccar.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 74. [AUTO SUCCESS] Magicshine
+     https://magicshine.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 75. [AUTO SUCCESS] Pizzello
+     https://pizzello.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 76. [AUTO SUCCESS] Badlands
+     https://badlandsgear.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 77. [AUTO SUCCESS] Extremebeauty
+     https://beaueye.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 78. [AUTO SUCCESS] BANDICAM COMPANY LLC
+     https://www.bandicam.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 79. [AUTO SUCCESS] SUNSHINE ECOMMERCE LLC
+     https://owleys.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 80. [AUTO SUCCESS] Pasturebird
+     https://www.pasturebird.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 81. [AUTO SUCCESS] 360 Cookware
+     https://www.360cookware.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 82. [AUTO SUCCESS] Fiido
+     https://fiido.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 83. [AUTO SUCCESS] The Hemp Doctor
+     https://thehempdoctor.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 84. [AUTO SUCCESS] PuppySpot LLC
+     https://www.puppyspot.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 85. [AUTO SUCCESS] The Skinny Confidential
+     https://shopskinnyconfidential.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 86. [AUTO SUCCESS] NOVAALAB
+     https://novaalab.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 87. [AUTO SUCCESS] Gooseberry Intimates Ltd
+     https://gooseberryintimates.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 88. [AUTO SUCCESS] BERLOOK
+     https://www.berlook.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 89. [AUTO SUCCESS] Boston Institute Of Finance
+     https://www.bostonifi.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 90. [AUTO SUCCESS] Inq Smart Pens
+     https://inq.shop/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 91. [AUTO SUCCESS] Kaabo
+     https://www.kaabousa.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 92. [AUTO SUCCESS] southfaces
+     https://www.southfaces.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 93. [AUTO SUCCESS] Vosteed
+     https://www.vosteed.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 94. [AUTO SUCCESS] Maxemblem
+     https://maxemblem.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 95. [AUTO SUCCESS] Avara
+     https://avarawell.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 96. [AUTO SUCCESS] Buddha Stones
+     https://buddhastoneshop.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 97. [AUTO SUCCESS] Artizan Joyeria
+     https://artizanjoyeria.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 98. [AUTO SUCCESS] Martin Dingman
+     https://MartinDingman.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+ 99. [AUTO SUCCESS] Amerisleep
+     https://amerisleep.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+100. [AUTO SUCCESS] Tabita Bags WW
+     https://tabitabags.ch
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+101. [AUTO SUCCESS] Atlas One Fund
+     https://atlasonefund.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+102. [AUTO SUCCESS] Shine Commerce
+     https://shinecommerce.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+103. [AUTO SUCCESS] Rsscsports
+     https://Rsscsports.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+104. [AUTO SUCCESS] Water Guru
+     https://www.waterguru.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+105. [AUTO SUCCESS] ShedRx
+     https://www.tryshed.com/
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+106. [AUTO SUCCESS] TIJN Eyewear
+     https://tijneyewear.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+107. [AUTO SUCCESS] SUNFLOW, Inc.
+     https://getsunflow.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+108. [AUTO SUCCESS] LaMO
+     https://mykos.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+109. [AUTO SUCCESS] WhiteWall
+     https://www.whitewall.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+110. [AUTO SUCCESS] Simple Retro
+     https://www.simpleretro.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+111. [AUTO SUCCESS] Cadence
+     https://keepyourcadence.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+112. [AUTO SUCCESS] White Lotus Home
+     https://www.whitelotushome.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+113. [AUTO SUCCESS] Bocomal
+     https://www.bocomalfr.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+114. [AUTO SUCCESS] The James Brand
+     https://thejamesbrand.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+115. [AUTO SUCCESS] KALM with Kava
+     https://www.kalmwithkava.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+116. [FLAGGED] Giant Teddy
+     https://Giantteddy.com
+     Issue: DNS resolution failed: page.goto: net::ERR_NAME_NOT_RESOLVED at https://giantteddy.com/
+
+117. [AUTO SUCCESS] SWIRISE
+     https://swirise.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+118. [AUTO SUCCESS] Astek
+     https://astekhome.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+119. [AUTO SUCCESS] Wing Assistant
+     https://wingassistant.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+120. [AUTO SUCCESS] Plumbing Sell
+     https://plumbingsell.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+121. [AUTO SUCCESS] Conscious Step
+     https://consciousstep.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+122. [AUTO SUCCESS] Segway
+     https://us.navimow.segway.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+123. [AUTO SUCCESS] Callas Milano
+     https://callasmilano.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+124. [AUTO SUCCESS] MegaFood
+     https://www.megafood.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+125. [AUTO SUCCESS] Free the Ocean
+     https://www.freetheocean.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+126. [AUTO SUCCESS] Dr.Prepare
+     https://drprepare.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+127. [AUTO SUCCESS] The Baby/s Brew
+     https://www.thebabysbrew.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+128. [AUTO SUCCESS] Embossed Graphics
+     https://www.embossedgraphics.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+129. [AUTO SUCCESS] Tealerlab
+     https://tealer-lab.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+130. [AUTO SUCCESS] GETPAIRR
+     https://getpairr.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+131. [AUTO SUCCESS] Jessup Beauty
+     https://www.jessupbeauty.com/collections/new-arrivals-sale
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+132. [AUTO SUCCESS] Bodega Cooler
+     https://www.bodegacooler.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+133. [AUTO SUCCESS] Cuzen Matcha
+     https://cuzenmatcha.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+134. [AUTO SUCCESS] KGORGE
+     https://www.kgorge.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+135. [AUTO SUCCESS] Figue Acquisition, LLC
+     https://Figue.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+136. [AUTO SUCCESS] Vous Vitamin
+     https://www.vousvitamin.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+137. [AUTO SUCCESS] Relife
+     https://relifesports.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+138. [AUTO SUCCESS] Fifthroom.com
+     https://www.fifthroom.com/
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+139. [AUTO SUCCESS] Silversal
+     https://silversal.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+140. [AUTO SUCCESS] Luma Flame
+     https://www.lumaflame.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+141. [AUTO SUCCESS] Potluck
+     https://potluckmarket.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+142. [AUTO SUCCESS] TOTY
+     https://toty.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+143. [AUTO SUCCESS] Vibe Alley
+     https://www.vibealley.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+144. [AUTO SUCCESS] Flux Footwear
+     https://Fluxfootwear.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+145. [AUTO SUCCESS] Sock It To Me
+     https://www.sockittome.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+146. [AUTO SUCCESS] RationAle Brewing
+     https://rationalebrewing.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+147. [AUTO SUCCESS] Dannico woodworks
+     https://dannicowoodworks.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+148. [AUTO SUCCESS] Dazzlingrock
+     https://www.dazzlingrock.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+149. [AUTO SUCCESS] Epicured
+     https://www.epicured.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+150. [AUTO SUCCESS] Ultahost
+     https://ultahost.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+151. [AUTO SUCCESS] Jovy
+     https://www.jovyco.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+152. [AUTO SUCCESS] Aware House
+     https://www.awarehouseshop.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+153. [AUTO SUCCESS] Posture Pump
+     https://posturepump.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+154. [AUTO SUCCESS] MediaZilla
+     https://mediazilla.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+155. [AUTO SUCCESS] JHY Design
+     https://jhy-design.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+156. [AUTO SUCCESS] Magno Chocolates
+     https://magnochocolates.us
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+157. [AUTO SUCCESS] Zoviz
+     https://zoviz.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+158. [AUTO SUCCESS] AL-MAWARED NATURAL BEAUTY CARE PRODUCTS (RIVAGE)
+     https://rivagecare.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+159. [AUTO SUCCESS] Curry and Paxton
+     https://www.curryandpaxton.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+160. [AUTO SUCCESS] MAXPAWN Luxury
+     https://maxpawn.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+161. [AUTO SUCCESS] Luv Clay LLC
+     https://www.salvivglobal.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+162. [AUTO SUCCESS] Artra Laboratory
+     https://artralab.hk
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+163. [AUTO SUCCESS] Bahimi
+     https://bahimi.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+164. [AUTO SUCCESS] Cube Tracker
+     https://www.CubeTracker.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+165. [AUTO SUCCESS] Inno Cn
+     https://innocn.com/products
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+166. [AUTO SUCCESS] Flora Animalia
+     https://floraanimalia.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+167. [AUTO SUCCESS] Calgee
+     https://calgee.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+168. [AUTO SUCCESS] FUMECLEAR
+     https://www.fumeclear.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+169. [AUTO SUCCESS] Mileseey
+     https://www.mileseeygolf.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+170. [AUTO SUCCESS] TIZAG Inc.
+     https://TIZAG.shop
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+171. [AUTO SUCCESS] ORPHEUS Skincare
+     https://orpheus-skin.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+172. [AUTO SUCCESS] FooJun LLC
+     https://www.greenleaflinens.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+173. [AUTO SUCCESS] LOFTEK
+     https://www.loftek.us/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+174. [AUTO SUCCESS] Mowbi
+     https://Mowbi.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+175. [AUTO SUCCESS] Charlie Bravo Delta
+     https://charliebravodelta.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+176. [AUTO SUCCESS] ayamayaoutdoor
+     https://ayamaya.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+177. [AUTO SUCCESS] Bengal Products
+     https://www.bengal.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+178. [AUTO SUCCESS] FREESOO
+     https://freesoo-auto.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+179. [AUTO SUCCESS] KAYGO
+     https://kaygosafety.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+180. [AUTO SUCCESS] Vintage Souls
+     https://vintagesouls.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+181. [AUTO SUCCESS] tethos
+     https://www.societeaco.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+182. [AUTO SUCCESS] Vertra
+     https://www.vertra.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+183. [AUTO SUCCESS] Raw Rev
+     https://www.rawrev.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+184. [AUTO SUCCESS] Fig For Kids
+     https://www.figforkids.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+185. [AUTO SUCCESS] Zhengzhou Auspicious Technology Co., Ltd
+     https://www.rxmoore.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+186. [AUTO SUCCESS] NORDIC HUB
+     https://primebotanicsbeauty.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+187. [AUTO SUCCESS] Chewy
+     https://chewy.com
+     Reason: No severe problems detected
+
+188. [AUTO SUCCESS] TV Lift Cabinet
+     https://www.tvliftcabinet.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+189. [AUTO SUCCESS] Skincare Junkie
+     https://www.skincarejunkie.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+190. [AUTO SUCCESS] Dorne
+     https://www.dorne.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+191. [AUTO SUCCESS] 3Doodler
+     https://the3doodler.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+192. [AUTO SUCCESS] Warfield & Grand
+     https://warfieldandgrand.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+193. [AUTO SUCCESS] Bouquet Box
+     https://www.bouquetbox.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+194. [AUTO SUCCESS] PINTRILL
+     https://www.pintrill.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+195. [AUTO SUCCESS] EO Products
+     https://www.eoproducts.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+196. [AUTO SUCCESS] Kiki Milk
+     https://www.kikimilk.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+197. [AUTO SUCCESS] Any Hill
+     https://www.anyhill.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+198. [AUTO SUCCESS] Freedom USA Sales
+     https://freedomusasales.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+199. [AUTO SUCCESS] Megawheels
+     https://megawheels.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+200. [AUTO SUCCESS] Alberto Nardoni
+     https://albertonardoni.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+201. [AUTO SUCCESS] Olivenorma
+     https://www.olivenorma.com/?utm_source=shareasale&utm_medium=shareasale
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+202. [AUTO SUCCESS] Bazyths
+     https://bazyths.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+203. [AUTO SUCCESS] iCrimp Tools
+     https://www.icrimptools.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+204. [AUTO SUCCESS] Real Dog Box
+     https://real.dog/offers/free-meatballs
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+205. [AUTO SUCCESS] Wellco industry co,.ltd
+     https://www.gardenport.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+206. [AUTO SUCCESS] NIPYATA!
+     https://nipyata.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+207. [AUTO SUCCESS] Svala
+     https://www.svala.co
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+208. [AUTO SUCCESS] Happy Paws
+     https://HappyPaws.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+209. [AUTO SUCCESS] Little Poppy Co
+     https://littlepoppyco.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+210. [AUTO SUCCESS] Republic of Durable Goods
+     https://republicofdurablegoods.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+211. [AUTO SUCCESS] Melodie Music
+     https://www.melod.ie
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+212. [AUTO SUCCESS] Kixies
+     https://kixies.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+213. [AUTO SUCCESS] Cat Box Classics
+     https://www.CatBoxClassics.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+214. [AUTO SUCCESS] Hot Springs Natural
+     https://www.hotspringsnatural.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+215. [AUTO SUCCESS] So this Pure Beauty
+     https://sothispurebeauty.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+216. [AUTO SUCCESS] Ecoer
+     https://www.ecoerfashion.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+217. [AUTO SUCCESS] OttLite
+     https://www.ottlite.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+218. [AUTO SUCCESS] RYL
+     https://drinkryl.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+219. [AUTO SUCCESS] Mission MightyMe
+     https://www.missionmightyme.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+220. [AUTO SUCCESS] Vankyo
+     https://ivankyo.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+221. [AUTO SUCCESS] Braxley Bands
+     https://braxleybands.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+222. [AUTO SUCCESS] MICHELLE WILHITE
+     https://WWW.MICHELLEWILHITE.COM
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+223. [AUTO SUCCESS] Cayatch Posture Corrector
+     https://www.cayatch.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+224. [AUTO SUCCESS] Gourmet Gift Basket Store
+     https://www.gourmetgiftbasketstore.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+225. [AUTO SUCCESS] Motif Beauty (Skincare)
+     https://motifskincare.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+226. [AUTO SUCCESS] Rainy Roses
+     https://www.rainyroses.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+227. [AUTO SUCCESS] uMobix
+     https://www.umobix.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+228. [AUTO SUCCESS] ZipGlove
+     https://zip-glove.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+229. [AUTO SUCCESS] Canary Clean Products, LLC
+     https://www.canarycleanco.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+230. [AUTO SUCCESS] Azova Inc.
+     https://www.azova.com/
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+231. [AUTO SUCCESS] Mint Clothing Boutiques
+     https://www.shopmint.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+232. [AUTO SUCCESS] Sally Beauty
+     https://www.sallybeauty.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+233. [AUTO SUCCESS] Fioboc
+     https://www.fioboc.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+234. [AUTO SUCCESS] Rize Home
+     https://rizehome.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+235. [AUTO SUCCESS] MONOCARBON
+     https://www.monocarbontech.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+236. [AUTO SUCCESS] Orce Cosmetics
+     https://www.orcecosmetics.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+237. [AUTO SUCCESS] Sheec Socks
+     https://sheecsocks.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+238. [AUTO SUCCESS] Chaptex Group, LLC
+     https://chaptex.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+239. [AUTO SUCCESS] Alex Apparel Group
+     https://www.alexevenings.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+240. [AUTO SUCCESS] My Face Swimsuit
+     https://myfaceswimsuit.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+241. [AUTO SUCCESS] DESERI
+     https://www.deseri.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+242. [AUTO SUCCESS] Wild Spirit Fragrances
+     https://www.wildspiritfragrances.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+243. [AUTO SUCCESS] Nuebiome
+     https://www.nuebiome.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+244. [AUTO SUCCESS] Curtarra
+     https://www.curtarra.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+245. [AUTO SUCCESS] Tru Luxe
+     https://www.truluxejeans.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+246. [AUTO SUCCESS] Tera
+     https://tera-innovation.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+247. [AUTO SUCCESS] Autio
+     https://app.autio.com/partnerdeal?sv1=affiliate&sv_campaign_id=407399&awc=46327_1756240472_85ce96ba55577656e3d564806a47ff46
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+248. [AUTO SUCCESS] Wabi Whiffs
+     https://www.WabiWhiffs.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+249. [AUTO SUCCESS] KillerPlayer
+     https://killerplayer.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+250. [AUTO SUCCESS] Remote CoWorker
+     https://remotecoworker.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+251. [AUTO SUCCESS] TrueMedX
+     https://truemedx.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+252. [AUTO SUCCESS] Drag Society
+     https://www.dragsociety.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+253. [AUTO SUCCESS] Yodolla
+     https://yodolla.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+254. [AUTO SUCCESS] Land Guard
+     https://landguardgarden.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+255. [AUTO SUCCESS] Lazy Seal Inc
+     https://www.lazy-seal.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+256. [AUTO SUCCESS] Spongelle
+     https://www.spongelle.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+257. [AUTO SUCCESS] Crave
+     https://cravedirect.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+258. [AUTO SUCCESS] LubbDubb
+     https://lubbdubb.io/home
+     Reason: No severe problems detected
+
+259. [AUTO SUCCESS] Brodi Specialty Products Ltd.
+     https://Www.Brodi.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+260. [FLAGGED] Unidragon
+     https://p.unidragon.com
+     Issue: DNS resolution failed: page.goto: net::ERR_NAME_NOT_RESOLVED at https://p.unidragon.com/
+
+261. [AUTO SUCCESS] Hugo Coffee Roasters
+     https://hugo.coffee
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+262. [AUTO SUCCESS] ARW Home
+     https://arwhome.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+263. [AUTO SUCCESS] Lutec
+     https://lutec-lighting.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+264. [AUTO SUCCESS] AirDroid
+     https://www.airdroid.com/
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+265. [AUTO SUCCESS] jace clinical solutions
+     https://jaceclinicalsolutions.com
+     Reason: No severe problems detected
+
+266. [AUTO SUCCESS] Saje Wellness
+     https://www.saje.ca
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+267. [AUTO SUCCESS] WhatGeek
+     https://www.whatgeek.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+268. [AUTO SUCCESS] FullyVital
+     https://fullyvital.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+269. [AUTO SUCCESS] All Moringa
+     https://allmoringatree.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+270. [AUTO SUCCESS] Dallas Designer Handbags
+     https://www.dallasdesignerhandbags.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+271. [AUTO SUCCESS] Bioniq
+     https://bioniq.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+272. [AUTO SUCCESS] Veefa
+     https://www.veefabike.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+273. [AUTO SUCCESS] Snore Circle
+     https://www.snorecircle.com/Snore-Circle-Smart-Anti-Snoring-Muscle-Stimulator-p825060.html
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+274. [AUTO SUCCESS] Attaché
+     https://www.buyattache.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+275. [AUTO SUCCESS] ShowersPlus.com
+     https://www.showersplus.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+276. [AUTO SUCCESS] Burlap & Barrel
+     https://www.burlapandbarrel.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+277. [AUTO SUCCESS] PowerMarket
+     https://dimension.powermarket.io/cadm.html
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+278. [AUTO SUCCESS] Kara Yoo Jewelry
+     https://www.karayoo.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+279. [AUTO SUCCESS] Revgear
+     https://www.revgear.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+280. [AUTO SUCCESS] GlocalMe
+     https://store.glocalme.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+281. [AUTO SUCCESS] EFE GLASSES
+     https://www.efeglasses.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+282. [AUTO SUCCESS] Spacejoy
+     https://www.spacejoy.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+283. [AUTO SUCCESS] SeroVital
+     https://www.serovital.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+284. [AUTO SUCCESS] L/Amour Des Pieds
+     https://www.lamourdespieds.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+285. [AUTO SUCCESS] SHED RAIN
+     https://shedrain.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+286. [AUTO SUCCESS] Foscam
+     https://www.foscammall.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+287. [AUTO SUCCESS] BeBird
+     https://bebird.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+288. [AUTO SUCCESS] Delilah Home
+     https://Delilahhome.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+289. [AUTO SUCCESS] Mindless Labs
+     https://shopmindless.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+290. [AUTO SUCCESS] JBW Watches
+     https://jbw.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+291. [AUTO SUCCESS] Kiss Chacey
+     https://kisschacey.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+292. [AUTO SUCCESS] Good Chop
+     https://www.goodchop.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+293. [AUTO SUCCESS] ECCO
+     https://us.ecco.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+294. [AUTO SUCCESS] ENNUE
+     https://www.ennuestudio.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+295. [AUTO SUCCESS] EVELYN & KATE
+     https://www.evelynandkate.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+296. [AUTO SUCCESS] ActivForce
+     https://activforce.com/
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+297. [AUTO SUCCESS] ExBrite Medicine Cabinets
+     https://www.allsumhome.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+298. [AUTO SUCCESS] MacCase
+     https://mac-case.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+299. [AUTO SUCCESS] Marmot
+     https://www.marmot.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+300. [AUTO SUCCESS] Great Wolf Lodge
+     https://www.greatwolf.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+301. [FLAGGED] SageFinds
+     https://www.sagefinds.com/
+     Issue: minimal content - likely unavailable
+
+302. [AUTO SUCCESS] Erno Laszlo
+     https://www.ernolaszlo.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+303. [AUTO SUCCESS] DAVIDsTEA
+     https://www.davidstea.com/us_en/home/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+304. [AUTO SUCCESS] Marc Jacobs
+     https://www.marcjacobs.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+305. [AUTO SUCCESS] AGMES
+     https://agmesnyc.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+306. [FLAGGED] Edgewell
+     https://edgewell.com
+     Issue: timeout error - site did not load within 30 seconds: page.goto: Timeout 30000ms exceeded.
+
+307. [AUTO SUCCESS] Buck Knives
+     https://www.buckknives.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+308. [AUTO SUCCESS] Fabric Insurance
+     https://www.meetfabric.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+309. [AUTO SUCCESS] PNW Components
+     https://www.pnwcomponents.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+310. [AUTO SUCCESS] BigRigVin
+     https://bigrigvin.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+311. [AUTO SUCCESS] Areaware
+     https://www.areaware.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+312. [AUTO SUCCESS] WriterAccess
+     https://www.writeraccess.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+313. [AUTO SUCCESS] UnderPar
+     https://www.underpar.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+314. [AUTO SUCCESS] SOG Knives and Tools
+     https://sogknives.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+315. [AUTO SUCCESS] Cabin Zero
+     https://www.cabinzero.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+316. [AUTO SUCCESS] Amanda Uprichard
+     https://amandauprichard.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+317. [AUTO SUCCESS] No! Jeans
+     https://nojeans.co/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+318. [AUTO SUCCESS] Mondaine
+     https://mondaine.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+319. [AUTO SUCCESS] Cerebral
+     https://cerebral.com/
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+320. [AUTO SUCCESS] Pots and Pans
+     https://www.potsandpans.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+321. [AUTO SUCCESS] Janie and Jack
+     https://www.janieandjack.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+322. [AUTO SUCCESS] Support Pets
+     https://www.supportpets.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+323. [AUTO SUCCESS] Bloch
+     https://uk.blochworld.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+324. [FLAGGED] SellHound
+     https://www.sellhound.com
+     Issue: DNS resolution failed: page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.sellhound.com/
+
+325. [AUTO SUCCESS] PureTree
+     https://www.PureTree.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+326. [AUTO SUCCESS] Splice
+     https://splice.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+327. [AUTO SUCCESS] Lumin
+     https://www.Luminskin.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+328. [AUTO SUCCESS] MANSUR GAVRIEL
+     https://www.mansurgavriel.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+329. [AUTO SUCCESS] localrent.com
+     https://localrent.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+330. [AUTO SUCCESS] Sunday Riley
+     https://sundayriley.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+331. [AUTO SUCCESS] Current
+     https://current.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+332. [AUTO SUCCESS] Brightside
+     https://www.brightside.com
+     Reason: Functional e-commerce features detected (GOOD protection)
+
+333. [AUTO SUCCESS] Roc Skincare
+     https://www.rocskincare.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+334. [AUTO SUCCESS] Sugar
+     https://www.sugar.it/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+335. [AUTO SUCCESS] Metro Brazil
+     https://metrobrazil.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+336. [AUTO SUCCESS] Clove Technology
+     https://www.clove-technology.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+337. [AUTO SUCCESS] Wisdom Essentials
+     https://wisdomessentials.com
+     Reason: No severe problems detected
+
+338. [AUTO SUCCESS] Trainer Academy
+     https://traineracademy.org/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+339. [AUTO SUCCESS] ecobee
+     https://www.ecobee.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+340. [AUTO SUCCESS] Weleda
+     https://www.weleda.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+341. [AUTO SUCCESS] Briogeo Hair
+     https://www.briogeohair.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+342. [AUTO SUCCESS] Beam
+     https://shopbeam.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+343. [AUTO SUCCESS] Meat! Your Maker
+     https://www.meatyourmaker.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+344. [AUTO SUCCESS] T-H Marine Supplies
+     https://thmarinesupplies.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+345. [AUTO SUCCESS] Tracie Martyn
+     https://www.traciemartyn.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+346. [AUTO SUCCESS] Trusy Social
+     https://go.trusy.co/start/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+347. [AUTO SUCCESS] BASSO
+     https://basso.co
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+348. [AUTO SUCCESS] Darkest Fox
+     https://www.darkestfox.com
+     Reason: No severe problems detected
+
+349. [AUTO SUCCESS] Sentiments Express
+     https://int.sentimentsexpress.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+350. [AUTO SUCCESS] Carve Designs
+     https://www.carvedesigns.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+351. [AUTO SUCCESS] Glamood
+     https://www.glamood.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+352. [AUTO SUCCESS] VENN Skincare
+     https://www.vennskincare.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+353. [AUTO SUCCESS] VigorLabs
+     https://www.vigorlabs.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+354. [AUTO SUCCESS] Mustela
+     https://www.mustelausa.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+355. [AUTO SUCCESS] At Home
+     https://www.athome.com/
+     Reason: No severe problems detected
+
+356. [AUTO SUCCESS] LifeSpan Fitness
+     https://www.lifespanfitness.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+357. [AUTO SUCCESS] Shaw/s
+     https://www.shaws.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+358. [AUTO SUCCESS] GoToConnect
+     https://www.goto.com/connect
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+359. [AUTO SUCCESS] Test My Allergy
+     https://www.testmyallergy.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+360. [AUTO SUCCESS] Byrna
+     https://byrna.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+361. [AUTO SUCCESS] Harry/s
+     https://www.harrys.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+362. [AUTO SUCCESS] Sanitas Skincare
+     https://sanitas-skincare.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+363. [AUTO SUCCESS] Moda Operandi
+     https://www.ModaOperandi.com
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+364. [AUTO SUCCESS] UKLASH
+     https://www.uklash.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+365. [AUTO SUCCESS] Magpul
+     https://www.magpul.com/
+     Reason: Functional e-commerce features detected (STRONG protection)
+
+================================================================================
+End of Report
