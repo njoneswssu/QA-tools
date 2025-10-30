@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Order Status Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .input-mode-selector {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .mode-buttons {
+            display: inline-flex;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+            gap: 5px;
+        }
+
+        .mode-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            color: #6c757d;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .converter-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: start;
+        }
+
+        .input-section, .output-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 2px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 500px;
+            height: 60vh;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+            flex: 1;
+            overflow-y: auto;
+            cursor: text;
+            pointer-events: auto;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        #outputArea {
+            background-color: #f8f9fa;
+            color: #333;
+            cursor: text;
+            pointer-events: auto;
+        }
+        
+        #inputArea {
+            cursor: text;
+            pointer-events: auto;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-convert {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-convert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(250, 112, 154, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .output-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .conversion-rules {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .conversion-rules h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .conversion-rules ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .conversion-rules li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .conversion-rules li:last-child {
+            border-bottom: none;
+        }
+
+        .conversion-rules li::before {
+            content: '✓';
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .converter-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .output-buttons {
+                flex-direction: column;
+            }
+            
+            textarea {
+                height: 50vh;
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>XML Order Status Converter</h1>
+            <p>Convert ORDER INPUT SHIPMENT to ORDER INPUT ORDER STATUS UPDATE ACCEPT</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-mode-selector">
+                <div class="mode-buttons">
+                    <button class="mode-btn" id="orderModeBtn">Order Numbers</button>
+                    <button class="mode-btn active" id="xmlModeBtn">XML Input</button>
+                </div>
+            </div>
+            
+            <div class="converter-section">
+                <div class="input-section">
+                    <div class="section-title" id="inputTitle">Input XML</div>
+                    <textarea id="inputArea" placeholder="Paste your XML code here..."></textarea>
+                </div>
+                
+                <div class="output-section">
+                    <div class="section-title">Converted XML</div>
+                    <textarea id="outputArea" readonly placeholder="Converted XML will appear here..."></textarea>
+                    <div class="output-buttons">
+                        <button class="btn btn-copy" id="copyBtn" disabled>
+                            📋 Copy to Clipboard
+                        </button>
+                        <button class="btn btn-download" id="downloadBtn" disabled>
+                            💾 Download XML
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <button class="btn btn-convert" id="convertBtn">
+                    🔄 Convert to ORDER STATUS UPDATE ACCEPT
+                </button>
+                <button class="btn btn-convert" id="reverseConvertBtn" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);">
+                    🔄 Convert to ORDER INPUT SHIPMENT
+                </button>
+            </div>
+            
+            <div class="status-message" id="statusMessage"></div>
+            
+            <div class="conversion-rules">
+                <h3>Conversion Rules Applied:</h3>
+                <ul>
+                    <li><strong>Order Numbers Mode:</strong> Paste order numbers (one per line) to generate complete XML</li>
+                    <li><strong>XML Input Mode:</strong> Paste existing XML to convert between formats</li>
+                    <li><strong>Blue Button:</strong> Converts to ORDER STATUS UPDATE ACCEPT format</li>
+                    <li><strong>Red Button:</strong> Converts to ORDER INPUT SHIPMENT format</li>
+                    <li>Automatically handles &lt;ShipmentDate&gt; and tracking info</li>
+                    <li>Processes multiple entries (order numbers or XML blocks)</li>
+                    <li>Shows converted version followed by original for each entry</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputArea = document.getElementById('inputArea');
+        const outputArea = document.getElementById('outputArea');
+        const inputTitle = document.getElementById('inputTitle');
+        const orderModeBtn = document.getElementById('orderModeBtn');
+        const xmlModeBtn = document.getElementById('xmlModeBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const reverseConvertBtn = document.getElementById('reverseConvertBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        let currentMode = 'xml'; // 'order' or 'xml' - default to XML mode
+
+        function showStatus(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${isError ? 'status-error' : 'status-success'}`;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        function generateCurrentDate() {
+            const now = new Date();
+            const currentDay = now.getDate();
+            
+            // Generate a random day between 1 and current day (so it's never in the future)
+            const randomDay = Math.floor(Math.random() * currentDay) + 1;
+            
+            // Set the date to the random day in the current month/year
+            const shipmentDate = new Date(now.getFullYear(), now.getMonth(), randomDay);
+            
+            const year = shipmentDate.getFullYear();
+            const month = String(shipmentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(shipmentDate.getDate()).padStart(2, '0');
+            
+            return `${year}-${month}-${day} 0:0:0.0`;
+        }
+
+        function generateXMLTemplate(orderNumber, isShipment = false) {
+            const orderInput = isShipment ? 'ORDER INPUT SHIPMENT' : 'ORDER INPUT ORDER STATUS UPDATE ACCEPT';
+            const shipmentDateTag = isShipment ? `\n                    <ShipmentDate>${generateCurrentDate()}</ShipmentDate>` : '';
+            const trackingInfo = isShipment ? `
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318464892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>` : '';
+
+            return `
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>${orderNumber}</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>${orderInput}</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0105</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>${shipmentDateTag}
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>${trackingInfo}
+        </OrderStatusUpdate>
+    </Comergent>`;
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            if (mode === 'order') {
+                orderModeBtn.classList.add('active');
+                xmlModeBtn.classList.remove('active');
+                inputTitle.textContent = 'Input Order Numbers';
+                inputArea.placeholder = 'Paste order numbers here (one per line)...\nExample:\n02438130\n02438109\n02440750';
+            } else {
+                xmlModeBtn.classList.add('active');
+                orderModeBtn.classList.remove('active');
+                inputTitle.textContent = 'Input XML';
+                inputArea.placeholder = 'Paste your XML code here...';
+            }
+            
+            inputArea.value = '';
+            outputArea.value = '';
+            copyBtn.disabled = true;
+            downloadBtn.disabled = true;
+        }
+
+        function convertXML() {
+            const inputText = inputArea.value.trim();
+            
+            if (!inputText) {
+                const inputType = currentMode === 'order' ? 'order numbers' : 'XML content';
+                showStatus(`Please paste some ${inputType} to convert.`, true);
+                return;
+            }
+
+            try {
+                let finalOutput = '';
+
+                if (currentMode === 'order') {
+                    // Order number mode - generate XML from order numbers
+                    const orderNumbers = inputText.split('\n').map(line => line.trim()).filter(line => line);
+
+                    orderNumbers.forEach((orderNumber, index) => {
+                        if (!orderNumber) return;
+
+                        // Generate ORDER STATUS UPDATE ACCEPT version (converted)
+                        const convertedXML = generateXMLTemplate(orderNumber, false);
+                        
+                        // Generate ORDER INPUT SHIPMENT version (original)
+                        const originalXML = generateXMLTemplate(orderNumber, true);
+
+                        // Add converted followed by original
+                        finalOutput += convertedXML + originalXML;
+                    });
+
+                    const orderCount = orderNumbers.length;
+                    showStatus(`Successfully converted ${orderCount} order number${orderCount > 1 ? 's' : ''}!`);
+                } else {
+                    // XML mode - convert existing XML
+                    const comergentBlocks = inputText.split(/(?=<Comergent>)/g).filter(block => block.trim());
+
+                    comergentBlocks.forEach((block, index) => {
+                        if (!block.trim()) return;
+
+                        // Process each block individually
+                        let convertedBlock = block;
+
+                        // Always convert TO ORDER STATUS UPDATE ACCEPT (blue button)
+                        convertedBlock = convertedBlock.replace(
+                            /ORDER INPUT SHIPMENT/g, 
+                            'ORDER INPUT ORDER STATUS UPDATE ACCEPT'
+                        );
+                        convertedBlock = convertedBlock.replace(
+                            /ORDER INPUT ORDER STATUS UPDATE ACCEPT/g, 
+                            'ORDER INPUT ORDER STATUS UPDATE ACCEPT'
+                        );
+
+                        // Remove all <ShipmentDate> tags and their content for ORDER STATUS UPDATE ACCEPT
+                        convertedBlock = convertedBlock.replace(
+                            /<ShipmentDate>.*?<\/ShipmentDate>/g, 
+                            ''
+                        );
+
+                        // Remove entire <JCPOrderShipmentUpdateInfoList> sections
+                        convertedBlock = convertedBlock.replace(
+                            /<JCPOrderShipmentUpdateInfoList[^>]*>[\s\S]*?<\/JCPOrderShipmentUpdateInfoList>/g, 
+                            ''
+                        );
+
+                        // Create the ORDER INPUT SHIPMENT version for second block
+                        let shipmentBlock = block;
+                        
+                        // Clean existing shipment dates to prevent duplicates
+                        shipmentBlock = shipmentBlock.replace(
+                            /<ShipmentDate>.*?<\/ShipmentDate>/g, 
+                            ''
+                        );
+                        
+                        shipmentBlock = shipmentBlock.replace(
+                            /ORDER INPUT SHIPMENT/g, 
+                            'ORDER INPUT SHIPMENT'
+                        );
+                        shipmentBlock = shipmentBlock.replace(
+                            /ORDER INPUT ORDER STATUS UPDATE ACCEPT/g, 
+                            'ORDER INPUT SHIPMENT'
+                        );
+
+                        // Now add fresh <ShipmentDate> after every <LineStatus> (no duplicates)
+                        shipmentBlock = shipmentBlock.replace(
+                            /(<LineStatus>ACCEPT<\/LineStatus>)/g,
+                            `$1\n                    <ShipmentDate>${generateCurrentDate()}</ShipmentDate>`
+                        );
+
+                        // Add JCPOrderShipmentUpdateInfoList to shipment block if not present
+                        if (!shipmentBlock.includes('<JCPOrderShipmentUpdateInfoList>')) {
+                            shipmentBlock = shipmentBlock.replace(
+                                /(<\/OrderShipmentUpdateLineItemList>)/g,
+                                `$1
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318464892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>`
+                            );
+                        }
+
+                        // Clean up extra whitespace and empty lines for both blocks
+                        convertedBlock = convertedBlock.replace(/\n\s*\n\s*\n/g, '\n\n');
+                        convertedBlock = convertedBlock.replace(/^\s*\n/gm, '');
+                        shipmentBlock = shipmentBlock.replace(/\n\s*\n\s*\n/g, '\n\n');
+                        shipmentBlock = shipmentBlock.replace(/^\s*\n/gm, '');
+
+                        // Add ORDER STATUS UPDATE ACCEPT first, then ORDER INPUT SHIPMENT second
+                        finalOutput += convertedBlock + shipmentBlock;
+                    });
+
+                    const blockCount = comergentBlocks.length;
+                    showStatus(`Successfully converted ${blockCount} XML block${blockCount > 1 ? 's' : ''}!`);
+                }
+
+                outputArea.value = finalOutput;
+                copyBtn.disabled = false;
+                downloadBtn.disabled = false;
+            } catch (error) {
+                showStatus('Error converting: ' + error.message, true);
+            }
+        }
+
+        function copyToClipboard() {
+            if (!outputArea.value) {
+                showStatus('No converted XML to copy.', true);
+                return;
+            }
+
+            outputArea.select();
+            outputArea.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                document.execCommand('copy');
+                showStatus('Successfully copied to clipboard!');
+            } catch (error) {
+                // Fallback for modern browsers
+                navigator.clipboard.writeText(outputArea.value).then(() => {
+                    showStatus('Successfully copied to clipboard!');
+                }).catch(() => {
+                    showStatus('Failed to copy to clipboard.', true);
+                });
+            }
+        }
+
+        function downloadXML() {
+            if (!outputArea.value) {
+                showStatus('No converted XML to download.', true);
+                return;
+            }
+
+            const blob = new Blob([outputArea.value], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = url;
+            a.download = 'converted_order_status.xml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('Successfully downloaded XML file!');
+        }
+
+        function reverseConvertXML() {
+            const inputText = inputArea.value.trim();
+            
+            if (!inputText) {
+                const inputType = currentMode === 'order' ? 'order numbers' : 'XML content';
+                showStatus(`Please paste some ${inputType} to convert.`, true);
+                return;
+            }
+
+            try {
+                let finalOutput = '';
+
+                if (currentMode === 'order') {
+                    // Order number mode - generate XML from order numbers
+                    const orderNumbers = inputText.split('\n').map(line => line.trim()).filter(line => line);
+
+                    orderNumbers.forEach((orderNumber, index) => {
+                        if (!orderNumber) return;
+
+                        // Generate ORDER INPUT SHIPMENT version (converted)
+                        const convertedXML = generateXMLTemplate(orderNumber, true);
+                        
+                        // Generate ORDER STATUS UPDATE ACCEPT version (original)
+                        const originalXML = generateXMLTemplate(orderNumber, false);
+
+                        // Add converted followed by original
+                        finalOutput += convertedXML + originalXML;
+                    });
+
+                    const orderCount = orderNumbers.length;
+                    showStatus(`Successfully converted ${orderCount} order number${orderCount > 1 ? 's' : ''} to ORDER INPUT SHIPMENT!`);
+                } else {
+                    // XML mode - convert existing XML to ORDER INPUT SHIPMENT ONLY
+                    const comergentBlocks = inputText.split(/(?=<Comergent>)/g).filter(block => block.trim());
+
+                    comergentBlocks.forEach((block, index) => {
+                        if (!block.trim()) return;
+
+                        // Process each block individually - convert TO ORDER INPUT SHIPMENT
+                        let convertedBlock = block;
+
+                        // Always convert TO ORDER INPUT SHIPMENT (red button)
+                        convertedBlock = convertedBlock.replace(
+                            /ORDER INPUT SHIPMENT/g, 
+                            'ORDER INPUT SHIPMENT'
+                        );
+                        convertedBlock = convertedBlock.replace(
+                            /ORDER INPUT ORDER STATUS UPDATE ACCEPT/g, 
+                            'ORDER INPUT SHIPMENT'
+                        );
+
+                        // Add <ShipmentDate> after every <LineStatus>
+                        convertedBlock = convertedBlock.replace(
+                            /(<LineStatus>ACCEPT<\/LineStatus>)/g,
+                            `$1\n                    <ShipmentDate>${generateCurrentDate()}</ShipmentDate>`
+                        );
+
+                        // Add JCPOrderShipmentUpdateInfoList if not present
+                        if (!convertedBlock.includes('<JCPOrderShipmentUpdateInfoList>')) {
+                            convertedBlock = convertedBlock.replace(
+                                /(<\/OrderShipmentUpdateLineItemList>)/g,
+                                `$1
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318464892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>`
+                            );
+                        }
+
+                        // Clean up extra whitespace and empty lines
+                        convertedBlock = convertedBlock.replace(/\n\s*\n\s*\n/g, '\n\n');
+                        convertedBlock = convertedBlock.replace(/^\s*\n/gm, '');
+
+                        // Add ONLY the ORDER INPUT SHIPMENT version
+                        finalOutput += convertedBlock;
+                    });
+
+                    const blockCount = comergentBlocks.length;
+                    showStatus(`Successfully converted ${blockCount} XML block${blockCount > 1 ? 's' : ''} to ORDER INPUT SHIPMENT!`);
+                }
+
+                outputArea.value = finalOutput;
+                copyBtn.disabled = false;
+                downloadBtn.disabled = false;
+            } catch (error) {
+                showStatus('Error converting: ' + error.message, true);
+            }
+        }
+
+        // Event listeners
+        orderModeBtn.addEventListener('click', () => switchMode('order'));
+        xmlModeBtn.addEventListener('click', () => switchMode('xml'));
+        convertBtn.addEventListener('click', convertXML);
+        reverseConvertBtn.addEventListener('click', reverseConvertXML);
+        copyBtn.addEventListener('click', copyToClipboard);
+        downloadBtn.addEventListener('click', downloadXML);
+
+        // Allow Enter key to convert (Ctrl+Enter or Cmd+Enter)
+        inputArea.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                convertXML();
+            }
+        });
+
+        // Auto-resize textareas based on content
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.max(500, textarea.scrollHeight) + 'px';
+        }
+
+        inputArea.addEventListener('input', () => autoResize(inputArea));
+        outputArea.addEventListener('input', () => autoResize(outputArea));
+    </script>
+</body>
+</html>
