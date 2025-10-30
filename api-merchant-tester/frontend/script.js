@@ -565,9 +565,9 @@ function debounce(func, wait) {
     };
 }
 
-// Reset results and filters function (UI only, does not affect database)
+// Reset results and filters function (clears all data and shows zero results)
 function resetResults() {
-    const confirmReset = confirm('Reset all filters and refresh the view?\n\nThis will clear your current filters and reload the data from the database.');
+    const confirmReset = confirm('Clear all results and reset to zero?\n\nThis will clear all displayed results and reset statistics to zero. Database data will remain safe.');
     
     if (!confirmReset) {
         return;
@@ -577,28 +577,50 @@ function resetResults() {
         elements.resetResultsBtn.disabled = true;
         elements.resetResultsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
         
+        // Clear all data arrays
+        currentData = [];
+        filteredData = [];
+        
         // Clear all filters
-        elements.sessionFilter.value = '';
-        elements.statusFilter.value = '';
-        elements.categoryFilter.value = '';
-        elements.searchFilter.value = '';
-        elements.dateFrom.value = '';
-        elements.dateTo.value = '';
+        if (elements.sessionFilter) {
+            elements.sessionFilter.innerHTML = '<option value="">All Sessions</option>';
+            elements.sessionFilter.value = '';
+        }
+        if (elements.statusFilter) elements.statusFilter.value = '';
+        if (elements.categoryFilter) {
+            elements.categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            elements.categoryFilter.value = '';
+        }
+        if (elements.searchFilter) elements.searchFilter.value = '';
+        if (elements.dateFrom) elements.dateFrom.value = '';
+        if (elements.dateTo) elements.dateTo.value = '';
         
         // Reset pagination
         currentPage = 1;
         
-        // Reload data from database (this will refresh stats and results)
-        loadData();
+        // Reset all statistics to zero
+        elements.totalTested.textContent = '0';
+        elements.totalSuccessful.textContent = '0';
+        elements.totalFlagged.textContent = '0';
+        elements.totalUserPassed.textContent = '0';
+        
+        // Clear results table
+        elements.resultsTbody.innerHTML = '<tr><td colspan="8" class="no-results">No test results found</td></tr>';
+        elements.resultsCount.textContent = '0 results';
+        
+        // Reset pagination display
+        elements.pageInfo.textContent = 'Page 0 of 0';
+        elements.prevPageBtn.disabled = true;
+        elements.nextPageBtn.disabled = true;
         
         // Show success message
-        alert('✅ Results view reset successfully!');
+        alert('✅ Results cleared successfully! All data reset to zero.');
         
     } catch (error) {
         console.error('Error resetting results:', error);
         alert('❌ Error resetting results: ' + error.message);
     } finally {
         elements.resetResultsBtn.disabled = false;
-        elements.resetResultsBtn.innerHTML = '<i class="fas fa-undo"></i> Reset Results';
+        elements.resetResultsBtn.innerHTML = '<i class="fas fa-broom"></i> Clear Results';
     }
 }
