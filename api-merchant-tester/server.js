@@ -1,11 +1,72 @@
+// Load environment variables
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { db, createTestSession, updateTestSession, saveMerchantTestResult } = require('./database/init_db');
+
+// Database selection based on environment variable
+// Set USE_POSTGRES=true to use PostgreSQL, otherwise falls back to SQLite
+const USE_POSTGRES = process.env.USE_POSTGRES === 'true' || process.env.PGDATABASE;
+
+let dbModule;
+if (USE_POSTGRES) {
+    console.log('🐘 Using PostgreSQL database');
+    dbModule = require('./database/pg_init_db');
+} else {
+    console.log('📦 Using SQLite database (set USE_POSTGRES=true or configure PGDATABASE to use PostgreSQL)');
+    dbModule = require('./database/init_db');
+}
+
+const { createTestSession, updateTestSession, saveMerchantTestResult } = dbModule;
+const db = dbModule.pool || dbModule.db; // pool for PostgreSQL, db for SQLite
 const APITestRunner = require('./api-test-runner');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Database query helpers that work with both PostgreSQL and SQLite
+async function queryAll(query, params = []) {
+    if (USE_POSTGRES) {
+        const result = await db.query(query, params);
+        return result.rows;
+    } else {
+        return new Promise((resolve, reject) => {
+            db.all(query, params, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+    }
+}
+
+async function queryOne(query, params = []) {
+    if (USE_POSTGRES) {
+        const result = await db.query(query, params);
+        return result.rows[0];
+    } else {
+        return new Promise((resolve, reject) => {
+            db.get(query, params, (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+    }
+}
+
+async function queryRun(query, params = []) {
+    if (USE_POSTGRES) {
+        const result = await db.query(query, params);
+        return result;
+    } else {
+        return new Promise((resolve, reject) => {
+            db.run(query, params, function(err) {
+                if (err) reject(err);
+                else resolve({ changes: this.changes, lastID: this.lastID });
+            });
+        });
+    }
+}
 
 // Middleware
 app.use(cors());
@@ -29,75 +90,72 @@ app.get('/tester', (req, res) => {
 // API Routes
 
 // Get all merchant test results
-app.get('/api/merchant-results', (req, res) => {
-    const {
-        session_id,
-        status,
-        category,
-        search,
-        date_from,
-        date_to,
-        page = 1,
-        limit = 50
-    } = req.query;
+app.get('/api/merchant-results', async (req, res) => {
+    try {
+        const {
+            session_id,
+            status,
+            category,
+            search,
+            date_from,
+            date_to,
+            page = 1,
+            limit = 50
+        } = req.query;
 
-    let query = `
-        SELECT mtr.*, mmd.primary_category, mmd.parent_category, mmd.max_rate, mmd.max_rate_kind
-        FROM merchant_test_results mtr
-        LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
-        WHERE 1=1
-    `;
-    const params = [];
+        let query = `
+            SELECT mtr.*, mmd.primary_category, mmd.parent_category, mmd.max_rate, mmd.max_rate_kind
+            FROM merchant_test_results mtr
+            LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
+            WHERE 1=1
+        `;
+        const params = [];
+        let paramIndex = 1;
 
-    // Apply filters
-    if (session_id) {
-        query += ' AND mtr.session_id = ?';
-        params.push(session_id);
-    }
-
-    if (status) {
-        if (status === 'user_passed') {
-            query += ' AND mtr.is_user_passed = 1';
-        } else {
-            query += ' AND mtr.test_status = ?';
-            params.push(status);
+        // Apply filters
+        if (session_id) {
+            query += ` AND mtr.session_id = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+            params.push(session_id);
         }
-    }
 
-    if (category) {
-        query += ' AND (mtr.primary_category = ? OR mmd.primary_category = ?)';
-        params.push(category, category);
-    }
-
-    if (search) {
-        query += ' AND (mtr.merchant_name LIKE ? OR mtr.merchant_url LIKE ?)';
-        params.push(`%${search}%`, `%${search}%`);
-    }
-
-    if (date_from) {
-        query += ' AND mtr.tested_at >= ?';
-        params.push(date_from);
-    }
-
-    if (date_to) {
-        query += ' AND mtr.tested_at <= ?';
-        params.push(date_to + ' 23:59:59');
-    }
-
-    // Add ordering
-    query += ' ORDER BY mtr.tested_at DESC';
-
-    // Add pagination
-    const offset = (page - 1) * limit;
-    query += ' LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), offset);
-
-    db.all(query, params, (err, rows) => {
-        if (err) {
-            console.error('Database error:', err);
-            res.status(500).json({ error: 'Database error' });
-            return;
+        if (status) {
+            if (status === 'user_passed') {
+                query += ` AND mtr.is_user_passed = ${USE_POSTGRES ? 'TRUE' : '1'}`;
+            } else {
+                query += ` AND mtr.test_status = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+                params.push(status);
+            }
         }
+
+        if (category) {
+            query += ` AND (mtr.primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OR mmd.primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'})`;
+            params.push(category, category);
+        }
+
+        if (search) {
+            query += ` AND (mtr.merchant_name ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OR mtr.merchant_url ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'})`;
+            params.push(`%${search}%`, `%${search}%`);
+        }
+
+        if (date_from) {
+            query += ` AND mtr.tested_at >= ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+            params.push(date_from);
+        }
+
+        if (date_to) {
+            query += ` AND mtr.tested_at <= ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+            params.push(date_to + ' 23:59:59');
+        }
+
+        // Add ordering
+        query += ' ORDER BY mtr.tested_at DESC';
+
+        // Add pagination
+        const offset = (page - 1) * limit;
+        query += ` LIMIT ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OFFSET ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+        params.push(parseInt(limit), offset);
+
+        const rows = await queryAll(query, params);
 
         // Get total count for pagination
         let countQuery = `
@@ -109,73 +167,120 @@ app.get('/api/merchant-results', (req, res) => {
         const countParams = params.slice(0, -2); // Remove LIMIT and OFFSET params
 
         // Re-apply the same filters for count
-        let paramIndex = 0;
+        paramIndex = 1;
         if (session_id) {
-            countQuery += ' AND mtr.session_id = ?';
-            paramIndex++;
+            countQuery += ` AND mtr.session_id = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
         }
         if (status) {
             if (status === 'user_passed') {
-                countQuery += ' AND mtr.is_user_passed = 1';
+                countQuery += ` AND mtr.is_user_passed = ${USE_POSTGRES ? 'TRUE' : '1'}`;
             } else {
-                countQuery += ' AND mtr.test_status = ?';
-                paramIndex++;
+                countQuery += ` AND mtr.test_status = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
             }
         }
         if (category) {
-            countQuery += ' AND (mtr.primary_category = ? OR mmd.primary_category = ?)';
-            paramIndex += 2;
+            countQuery += ` AND (mtr.primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OR mmd.primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'})`;
         }
         if (search) {
-            countQuery += ' AND (mtr.merchant_name LIKE ? OR mtr.merchant_url LIKE ?)';
-            paramIndex += 2;
+            countQuery += ` AND (mtr.merchant_name ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OR mtr.merchant_url ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'})`;
         }
         if (date_from) {
-            countQuery += ' AND mtr.tested_at >= ?';
-            paramIndex++;
+            countQuery += ` AND mtr.tested_at >= ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
         }
         if (date_to) {
-            countQuery += ' AND mtr.tested_at <= ?';
-            paramIndex++;
+            countQuery += ` AND mtr.tested_at <= ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
         }
 
-        db.get(countQuery, countParams, (countErr, countResult) => {
-            if (countErr) {
-                console.error('Count query error:', countErr);
-                res.status(500).json({ error: 'Database error' });
-                return;
-            }
+        const countResult = await queryOne(countQuery, countParams);
 
-            res.json({
-                data: rows,
-                pagination: {
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    total: countResult.total,
-                    pages: Math.ceil(countResult.total / limit)
-                }
-            });
+        res.json({
+            data: rows,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total: countResult.total,
+                pages: Math.ceil(countResult.total / limit)
+            }
         });
-    });
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Get test sessions
-app.get('/api/sessions', (req, res) => {
-    const query = `
-        SELECT session_id, started_at, completed_at, status, 
-               total_merchants, successful_merchants, flagged_merchants, user_passed_merchants
-        FROM test_sessions 
-        ORDER BY started_at DESC
-    `;
+app.get('/api/sessions', async (req, res) => {
+    try {
+        const query = `
+            SELECT session_id, started_at, completed_at, status, 
+                   total_merchants, successful_merchants, flagged_merchants, user_passed_merchants,
+                   current_merchant, current_url, notes
+            FROM test_sessions 
+            ORDER BY started_at DESC
+        `;
 
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error('Database error:', err);
-            res.status(500).json({ error: 'Database error' });
+        const rows = await queryAll(query, []);
+        res.json(rows);
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get specific test session with real-time status
+app.get('/api/sessions/:sessionId', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        
+        const query = `
+            SELECT session_id, started_at, completed_at, status, 
+                   total_merchants, successful_merchants, flagged_merchants, user_passed_merchants,
+                   current_merchant, current_url, notes
+            FROM test_sessions 
+            WHERE session_id = ${USE_POSTGRES ? '$1' : '?'}
+        `;
+
+        const row = await queryOne(query, [sessionId]);
+        
+        if (!row) {
+            res.status(404).json({ error: 'Session not found' });
             return;
         }
+        res.json(row);
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get recent test results for a session (for real-time updates)
+app.get('/api/sessions/:sessionId/recent-results', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        const { since } = req.query; // timestamp
+        
+        let query = `
+            SELECT mtr.*, mmd.primary_category, mmd.parent_category, mmd.max_rate, mmd.max_rate_kind
+            FROM merchant_test_results mtr
+            LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
+            WHERE mtr.session_id = ${USE_POSTGRES ? '$1' : '?'}
+        `;
+        const params = [sessionId];
+        let paramIndex = 2;
+        
+        if (since) {
+            query += ` AND mtr.tested_at > ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+            params.push(since);
+        }
+        
+        query += ' ORDER BY mtr.tested_at DESC LIMIT 100';
+        
+        const rows = await queryAll(query, params);
         res.json(rows);
-    });
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Get categories

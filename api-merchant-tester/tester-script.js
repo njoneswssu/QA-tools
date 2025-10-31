@@ -2,6 +2,7 @@
 let merchantsData = null;
 let allMerchants = [];
 let filteredMerchants = [];
+let priorityQueue = []; // Priority queue for merchants to test first
 let merchantStatuses = new Map(); // Track merchant test statuses
 let isValidating = false; // Prevent recursive validation calls
 let testSession = null;
@@ -28,14 +29,34 @@ const CACHE_KEYS = {
 function saveMerchantsToCache() {
     try {
         if (merchantsData && merchantsData.Merchants && merchantsData.Merchants.length > 0) {
-            console.log('💾 Saving to cache:', {
+            // Check size before caching
+            const dataString = JSON.stringify(merchantsData);
+            const sizeInMB = new Blob([dataString]).size / (1024 * 1024);
+            
+            console.log('💾 Checking cache size:', {
                 totalMerchants: merchantsData.Merchants.length,
-                filteredCount: filteredMerchants.length,
-                merchantsDataValid: !!merchantsData,
-                filteredMerchantsValid: !!filteredMerchants
+                sizeInMB: sizeInMB.toFixed(2),
+                filteredCount: filteredMerchants.length
             });
             
-            localStorage.setItem(CACHE_KEYS.MERCHANTS_DATA, JSON.stringify(merchantsData));
+            // Only cache if data is smaller than 4MB to avoid quota errors
+            if (sizeInMB > 4) {
+                console.warn(`⚠️ Skipping cache - data too large (${sizeInMB.toFixed(2)}MB). Using database instead.`);
+                
+                // Just save the filters
+                const currentFilters = {
+                    appId: elements.appIdFilter ? elements.appIdFilter.value : '',
+                    category: elements.categoryFilter ? elements.categoryFilter.value : '',
+                    status: elements.statusFilter ? elements.statusFilter.value : '',
+                    limit: elements.limitFilter ? elements.limitFilter.value : '',
+                    search: elements.searchFilter ? elements.searchFilter.value : ''
+                };
+                localStorage.setItem(CACHE_KEYS.LAST_FILTERS, JSON.stringify(currentFilters));
+                localStorage.setItem(CACHE_KEYS.LAST_LOAD_TIME, Date.now().toString());
+                return;
+            }
+            
+            localStorage.setItem(CACHE_KEYS.MERCHANTS_DATA, dataString);
             localStorage.setItem(CACHE_KEYS.FILTERED_MERCHANTS, JSON.stringify(filteredMerchants));
             localStorage.setItem(CACHE_KEYS.LAST_LOAD_TIME, Date.now().toString());
             
@@ -49,23 +70,23 @@ function saveMerchantsToCache() {
             };
             localStorage.setItem(CACHE_KEYS.LAST_FILTERS, JSON.stringify(currentFilters));
             
-            console.log(`✅ ${merchantsData.Merchants.length} merchants permanently cached with filters:`, currentFilters);
-            
-            // Verify cache was saved
-            const verification = localStorage.getItem(CACHE_KEYS.MERCHANTS_DATA);
-            console.log('🔍 Cache verification:', {
-                saved: !!verification,
-                size: verification ? verification.length : 0
-            });
+            console.log(`✅ ${merchantsData.Merchants.length} merchants cached (${sizeInMB.toFixed(2)}MB)`);
         } else {
-            console.warn('⚠️ Cannot cache - invalid merchant data:', {
-                merchantsData: !!merchantsData,
-                hasMerchants: merchantsData && merchantsData.Merchants,
-                merchantCount: merchantsData && merchantsData.Merchants ? merchantsData.Merchants.length : 0
-            });
+            console.warn('⚠️ Cannot cache - invalid merchant data');
         }
     } catch (error) {
-        console.error('❌ Failed to cache merchants:', error);
+        if (error.name === 'QuotaExceededError') {
+            console.warn('⚠️ LocalStorage quota exceeded - skipping cache. Data is still available from database.');
+            // Clear old cache to free up space
+            try {
+                localStorage.removeItem(CACHE_KEYS.MERCHANTS_DATA);
+                localStorage.removeItem(CACHE_KEYS.FILTERED_MERCHANTS);
+            } catch (e) {
+                // Ignore cleanup errors
+            }
+        } else {
+            console.error('❌ Failed to cache merchants:', error);
+        }
     }
 }
 
@@ -266,8 +287,78 @@ const elements = {
     finalFlagged: document.getElementById('final-flagged'),
     viewDashboardBtn: document.getElementById('view-dashboard-btn'),
     downloadResultsBtn: document.getElementById('download-results-btn'),
-    startNewTestBtn: document.getElementById('start-new-test-btn')
+    startNewTestBtn: document.getElementById('start-new-test-btn'),
+    
+    // Queue elements
+    queueSection: document.getElementById('queue-section'),
+    queueList: document.getElementById('queue-list'),
+    queueCount: document.getElementById('queue-count'),
+    clearQueueBtn: document.getElementById('clear-queue-btn')
 };
+
+// Check for active test session on page load
+async function checkForActiveTestSession() {
+    try {
+        const activeSessionId = localStorage.getItem('active_test_session');
+        if (!activeSessionId) {
+            return;
+        }
+        
+        console.log('🔍 Found active test session:', activeSessionId);
+        
+        // Check if the session is still running
+        const response = await fetch(`/api/sessions/${activeSessionId}`);
+        if (response.ok) {
+            const session = await response.json();
+            
+            // If the session is still running, resume monitoring
+            if (session.status === 'running') {
+                console.log('▶️ Resuming active test session...');
+                
+                // Set up the test session
+                testSession = { session_id: session.session_id };
+                
+                // Show results section
+                elements.resultsSection.style.display = 'block';
+                
+                // Load test results
+                const resultsResponse = await fetch(`/api/merchant-results?session_id=${activeSessionId}&limit=10000`);
+                if (resultsResponse.ok) {
+                    const data = await resultsResponse.json();
+                    const results = data.data || data;
+                    
+                    // Update UI with existing results
+                    updateStatsFromResults(results);
+                    updateResultsFromDatabase(results);
+                    
+                    // Show current merchant being tested
+                    if (session.current_merchant) {
+                        elements.currentMerchant.textContent = `Testing: ${session.current_merchant}`;
+                        elements.currentUrl.textContent = session.current_url || 'Loading...';
+                    } else {
+                        elements.currentMerchant.textContent = 'Test in progress...';
+                    }
+                    
+                    addLogEntry('🔄 Resumed monitoring active test session', 'success');
+                    addLogEntry(`📊 Currently: ${results.length} merchants tested`, 'info');
+                    
+                    // Start polling for new results
+                    pollForResults();
+                }
+            } else {
+                // Session is completed or stopped
+                console.log('✅ Session already completed:', session.status);
+                localStorage.removeItem('active_test_session');
+            }
+        } else {
+            // Session not found
+            console.log('⚠️ Active session not found in database');
+            localStorage.removeItem('active_test_session');
+        }
+    } catch (error) {
+        console.error('❌ Error checking for active session:', error);
+    }
+}
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
@@ -278,6 +369,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Clear any default values that might limit merchants
     elements.merchantLimit.value = '';
+    
+    // Check for active test session on page load
+    checkForActiveTestSession();
     
     // Add a small delay to ensure all DOM elements are ready
     setTimeout(() => {
@@ -325,6 +419,9 @@ function initializeEventListeners() {
     elements.resumeTestBtn.addEventListener('click', resumeTest);
     elements.clearLogBtn.addEventListener('click', clearLog);
     elements.autoScrollBtn.addEventListener('click', toggleAutoScroll);
+    
+    // Queue events
+    elements.clearQueueBtn.addEventListener('click', clearQueue);
     
     // Test control events
     elements.pauseTestBtn.addEventListener('click', pauseTest);
@@ -707,13 +804,35 @@ async function startTest() {
         current: 0
     };
     
-    // Shuffle merchants if option is enabled
-    let merchantsToTest = [...filteredMerchants]; // Create a copy
-    if (elements.shuffleMerchants.checked) {
-        merchantsToTest = shuffleArray(merchantsToTest);
-        addLogEntry('🔀 Merchants shuffled for random testing order', 'info');
+    // Prepare merchants list - priority queue first, then others
+    let merchantsToTest = [];
+    
+    if (priorityQueue.length > 0) {
+        addLogEntry(`🎯 Priority Queue: Testing ${priorityQueue.length} queued merchants first`, 'success');
+        merchantsToTest = [...priorityQueue];
+        
+        // Add remaining merchants not in queue
+        const queueIds = new Set(priorityQueue.map(m => m.MerchantID || m.MerchantName));
+        const remainingMerchants = filteredMerchants.filter(m => 
+            !queueIds.has(m.MerchantID || m.MerchantName)
+        );
+        
+        // Shuffle remaining if option is enabled
+        if (elements.shuffleMerchants.checked && remainingMerchants.length > 0) {
+            addLogEntry('🔀 Remaining merchants shuffled', 'info');
+            merchantsToTest = [...merchantsToTest, ...shuffleArray(remainingMerchants)];
+        } else {
+            merchantsToTest = [...merchantsToTest, ...remainingMerchants];
+        }
     } else {
-        addLogEntry('📋 Testing merchants in original order', 'info');
+        // No queue - use normal flow
+        merchantsToTest = [...filteredMerchants];
+        if (elements.shuffleMerchants.checked) {
+            merchantsToTest = shuffleArray(merchantsToTest);
+            addLogEntry('🔀 Merchants shuffled for random testing order', 'info');
+        } else {
+            addLogEntry('📋 Testing merchants in original order', 'info');
+        }
     }
     
     // Create test session
@@ -804,31 +923,41 @@ async function pollForResults() {
     let lastResultCount = 0;
     let lastCurrentMerchant = '';
     
+    // Save active session to localStorage for persistence
+    localStorage.setItem('active_test_session', testSession.session_id);
+    
     const poll = async () => {
         try {
-            // Get current test session status
-            const sessionResponse = await fetch(`/api/sessions?session_id=${testSession.session_id}`);
+            // Get current test session status using the specific endpoint
+            const sessionResponse = await fetch(`/api/sessions/${testSession.session_id}`);
             if (sessionResponse.ok) {
-                const sessionData = await sessionResponse.json();
-                const currentSession = sessionData.find(s => s.session_id === testSession.session_id);
+                const currentSession = await sessionResponse.json();
                 
                 // Update current merchant being tested
-                if (currentSession && currentSession.current_merchant && currentSession.current_merchant !== lastCurrentMerchant) {
+                if (currentSession.current_merchant && currentSession.current_merchant !== lastCurrentMerchant) {
                     lastCurrentMerchant = currentSession.current_merchant;
                     elements.currentMerchant.textContent = `Testing: ${currentSession.current_merchant}`;
                     elements.currentUrl.textContent = currentSession.current_url || 'Loading...';
                     addLogEntry(`🔍 Now testing: ${currentSession.current_merchant}`, 'info');
                 }
+                
+                // Check if test was marked as completed or stopped
+                if (currentSession.status === 'completed' || currentSession.status === 'stopped') {
+                    addLogEntry(`Test ${currentSession.status}`, 'info');
+                    completeTest();
+                    localStorage.removeItem('active_test_session');
+                    return;
+                }
             }
             
-            const response = await fetch(`/api/merchant-results?session_id=${testSession.session_id}&limit=1000`);
+            const response = await fetch(`/api/merchant-results?session_id=${testSession.session_id}&limit=10000`);
             if (response.ok) {
                 const data = await response.json();
                 const results = data.data || data;
                 
                 // Update stats if we have new results
                 if (results.length > lastResultCount) {
-                    const newResults = results.slice(lastResultCount);
+                    const newResults = results.slice(0, results.length - lastResultCount).reverse();
                     newResults.forEach(result => {
                         const status = result.is_user_passed ? 'success' : result.test_status;
                         const statusText = status === 'success' ? '✅' : (status === 'flagged' ? '🚨' : '⚠️');
@@ -841,8 +970,9 @@ async function pollForResults() {
                     lastResultCount = results.length;
                     
                     // Enhanced progress logging with percentage
-                    const progress = Math.round((results.length / filteredMerchants.length) * 100);
-                    addLogEntry(`📊 Progress: ${results.length}/${filteredMerchants.length} merchants tested (${progress}%)`, 'info');
+                    const totalMerchants = filteredMerchants.length || results.length;
+                    const progress = Math.round((results.length / totalMerchants) * 100);
+                    addLogEntry(`📊 Progress: ${results.length}/${totalMerchants} merchants tested (${progress}%)`, 'info');
                     
                     // Show milestone messages
                     if (results.length % 10 === 0 && results.length > 0) {
@@ -853,10 +983,12 @@ async function pollForResults() {
                 }
                 
                 // Check if test is complete
-                if (results.length >= filteredMerchants.length) {
+                const expectedTotal = filteredMerchants.length || 1;
+                if (results.length >= expectedTotal && expectedTotal > 0) {
                     const successful = results.filter(r => r.test_status === 'success' || r.is_user_passed).length;
                     const successRate = Math.round((successful / results.length) * 100);
                     addLogEntry(`🎉 Test completed successfully! Final results: ${successful}/${results.length} successful (${successRate}%)`, 'success');
+                    localStorage.removeItem('active_test_session');
                     completeTest();
                     return;
                 }
@@ -867,6 +999,7 @@ async function pollForResults() {
         } catch (error) {
             console.error('Error polling results:', error);
             addLogEntry(`⚠️ Polling error: ${error.message}`, 'warning');
+            // Keep polling even on error
             setTimeout(poll, pollInterval);
         }
     };
@@ -1708,7 +1841,9 @@ function displayMerchantList(merchants) {
         const domain = merchant.MerchantDomains && merchant.MerchantDomains[0] ? merchant.MerchantDomains[0] : 'No domain';
         
         const merchantItem = document.createElement('div');
-        merchantItem.className = 'merchant-item';
+        merchantItem.className = 'merchant-item merchant-card';
+        merchantItem.dataset.merchantId = merchant.MerchantID || '';
+        merchantItem.dataset.merchantName = merchant.MerchantName;
         merchantItem.innerHTML = `
             <div class="merchant-info-item">
                 <div class="merchant-name-item">${escapeHtml(merchant.MerchantName)}</div>
@@ -1725,6 +1860,11 @@ function displayMerchantList(merchants) {
     elements.merchantPreview.innerHTML = '';
     elements.merchantPreview.appendChild(merchantList);
     console.log('merchantPreview updated, innerHTML length:', elements.merchantPreview.innerHTML.length);
+    
+    // Update queue buttons after rendering
+    if (typeof updateMerchantCards === 'function') {
+        updateMerchantCards();
+    }
 }
 
 // Database reset with confirmation

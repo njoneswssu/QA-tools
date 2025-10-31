@@ -1,0 +1,3164 @@
+<ComergentData>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02438110</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0105</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318464892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02438109</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0105</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318464892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02438130</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0105</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318464892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02438065</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0105</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318464892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02437935</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0105</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318464892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440750</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4005</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440750</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4005</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-20 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10329913868</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440865</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440865</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-18 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10317894536</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440888</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440888</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-20 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392336544251</TrackingNumber>
+                    <ShipCarrier>FedEx Home Delivery®</ShipCarrier>
+                    <CarrierSCAC>FDXG</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440908</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440908</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-21 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10308917448</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440909</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440909</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-19 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10333428189</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440923</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440923</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10323678571</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440933</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4001</JCPLotNumber>
+                    <JCPLineNumber>0108</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4001</JCPLotNumber>
+                    <JCPLineNumber>0207</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4001</JCPLotNumber>
+                    <JCPLineNumber>0306</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440933</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4001</JCPLotNumber>
+                    <JCPLineNumber>0108</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4001</JCPLotNumber>
+                    <JCPLineNumber>0207</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4001</JCPLotNumber>
+                    <JCPLineNumber>0306</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10315808794</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440934</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440934</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-20 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10330391474</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440942</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0206</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440942</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-21 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0206</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-21 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10318936426</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440947</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0203</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440947</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0203</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10307455850</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440954</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4005</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440954</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4005</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10305980867</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440957</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0202</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440957</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-23 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0202</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-23 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392433170505</TrackingNumber>
+                    <ShipCarrier>FedEx Home Delivery®</ShipCarrier>
+                    <CarrierSCAC>FDXG</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392433157173</TrackingNumber>
+                    <ShipCarrier>FedEx Home Delivery®</ShipCarrier>
+                    <CarrierSCAC>FDXG</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440966</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440966</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-20 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10320508812</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440968</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4118</JCPLotNumber>
+                    <JCPLineNumber>0108</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440968</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4118</JCPLotNumber>
+                    <JCPLineNumber>0108</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10337388439</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440973</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440973</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392424780380</TrackingNumber>
+                    <ShipCarrier>FedEx Home Delivery®</ShipCarrier>
+                    <CarrierSCAC>FDXG</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440980</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440980</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-21 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10336423919</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440984</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0206</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440984</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-20 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0206</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-20 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10338207248</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10329610239</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440994</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0202</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0301</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0400</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0509</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0608</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0707</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0806</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0905</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1002</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1101</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1200</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1309</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1408</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392410218682</TrackingNumber>
+                    <ShipCarrier>FedEx Home Delivery®</ShipCarrier>
+                    <CarrierSCAC>FDXG</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392410621819</TrackingNumber>
+                    <ShipCarrier>FedEx Home Delivery®</ShipCarrier>
+                    <CarrierSCAC>FDXG</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440994</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0202</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0301</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0400</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0509</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0608</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0707</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0806</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0905</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1002</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1101</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1200</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1309</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>1408</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441032</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4032</JCPLotNumber>
+                    <JCPLineNumber>0101</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4032</JCPLotNumber>
+                    <JCPLineNumber>0200</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441032</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4032</JCPLotNumber>
+                    <JCPLineNumber>0101</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4032</JCPLotNumber>
+                    <JCPLineNumber>0200</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441035</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441044</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>1689</JCPLotNumber>
+                    <JCPLineNumber>0103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392505452860</TrackingNumber>
+                    <ShipCarrier>FedEx Home Delivery®</ShipCarrier>
+                    <CarrierSCAC>FDXG</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441055</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441055</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10322986383</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441060</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4032</JCPLotNumber>
+                    <JCPLineNumber>0101</JCPLineNumber>
+                    <SKU />
+                    <Quantity>4</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441060</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4032</JCPLotNumber>
+                    <JCPLineNumber>0101</JCPLineNumber>
+                    <SKU />
+                    <Quantity>4</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10320946394</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441071</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>8784</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>8784</JCPLotNumber>
+                    <JCPLineNumber>0201</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441071</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>8784</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>8784</JCPLotNumber>
+                    <JCPLineNumber>0201</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-22 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392425931660</TrackingNumber>
+                    <ShipCarrier>FedEx Express Saver®</ShipCarrier>
+                    <CarrierSCAC>FDXE</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>392425941866</TrackingNumber>
+                    <ShipCarrier>FedEx Express Saver®</ShipCarrier>
+                    <CarrierSCAC>FDXE</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441100</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0203</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0302</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0401</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441100</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0203</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0302</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9863</JCPLotNumber>
+                    <JCPLineNumber>0401</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10308266900</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10317664918</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441109</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441109</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10303214680</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441142</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0843</JCPLotNumber>
+                    <JCPLineNumber>0108</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441142</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0843</JCPLotNumber>
+                    <JCPLineNumber>0108</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-27 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10321512743</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441153</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0206</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441153</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>2</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0206</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-25 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10301008479</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10334122604</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440979</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0201</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02440979</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0201</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10331033840</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10313273268</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441357</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPTT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441357</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0844</JCPLotNumber>
+                    <JCPLineNumber>0107</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10323584832</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441399</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0105</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0204</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0303</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0402</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0501</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0600</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0709</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0808</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0907</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1004</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1202</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1301</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1400</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1509</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1608</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1707</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441399</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0105</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0204</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0303</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0402</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0501</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0600</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0709</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0808</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>0907</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1004</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1103</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1202</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1301</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1400</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1509</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1608</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>9862</JCPLotNumber>
+                    <JCPLineNumber>1707</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10339988108</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10306885138</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10332414070</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10311477319</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10315519892</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10310695308</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10308795080</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10320734514</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10304324872</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10323231883</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10338901890</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10315581921</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441359</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441359</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4015</JCPLotNumber>
+                    <JCPLineNumber>0102</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10328742787</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441278</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0843</JCPLotNumber>
+                    <JCPLineNumber>0108</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441278</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0843</JCPLotNumber>
+                    <JCPLineNumber>0108</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10316532820</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441178</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0841</JCPLotNumber>
+                    <JCPLineNumber>0100</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441178</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>0841</JCPLotNumber>
+                    <JCPLineNumber>0100</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10326775004</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441521</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT ORDER STATUS UPDATE ACCEPT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4005</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+        </OrderStatusUpdate>
+    </Comergent>
+    <Comergent>
+        <MessageHeader>
+            <MessageType>OrderStatusUpdateRequest</MessageType>
+            <MessageVersion>4.0</MessageVersion>
+        </MessageHeader>
+        <RemoteUser>
+            <UserLogin>ERPAdmin</UserLogin>
+            <UserAuthenticator>ERPAdmin</UserAuthenticator>
+        </RemoteUser>
+        <OrderStatusUpdate type="BusinessObject" state="INSERTED">
+            <OrderNumber>02441521</OrderNumber>
+            <JCPSupplierNumber>153411</JCPSupplierNumber>
+            <ERPOrderNumber>0</ERPOrderNumber>
+            <OrderInput>ORDER INPUT SHIPMENT</OrderInput>
+            <OrderShipmentUpdateLineItemList state="INSERTED">
+                <OrderShipmentUpdateLineItem state="INSERTED">
+                    <JCPSubNumber>739</JCPSubNumber>
+                    <JCPLotNumber>4005</JCPLotNumber>
+                    <JCPLineNumber>0104</JCPLineNumber>
+                    <SKU />
+                    <Quantity>1</Quantity>
+                    <JCPRejectionText />
+                    <LineStatus>ACCEPT</LineStatus>
+                    <ShipmentDate>2025-08-28 0:0:0.0</ShipmentDate>
+                </OrderShipmentUpdateLineItem>
+            </OrderShipmentUpdateLineItemList>
+            <JCPOrderShipmentUpdateInfoList state="INSERTED">
+                <JCPOrderShipmentUpdateInfo state="INSERTED">
+                    <TrackingNumber>1Z3A06R10325879056</TrackingNumber>
+                    <ShipCarrier>UPS Ground</ShipCarrier>
+                    <CarrierSCAC>UPS</CarrierSCAC>
+                </JCPOrderShipmentUpdateInfo>
+            </JCPOrderShipmentUpdateInfoList>
+        </OrderStatusUpdate>
+    </Comergent>
+</ComergentData>

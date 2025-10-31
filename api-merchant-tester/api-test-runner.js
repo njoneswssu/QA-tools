@@ -624,38 +624,63 @@ test.describe('API Merchant Tester - UI Generated', () => {
                 
                 console.log(`🚀 Starting API test with ${merchants.length} merchants`);
                 console.log(`📁 Temp test file: ${tempTestFile}`);
+                console.log(`📂 Working directory: ${__dirname}`);
                 
-                // Run Playwright test
+                // Run Playwright test with detached process
+                console.log('🎬 Spawning Playwright process...');
                 const playwrightProcess = spawn('npx', ['playwright', 'test', tempTestFile, '--headed', '--project=chromium-with-extension'], {
-                    stdio: 'inherit',
+                    stdio: 'ignore',  // Ignore stdio so it can run independently
                     cwd: __dirname,
-                    shell: true
+                    shell: true,
+                    detached: true,  // Detach so it survives parent process
+                    env: process.env
+                });
+                
+                // Unreference so parent can exit
+                playwrightProcess.unref();
+
+                // Log the PID for debugging
+                console.log(`📌 Playwright process PID: ${playwrightProcess.pid}`);
+
+                // Resolve immediately so the API doesn't wait
+                resolve({ 
+                    success: true, 
+                    message: 'Test started',
+                    pid: playwrightProcess.pid 
+                });
+
+                playwrightProcess.on('spawn', () => {
+                    console.log('✅ Playwright process spawned successfully');
                 });
 
                 playwrightProcess.on('close', (code) => {
+                    console.log(`🏁 Playwright process exited with code ${code}`);
+                    
                     // Clean up temp file
                     try {
                         fs.unlinkSync(tempTestFile);
+                        console.log('🗑️ Temp file cleaned up');
                     } catch (cleanupError) {
-                        console.log('Warning: Could not clean up temp file:', cleanupError.message);
+                        console.log('⚠️ Warning: Could not clean up temp file:', cleanupError.message);
                     }
 
                     if (code === 0) {
                         console.log('✅ Test completed successfully');
-                        resolve({ success: true, code });
                     } else {
                         console.log(`❌ Test failed with code ${code}`);
-                        resolve({ success: false, code });
                     }
                 });
 
                 playwrightProcess.on('error', (error) => {
-                    console.error('Failed to start test:', error);
-                    reject(error);
+                    console.error('❌ Failed to start Playwright process:', error);
+                    console.error('Error details:', {
+                        message: error.message,
+                        code: error.code
+                    });
                 });
 
             } catch (error) {
-                console.error('Error setting up test:', error);
+                console.error('❌ Error setting up test:', error);
                 reject(error);
             }
         });

@@ -166,6 +166,38 @@ Page 3 JSON'
                             <span id="merchant-count-display">0 merchants</span>
                         </div>
                     </div>
+
+                    <!-- Priority Queue Section -->
+                    <div class="queue-section" id="queue-section" style="display: none;">
+                        <div class="queue-header">
+                            <h4><i class="fas fa-list-ol"></i> Priority Queue (<span id="queue-count">0</span>)</h4>
+                            <button id="clear-queue-btn" class="btn btn-sm btn-outline" title="Clear queue">
+                                <i class="fas fa-times"></i> Clear Queue
+                            </button>
+                        </div>
+                        
+                        <!-- Queue Search Bar with Autocomplete -->
+                        <div class="queue-search-container">
+                            <div class="queue-search-wrapper">
+                                <i class="fas fa-search queue-search-icon"></i>
+                                <input 
+                                    type="text" 
+                                    id="queue-search" 
+                                    class="queue-search-input" 
+                                    placeholder="Search merchants to add to queue..."
+                                    autocomplete="off"
+                                >
+                                <div id="queue-autocomplete" class="queue-autocomplete" style="display: none;"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="queue-list" class="queue-list">
+                            <div class="queue-placeholder">
+                                <i class="fas fa-info-circle"></i>
+                                <p>Click the <i class="fas fa-play-circle"></i> button on merchants to add them to the priority queue</p>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div id="merchant-preview" class="merchant-preview">
                         <div class="preview-placeholder">
@@ -369,5 +401,6 @@ Page 3 JSON'
     </div>
 
     <script src="tester-script.js"></script>
+    <script src="queue-and-logging.js"></script>
 </body>
 </html>
