@@ -678,6 +678,12 @@
                             'ORDER INPUT SHIPMENT'
                         );
 
+                        // Clean existing shipment dates to prevent duplicates
+                        convertedBlock = convertedBlock.replace(
+                            /<ShipmentDate>.*?<\/ShipmentDate>/g, 
+                            ''
+                        );
+
                         // Add <ShipmentDate> after every <LineStatus>
                         convertedBlock = convertedBlock.replace(
                             /(<LineStatus>ACCEPT<\/LineStatus>)/g,
