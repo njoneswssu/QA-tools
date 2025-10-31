@@ -291,8 +291,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Only auto-load from database if cache wasn't loaded
         if (!cacheLoaded) {
-            console.log('📥 No cache found, checking database...');
-            autoLoadStoredMerchants();
+            console.log('📥 No cache found, attempting to auto-load from database...');
+            loadStoredMerchants(true).then(() => {
+                console.log('✅ Auto-loaded merchants from database');
+            }).catch(error => {
+                console.log('ℹ️ No stored merchants available in database');
+            });
         } else {
             console.log('✅ Cache loaded successfully');
         }
@@ -1438,33 +1442,13 @@ function toggleAutoScroll() {
 }
 
 // Merchant Storage Functions
-async function autoLoadStoredMerchants() {
-    try {
-        // Check if there are stored merchants without loading them all
-        const response = await fetch('/api/stored-merchants?limit=1');
-        if (!response.ok) {
-            // No stored merchants or error - this is fine for first load
-            return;
-        }
-        
-        const data = await response.json();
-        
-        if (data.count > 0) {
-            // Show a notification that merchants are available instead of auto-loading
-            showInfo(`💾 ${data.count} stored merchants available. Click "Load Stored Merchants" to use them.`);
-            addLogEntry(`Found ${data.count} stored merchants in database`, 'info');
-        } else {
-            addLogEntry('No stored merchants found in database', 'info');
-        }
-    } catch (error) {
-        // Silent fail for auto-load - don't spam the user on page load
-        console.log('Auto-load check failed (this is normal for first visit):', error.message);
-    }
-}
+// Function removed - now using full loadStoredMerchants() for auto-loading
 
-async function loadStoredMerchants() {
+async function loadStoredMerchants(isAutoLoad = false) {
     try {
-        addLogEntry('Loading stored merchants from database...', 'info');
+        if (!isAutoLoad) {
+            addLogEntry('Loading stored merchants from database...', 'info');
+        }
         
         const response = await fetch('/api/stored-merchants');
         if (!response.ok) {
@@ -1502,19 +1486,28 @@ async function loadStoredMerchants() {
             elements.startTestBtn.disabled = false;
             elements.saveToDbBtn.disabled = false;
             
-            addLogEntry(`Loaded ${data.merchants.length} stored merchants`, 'success');
-            showSuccess(`Loaded ${data.merchants.length} stored merchants from database`);
+            if (!isAutoLoad) {
+                addLogEntry(`Loaded ${data.merchants.length} stored merchants`, 'success');
+                showSuccess(`Loaded ${data.merchants.length} stored merchants from database`);
+            } else {
+                console.log(`✅ Auto-loaded ${data.merchants.length} stored merchants from database`);
+            }
             
             // Save to cache for persistence across navigation
             saveMerchantsToCache();
         } else {
-            addLogEntry('No stored merchants found in database', 'warning');
-            showInfo('No stored merchants found. Please paste API data first.');
+            if (!isAutoLoad) {
+                addLogEntry('No stored merchants found in database', 'warning');
+                showInfo('No stored merchants found. Please paste API data first.');
+            }
         }
     } catch (error) {
         console.error('Error loading stored merchants:', error);
-        addLogEntry(`Error loading stored merchants: ${error.message}`, 'error');
-        showError('Failed to load stored merchants');
+        if (!isAutoLoad) {
+            addLogEntry(`Error loading stored merchants: ${error.message}`, 'error');
+            showError('Failed to load stored merchants');
+        }
+        throw error; // Re-throw for the calling code to handle
     }
 }
 
