@@ -16,6 +16,196 @@ let testStartTime = null;
 let autoScroll = true;
 let testPaused = false;
 
+// Cache keys for localStorage
+const CACHE_KEYS = {
+    MERCHANTS_DATA: 'api_tester_merchants_data',
+    FILTERED_MERCHANTS: 'api_tester_filtered_merchants',
+    LAST_FILTERS: 'api_tester_last_filters',
+    LAST_LOAD_TIME: 'api_tester_last_load_time'
+};
+
+// Cache management functions
+function saveMerchantsToCache() {
+    try {
+        if (merchantsData && merchantsData.Merchants && merchantsData.Merchants.length > 0) {
+            console.log('💾 Saving to cache:', {
+                totalMerchants: merchantsData.Merchants.length,
+                filteredCount: filteredMerchants.length,
+                merchantsDataValid: !!merchantsData,
+                filteredMerchantsValid: !!filteredMerchants
+            });
+            
+            localStorage.setItem(CACHE_KEYS.MERCHANTS_DATA, JSON.stringify(merchantsData));
+            localStorage.setItem(CACHE_KEYS.FILTERED_MERCHANTS, JSON.stringify(filteredMerchants));
+            localStorage.setItem(CACHE_KEYS.LAST_LOAD_TIME, Date.now().toString());
+            
+            // Save current filter values
+            const currentFilters = {
+                appId: elements.appIdFilter ? elements.appIdFilter.value : '',
+                category: elements.categoryFilter ? elements.categoryFilter.value : '',
+                status: elements.statusFilter ? elements.statusFilter.value : '',
+                limit: elements.limitFilter ? elements.limitFilter.value : '',
+                search: elements.searchFilter ? elements.searchFilter.value : ''
+            };
+            localStorage.setItem(CACHE_KEYS.LAST_FILTERS, JSON.stringify(currentFilters));
+            
+            console.log(`✅ ${merchantsData.Merchants.length} merchants permanently cached with filters:`, currentFilters);
+            
+            // Verify cache was saved
+            const verification = localStorage.getItem(CACHE_KEYS.MERCHANTS_DATA);
+            console.log('🔍 Cache verification:', {
+                saved: !!verification,
+                size: verification ? verification.length : 0
+            });
+        } else {
+            console.warn('⚠️ Cannot cache - invalid merchant data:', {
+                merchantsData: !!merchantsData,
+                hasMerchants: merchantsData && merchantsData.Merchants,
+                merchantCount: merchantsData && merchantsData.Merchants ? merchantsData.Merchants.length : 0
+            });
+        }
+    } catch (error) {
+        console.error('❌ Failed to cache merchants:', error);
+    }
+}
+
+function loadMerchantsFromCache() {
+    try {
+        console.log('🔍 Checking for cached merchants...');
+        const cachedData = localStorage.getItem(CACHE_KEYS.MERCHANTS_DATA);
+        const cachedFiltered = localStorage.getItem(CACHE_KEYS.FILTERED_MERCHANTS);
+        const cachedFilters = localStorage.getItem(CACHE_KEYS.LAST_FILTERS);
+        
+        console.log('Cache check:', {
+            hasData: !!cachedData,
+            hasFiltered: !!cachedFiltered,
+            hasFilters: !!cachedFilters
+        });
+        
+        if (cachedData && cachedFiltered) {
+            merchantsData = JSON.parse(cachedData);
+            filteredMerchants = JSON.parse(cachedFiltered);
+            
+            console.log('📦 Loaded from cache:', {
+                totalMerchants: merchantsData.Merchants.length,
+                filteredCount: filteredMerchants.length
+            });
+            
+            // Restore filter values (with safety checks)
+            if (cachedFilters) {
+                try {
+                    const filters = JSON.parse(cachedFilters);
+                    if (elements.appIdFilter && filters.appId !== undefined) elements.appIdFilter.value = filters.appId;
+                    if (elements.categoryFilter && filters.category !== undefined) elements.categoryFilter.value = filters.category;
+                    if (elements.statusFilter && filters.status !== undefined) elements.statusFilter.value = filters.status;
+                    if (elements.limitFilter && filters.limit !== undefined) elements.limitFilter.value = filters.limit;
+                    if (elements.searchFilter && filters.search !== undefined) elements.searchFilter.value = filters.search;
+                    if (elements.merchantSearch && filters.search !== undefined) elements.merchantSearch.value = filters.search;
+                } catch (filterError) {
+                    console.warn('Failed to restore filters:', filterError);
+                }
+            }
+            
+            // Update UI
+            try {
+                // Ensure merchant preview is updated
+                if (elements.merchantPreview && filteredMerchants.length > 0) {
+                    displayMerchantList(filteredMerchants);
+                }
+                
+                populateAppIdDropdown();
+                populateCategories();
+                
+                // Enable buttons since we have merchants
+                if (elements.startTestBtn) elements.startTestBtn.disabled = false;
+                if (elements.saveToDbBtn) elements.saveToDbBtn.disabled = false;
+                
+                // Update merchant count display
+                if (elements.merchantCountDisplay) {
+                    elements.merchantCountDisplay.textContent = `${filteredMerchants.length} merchants`;
+                }
+                
+                addLogEntry(`📦 Restored ${merchantsData.Merchants.length} permanently cached merchants`, 'success');
+                showInfo(`Restored ${merchantsData.Merchants.length} merchants from permanent cache`);
+                
+                return true;
+            } catch (uiError) {
+                console.error('Failed to update UI with cached data:', uiError);
+                clearMerchantsCache();
+            }
+        } else {
+            console.log('🔍 No cached merchants found');
+        }
+    } catch (error) {
+        console.warn('Failed to load cached merchants:', error);
+        clearMerchantsCache();
+    }
+    
+    return false;
+}
+
+function clearMerchantsCache() {
+    try {
+        localStorage.removeItem(CACHE_KEYS.MERCHANTS_DATA);
+        localStorage.removeItem(CACHE_KEYS.FILTERED_MERCHANTS);
+        localStorage.removeItem(CACHE_KEYS.LAST_FILTERS);
+        localStorage.removeItem(CACHE_KEYS.LAST_LOAD_TIME);
+        console.log('🗑️ Merchants cache cleared');
+    } catch (error) {
+        console.warn('Failed to clear merchants cache:', error);
+    }
+}
+
+// Clear all merchants from UI and cache
+function clearAllMerchants() {
+    const confirmClear = confirm('Clear all loaded merchants?\n\nThis will remove all merchants from the interface. You can reload them from the database or paste new API data.');
+    
+    if (!confirmClear) {
+        return;
+    }
+    
+    try {
+        // Clear all merchant data
+        merchantsData = null;
+        allMerchants = [];
+        filteredMerchants = [];
+        merchantStatuses.clear();
+        
+        // Clear UI
+        elements.apiData.value = '';
+        elements.merchantPreview.innerHTML = `
+            <div class="preview-placeholder">
+                <i class="fas fa-upload"></i>
+                <p>Paste API data above to preview merchants</p>
+            </div>
+        `;
+        elements.merchantCountDisplay.textContent = '0 merchants';
+        
+        // Reset filters
+        if (elements.appIdFilter) elements.appIdFilter.value = '';
+        if (elements.categoryFilter) elements.categoryFilter.value = '';
+        if (elements.statusFilter) elements.statusFilter.value = '';
+        if (elements.limitFilter) elements.limitFilter.value = '';
+        if (elements.searchFilter) elements.searchFilter.value = '';
+        if (elements.merchantSearch) elements.merchantSearch.value = '';
+        
+        // Disable buttons
+        elements.startTestBtn.disabled = true;
+        elements.saveToDbBtn.disabled = true;
+        
+        // Clear cache
+        clearMerchantsCache();
+        
+        addLogEntry('🗑️ All merchants cleared from interface', 'info');
+        showInfo('All merchants cleared. You can now load new merchants.');
+        
+    } catch (error) {
+        console.error('Error clearing merchants:', error);
+        addLogEntry(`Error clearing merchants: ${error.message}`, 'error');
+        showError('Failed to clear merchants');
+    }
+}
+
 // DOM elements
 const elements = {
     apiData: document.getElementById('api-data'),
@@ -38,6 +228,7 @@ const elements = {
     startTestBtn: document.getElementById('start-test-btn'),
     resetDatabaseBtn: document.getElementById('reset-database-btn'),
     loadStoredBtn: document.getElementById('load-stored-btn'),
+    clearMerchantsBtn: document.getElementById('clear-merchants-btn'),
     pauseTestBtn: document.getElementById('pause-test-btn'),
     resumeTestBtn: document.getElementById('resume-test-btn'),
     logContainer: document.getElementById('log-container'),
@@ -80,17 +271,32 @@ const elements = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM Content Loaded - Initializing tester...');
+    
     initializeEventListeners();
     generateDefaultTestName();
     
     // Clear any default values that might limit merchants
     elements.merchantLimit.value = '';
     
-    // Populate dropdowns
-    populateAppIdDropdown();
-    
-    // Auto-load stored merchants if available
-    autoLoadStoredMerchants();
+    // Add a small delay to ensure all DOM elements are ready
+    setTimeout(() => {
+        console.log('⏰ Attempting to load cached merchants...');
+        
+        // Try to load merchants from cache first
+        const cacheLoaded = loadMerchantsFromCache();
+        
+        // Populate dropdowns
+        populateAppIdDropdown();
+        
+        // Only auto-load from database if cache wasn't loaded
+        if (!cacheLoaded) {
+            console.log('📥 No cache found, checking database...');
+            autoLoadStoredMerchants();
+        } else {
+            console.log('✅ Cache loaded successfully');
+        }
+    }, 100); // Small delay to ensure DOM is fully ready
 });
 
 // Event listeners
@@ -107,6 +313,7 @@ function initializeEventListeners() {
     elements.saveToDbBtn.addEventListener('click', saveToDatabase);
     elements.startTestBtn.addEventListener('click', startTest);
     elements.loadStoredBtn.addEventListener('click', loadStoredMerchants);
+    elements.clearMerchantsBtn.addEventListener('click', clearAllMerchants);
     elements.resetDatabaseBtn.addEventListener('click', handleDatabaseReset);
     elements.fetchAllBtn.addEventListener('click', fetchAllPages);
     elements.testApiBtn.addEventListener('click', testApiEndpoint);
@@ -292,6 +499,9 @@ function validateAndPreview() {
             console.warn('Failed to auto-store merchants:', error);
         });
         
+        // Save to cache for persistence across navigation
+        saveMerchantsToCache();
+        
     } catch (error) {
         showError(`Invalid API data: ${error.message}`);
         showPreviewPlaceholder();
@@ -419,8 +629,21 @@ function applyFiltersAndPreview() {
     
     filteredMerchants = merchants;
     allMerchants = merchants; // Update allMerchants for filtering
+    
+    console.log('🔄 applyFiltersAndPreview updating UI:', {
+        merchantCount: merchants.length,
+        filteredMerchantsLength: filteredMerchants.length,
+        allMerchantsLength: allMerchants.length
+    });
+    
     displayMerchantList(merchants);
     elements.merchantCountDisplay.textContent = `${merchants.length} merchants`;
+    
+    // Save to cache when filters are applied (only if we have merchant data)
+    if (merchantsData && merchantsData.Merchants && merchantsData.Merchants.length > 0) {
+        console.log('💾 Saving to cache from applyFiltersAndPreview');
+        saveMerchantsToCache();
+    }
 }
 
 // Update merchant preview
@@ -1270,12 +1493,20 @@ async function loadStoredMerchants() {
             // Apply filters and display merchants
             applyFiltersAndPreview();
             
+            // Force update the merchant preview display
+            if (elements.merchantPreview && filteredMerchants.length > 0) {
+                displayMerchantList(filteredMerchants);
+            }
+            
             // Enable buttons
             elements.startTestBtn.disabled = false;
             elements.saveToDbBtn.disabled = false;
             
             addLogEntry(`Loaded ${data.merchants.length} stored merchants`, 'success');
             showSuccess(`Loaded ${data.merchants.length} stored merchants from database`);
+            
+            // Save to cache for persistence across navigation
+            saveMerchantsToCache();
         } else {
             addLogEntry('No stored merchants found in database', 'warning');
             showInfo('No stored merchants found. Please paste API data first.');
@@ -1461,12 +1692,12 @@ function filterMerchants() {
 
 // Enhanced merchant list display
 function displayMerchantList(merchants) {
-    console.log('displayMerchantList called with merchants:', merchants);
-    console.log('merchants length:', merchants ? merchants.length : 'null/undefined');
-    console.log('elements.merchantPreview:', elements.merchantPreview);
+    if (!elements.merchantPreview) {
+        console.error('merchantPreview element not found');
+        return;
+    }
     
     if (!merchants || merchants.length === 0) {
-        console.log('No merchants to display, showing placeholder');
         elements.merchantPreview.innerHTML = `
             <div class="preview-placeholder">
                 <i class="fas fa-search"></i>
@@ -1554,6 +1785,9 @@ async function handleDatabaseReset() {
                 </div>
             `;
             elements.startTestBtn.disabled = true;
+            
+            // Clear cached merchants
+            clearMerchantsCache();
             
             addLogEntry('Database reset completed successfully', 'success');
             showSuccess('Database reset successfully');
@@ -1891,6 +2125,9 @@ async function fetchAllPages() {
             elements.startTestBtn.disabled = false;
             elements.saveToDbBtn.disabled = false;
             elements.saveToDbBtn.style.display = 'inline-flex';
+            
+            // Save to cache for persistence across navigation
+            saveMerchantsToCache();
             
             // Highlight the save button temporarily
             elements.saveToDbBtn.style.animation = 'pulse 2s infinite';

@@ -92,14 +92,14 @@ function initializeEventListeners() {
 async function loadData() {
     showLoading(true);
     try {
-        // In a real implementation, this would be an API call
-        // For now, we'll simulate with sample data
         const response = await fetch('/api/merchant-results');
         if (response.ok) {
-            currentData = await response.json();
+            const data = await response.json();
+            // Only use actual test results, not sample data
+            currentData = Array.isArray(data) ? data : (data.data || []);
         } else {
-            // Fallback to sample data for demonstration
-            currentData = generateSampleData();
+            // No fallback to sample data - show empty state
+            currentData = [];
         }
         
         populateFilters();
@@ -107,8 +107,8 @@ async function loadData() {
         applyFilters();
     } catch (error) {
         console.error('Error loading data:', error);
-        // Use sample data as fallback
-        currentData = generateSampleData();
+        // Show empty state instead of sample data
+        currentData = [];
         populateFilters();
         updateStats();
         applyFilters();
