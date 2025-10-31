@@ -286,6 +286,63 @@ function renderResults() {
     }
 }
 
+// Generate media icons for screenshots and videos
+function getMediaIcons(item) {
+    let mediaIcons = '';
+    
+    if (item.screenshot_path) {
+        mediaIcons += `
+            <button class="media-icon screenshot-icon" onclick="showMedia('${item.screenshot_path}', 'screenshot')" title="View Screenshot">
+                <i class="fas fa-camera"></i>
+            </button>
+        `;
+    }
+    
+    if (item.video_path) {
+        mediaIcons += `
+            <button class="media-icon video-icon" onclick="showMedia('${item.video_path}', 'video')" title="View Video">
+                <i class="fas fa-video"></i>
+            </button>
+        `;
+    }
+    
+    return mediaIcons;
+}
+
+// Show media file in modal
+function showMedia(mediaPath, mediaType) {
+    const modal = document.createElement('div');
+    modal.className = 'media-modal';
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    };
+    
+    let mediaContent;
+    if (mediaType === 'screenshot') {
+        mediaContent = `<img src="/media/${mediaPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh;">`;
+    } else if (mediaType === 'video') {
+        mediaContent = `
+            <video controls style="max-width: 100%; max-height: 80vh;">
+                <source src="/media/${mediaPath}" type="video/webm">
+                Your browser does not support the video tag.
+            </video>
+        `;
+    }
+    
+    modal.innerHTML = `
+        <div class="media-modal-content">
+            <button class="media-modal-close" onclick="document.body.removeChild(this.closest('.media-modal'))">
+                <i class="fas fa-times"></i>
+            </button>
+            ${mediaContent}
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
 // Render table view
 function renderTableView(data) {
     elements.resultsTbody.innerHTML = '';
@@ -310,9 +367,12 @@ function renderTableView(data) {
                 </a>
             </td>
             <td>
-                <button class="details-btn" onclick="showDetails(${item.id})">
-                    <i class="fas fa-eye"></i> View
-                </button>
+                <div class="action-buttons">
+                    ${getMediaIcons(item)}
+                    <button class="details-btn" onclick="showDetails(${item.id})">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </div>
             </td>
         `;
         elements.resultsTbody.appendChild(row);
@@ -326,7 +386,12 @@ function renderCardView(data) {
     data.forEach(item => {
         const card = document.createElement('div');
         card.className = 'merchant-card';
-        card.onclick = () => showDetails(item.id);
+        card.onclick = (e) => {
+            // Don't show details if clicking on media icons
+            if (!e.target.closest('.media-icon')) {
+                showDetails(item.id);
+            }
+        };
         
         card.innerHTML = `
             <div class="card-header">
@@ -343,8 +408,13 @@ function renderCardView(data) {
                 <div class="card-result">${escapeHtml(truncateText(item.test_result, 100))}</div>
             </div>
             <div class="card-footer">
-                <span>${formatDate(item.tested_at)}</span>
-                <span>${item.test_duration_ms ? `${item.test_duration_ms}ms` : ''}</span>
+                <div class="card-footer-left">
+                    <span>${formatDate(item.tested_at)}</span>
+                    <span>${item.test_duration_ms ? `${item.test_duration_ms}ms` : ''}</span>
+                </div>
+                <div class="card-footer-right">
+                    ${getMediaIcons(item)}
+                </div>
             </div>
         `;
         
