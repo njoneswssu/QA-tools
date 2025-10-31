@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config(); // Load environment variables
 
 /**
  * API Test Runner - Bridges the UI with the Playwright test
@@ -27,12 +28,32 @@ class APITestRunner {
 const { test, expect, chromium } = require('@playwright/test');
 const path = require('path');
 
-// Database integration
+// Database integration - automatically uses correct database (SQLite or PostgreSQL)
 let dbModule;
 try {
-  dbModule = require(path.join(__dirname, '..', 'database', 'init_db'));
+  const path = require('path');
+  
+  // Since this temp file is in temp/ directory, go up two levels: temp/ -> api-merchant-tester/ -> database/
+  const USE_POSTGRES = process.env.USE_POSTGRES === 'true' || process.env.PGDATABASE;
+  
+  let dbPath;
+  if (USE_POSTGRES) {
+    dbPath = path.join(__dirname, '..', 'database', 'pg_init_db');
+    dbModule = require(dbPath);
+    console.log('📦 Using PostgreSQL database for test');
+  } else {
+    dbPath = path.join(__dirname, '..', 'database', 'init_db');
+    dbModule = require(dbPath);
+    console.log('📦 Using SQLite database for test');
+  }
+  
+  console.log('✅ Database module loaded successfully');
+  console.log('Database path used:', dbPath);
+  console.log('Available functions:', Object.keys(dbModule));
 } catch (error) {
-  console.log('Database module not found, results will only be saved to console/file');
+  console.error('❌ Database module loading failed:', error.message);
+  console.error('Error stack:', error.stack);
+  console.error('Current __dirname:', __dirname);
   dbModule = null;
 }
 
@@ -42,7 +63,7 @@ test.describe('API Merchant Tester - UI Generated', () => {
     
     const browser = await chromium.launch({
       headless: false,
-      slowMo: 1000  // Increased slowMo for better visibility
+      slowMo: 2000  // Slow down to 2 seconds between actions
     });
     
     const context = await browser.newContext({
@@ -54,6 +75,27 @@ test.describe('API Merchant Tester - UI Generated', () => {
     });
     
     const page = await context.newPage();
+    
+    // Detect browser close and update session
+    let browserClosed = false;
+    browser.on('disconnected', async () => {
+      console.log('🚪 Browser closed by user');
+      browserClosed = true;
+      if (dbModule && dbSessionCreated) {
+        try {
+          await dbModule.updateTestSession(sessionId, {
+            status: 'stopped',
+            completed_at: new Date().toISOString(),
+            total_merchants: checkedCount,
+            successful_merchants: successfulWebsites.length,
+            flagged_merchants: unavailableWebsites.length
+          });
+          console.log('💾 Session marked as stopped due to browser close');
+        } catch (error) {
+          console.log('⚠️ Failed to update session on browser close:', error.message);
+        }
+      }
+    });
     
     try {
       // Merchant data from UI
@@ -92,14 +134,31 @@ test.describe('API Merchant Tester - UI Generated', () => {
       const sessionId = '${sessionId}';
       let dbSessionCreated = false;
       
+      console.log('🔍 Checking database module availability...');
+      console.log('dbModule exists:', !!dbModule);
+      
       if (dbModule) {
+        console.log('✅ Database module available');
+        console.log('createTestSession exists:', !!dbModule.createTestSession);
+        
         try {
+          // Check if session already exists, if so, just continue with it
+          console.log(\`📝 Attempting to create session: \${sessionId}\`);
           await dbModule.createTestSession(sessionId, '${testName} - UI Generated Test');
           dbSessionCreated = true;
-          console.log(\`📊 Database session created: \${sessionId}\`);
+          console.log(\`✅ Database session created: \${sessionId}\`);
         } catch (error) {
-          console.log(\`⚠️ Failed to create database session: \${error.message}\`);
+          // If UNIQUE constraint error, session already exists - that's OK, use it
+          if (error.message && error.message.includes('UNIQUE constraint')) {
+            console.log(\`⚠️ Session already exists, continuing with existing session: \${sessionId}\`);
+            dbSessionCreated = true; // Set to true since we can still use the existing session
+          } else {
+            console.log(\`❌ Failed to create database session: \${error.message}\`);
+            console.error('Full error:', error);
+          }
         }
+      } else {
+        console.log('❌ Database module is NULL - results will NOT be saved!');
       }
 
       // Function to handle media files (screenshots and videos)
@@ -118,7 +177,8 @@ test.describe('API Merchant Tester - UI Generated', () => {
             const screenshot = testInfo.attachments.find(a => a.name === 'screenshot' && a.path);
             if (screenshot && fs.existsSync(screenshot.path)) {
               const screenshotName = \`\${safeFileName}_\${timestamp}.png\`;
-              const screenshotDest = path.join(__dirname, 'media', 'screenshots', screenshotName);
+              // Use absolute path - go up one level from temp/ to api-merchant-tester/
+              const screenshotDest = path.join(__dirname, '..', 'media', 'screenshots', screenshotName);
               fs.copyFileSync(screenshot.path, screenshotDest);
               mediaFiles.screenshot = \`media/screenshots/\${screenshotName}\`;
               console.log(\`📸 Screenshot saved: \${mediaFiles.screenshot}\`);
@@ -130,7 +190,8 @@ test.describe('API Merchant Tester - UI Generated', () => {
             const video = testInfo.attachments.find(a => a.name === 'video' && a.path);
             if (video && fs.existsSync(video.path)) {
               const videoName = \`\${safeFileName}_\${timestamp}.webm\`;
-              const videoDest = path.join(__dirname, 'media', 'videos', videoName);
+              // Use absolute path - go up one level from temp/ to api-merchant-tester/
+              const videoDest = path.join(__dirname, '..', 'media', 'videos', videoName);
               fs.copyFileSync(video.path, videoDest);
               mediaFiles.video = \`media/videos/\${videoName}\`;
               console.log(\`🎥 Video saved: \${mediaFiles.video}\`);
@@ -145,9 +206,14 @@ test.describe('API Merchant Tester - UI Generated', () => {
 
       // Function to save merchant result to database
       async function saveMerchantToDatabase(website, status, reason, errorPattern = null, duration = null, mediaFiles = {}) {
-        if (!dbModule || !dbSessionCreated) return;
+        if (!dbModule || !dbSessionCreated) {
+          console.log('⚠️ Database not available or session not created');
+          return;
+        }
         
         try {
+          console.log(\`💾 Saving to database: \${website.name} - \${status}\`);
+          
           const testData = {
             session_id: sessionId,
             merchant_name: website.name,
@@ -169,8 +235,10 @@ test.describe('API Merchant Tester - UI Generated', () => {
           };
           
           await dbModule.saveMerchantTestResult(testData);
+          console.log(\`✅ Successfully saved: \${website.name}\`);
         } catch (error) {
-          console.log(\`⚠️ Failed to save to database: \${error.message}\`);
+          console.log(\`❌ Failed to save to database: \${error.message}\`);
+          console.error('Full error:', error);
         }
       }
 
@@ -202,22 +270,31 @@ test.describe('API Merchant Tester - UI Generated', () => {
 
       // Main testing loop
       for (const website of websites) {
+        // Check if browser was closed
+        if (browserClosed) {
+          console.log('🛑 Stopping test - browser was closed');
+          break;
+        }
+        
         const testStartTime = Date.now();
         checkedCount++;
         
         console.log(\`\\n[\${checkedCount}/\${websites.length}] 📋 Testing: \${website.name}\`);
         console.log(\`🔗 URL: \${website.url}\`);
         console.log(\`📂 Category: \${website.primaryCategory}\`);
+        console.log(\`📊 Progress: Testing merchant \${checkedCount} of \${websites.length} total\`);
         
         // Update current merchant in database for real-time tracking
         try {
-          await dbModule.updateCurrentMerchant(sessionId, website.name, website.url);
+          if (dbModule && dbModule.updateCurrentMerchant) {
+            await dbModule.updateCurrentMerchant(sessionId, website.name, website.url);
+          }
         } catch (error) {
           console.error('Failed to update current merchant:', error);
         }
         
         // Add delay before starting each website test
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(2000);
 
         // Check for user pass
         try {
@@ -232,6 +309,10 @@ test.describe('API Merchant Tester - UI Generated', () => {
             });
 
             await saveMerchantToDatabase(website, 'user_passed', 'User manually passed', null, Date.now() - testStartTime);
+            
+            // Wait for database save to complete
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log('💾 Result saved to database');
             
             userPassedWebsites.push({ name: website.name, url: website.url });
             checkedWebsites.push({ name: website.name, url: website.url });
@@ -277,18 +358,22 @@ test.describe('API Merchant Tester - UI Generated', () => {
           const titleText = pageTitle ? pageTitle.toLowerCase() : '';
           
           // Enhanced content detection with scrolling
+          console.log(\`📜 Scrolling page to load all content...\`);
           try {
             for (let i = 0; i < 3; i++) {
               await page.evaluate(() => window.scrollBy(0, window.innerHeight));
-              await page.waitForTimeout(1000);
+              await page.waitForTimeout(1500); // Increased delay
             }
             
             await page.evaluate(() => window.scrollTo(0, 0));
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(1000); // Increased delay
             
             const scrolledContent = await page.textContent('body');
             pageText = pageText + ' ' + (scrolledContent ? scrolledContent.toLowerCase() : '');
-          } catch (scrollError) {}
+            console.log(\`📜 Content loaded: \${pageText.length} characters total\`);
+          } catch (scrollError) {
+            console.log(\`⚠️ Scrolling error: \${scrollError.message}\`);
+          }
 
           const testDuration = Date.now() - testStartTime;
           
@@ -316,6 +401,11 @@ test.describe('API Merchant Tester - UI Generated', () => {
               reason: 'Major brand protection - automatically successful'
             });
             await saveMerchantToDatabase(website, 'success', 'Major brand protection', null, testDuration);
+            
+            // Wait for database save to complete
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log('💾 Result saved to database');
+            
             checkedWebsites.push({ name: website.name, url: website.url });
             continue;
           }
@@ -505,7 +595,8 @@ test.describe('API Merchant Tester - UI Generated', () => {
               const safeFileName = website.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
               const timestamp = Date.now();
               const screenshotName = \`\${safeFileName}_success_\${timestamp}.png\`;
-              const screenshotPath = path.join(__dirname, 'media', 'screenshots', screenshotName);
+              // Use absolute path - go up one level from temp/ to api-merchant-tester/
+              const screenshotPath = path.join(__dirname, '..', 'media', 'screenshots', screenshotName);
               
               await page.screenshot({ path: screenshotPath, fullPage: true });
               mediaFiles.screenshot = \`media/screenshots/\${screenshotName}\`;
@@ -521,9 +612,17 @@ test.describe('API Merchant Tester - UI Generated', () => {
             });
 
             await saveMerchantToDatabase(website, 'success', successReason, null, testDuration, mediaFiles);
+            
+            // Wait for database save to complete
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log('💾 Result saved to database');
           }
 
           checkedWebsites.push({ name: website.name, url: website.url });
+          
+          // Add delay between merchants to ensure everything is processed
+          console.log('⏳ Waiting 2 seconds before next merchant...');
+          await page.waitForTimeout(2000);
 
         } catch (error) {
           console.log(\`❌ Error checking \${website.name}: \${error.message}\`);
@@ -541,7 +640,8 @@ test.describe('API Merchant Tester - UI Generated', () => {
             const safeFileName = website.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
             const timestamp = Date.now();
             const screenshotName = \`\${safeFileName}_error_\${timestamp}.png\`;
-            const screenshotPath = path.join(__dirname, 'media', 'screenshots', screenshotName);
+            // Use absolute path - go up one level from temp/ to api-merchant-tester/
+            const screenshotPath = path.join(__dirname, '..', 'media', 'screenshots', screenshotName);
             
             await page.screenshot({ path: screenshotPath, fullPage: true });
             mediaFiles.screenshot = \`media/screenshots/\${screenshotName}\`;
@@ -558,7 +658,15 @@ test.describe('API Merchant Tester - UI Generated', () => {
 
           await saveMerchantToDatabase(website, 'flagged', \`Error: \${errorType}\`, errorType, Date.now() - testStartTime, mediaFiles);
           
+          // Wait for database save to complete
+          await new Promise(resolve => setTimeout(resolve, 500));
+          console.log('💾 Error result saved to database');
+          
           checkedWebsites.push({ name: website.name, url: website.url });
+          
+          // Add delay before continuing
+          console.log('⏳ Waiting 2 seconds before next merchant...');
+          await page.waitForTimeout(2000);
         }
 
         // Progress checkpoint every 10 websites
@@ -567,7 +675,34 @@ test.describe('API Merchant Tester - UI Generated', () => {
           console.log(\`✅ Successful: \${successfulWebsites.length}\`);
           console.log(\`🚨 Flagged: \${unavailableWebsites.length}\`);
           console.log('⏸️  Pausing for 3 seconds...');
+          
+          // Show list of successful merchants every 10
+          if (successfulWebsites.length > 0) {
+            console.log('\\n✅ SUCCESSFUL MERCHANTS (Last 10):');
+            console.log('═'.repeat(60));
+            const recentSuccessful = successfulWebsites.slice(-10);
+            recentSuccessful.forEach((site, idx) => {
+              console.log(\`  \${idx + 1}. \${site.name}\`);
+              console.log(\`     🔗 \${site.url}\`);
+              console.log(\`     ✓ \${site.reason}\`);
+            });
+            console.log('═'.repeat(60));
+          }
+          
           await page.waitForTimeout(3000);
+        }
+        
+        // Show flagged merchants every 5
+        if (checkedCount % 5 === 0 && unavailableWebsites.length > 0) {
+          console.log('\\n🚨 FLAGGED MERCHANTS (Last 5):');
+          console.log('═'.repeat(60));
+          const recentFlagged = unavailableWebsites.slice(-5);
+          recentFlagged.forEach((site, idx) => {
+            console.log(\`  \${idx + 1}. \${site.name}\`);
+            console.log(\`     🔗 \${site.url}\`);
+            console.log(\`     ⚠️  \${site.pattern}\`);
+          });
+          console.log('═'.repeat(60));
         }
         
         // Small delay between each website for better visibility
@@ -626,27 +761,46 @@ test.describe('API Merchant Tester - UI Generated', () => {
                 console.log(`📁 Temp test file: ${tempTestFile}`);
                 console.log(`📂 Working directory: ${__dirname}`);
                 
-                // Run Playwright test with detached process
+                // Create log file for streaming
+                const logDir = path.join(__dirname, 'logs');
+                if (!fs.existsSync(logDir)) {
+                    fs.mkdirSync(logDir, { recursive: true });
+                }
+                const logFile = path.join(logDir, `test-${sessionId}.log`);
+                const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+                
+                // Run Playwright test with output capture
                 console.log('🎬 Spawning Playwright process...');
                 const playwrightProcess = spawn('npx', ['playwright', 'test', tempTestFile, '--headed', '--project=chromium-with-extension'], {
-                    stdio: 'ignore',  // Ignore stdio so it can run independently
                     cwd: __dirname,
                     shell: true,
-                    detached: true,  // Detach so it survives parent process
+                    detached: false,  // Keep attached to capture output
                     env: process.env
                 });
                 
-                // Unreference so parent can exit
-                playwrightProcess.unref();
+                // Capture stdout and stderr
+                playwrightProcess.stdout.on('data', (data) => {
+                    const output = data.toString();
+                    console.log(output);
+                    logStream.write(output);
+                });
+                
+                playwrightProcess.stderr.on('data', (data) => {
+                    const output = data.toString();
+                    console.error(output);
+                    logStream.write(output);
+                });
 
                 // Log the PID for debugging
                 console.log(`📌 Playwright process PID: ${playwrightProcess.pid}`);
+                console.log(`📝 Logs streaming to: ${logFile}`);
 
                 // Resolve immediately so the API doesn't wait
                 resolve({ 
                     success: true, 
                     message: 'Test started',
-                    pid: playwrightProcess.pid 
+                    pid: playwrightProcess.pid,
+                    logFile: logFile
                 });
 
                 playwrightProcess.on('spawn', () => {
@@ -655,6 +809,7 @@ test.describe('API Merchant Tester - UI Generated', () => {
 
                 playwrightProcess.on('close', (code) => {
                     console.log(`🏁 Playwright process exited with code ${code}`);
+                    logStream.end();
                     
                     // Clean up temp file
                     try {
@@ -677,6 +832,7 @@ test.describe('API Merchant Tester - UI Generated', () => {
                         message: error.message,
                         code: error.code
                     });
+                    logStream.end();
                 });
 
             } catch (error) {

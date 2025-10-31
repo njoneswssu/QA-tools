@@ -271,6 +271,7 @@ const elements = {
     // Control buttons
     pauseTestBtn: document.getElementById('pause-test-btn'),
     stopTestBtn: document.getElementById('stop-test-btn'),
+    clearTestBtn: document.getElementById('clear-test-btn'),
     passCurrentBtn: document.getElementById('pass-current-btn'),
     
     // Results tabs and lists
@@ -426,7 +427,23 @@ function initializeEventListeners() {
     // Test control events
     elements.pauseTestBtn.addEventListener('click', pauseTest);
     elements.stopTestBtn.addEventListener('click', stopTest);
+    elements.clearTestBtn.addEventListener('click', clearTest);
     elements.passCurrentBtn.addEventListener('click', passCurrentMerchant);
+    
+    // Global keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Ctrl+C to stop testing
+        if (e.ctrlKey && e.key === 'c' && isTestRunning) {
+            e.preventDefault();
+            addLogEntry('⚠️ Ctrl+C detected - Stopping test...', 'warning');
+            stopTest();
+        }
+        // Ctrl+Shift+C to clear log
+        if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+            e.preventDefault();
+            clearLog();
+        }
+    });
     
     // Tab events
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -919,16 +936,41 @@ async function runTest(merchantsToTest = filteredMerchants) {
 
 // Poll for test results from the database
 async function pollForResults() {
-    const pollInterval = 1500; // Poll every 1.5 seconds for more responsive updates
+    const pollInterval = 1000; // Poll every second for faster updates
     let lastResultCount = 0;
     let lastCurrentMerchant = '';
+    let logPosition = 0; // Track log file position
     
     // Save active session to localStorage for persistence
     localStorage.setItem('active_test_session', testSession.session_id);
     
     const poll = async () => {
         try {
-            // Get current test session status using the specific endpoint
+            // Poll for logs first (faster/more responsive)
+            try {
+                const logResponse = await fetch(`/api/sessions/${testSession.session_id}/logs?since=${logPosition}`);
+                if (logResponse.ok) {
+                    const logData = await logResponse.json();
+                    if (logData.logs && logData.logs.length > 0) {
+                        // Parse and display logs
+                        const logLines = logData.logs.split('\n').filter(line => line.trim());
+                        logLines.forEach(line => {
+                            // Determine log type from content
+                            let type = 'info';
+                            if (line.includes('✅') || line.includes('SUCCESS')) type = 'success';
+                            else if (line.includes('❌') || line.includes('ERROR') || line.includes('🚨') || line.includes('FLAGGED')) type = 'error';
+                            else if (line.includes('⚠️') || line.includes('WARNING')) type = 'warning';
+                            
+                            addLogEntry(line.trim(), type);
+                        });
+                        logPosition = logData.position;
+                    }
+                }
+            } catch (logError) {
+                // Log errors are non-fatal, continue polling
+            }
+            
+            // Get current test session status
             const sessionResponse = await fetch(`/api/sessions/${testSession.session_id}`);
             if (sessionResponse.ok) {
                 const currentSession = await sessionResponse.json();
@@ -938,7 +980,6 @@ async function pollForResults() {
                     lastCurrentMerchant = currentSession.current_merchant;
                     elements.currentMerchant.textContent = `Testing: ${currentSession.current_merchant}`;
                     elements.currentUrl.textContent = currentSession.current_url || 'Loading...';
-                    addLogEntry(`🔍 Now testing: ${currentSession.current_merchant}`, 'info');
                 }
                 
                 // Check if test was marked as completed or stopped
@@ -950,21 +991,14 @@ async function pollForResults() {
                 }
             }
             
+            // Get test results
             const response = await fetch(`/api/merchant-results?session_id=${testSession.session_id}&limit=10000`);
             if (response.ok) {
                 const data = await response.json();
                 const results = data.data || data;
                 
-                // Update stats if we have new results
+                // Update stats and display if we have new results
                 if (results.length > lastResultCount) {
-                    const newResults = results.slice(0, results.length - lastResultCount).reverse();
-                    newResults.forEach(result => {
-                        const status = result.is_user_passed ? 'success' : result.test_status;
-                        const statusText = status === 'success' ? '✅' : (status === 'flagged' ? '🚨' : '⚠️');
-                        const domain = result.merchant_url ? result.merchant_url.replace('https://', '').replace('http://', '') : 'N/A';
-                        addLogEntry(`${statusText} ${result.merchant_name} (${domain}): ${result.test_result}`, status === 'success' ? 'success' : 'error');
-                    });
-                    
                     updateStatsFromResults(results);
                     updateResultsFromDatabase(results);
                     lastResultCount = results.length;
@@ -1028,7 +1062,8 @@ function updateResultsFromDatabase(results) {
     results.forEach(result => {
         const merchant = {
             MerchantName: result.merchant_name,
-            MerchantDomains: [result.merchant_url?.replace('https://', '') || '']
+            MerchantDomains: [result.merchant_url?.replace('https://', '') || ''],
+            MerchantID: result.merchant_id
         };
         
         const testResult = {
@@ -1038,8 +1073,18 @@ function updateResultsFromDatabase(results) {
             video_path: result.video_path
         };
         
+        // Update merchant status in Map
+        if (result.merchant_id) {
+            merchantStatuses.set(result.merchant_id, testResult.status);
+        }
+        
         addResultToList(merchant, testResult);
     });
+    
+    // Refresh merchant display to show updated statuses
+    if (typeof displayMerchantList === 'function' && filteredMerchants.length > 0) {
+        displayMerchantList(filteredMerchants);
+    }
 }
 
 // Fallback simulation for when Playwright test fails to start
@@ -1305,7 +1350,7 @@ async function completeTest() {
     }
     
     // Update final stats
-    elements.finalTotal.textContent = testResults.total;
+    elements.finalTotal.textContent = testResults.current; // Use actual tested count
     elements.finalSuccessful.textContent = testResults.successful;
     elements.finalFlagged.textContent = testResults.flagged;
     
@@ -1317,19 +1362,9 @@ async function completeTest() {
 }
 
 // Control functions
-function pauseTest() {
-    // In real implementation, this would pause the Playwright test
-    showInfo('Test paused - click resume to continue');
-}
-
 function stopTest() {
     // In real implementation, this would stop the Playwright test
     completeTest();
-}
-
-function passCurrentMerchant() {
-    // In real implementation, this would mark current merchant as passed
-    showInfo('Current merchant marked as passed');
 }
 
 // Download results
@@ -2304,21 +2339,6 @@ async function fetchAllPages() {
 let testProcess = null;
 let isTestRunning = false;
 
-function pauseTest() {
-    addLogEntry('⏸️ Pause requested - test will pause at next checkpoint', 'warning');
-    showInfo('Test will pause at the next checkpoint');
-}
-
-function resumeTest() {
-    addLogEntry('▶️ Resume requested', 'info');
-    showInfo('Test resumed');
-}
-
-function passCurrentMerchant() {
-    addLogEntry('👤 Pass current merchant requested', 'info');
-    showInfo('Current merchant will be marked as passed');
-}
-
 async function stopTest() {
     if (!isTestRunning) {
         showError('No test is currently running');
@@ -2330,12 +2350,6 @@ async function stopTest() {
         showWarning('Stopping test - this may take a moment...');
         
         // Try to stop the Playwright process
-        if (testProcess) {
-            testProcess.kill('SIGTERM');
-            testProcess = null;
-        }
-        
-        // Call the server to stop the test
         const response = await fetch('/api/stop-test', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -2357,4 +2371,49 @@ async function stopTest() {
         addLogEntry(`❌ Error stopping test: ${error.message}`, 'error');
         showError('Error stopping test: ' + error.message);
     }
+}
+
+// Clear test and reset everything
+function clearTest() {
+    if (isTestRunning) {
+        if (!confirm('Test is currently running. Stop and clear?')) {
+            return;
+        }
+        stopTest();
+    }
+    
+    // Reset all state
+    testResults = {
+        total: 0,
+        successful: 0,
+        flagged: 0,
+        current: 0
+    };
+    testSession = null;
+    isTestRunning = false;
+    
+    // Clear UI
+    elements.currentMerchant.textContent = 'No test running';
+    elements.currentUrl.textContent = '';
+    elements.progressFill.style.width = '0%';
+    
+    // Reset stats
+    elements.totalTested.textContent = '0';
+    elements.successfulCount.textContent = '0';
+    elements.flaggedCount.textContent = '0';
+    
+    // Clear result lists
+    clearResultsLists();
+    
+    // Clear log
+    clearLog();
+    
+    // Hide results section
+    elements.resultsSection.style.display = 'none';
+    
+    // Clear localStorage
+    localStorage.removeItem('active_test_session');
+    
+    addLogEntry('🔄 Test cleared - ready to start new test', 'success');
+    showSuccess('Test cleared successfully');
 }

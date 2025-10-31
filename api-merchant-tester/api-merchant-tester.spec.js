@@ -498,6 +498,10 @@ test.describe('API Merchant Tester', () => {
           // Analyze content for availability patterns
           const testDuration = Date.now() - testStartTime;
           
+          console.log(`🔍 ${website.name}: Starting pattern detection...`);
+          console.log(`📄 Page text length: ${pageText.length} characters`);
+          console.log(`📰 Page title: "${pageTitle}"`);
+          
           // Check for unavailability patterns
           const unavailabilityPatterns = [
             'this store is unavailable',
@@ -525,12 +529,25 @@ test.describe('API Merchant Tester', () => {
             'site suspended'
           ];
 
+          console.log(`🔎 Checking ${unavailabilityPatterns.length} unavailability patterns...`);
           let foundPattern = null;
+          let checkedPatterns = [];
+          
           for (const pattern of unavailabilityPatterns) {
-            if (pageText.includes(pattern) || titleText.includes(pattern)) {
+            const foundInText = pageText.includes(pattern);
+            const foundInTitle = titleText.includes(pattern);
+            
+            if (foundInText || foundInTitle) {
               foundPattern = pattern;
+              const location = foundInText ? (foundInTitle ? 'text & title' : 'page text') : 'page title';
+              console.log(`   ⚠️ Pattern match: "${pattern}" (found in ${location})`);
               break;
             }
+            checkedPatterns.push(pattern);
+          }
+          
+          if (!foundPattern) {
+            console.log(`   ✓ No unavailability patterns detected (checked ${checkedPatterns.length} patterns)`);
           }
 
           if (foundPattern) {
@@ -550,9 +567,15 @@ test.describe('API Merchant Tester', () => {
             displayRunningFlaggedList();
           } else {
             // Check for positive indicators (e-commerce features, pricing, etc.)
+            console.log(`🔍 ${website.name}: Checking for e-commerce indicators...`);
+            
             const hasEcommerceFeatures = /add to cart|buy now|purchase|checkout|shopping cart|add to bag|shop now|order now/i.test(pageText);
             const hasPricing = /\$\s*\d+|\d+\s*\$|price|pricing|cost/i.test(pageText);
             const hasBusinessContent = /about us|contact us|customer service|shipping|returns|privacy policy/i.test(pageText);
+            
+            console.log(`   ${hasEcommerceFeatures ? '✓' : '✗'} E-commerce features (add to cart, buy now, etc.)`);
+            console.log(`   ${hasPricing ? '✓' : '✗'} Pricing information ($, price, cost, etc.)`);
+            console.log(`   ${hasBusinessContent ? '✓' : '✗'} Business content (about, contact, etc.)`);
             
             let successReason = 'Website appears to be available';
             

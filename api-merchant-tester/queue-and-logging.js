@@ -354,39 +354,111 @@ function escapeHtml(text) {
 let logBuffer = [];
 let logUpdateInterval = null;
 
+// Initialize log search functionality
+function initializeLogSearch() {
+    const logSearchInput = document.getElementById('log-search-input');
+    const logSearchInfo = document.getElementById('log-search-info');
+    const logContainer = document.getElementById('log-container');
+    
+    if (!logSearchInput || !logSearchInfo || !logContainer) return;
+    
+    let currentMatchIndex = 0;
+    let matches = [];
+    
+    function performSearch() {
+        const searchTerm = logSearchInput.value.toLowerCase();
+        const logEntries = logContainer.querySelectorAll('.log-entry');
+        
+        // Clear previous highlights
+        logEntries.forEach(entry => {
+            entry.classList.remove('highlight', 'current-match');
+        });
+        
+        matches = [];
+        
+        if (!searchTerm) {
+            logSearchInfo.textContent = '';
+            currentMatchIndex = 0;
+            return;
+        }
+        
+        // Find and highlight all matches
+        logEntries.forEach((entry, index) => {
+            const text = entry.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                entry.classList.add('highlight');
+                matches.push({ entry, index });
+            }
+        });
+        
+        // Update info and highlight current match
+        if (matches.length > 0) {
+            currentMatchIndex = 0;
+            highlightCurrentMatch();
+        } else {
+            logSearchInfo.textContent = 'No matches';
+            currentMatchIndex = 0;
+        }
+    }
+    
+    function highlightCurrentMatch() {
+        if (matches.length === 0) return;
+        
+        // Remove previous current match highlight
+        matches.forEach(m => m.entry.classList.remove('current-match'));
+        
+        // Highlight current match
+        const current = matches[currentMatchIndex];
+        current.entry.classList.add('current-match');
+        current.entry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Update info text
+        logSearchInfo.textContent = `${currentMatchIndex + 1} of ${matches.length} matches`;
+    }
+    
+    function navigateMatches(direction) {
+        if (matches.length === 0) return;
+        
+        if (direction === 'next') {
+            currentMatchIndex = (currentMatchIndex + 1) % matches.length;
+        } else if (direction === 'prev') {
+            currentMatchIndex = (currentMatchIndex - 1 + matches.length) % matches.length;
+        }
+        
+        highlightCurrentMatch();
+    }
+    
+    logSearchInput.addEventListener('input', performSearch);
+    
+    // Keyboard navigation
+    logSearchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            navigateMatches('next');
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            navigateMatches('prev');
+        } else if (e.key === 'Escape') {
+            logSearchInput.value = '';
+            performSearch();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            navigateMatches('next');
+        }
+    });
+}
+
 // Start real-time log streaming (polls the Playwright process output)
 function startRealTimeLogging() {
     // The actual Playwright logs will come from the browser console
     // We'll enhance the existing addLogEntry to make it searchable
     
     // Make log container searchable with Ctrl+F
-    const logContainer = elements.logContainer;
+    const logContainer = document.getElementById('log-container');
     if (logContainer) {
         logContainer.setAttribute('tabindex', '0');
         logContainer.style.userSelect = 'text';
         logContainer.style.cursor = 'text';
-        
-        // Add search hint
-        const searchHint = document.createElement('div');
-        searchHint.className = 'log-search-hint';
-        searchHint.innerHTML = '<i class="fas fa-search"></i> Press Ctrl+F to search logs';
-        searchHint.style.cssText = `
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(102, 126, 234, 0.1);
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            color: #667eea;
-            opacity: 0.7;
-        `;
-        
-        const logHeader = logContainer.closest('.terminal-log').querySelector('h3');
-        if (logHeader) {
-            logHeader.style.position = 'relative';
-            logHeader.appendChild(searchHint);
-        }
     }
 }
 
@@ -430,6 +502,7 @@ if (typeof addLogEntry === 'function') {
 document.addEventListener('DOMContentLoaded', function() {
     startRealTimeLogging();
     initializeQueueSearch();
+    initializeLogSearch();
 });
 
 // Also initialize when queue section is shown

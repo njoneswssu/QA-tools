@@ -1516,29 +1516,39 @@ body {
 /* Merchant Card Play Button */
 .merchant-card {
     position: relative;
+    padding-top: 45px; /* Add space at top for buttons */
 }
 
 .merchant-card-actions {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 8px;
+    right: 8px;
     display: flex;
     gap: 5px;
+    z-index: 10;
+}
+
+.merchant-status {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 5;
 }
 
 .btn-priority {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
     color: white;
-    padding: 8px 12px;
+    padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 5px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    white-space: nowrap;
 }
 
 .btn-priority:hover {
@@ -1647,6 +1657,55 @@ body {
 /* Make log text selectable for Ctrl+F */
 .log-container * {
     user-select: text !important;
+}
+
+/* Log Search Bar */
+.log-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.log-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #00ff00;
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+}
+
+.log-search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.log-search-input::placeholder {
+    color: #666;
+}
+
+.log-search-info {
+    color: #888;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.log-entry.highlight {
+    background: rgba(255, 255, 0, 0.2) !important;
+    border-left: 3px solid #ff0;
+}
+
+.log-entry.current-match {
+    background: rgba(255, 165, 0, 0.4) !important;
+    border-left: 3px solid #ffa500;
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
 }
 
 /* Queue Search Bar and Autocomplete */

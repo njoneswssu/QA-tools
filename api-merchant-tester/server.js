@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 
 // Database selection based on environment variable
@@ -553,6 +554,53 @@ app.post('/api/start-test', async (req, res) => {
     } catch (error) {
         console.error('Error starting test:', error);
         res.status(500).json({ error: 'Failed to start test' });
+    }
+});
+
+// Get test logs for streaming
+app.get('/api/sessions/:sessionId/logs', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        const { since } = req.query; // Optional: get logs since this byte offset
+        
+        const logFile = path.join(__dirname, 'logs', `test-${sessionId}.log`);
+        
+        if (!fs.existsSync(logFile)) {
+            return res.json({ logs: '', hasMore: false });
+        }
+        
+        const stats = fs.statSync(logFile);
+        const startPosition = since ? parseInt(since) : 0;
+        
+        if (startPosition >= stats.size) {
+            return res.json({ logs: '', position: stats.size, hasMore: false });
+        }
+        
+        const stream = fs.createReadStream(logFile, {
+            start: startPosition,
+            encoding: 'utf8'
+        });
+        
+        let logs = '';
+        stream.on('data', (chunk) => {
+            logs += chunk;
+        });
+        
+        stream.on('end', () => {
+            res.json({
+                logs: logs,
+                position: stats.size,
+                hasMore: false
+            });
+        });
+        
+        stream.on('error', (error) => {
+            console.error('Error reading log file:', error);
+            res.status(500).json({ error: 'Failed to read logs' });
+        });
+    } catch (error) {
+        console.error('Error streaming logs:', error);
+        res.status(500).json({ error: 'Failed to stream logs' });
     }
 });
 
