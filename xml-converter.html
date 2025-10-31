@@ -383,13 +383,13 @@
 
         function generateCurrentDate() {
             const now = new Date();
-            const currentDay = now.getDate();
             
-            // Generate a random day between 1 and current day (so it's never in the future)
-            const randomDay = Math.floor(Math.random() * currentDay) + 1;
+            // Generate a random number of days between 1 and 10 days ago
+            const randomDaysAgo = Math.floor(Math.random() * 10) + 1;
             
-            // Set the date to the random day in the current month/year
-            const shipmentDate = new Date(now.getFullYear(), now.getMonth(), randomDay);
+            // Generate a date that's randomDaysAgo days ago from today
+            const shipmentDate = new Date(now);
+            shipmentDate.setDate(now.getDate() - randomDaysAgo);
             
             const year = shipmentDate.getFullYear();
             const month = String(shipmentDate.getMonth() + 1).padStart(2, '0');
