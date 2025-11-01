@@ -21,7 +21,7 @@
             </div>
         </header>
 
-        <div class="setup-section">
+        <div class="setup-section" id="setup-section">
             <div class="setup-card">
                 <h2><i class="fas fa-cog"></i> Test Configuration</h2>
                 
@@ -158,7 +158,8 @@ Page 3 JSON'
                             <select id="status-filter">
                                 <option value="">All Merchants</option>
                                 <option value="untested">Not Tested</option>
-                                <option value="successful">Successful</option>
+                                <option value="tested">Tested (Any Result)</option>
+                                <option value="success">Successful</option>
                                 <option value="flagged">Flagged</option>
                             </select>
                         </div>
@@ -240,6 +241,9 @@ Page 3 JSON'
                 <button id="stop-test-btn" class="btn btn-danger">
                     <i class="fas fa-stop"></i> Stop Test
                 </button>
+                <button id="restart-test-btn" class="btn btn-primary" style="display: none;">
+                    <i class="fas fa-play"></i> Restart Testing
+                </button>
                 <button id="clear-test-btn" class="btn btn-secondary">
                     <i class="fas fa-redo"></i> Clear Test
                 </button>
@@ -290,19 +294,19 @@ Page 3 JSON'
 
             <div class="live-results">
                 <div class="results-tabs">
-                    <button class="tab-btn active" data-tab="successful">
+                    <button class="tab-btn" data-tab="successful">
                         <i class="fas fa-check-circle"></i> Successful (<span id="successful-tab-count">0</span>)
                     </button>
                     <button class="tab-btn" data-tab="flagged">
                         <i class="fas fa-exclamation-triangle"></i> Flagged (<span id="flagged-tab-count">0</span>)
                     </button>
-                    <button class="tab-btn" data-tab="all">
+                    <button class="tab-btn active" data-tab="all">
                         <i class="fas fa-list"></i> All Results (<span id="all-tab-count">0</span>)
                     </button>
                 </div>
 
                 <div class="tab-content">
-                    <div id="successful-results" class="tab-pane active">
+                    <div id="successful-results" class="tab-pane">
                         <div class="results-list" id="successful-list">
                             <div class="no-results">
                                 <i class="fas fa-hourglass-start"></i>
@@ -318,7 +322,7 @@ Page 3 JSON'
                             </div>
                         </div>
                     </div>
-                    <div id="all-results" class="tab-pane">
+                    <div id="all-results" class="tab-pane active">
                         <div class="results-list" id="all-list">
                             <div class="no-results">
                                 <i class="fas fa-hourglass-start"></i>

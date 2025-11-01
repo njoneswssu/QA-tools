@@ -255,6 +255,7 @@ const elements = {
     logContainer: document.getElementById('log-container'),
     clearLogBtn: document.getElementById('clear-log-btn'),
     autoScrollBtn: document.getElementById('auto-scroll-btn'),
+    setupSection: document.getElementById('setup-section'),
     resultsSection: document.getElementById('results-section'),
     completionSection: document.getElementById('completion-section'),
     
@@ -272,6 +273,7 @@ const elements = {
     pauseTestBtn: document.getElementById('pause-test-btn'),
     stopTestBtn: document.getElementById('stop-test-btn'),
     clearTestBtn: document.getElementById('clear-test-btn'),
+    restartTestBtn: document.getElementById('restart-test-btn'),
     passCurrentBtn: document.getElementById('pass-current-btn'),
     
     // Results tabs and lists
@@ -302,67 +304,108 @@ async function checkForActiveTestSession() {
     try {
         const activeSessionId = localStorage.getItem('active_test_session');
         if (!activeSessionId) {
-            return;
+            console.log('ℹ️ No active test session found in localStorage');
+            return false;
         }
         
         console.log('🔍 Found active test session:', activeSessionId);
         
         // Check if the session is still running
         const response = await fetch(`/api/sessions/${activeSessionId}`);
-        if (response.ok) {
-            const session = await response.json();
+        if (!response.ok) {
+            console.log('⚠️ Active session not found in database (HTTP', response.status, ')');
+            localStorage.removeItem('active_test_session');
+            return false;
+        }
+        
+        const session = await response.json();
+        console.log('📋 Session status:', session.status);
+        
+        // If the session is still running, resume monitoring
+        if (session.status === 'running') {
+            console.log('▶️ Resuming active test session...');
             
-            // If the session is still running, resume monitoring
-            if (session.status === 'running') {
-                console.log('▶️ Resuming active test session...');
+            // Set up the test session and mark as running FIRST
+            testSession = { session_id: session.session_id };
+            isTestRunning = true;
+            
+            console.log('✓ Set isTestRunning =', isTestRunning);
+            console.log('✓ Set testSession =', testSession);
+            
+            // Hide setup section and show results section
+            elements.setupSection.style.display = 'none';
+            elements.resultsSection.style.display = 'block';
+            
+            console.log('✓ UI sections updated (setup hidden, results shown)');
+            
+            // Load test results
+            const resultsResponse = await fetch(`/api/merchant-results?session_id=${activeSessionId}&limit=10000`);
+            if (resultsResponse.ok) {
+                const data = await resultsResponse.json();
+                const results = data.data || data;
                 
-                // Set up the test session
-                testSession = { session_id: session.session_id };
+                console.log(`✓ Loaded ${results.length} existing test results`);
                 
-                // Show results section
-                elements.resultsSection.style.display = 'block';
+                // Update UI with existing results
+                updateStatsFromResults(results);
+                updateResultsFromDatabase(results);
                 
-                // Load test results
-                const resultsResponse = await fetch(`/api/merchant-results?session_id=${activeSessionId}&limit=10000`);
-                if (resultsResponse.ok) {
-                    const data = await resultsResponse.json();
-                    const results = data.data || data;
-                    
-                    // Update UI with existing results
-                    updateStatsFromResults(results);
-                    updateResultsFromDatabase(results);
-                    
-                    // Show current merchant being tested
-                    if (session.current_merchant) {
-                        elements.currentMerchant.textContent = `Testing: ${session.current_merchant}`;
-                        elements.currentUrl.textContent = session.current_url || 'Loading...';
+                // Load and display merchants if available
+                try {
+                    const merchantsLoaded = loadMerchantsFromCache();
+                    if (merchantsLoaded && filteredMerchants.length > 0) {
+                        console.log('✓ Loaded merchants from cache for preview');
+                        displayMerchantList(filteredMerchants);
                     } else {
-                        elements.currentMerchant.textContent = 'Test in progress...';
+                        // Try loading from database
+                        console.log('📥 Loading merchants from database...');
+                        await loadStoredMerchants(true);
+                        if (filteredMerchants.length > 0) {
+                            console.log('✓ Loaded merchants from database for preview');
+                            displayMerchantList(filteredMerchants);
+                        }
                     }
-                    
-                    addLogEntry('🔄 Resumed monitoring active test session', 'success');
-                    addLogEntry(`📊 Currently: ${results.length} merchants tested`, 'info');
-                    
-                    // Start polling for new results
-                    pollForResults();
+                } catch (error) {
+                    console.log('⚠️ Could not load merchants for preview:', error.message);
                 }
+                
+                // Show current merchant being tested
+                if (session.current_merchant) {
+                    elements.currentMerchant.textContent = `Testing: ${session.current_merchant}`;
+                    elements.currentUrl.textContent = session.current_url || 'Loading...';
+                    console.log('✓ Current merchant:', session.current_merchant);
+                } else {
+                    elements.currentMerchant.textContent = 'Test in progress...';
+                }
+                
+                addLogEntry('🔄 Resumed monitoring active test session', 'success');
+                addLogEntry(`📊 Currently: ${results.length} merchants tested`, 'info');
+                
+                // Start polling for new results
+                console.log('✓ Starting polling for new results...');
+                pollForResults();
+                
+                console.log('✅ Active test session fully restored!');
+                return true;
             } else {
-                // Session is completed or stopped
-                console.log('✅ Session already completed:', session.status);
-                localStorage.removeItem('active_test_session');
+                console.error('❌ Failed to load test results:', resultsResponse.status);
+                return false;
             }
         } else {
-            // Session not found
-            console.log('⚠️ Active session not found in database');
+            // Session is completed or stopped
+            console.log('✅ Session already completed:', session.status);
             localStorage.removeItem('active_test_session');
+            return false;
         }
     } catch (error) {
         console.error('❌ Error checking for active session:', error);
+        console.error('Error details:', error.message, error.stack);
+        return false;
     }
 }
 
 // Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 DOM Content Loaded - Initializing tester...');
     
     initializeEventListeners();
@@ -372,30 +415,42 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.merchantLimit.value = '';
     
     // Check for active test session on page load
-    checkForActiveTestSession();
+    await checkForActiveTestSession();
     
-    // Add a small delay to ensure all DOM elements are ready
-    setTimeout(() => {
-        console.log('⏰ Attempting to load cached merchants...');
-        
-        // Try to load merchants from cache first
-        const cacheLoaded = loadMerchantsFromCache();
-        
-        // Populate dropdowns
-        populateAppIdDropdown();
-        
-        // Only auto-load from database if cache wasn't loaded
-        if (!cacheLoaded) {
-            console.log('📥 No cache found, attempting to auto-load from database...');
-            loadStoredMerchants(true).then(() => {
-                console.log('✅ Auto-loaded merchants from database');
-            }).catch(error => {
-                console.log('ℹ️ No stored merchants available in database');
-            });
-        } else {
-            console.log('✅ Cache loaded successfully');
-        }
-    }, 100); // Small delay to ensure DOM is fully ready
+    // Only load merchants if there's no active test running
+    if (!isTestRunning) {
+        // Add a small delay to ensure all DOM elements are ready
+        setTimeout(async () => {
+            console.log('⏰ Attempting to load merchants...');
+            
+            // Try to load merchants from cache first
+            const cacheLoaded = loadMerchantsFromCache();
+            
+            // Populate dropdowns
+            populateAppIdDropdown();
+            
+            // If cache loaded successfully, display merchants
+            if (cacheLoaded) {
+                console.log('✅ Cache loaded successfully, displaying merchants');
+                if (filteredMerchants.length > 0) {
+                    displayMerchantList(filteredMerchants);
+                    elements.startTestBtn.disabled = false;
+                }
+            } else {
+                // No cache found, load from database
+                console.log('📥 No cache found, loading from database...');
+                try {
+                    await loadStoredMerchants(true);
+                    console.log('✅ Auto-loaded merchants from database');
+                } catch (error) {
+                    console.log('ℹ️ No stored merchants available:', error.message);
+                    console.log('💡 Please load merchants using API data or "Load from Database" button');
+                }
+            }
+        }, 100); // Small delay to ensure DOM is fully ready
+    } else {
+        console.log('🔄 Test is running - skipping merchant load to preserve test state');
+    }
 });
 
 // Event listeners
@@ -418,6 +473,7 @@ function initializeEventListeners() {
     elements.testApiBtn.addEventListener('click', testApiEndpoint);
     elements.pauseTestBtn.addEventListener('click', pauseTest);
     elements.resumeTestBtn.addEventListener('click', resumeTest);
+    elements.restartTestBtn.addEventListener('click', restartTest);
     elements.clearLogBtn.addEventListener('click', clearLog);
     elements.autoScrollBtn.addEventListener('click', toggleAutoScroll);
     
@@ -1085,6 +1141,11 @@ function updateResultsFromDatabase(results) {
     if (typeof displayMerchantList === 'function' && filteredMerchants.length > 0) {
         displayMerchantList(filteredMerchants);
     }
+    
+    // Update the filter to reflect the new statuses
+    if (typeof filterMerchants === 'function') {
+        filterMerchants();
+    }
 }
 
 // Fallback simulation for when Playwright test fails to start
@@ -1232,11 +1293,19 @@ function addResultToList(merchant, result) {
         mediaIcons += `<i class="fas fa-video media-icon video-icon" title="View Video" onclick="showMedia('${result.video_path}', 'video')"></i>`;
     }
     
+    // Create status change buttons
+    const merchantId = merchant.MerchantID;
+    const currentStatus = result.status;
+    const statusButtons = currentStatus === 'success' 
+        ? `<button class="status-change-btn btn-flag" onclick="changeResultStatus('${merchantId}', 'flagged')" title="Mark as Flagged"><i class="fas fa-flag"></i></button>`
+        : `<button class="status-change-btn btn-success" onclick="changeResultStatus('${merchantId}', 'success')" title="Mark as Success"><i class="fas fa-check"></i></button>`;
+    
     const resultHtml = `
-        <div class="result-item ${result.status}">
+        <div class="result-item ${result.status}" data-merchant-id="${merchantId}">
             <div class="result-header">
                 <div class="result-name">${escapeHtml(merchant.MerchantName)}</div>
                 <div class="result-actions">
+                    ${statusButtons}
                     ${mediaIcons}
                     <div class="result-status ${result.status}">${result.status}</div>
                 </div>
@@ -1266,6 +1335,49 @@ function addResultToList(merchant, result) {
     elements.allList.insertAdjacentHTML('afterbegin', resultHtml);
 }
 
+// Change result status (success <-> flagged)
+async function changeResultStatus(merchantId, newStatus) {
+    if (!testSession || !testSession.session_id) {
+        showError('No active test session');
+        return;
+    }
+    
+    try {
+        console.log(`Changing status for merchant ${merchantId} to ${newStatus} in session ${testSession.session_id}`);
+        
+        const response = await fetch(`/api/merchant-results/${merchantId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                status: newStatus,
+                session_id: testSession.session_id 
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+        
+        // Update merchant status map
+        merchantStatuses.set(merchantId, newStatus);
+        
+        // Reload results from database to reflect changes
+        const resultsResponse = await fetch(`/api/merchant-results?session_id=${testSession.session_id}&limit=10000`);
+        if (resultsResponse.ok) {
+            const data = await resultsResponse.json();
+            const results = data.data || data;
+            updateResultsFromDatabase(results);
+            updateStatsFromResults(results);
+        }
+        
+        showSuccess(`Merchant marked as ${newStatus}`);
+    } catch (error) {
+        console.error('Error changing status:', error);
+        showError(`Failed to update merchant status: ${error.message}`);
+    }
+}
+
 // Show media file in modal
 function showMedia(mediaPath, mediaType) {
     // Create modal if it doesn't exist
@@ -1276,7 +1388,15 @@ function showMedia(mediaPath, mediaType) {
         modal.className = 'media-modal';
         modal.innerHTML = `
             <div class="media-modal-content">
-                <span class="media-modal-close">&times;</span>
+                <div class="media-modal-header">
+                    <div class="media-modal-controls">
+                        <button class="media-btn" id="zoom-in-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                        <button class="media-btn" id="zoom-out-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                        <button class="media-btn" id="reset-zoom-btn" title="Reset Zoom"><i class="fas fa-expand"></i></button>
+                        <button class="media-btn" id="download-media-btn" title="Download"><i class="fas fa-download"></i></button>
+                    </div>
+                    <span class="media-modal-close">&times;</span>
+                </div>
                 <div class="media-container" id="media-container"></div>
             </div>
         `;
@@ -1295,10 +1415,109 @@ function showMedia(mediaPath, mediaType) {
     
     // Set media content
     const container = modal.querySelector('#media-container');
+    let zoomLevel = 1;
+    let translateX = 0;
+    let translateY = 0;
+    
     if (mediaType === 'image') {
-        container.innerHTML = `<img src="/${mediaPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh;">`;
+        container.innerHTML = `<img id="modal-image" src="/${mediaPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh; transform: scale(1) translate(0px, 0px); transition: transform 0.2s; cursor: grab;">`;
+        
+        const img = container.querySelector('#modal-image');
+        
+        // Panning variables
+        let isPanning = false;
+        let startX = 0;
+        let startY = 0;
+        let currentTranslateX = 0;
+        let currentTranslateY = 0;
+        
+        // Update transform
+        const updateTransform = () => {
+            img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
+        };
+        
+        // Zoom controls
+        document.getElementById('zoom-in-btn').onclick = () => {
+            zoomLevel = Math.min(zoomLevel + 0.25, 3);
+            updateTransform();
+            if (zoomLevel > 1) {
+                img.style.cursor = 'grab';
+            }
+        };
+        
+        document.getElementById('zoom-out-btn').onclick = () => {
+            zoomLevel = Math.max(zoomLevel - 0.25, 0.5);
+            updateTransform();
+            if (zoomLevel <= 1) {
+                img.style.cursor = 'default';
+                translateX = 0;
+                translateY = 0;
+                updateTransform();
+            }
+        };
+        
+        document.getElementById('reset-zoom-btn').onclick = () => {
+            zoomLevel = 1;
+            translateX = 0;
+            translateY = 0;
+            img.style.cursor = 'default';
+            updateTransform();
+        };
+        
+        // Panning with mouse
+        img.addEventListener('mousedown', (e) => {
+            if (zoomLevel > 1) {
+                isPanning = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                currentTranslateX = translateX;
+                currentTranslateY = translateY;
+                img.style.cursor = 'grabbing';
+                img.style.transition = 'none';
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (isPanning && zoomLevel > 1) {
+                const deltaX = (e.clientX - startX) / zoomLevel;
+                const deltaY = (e.clientY - startY) / zoomLevel;
+                translateX = currentTranslateX + deltaX;
+                translateY = currentTranslateY + deltaY;
+                updateTransform();
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isPanning) {
+                isPanning = false;
+                img.style.cursor = 'grab';
+                img.style.transition = 'transform 0.2s';
+            }
+        });
+        
+        // Download button
+        document.getElementById('download-media-btn').onclick = () => {
+            const link = document.createElement('a');
+            link.href = `/${mediaPath}`;
+            link.download = mediaPath.split('/').pop();
+            link.click();
+        };
     } else if (mediaType === 'video') {
-        container.innerHTML = `<video controls style="max-width: 100%; max-height: 80vh;"><source src="/${mediaPath}" type="video/webm"></video>`;
+        container.innerHTML = `<video id="modal-video" controls style="max-width: 100%; max-height: 80vh;"><source src="/${mediaPath}" type="video/webm"></video>`;
+        
+        // Hide zoom controls for video
+        document.getElementById('zoom-in-btn').style.display = 'none';
+        document.getElementById('zoom-out-btn').style.display = 'none';
+        document.getElementById('reset-zoom-btn').style.display = 'none';
+        
+        // Download button
+        document.getElementById('download-media-btn').onclick = () => {
+            const link = document.createElement('a');
+            link.href = `/${mediaPath}`;
+            link.download = mediaPath.split('/').pop();
+            link.click();
+        };
     }
     
     // Show modal
@@ -1354,6 +1573,12 @@ async function completeTest() {
     elements.finalSuccessful.textContent = testResults.successful;
     elements.finalFlagged.textContent = testResults.flagged;
     
+    // Show restart button and hide stop/pause buttons
+    elements.restartTestBtn.style.display = 'inline-block';
+    elements.stopTestBtn.style.display = 'none';
+    elements.pauseTestBtn.style.display = 'none';
+    elements.resumeTestBtn.style.display = 'none';
+    
     // Show completion section
     elements.completionSection.style.display = 'block';
     elements.completionSection.scrollIntoView({ behavior: 'smooth' });
@@ -1362,9 +1587,59 @@ async function completeTest() {
 }
 
 // Control functions
-function stopTest() {
-    // In real implementation, this would stop the Playwright test
-    completeTest();
+async function stopTest() {
+    if (!isTestRunning) {
+        showError('No test is currently running');
+        return;
+    }
+    
+    try {
+        addLogEntry('🛑 Stopping test...', 'warning');
+        showWarning('Stopping test - this may take a moment...');
+        
+        // Try to stop the Playwright process
+        const response = await fetch('/api/stop-test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: testSession?.session_id })
+        });
+        
+        if (response.ok) {
+            addLogEntry('✅ Test stopped successfully', 'success');
+            showSuccess('Test stopped successfully');
+        } else {
+            addLogEntry('⚠️ Test stop request sent, but server response was not OK', 'warning');
+        }
+        
+        isTestRunning = false;
+        completeTest();
+        
+    } catch (error) {
+        console.error('Error stopping test:', error);
+        addLogEntry(`❌ Error stopping test: ${error.message}`, 'error');
+        showError('Error stopping test: ' + error.message);
+    }
+}
+
+// Restart testing with current configuration
+async function restartTest() {
+    if (!filteredMerchants || filteredMerchants.length === 0) {
+        showError('No merchants available to test. Please load merchants first.');
+        return;
+    }
+    
+    // Hide restart button, show stop button
+    elements.restartTestBtn.style.display = 'none';
+    elements.stopTestBtn.style.display = 'inline-block';
+    elements.pauseTestBtn.style.display = 'inline-block';
+    
+    // Hide completion section
+    elements.completionSection.style.display = 'none';
+    
+    addLogEntry('🔄 Restarting test with current merchants...', 'info');
+    
+    // Call startTest to reinitialize everything
+    await startTest();
 }
 
 // Download results
@@ -1825,6 +2100,11 @@ function resumeTest() {
     showInfo('Test resumed.');
 }
 
+function passCurrentMerchant() {
+    addLogEntry('👤 Pass current merchant requested', 'info');
+    showInfo('Current merchant will be marked as passed');
+}
+
 // Enhanced merchant filtering
 function filterMerchants() {
     if (!allMerchants.length) return;
@@ -1842,10 +2122,24 @@ function filterMerchants() {
         
         // Status filter
         const merchantStatus = merchantStatuses.get(merchant.MerchantID) || 'untested';
-        const matchesStatus = !statusFilter || merchantStatus === statusFilter;
+        let matchesStatus = false;
+        
+        if (!statusFilter) {
+            // Show all merchants
+            matchesStatus = true;
+        } else if (statusFilter === 'tested') {
+            // Show any tested merchant (success or flagged)
+            matchesStatus = merchantStatus === 'success' || merchantStatus === 'flagged';
+        } else {
+            // Match specific status
+            matchesStatus = merchantStatus === statusFilter;
+        }
         
         return matchesSearch && matchesStatus;
     });
+    
+    // Update filteredMerchants global
+    filteredMerchants = filtered;
     
     displayMerchantList(filtered);
     elements.merchantCountDisplay.textContent = `${filtered.length} merchants`;
@@ -2374,13 +2668,16 @@ async function stopTest() {
 }
 
 // Clear test and reset everything
-function clearTest() {
+async function clearTest() {
     if (isTestRunning) {
         if (!confirm('Test is currently running. Stop and clear?')) {
             return;
         }
-        stopTest();
+        await stopTest();
     }
+    
+    // Get current session ID before clearing
+    const sessionIdToClear = testSession?.session_id;
     
     // Reset all state
     testResults = {
@@ -2391,6 +2688,9 @@ function clearTest() {
     };
     testSession = null;
     isTestRunning = false;
+    
+    // Clear merchant statuses map
+    merchantStatuses.clear();
     
     // Clear UI
     elements.currentMerchant.textContent = 'No test running';
@@ -2408,11 +2708,34 @@ function clearTest() {
     // Clear log
     clearLog();
     
-    // Hide results section
+    // Hide results section and show setup section
     elements.resultsSection.style.display = 'none';
+    elements.setupSection.style.display = 'block';
     
     // Clear localStorage
     localStorage.removeItem('active_test_session');
+    
+    // Delete session from database
+    if (sessionIdToClear) {
+        try {
+            const response = await fetch(`/api/sessions/${sessionIdToClear}`, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                addLogEntry('🗑️ Test results cleared from database', 'success');
+            } else {
+                addLogEntry('⚠️ Failed to clear test results from database', 'warning');
+            }
+        } catch (error) {
+            console.error('Error clearing test from database:', error);
+            addLogEntry(`⚠️ Error clearing database: ${error.message}`, 'warning');
+        }
+    }
+    
+    // Refresh merchant list to remove status badges
+    if (filteredMerchants.length > 0) {
+        displayMerchantList(filteredMerchants);
+    }
     
     addLogEntry('🔄 Test cleared - ready to start new test', 'success');
     showSuccess('Test cleared successfully');

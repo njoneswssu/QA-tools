@@ -309,6 +309,25 @@ function getMediaIcons(item) {
     return mediaIcons;
 }
 
+// Generate status change buttons
+function getStatusChangeButtons(item) {
+    const currentStatus = item.is_user_passed ? 'success' : item.test_status;
+    
+    if (currentStatus === 'success') {
+        return `
+            <button class="status-change-btn btn-flag" onclick="changeResultStatus(${item.merchant_id}, '${item.session_id}', 'flagged')" title="Mark as Flagged">
+                <i class="fas fa-flag"></i>
+            </button>
+        `;
+    } else {
+        return `
+            <button class="status-change-btn btn-success" onclick="changeResultStatus(${item.merchant_id}, '${item.session_id}', 'success')" title="Mark as Success">
+                <i class="fas fa-check"></i>
+            </button>
+        `;
+    }
+}
+
 // Show media file in modal
 function showMedia(mediaPath, mediaType) {
     const modal = document.createElement('div');
@@ -319,13 +338,17 @@ function showMedia(mediaPath, mediaType) {
         }
     };
     
+    // Clean up path - remove leading slash or 'media/' if already present
+    const cleanPath = mediaPath.startsWith('/') ? mediaPath.substring(1) : mediaPath;
+    const finalPath = cleanPath.startsWith('media/') ? `/${cleanPath}` : `/media/${cleanPath}`;
+    
     let mediaContent;
     if (mediaType === 'screenshot') {
-        mediaContent = `<img src="/media/${mediaPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh;">`;
+        mediaContent = `<img src="${finalPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh; cursor: zoom-in;" id="dashboard-media-img">`;
     } else if (mediaType === 'video') {
         mediaContent = `
             <video controls style="max-width: 100%; max-height: 80vh;">
-                <source src="/media/${mediaPath}" type="video/webm">
+                <source src="${finalPath}" type="video/webm">
                 Your browser does not support the video tag.
             </video>
         `;
@@ -341,6 +364,28 @@ function showMedia(mediaPath, mediaType) {
     `;
     
     document.body.appendChild(modal);
+    
+    // Add zoom functionality for images
+    if (mediaType === 'screenshot') {
+        const img = document.getElementById('dashboard-media-img');
+        let isZoomed = false;
+        
+        img.onclick = (e) => {
+            e.stopPropagation();
+            isZoomed = !isZoomed;
+            if (isZoomed) {
+                img.style.cursor = 'zoom-out';
+                img.style.maxWidth = 'none';
+                img.style.maxHeight = 'none';
+                img.style.width = 'auto';
+            } else {
+                img.style.cursor = 'zoom-in';
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '80vh';
+                img.style.width = 'auto';
+            }
+        };
+    }
 }
 
 // Render table view
@@ -368,6 +413,7 @@ function renderTableView(data) {
             </td>
             <td>
                 <div class="action-buttons">
+                    ${getStatusChangeButtons(item)}
                     ${getMediaIcons(item)}
                     <button class="details-btn" onclick="showDetails(${item.id})">
                         <i class="fas fa-eye"></i> View
@@ -413,6 +459,7 @@ function renderCardView(data) {
                     <span>${item.test_duration_ms ? `${item.test_duration_ms}ms` : ''}</span>
                 </div>
                 <div class="card-footer-right">
+                    ${getStatusChangeButtons(item)}
                     ${getMediaIcons(item)}
                 </div>
             </div>
@@ -584,6 +631,48 @@ function showLoading(show) {
     elements.loading.style.display = show ? 'block' : 'none';
 }
 
+// Change result status (success <-> flagged)
+async function changeResultStatus(merchantId, sessionId, newStatus) {
+    try {
+        console.log(`Changing status for merchant ${merchantId} to ${newStatus} in session ${sessionId}`);
+        
+        const response = await fetch(`/api/merchant-results/${merchantId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                status: newStatus,
+                session_id: sessionId 
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+        
+        // Reload data to reflect changes
+        await loadData();
+        
+        // Show success message
+        const message = document.createElement('div');
+        message.className = 'toast-message success';
+        message.textContent = `Merchant marked as ${newStatus}`;
+        document.body.appendChild(message);
+        
+        setTimeout(() => message.remove(), 3000);
+    } catch (error) {
+        console.error('Error changing status:', error);
+        
+        // Show error message
+        const message = document.createElement('div');
+        message.className = 'toast-message error';
+        message.textContent = `Failed: ${error.message}`;
+        document.body.appendChild(message);
+        
+        setTimeout(() => message.remove(), 3000);
+    }
+}
+
 function getStatusClass(item) {
     if (item.is_user_passed) return 'user-passed';
     return item.test_status === 'success' ? 'success' : 'flagged';
@@ -637,7 +726,7 @@ function debounce(func, wait) {
 
 // Reset results and filters function (clears all data and shows zero results)
 function resetResults() {
-    const confirmReset = confirm('Clear all results and reset to zero?\n\nThis will clear all displayed results and reset statistics to zero. Database data will remain safe.');
+    const confirmReset = confirm('Clear all displayed results and reset to zero?\n\nThis will only clear the UI. Database data will remain safe and can be reloaded.');
     
     if (!confirmReset) {
         return;
@@ -684,7 +773,7 @@ function resetResults() {
         elements.nextPageBtn.disabled = true;
         
         // Show success message
-        alert('✅ Results cleared successfully! All data reset to zero.');
+        alert('✅ Results cleared successfully! UI reset to zero. Database data is safe.');
         
     } catch (error) {
         console.error('Error resetting results:', error);

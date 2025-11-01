@@ -285,7 +285,7 @@ app.get('/api/sessions/:sessionId/recent-results', async (req, res) => {
 });
 
 // Get categories
-app.get('/api/categories', (req, res) => {
+app.get('/api/categories', async (req, res) => {
     const query = `
         SELECT DISTINCT primary_category 
         FROM merchant_test_results 
@@ -297,18 +297,17 @@ app.get('/api/categories', (req, res) => {
         ORDER BY primary_category
     `;
 
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error('Database error:', err);
-            res.status(500).json({ error: 'Database error' });
-            return;
-        }
+    try {
+        const rows = await queryAll(query, []);
         res.json(rows.map(row => row.primary_category));
-    });
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Get statistics
-app.get('/api/stats', (req, res) => {
+app.get('/api/stats', async (req, res) => {
     const { session_id } = req.query;
     
     let query = `
@@ -316,24 +315,23 @@ app.get('/api/stats', (req, res) => {
             COUNT(*) as total,
             SUM(CASE WHEN test_status = 'success' THEN 1 ELSE 0 END) as successful,
             SUM(CASE WHEN test_status = 'flagged' THEN 1 ELSE 0 END) as flagged,
-            SUM(CASE WHEN is_user_passed = 1 THEN 1 ELSE 0 END) as user_passed
+            SUM(CASE WHEN is_user_passed = ${USE_POSTGRES ? 'TRUE' : '1'} THEN 1 ELSE 0 END) as user_passed
         FROM merchant_test_results
     `;
     const params = [];
 
     if (session_id) {
-        query += ' WHERE session_id = ?';
+        query += ` WHERE session_id = ${USE_POSTGRES ? '$1' : '?'}`;
         params.push(session_id);
     }
 
-    db.get(query, params, (err, row) => {
-        if (err) {
-            console.error('Database error:', err);
-            res.status(500).json({ error: 'Database error' });
-            return;
-        }
+    try {
+        const row = await queryOne(query, params);
         res.json(row);
-    });
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Create a new test session
@@ -363,6 +361,38 @@ app.put('/api/sessions/:sessionId', async (req, res) => {
     }
 });
 
+// Delete a test session and all its results
+app.delete('/api/sessions/:sessionId', async (req, res) => {
+    const { sessionId } = req.params;
+    
+    try {
+        // Delete all merchant results for this session first
+        if (USE_POSTGRES) {
+            await pgPool.query('DELETE FROM merchant_test_results WHERE session_id = $1', [sessionId]);
+            await pgPool.query('DELETE FROM test_sessions WHERE session_id = $1', [sessionId]);
+        } else {
+            await new Promise((resolve, reject) => {
+                db.run('DELETE FROM merchant_test_results WHERE session_id = ?', [sessionId], (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+            await new Promise((resolve, reject) => {
+                db.run('DELETE FROM test_sessions WHERE session_id = ?', [sessionId], (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+        }
+        
+        console.log(`✅ Deleted session and results: ${sessionId}`);
+        res.json({ success: true, message: 'Session and results deleted' });
+    } catch (error) {
+        console.error('Error deleting session:', error);
+        res.status(500).json({ error: 'Failed to delete session' });
+    }
+});
+
 // Save a merchant test result
 app.post('/api/merchant-results', async (req, res) => {
     const testData = req.body;
@@ -373,6 +403,63 @@ app.post('/api/merchant-results', async (req, res) => {
     } catch (error) {
         console.error('Error saving test result:', error);
         res.status(500).json({ error: 'Failed to save test result' });
+    }
+});
+
+// Update merchant result status
+app.put('/api/merchant-results/:merchantId/status', async (req, res) => {
+    try {
+        const { merchantId } = req.params;
+        const { status, session_id } = req.body;
+        
+        console.log(`📝 Status change request: merchant_id=${merchantId}, status=${status}, session_id=${session_id}`);
+        
+        if (!['success', 'flagged'].includes(status)) {
+            return res.status(400).json({ error: 'Invalid status' });
+        }
+        
+        if (!session_id) {
+            return res.status(400).json({ error: 'Session ID is required' });
+        }
+        
+        // Update the test status in database
+        let result;
+        if (USE_POSTGRES) {
+            result = await pgPool.query(
+                'UPDATE merchant_test_results SET test_status = $1 WHERE merchant_id = $2 AND session_id = $3',
+                [status, parseInt(merchantId), session_id]
+            );
+            console.log(`✅ Updated ${result.rowCount} row(s) for merchant ${merchantId}`);
+            
+            if (result.rowCount === 0) {
+                return res.status(404).json({ error: 'No matching result found for this merchant and session' });
+            }
+        } else {
+            await new Promise((resolve, reject) => {
+                db.run(
+                    'UPDATE merchant_test_results SET test_status = ? WHERE merchant_id = ? AND session_id = ?',
+                    [status, parseInt(merchantId), session_id],
+                    function(err) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            console.log(`✅ Updated ${this.changes} row(s) for merchant ${merchantId}`);
+                            if (this.changes === 0) {
+                                reject(new Error('No matching result found'));
+                            } else {
+                                resolve();
+                            }
+                        }
+                    }
+                );
+            });
+        }
+        
+        console.log(`✅ Updated merchant ${merchantId} to status: ${status}`);
+        res.json({ success: true, message: 'Status updated' });
+    } catch (error) {
+        console.error('Error updating status:', error);
+        res.status(500).json({ error: error.message || 'Failed to update status' });
     }
 });
 
@@ -387,8 +474,8 @@ app.post('/api/store-merchants', async (req, res) => {
         
         console.log(`📦 Storing ${merchants.length} merchants in database`);
         
-        // Use the populateMerchantMasterData function
-        const { populateMerchantMasterData } = require('./database/init_db');
+        // Use the correct database module's populate function
+        const { populateMerchantMasterData } = dbModule;
         await populateMerchantMasterData(merchants);
         
         console.log(`✅ Successfully stored ${merchants.length} merchants`);
@@ -400,7 +487,7 @@ app.post('/api/store-merchants', async (req, res) => {
         });
     } catch (error) {
         console.error('Error storing merchants:', error);
-        res.status(500).json({ error: 'Failed to store merchants' });
+        res.status(500).json({ error: 'Failed to store merchants', details: error.message });
     }
 });
 
@@ -411,21 +498,18 @@ app.get('/api/stored-merchants', async (req, res) => {
         
         let query = 'SELECT * FROM merchant_master_data';
         let params = [];
+        let paramIndex = 1;
         
         if (app_id) {
-            query += ' WHERE app_id = ?';
+            query += ` WHERE app_id = ${USE_POSTGRES ? '$1' : '?'}`;
             params.push(app_id);
+            paramIndex++;
         }
         
-        query += ' ORDER BY merchant_name LIMIT ?';
+        query += ` ORDER BY merchant_name LIMIT ${USE_POSTGRES ? `$${paramIndex}` : '?'}`;
         params.push(parseInt(limit));
         
-        const merchants = await new Promise((resolve, reject) => {
-            db.all(query, params, (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
-            });
-        });
+        const merchants = await queryAll(query, params);
         
         // Convert back to API format with safe JSON parsing
         const apiFormat = merchants.map(merchant => {
@@ -445,7 +529,7 @@ app.get('/api/stored-merchants', async (req, res) => {
                 MerchantName: merchant.merchant_name,
                 MerchantDomains: safeJsonParse(merchant.merchant_domains, []),
                 MerchantScore: merchant.merchant_score,
-                IsFeaturedMerchant: merchant.is_featured_merchant === 1,
+                IsFeaturedMerchant: merchant.is_featured_merchant === 1 || merchant.is_featured_merchant === true,
                 PrimaryCategory: merchant.primary_category,
                 PrimaryCategoryID: merchant.primary_category_id,
                 ParentCategory: merchant.parent_category,
@@ -454,14 +538,14 @@ app.get('/api/stored-merchants', async (req, res) => {
                 MaxRateKind: merchant.max_rate_kind,
                 MaxRateCurrency: merchant.max_rate_currency,
                 MaxRateLedgerID: merchant.max_rate_ledger_id,
-                Boosted: merchant.boosted === 1,
+                Boosted: merchant.boosted === 1 || merchant.boosted === true,
                 MaxOfferScore: merchant.max_offer_score,
                 DetailedRates: safeJsonParse(merchant.detailed_rates, []),
                 Coupons: safeJsonParse(merchant.coupons, []),
                 BrandColor: merchant.brand_color,
                 TextColor: merchant.text_color,
                 FeaturedImageURL: merchant.featured_image_url,
-                LogoImageExists: merchant.logo_image_exists === 1,
+                LogoImageExists: merchant.logo_image_exists === 1 || merchant.logo_image_exists === true,
                 Images: safeJsonParse(merchant.images, []),
                 CreatedDate: merchant.created_date,
                 ModifiedDate: merchant.modified_date
@@ -472,16 +556,12 @@ app.get('/api/stored-merchants', async (req, res) => {
         let totalCount = apiFormat.length;
         if (parseInt(limit) === 1 && apiFormat.length > 0) {
             const countQuery = app_id ? 
-                'SELECT COUNT(*) as total FROM merchant_master_data WHERE app_id = ?' :
+                `SELECT COUNT(*) as total FROM merchant_master_data WHERE app_id = ${USE_POSTGRES ? '$1' : '?'}` :
                 'SELECT COUNT(*) as total FROM merchant_master_data';
             const countParams = app_id ? [app_id] : [];
             
-            totalCount = await new Promise((resolve, reject) => {
-                db.get(countQuery, countParams, (err, row) => {
-                    if (err) reject(err);
-                    else resolve(row.total);
-                });
-            });
+            const countResult = await queryOne(countQuery, countParams);
+            totalCount = countResult.total;
         }
         
         res.json({
@@ -497,22 +577,20 @@ app.get('/api/stored-merchants', async (req, res) => {
 // Get available App IDs from database
 app.get('/api/app-ids', async (req, res) => {
     try {
-        const appIds = await new Promise((resolve, reject) => {
-            db.all(`
-                SELECT DISTINCT app_id 
-                FROM merchant_master_data 
-                WHERE app_id IS NOT NULL 
-                ORDER BY app_id
-            `, (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows.map(row => row.app_id));
-            });
-        });
+        const query = `
+            SELECT DISTINCT app_id 
+            FROM merchant_master_data 
+            WHERE app_id IS NOT NULL 
+            ORDER BY app_id
+        `;
+        
+        const rows = await queryAll(query, []);
+        const appIds = rows.map(row => row.app_id);
         
         res.json(appIds);
     } catch (error) {
         console.error('Error fetching App IDs:', error);
-        res.status(500).json({ error: 'Failed to fetch App IDs' });
+        res.status(500).json({ error: 'Failed to fetch App IDs', details: error.message });
     }
 });
 
@@ -644,36 +722,45 @@ app.post('/api/reset-database', async (req, res) => {
         console.log('🚨 Database reset requested');
         
         // Clear all tables
-        await new Promise((resolve, reject) => {
-            db.serialize(() => {
-                db.run('DELETE FROM merchant_test_results', (err) => {
-                    if (err) {
-                        console.error('Error clearing merchant_test_results:', err);
-                        reject(err);
-                        return;
-                    }
-                });
-                
-                db.run('DELETE FROM test_sessions', (err) => {
-                    if (err) {
-                        console.error('Error clearing test_sessions:', err);
-                        reject(err);
-                        return;
-                    }
-                });
-                
-                db.run('DELETE FROM merchant_master_data', (err) => {
-                    if (err) {
-                        console.error('Error clearing merchant_master_data:', err);
-                        reject(err);
-                        return;
-                    }
+        if (USE_POSTGRES) {
+            // PostgreSQL version
+            await pgPool.query('DELETE FROM merchant_test_results');
+            await pgPool.query('DELETE FROM test_sessions');
+            await pgPool.query('DELETE FROM merchant_master_data');
+            console.log('✅ PostgreSQL database reset completed');
+        } else {
+            // SQLite version
+            await new Promise((resolve, reject) => {
+                db.serialize(() => {
+                    db.run('DELETE FROM merchant_test_results', (err) => {
+                        if (err) {
+                            console.error('Error clearing merchant_test_results:', err);
+                            reject(err);
+                            return;
+                        }
+                    });
                     
-                    console.log('✅ Database reset completed');
-                    resolve();
+                    db.run('DELETE FROM test_sessions', (err) => {
+                        if (err) {
+                            console.error('Error clearing test_sessions:', err);
+                            reject(err);
+                            return;
+                        }
+                    });
+                    
+                    db.run('DELETE FROM merchant_master_data', (err) => {
+                        if (err) {
+                            console.error('Error clearing merchant_master_data:', err);
+                            reject(err);
+                            return;
+                        }
+                        
+                        console.log('✅ SQLite database reset completed');
+                        resolve();
+                    });
                 });
             });
-        });
+        }
         
         res.json({ 
             success: true, 
@@ -689,33 +776,33 @@ app.post('/api/reset-database', async (req, res) => {
 });
 
 // Get merchant master data
-app.get('/api/merchants', (req, res) => {
+app.get('/api/merchants', async (req, res) => {
     const { search, category, limit = 100 } = req.query;
     
     let query = 'SELECT * FROM merchant_master_data WHERE 1=1';
     const params = [];
+    let paramIndex = 1;
 
     if (search) {
-        query += ' AND merchant_name LIKE ?';
+        query += ` AND merchant_name ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
         params.push(`%${search}%`);
     }
 
     if (category) {
-        query += ' AND primary_category = ?';
+        query += ` AND primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
         params.push(category);
     }
 
-    query += ' ORDER BY merchant_name LIMIT ?';
+    query += ` ORDER BY merchant_name LIMIT ${USE_POSTGRES ? `$${paramIndex}` : '?'}`;
     params.push(parseInt(limit));
 
-    db.all(query, params, (err, rows) => {
-        if (err) {
-            console.error('Database error:', err);
-            res.status(500).json({ error: 'Database error' });
-            return;
-        }
+    try {
+        const rows = await queryAll(query, params);
         res.json(rows);
-    });
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 // Error handling middleware

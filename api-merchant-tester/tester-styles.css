@@ -1376,25 +1376,56 @@ body {
     position: relative;
     background: #1a1a1a;
     margin: 2% auto;
-    padding: 20px;
+    padding: 0;
     border-radius: 12px;
     width: 90%;
     max-width: 1200px;
     max-height: 90vh;
-    overflow: auto;
+    overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.media-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #2a2a2a;
+    border-bottom: 1px solid #444;
+}
+
+.media-modal-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.media-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.media-btn:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+}
+
+.media-btn i {
+    margin: 0;
 }
 
 .media-modal-close {
     color: #aaa;
-    float: right;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    position: absolute;
-    top: 15px;
-    right: 25px;
     z-index: 1;
+    transition: color 0.3s ease;
 }
 
 .media-modal-close:hover,
@@ -1404,13 +1435,53 @@ body {
 
 .media-container {
     text-align: center;
-    padding: 20px 0;
+    padding: 20px;
+    overflow: auto;
+    max-height: calc(90vh - 80px);
 }
 
 .media-container img,
 .media-container video {
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Status Change Buttons */
+.status-change-btn {
+    background: transparent;
+    border: 2px solid;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    margin-right: 8px;
+}
+
+.status-change-btn.btn-success {
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.status-change-btn.btn-success:hover {
+    background: #10b981;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.status-change-btn.btn-flag {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.status-change-btn.btn-flag:hover {
+    background: #ef4444;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.status-change-btn i {
+    margin: 0;
 }
 
 /* Priority Queue Styles */

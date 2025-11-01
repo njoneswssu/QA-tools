@@ -148,9 +148,9 @@ test.describe('API Merchant Tester - UI Generated', () => {
           dbSessionCreated = true;
           console.log(\`✅ Database session created: \${sessionId}\`);
         } catch (error) {
-          // If UNIQUE constraint error, session already exists - that's OK, use it
-          if (error.message && error.message.includes('UNIQUE constraint')) {
-            console.log(\`⚠️ Session already exists, continuing with existing session: \${sessionId}\`);
+          // If UNIQUE constraint error (SQLite or PostgreSQL), session already exists - that's OK, use it
+          if (error.message && (error.message.includes('UNIQUE constraint') || error.message.includes('duplicate key'))) {
+            console.log(\`⚠️ Session \${sessionId} already exists, continuing with existing session\`);
             dbSessionCreated = true; // Set to true since we can still use the existing session
           } else {
             console.log(\`❌ Failed to create database session: \${error.message}\`);
@@ -558,13 +558,29 @@ test.describe('API Merchant Tester - UI Generated', () => {
           if (foundPattern) {
             console.log(\`🚨 FLAGGED: \${website.name} - Pattern: "\${foundPattern}"\`);
             
+            // Capture screenshot of flagged website
+            let mediaFiles = {};
+            try {
+              const fs = require('fs');
+              const path = require('path');
+              const screenshotName = \`\${website.name.replace(/[^a-zA-Z0-9]/g, '_')}_flagged_\${Date.now()}.png\`;
+              // Use absolute path - go up one level from temp/ to api-merchant-tester/
+              const screenshotPath = path.join(__dirname, '..', 'media', 'screenshots', screenshotName);
+              
+              await page.screenshot({ path: screenshotPath, fullPage: true });
+              mediaFiles.screenshot = \`media/screenshots/\${screenshotName}\`;
+              console.log(\`📸 Flagged screenshot saved: \${mediaFiles.screenshot}\`);
+            } catch (screenshotError) {
+              console.log(\`⚠️ Failed to capture flagged screenshot: \${screenshotError.message}\`);
+            }
+            
             unavailableWebsites.push({
               name: website.name,
               url: website.url,
               pattern: foundPattern
             });
 
-            await saveMerchantToDatabase(website, 'flagged', \`Website unavailable: \${foundPattern}\`, foundPattern, testDuration);
+            await saveMerchantToDatabase(website, 'flagged', \`Website unavailable: \${foundPattern}\`, foundPattern, testDuration, mediaFiles);
           } else {
             // Determine success reason
             let successReason = 'Website appears to be available and functional';
