@@ -5,6 +5,9 @@ let currentPage = 1;
 let itemsPerPage = 50;
 let sortField = 'tested_at';
 let sortDirection = 'desc';
+let pollInterval = null; // For auto-refresh during active tests
+// Check localStorage for cleared flag
+let dataClearedManually = localStorage.getItem('dashboard_cleared') === 'true';
 
 // DOM elements
 const elements = {
@@ -39,8 +42,74 @@ const elements = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎬 [Dashboard] Initializing...');
+    
+    // Check for active session first before loading data
+    const activeSession = localStorage.getItem('active_test_session');
+    if (activeSession) {
+        try {
+            const sessionData = JSON.parse(activeSession);
+            console.log(`🔍 [Dashboard] Found active session on load: ${sessionData.sessionId}`);
+        } catch (e) {
+            console.warn('⚠️ [Dashboard] Invalid session data in localStorage, clearing...');
+            localStorage.removeItem('active_test_session');
+        }
+    } else {
+        console.log('ℹ️ [Dashboard] No active session found on load');
+    }
+    
     initializeEventListeners();
-    loadData();
+    loadData(); // This will now respect the active session
+    startPolling(); // Start polling for live updates
+});
+
+// Add page show listener to restore dashboard state (works with browser navigation)
+window.addEventListener('pageshow', async function(event) {
+    console.log('👁️ [Dashboard PageShow] Page shown, persisted:', event.persisted);
+    
+    const activeSession = localStorage.getItem('active_test_session');
+    console.log('👁️ [Dashboard PageShow] Active session:', activeSession ? 'YES' : 'NO');
+    console.log('👁️ [Dashboard PageShow] Current data count:', currentData.length);
+    console.log('👁️ [Dashboard PageShow] dataClearedManually:', dataClearedManually);
+    
+    // If coming from back/forward cache or have active session with no data
+    if ((event.persisted || activeSession) && currentData.length === 0 && !dataClearedManually) {
+        // Have session but no data displayed - reload
+        console.log('🔄 [Dashboard PageShow] Have session but no data - reloading...');
+        setTimeout(async () => {
+            await loadData();
+        }, 100);
+    } else if (activeSession && currentData.length > 0) {
+        // Have session and data - verify it's current
+        console.log('🔄 [Dashboard PageShow] Verifying data is current...');
+        try {
+            const sessionData = JSON.parse(activeSession);
+            const sessionId = sessionData.sessionId || sessionData;
+            
+            const response = await fetch(`/api/merchant-results?session_id=${sessionId}&limit=10000`);
+            if (response.ok) {
+                const data = await response.json();
+                const serverResults = Array.isArray(data) ? data : (data.data || []);
+                
+                console.log(`👁️ [Dashboard PageShow] Server has ${serverResults.length} results, we have ${currentData.length}`);
+                
+                if (serverResults.length !== currentData.length) {
+                    console.log('⚠️ [Dashboard PageShow] Result count mismatch - reloading...');
+                    setTimeout(async () => {
+                        await loadData();
+                    }, 100);
+                } else {
+                    console.log('✓ [Dashboard PageShow] Data is current');
+                }
+            }
+        } catch (error) {
+            console.error('❌ [Dashboard PageShow] Error verifying data:', error);
+        }
+    } else if (dataClearedManually) {
+        console.log('ℹ️ [Dashboard PageShow] Data was manually cleared - staying empty');
+    } else {
+        console.log('ℹ️ [Dashboard PageShow] No session - showing empty state');
+    }
 });
 
 // Event listeners
@@ -80,7 +149,55 @@ function initializeEventListeners() {
     elements.dateTo.addEventListener('change', applyFilters);
 
     // Button events
-    elements.refreshBtn.addEventListener('click', loadData);
+    elements.refreshBtn.addEventListener('click', async () => {
+        console.log('🔄 [Dashboard] Manual refresh requested');
+        dataClearedManually = false; // Reset flag to allow loading
+        localStorage.removeItem('dashboard_cleared'); // Remove from localStorage
+        
+        // Check if there's an active session
+        const activeSession = localStorage.getItem('active_test_session');
+        
+        if (!activeSession) {
+            // No active session - explicitly load ALL historical data
+            console.log('📊 [Dashboard] Loading ALL historical data on manual refresh');
+            showLoading(true);
+            try {
+                const response = await fetch('/api/merchant-results?limit=10000');
+                if (response.ok) {
+                    const data = await response.json();
+                    let rawData = Array.isArray(data) ? data : (data.data || []);
+                    
+                    console.log(`📦 [Dashboard] Received ${rawData.length} raw historical results`);
+                    
+                    // Deduplicate
+                    const seenIds = new Set();
+                    currentData = rawData.filter(item => {
+                        if (seenIds.has(item.merchant_id)) return false;
+                        seenIds.add(item.merchant_id);
+                        return true;
+                    });
+                    
+                    console.log(`✅ [Dashboard] Loaded ${currentData.length} unique historical results`);
+                    
+                    populateFilters();
+                    updateStats();
+                    applyFilters();
+                } else {
+                    currentData = [];
+                    populateFilters();
+                    updateStats();
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error('❌ [Dashboard] Error loading historical data:', error);
+            } finally {
+                showLoading(false);
+            }
+        } else {
+            // Has active session - use normal loadData
+            loadData();
+        }
+    });
     elements.exportBtn.addEventListener('click', exportToCSV);
     elements.clearFiltersBtn.addEventListener('click', clearFilters);
     elements.resetResultsBtn.addEventListener('click', resetResults);
@@ -116,15 +233,56 @@ function initializeEventListeners() {
 
 // Load data from the API/database
 async function loadData() {
+    // Don't reload if data was manually cleared
+    if (dataClearedManually) {
+        console.log('ℹ️ [Dashboard] Data was manually cleared - skipping auto-load');
+        showLoading(false); // Make sure to hide loading spinner
+        return;
+    }
+    
     showLoading(true);
     try {
-        const response = await fetch('/api/merchant-results');
-        if (response.ok) {
-            const data = await response.json();
-            // Only use actual test results, not sample data
-            currentData = Array.isArray(data) ? data : (data.data || []);
+        // Check if there's an active test session
+        const activeSession = localStorage.getItem('active_test_session');
+        
+        if (activeSession) {
+            // Load results from the active session ONLY
+            const sessionData = JSON.parse(activeSession);
+            const sessionId = sessionData.sessionId || sessionData;
+            const apiUrl = `/api/merchant-results?session_id=${sessionId}&limit=10000`;
+            
+            console.log(`📊 [Dashboard] Loading results for session: ${sessionId}`);
+            
+            const response = await fetch(apiUrl);
+            if (response.ok) {
+                const data = await response.json();
+                let rawData = Array.isArray(data) ? data : (data.data || []);
+                
+                console.log(`📦 [Dashboard] Received ${rawData.length} raw results from API`);
+                
+                // Deduplicate by merchant_id (keep first/most recent)
+                const seenIds = new Set();
+                currentData = rawData.filter(item => {
+                    if (seenIds.has(item.merchant_id)) {
+                        console.warn(`⚠️ [Dashboard] Duplicate merchant_id ${item.merchant_id} (${item.merchant_name}) removed from session ${sessionId}`);
+                        return false;
+                    }
+                    seenIds.add(item.merchant_id);
+                    return true;
+                });
+                
+                console.log(`✅ [Dashboard] Loaded ${currentData.length} unique results from session ${sessionId}`);
+                if (rawData.length > currentData.length) {
+                    console.log(`🔍 [Dashboard] ${rawData.length - currentData.length} duplicates removed`);
+                }
+            } else {
+                console.error(`❌ [Dashboard] Failed to fetch results: ${response.status}`);
+                currentData = [];
+            }
         } else {
-            // No fallback to sample data - show empty state
+            // No active session - DON'T load historical data automatically
+            console.log('📊 [Dashboard] No active session - showing empty state');
+            console.log('💡 [Dashboard] Click "Refresh" to load all historical results');
             currentData = [];
         }
         
@@ -132,7 +290,7 @@ async function loadData() {
         updateStats();
         applyFilters();
     } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('❌ [Dashboard] Error loading data:', error);
         // Show empty state instead of sample data
         currentData = [];
         populateFilters();
@@ -223,7 +381,19 @@ function updateStats() {
 
 // Apply filters and sorting
 function applyFilters() {
-    filteredData = currentData.filter(item => {
+    // First, deduplicate currentData by merchant_id (safety layer)
+    const seenMerchantIds = new Set();
+    const deduplicatedData = currentData.filter(item => {
+        if (seenMerchantIds.has(item.merchant_id)) {
+            console.warn(`⚠️ Duplicate merchant_id ${item.merchant_id} found in frontend, filtering out`);
+            return false;
+        }
+        seenMerchantIds.add(item.merchant_id);
+        return true;
+    });
+    
+    // Apply filters to deduplicated data
+    filteredData = deduplicatedData.filter(item => {
         // Session filter
         if (elements.sessionFilter.value && item.session_id !== elements.sessionFilter.value) {
             return false;
@@ -551,7 +721,8 @@ function showMedia(mediaPath, mediaType) {
     };
     
     if (mediaType === 'screenshot') {
-        container.innerHTML = `<img id="dashboard-media-img" src="${finalPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh; transform: scale(1) translate(0px, 0px); transition: transform 0.2s; cursor: grab;">`;
+        // Display image at natural size (100%) with scrolling, no max constraints
+        container.innerHTML = `<img id="dashboard-media-img" src="${finalPath}" alt="Screenshot" style="width: 100%; height: auto; display: block; transform: scale(1); transition: transform 0.2s; cursor: default;">`;
         
         const img = document.getElementById('dashboard-media-img');
         
@@ -561,25 +732,15 @@ function showMedia(mediaPath, mediaType) {
         document.getElementById('dashboard-zoom-out-btn').style.display = 'inline-flex';
         document.getElementById('dashboard-reset-zoom-btn').style.display = 'inline-flex';
         
-        // Panning variables
-        let isPanning = false;
-        let startX = 0;
-        let startY = 0;
-        let currentTranslateX = 0;
-        let currentTranslateY = 0;
-        
         // Update transform and slider
         const updateZoom = () => {
-            img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
+            img.style.transform = `scale(${zoomLevel})`;
             zoomSlider.value = zoomLevel * 100;
             
             if (zoomLevel > 1) {
                 img.style.cursor = 'grab';
             } else {
                 img.style.cursor = 'default';
-                translateX = 0;
-                translateY = 0;
-                img.style.transform = `scale(${zoomLevel}) translate(0px, 0px)`;
             }
         };
         
@@ -619,55 +780,49 @@ function showMedia(mediaPath, mediaType) {
             }
         });
         
-        // Mouse wheel zoom (hover over image)
-        img.addEventListener('wheel', (e) => {
+        // Click and drag to pan around the image at any zoom level
+        let isPanning = false;
+        let startX = 0;
+        let startY = 0;
+        let scrollLeft = 0;
+        let scrollTop = 0;
+        
+        container.addEventListener('mousedown', (e) => {
+            isPanning = true;
+            container.style.cursor = 'grabbing';
+            startX = e.pageX - container.offsetLeft;
+            startY = e.pageY - container.offsetTop;
+            scrollLeft = container.scrollLeft;
+            scrollTop = container.scrollTop;
             e.preventDefault();
-            
-            if (e.deltaY < 0) {
-                // Scroll up - zoom in
-                zoomLevel = Math.min(zoomLevel + 0.1, 3);
-            } else {
-                // Scroll down - zoom out
-                zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
-            }
-            
-            updateZoom();
-        }, { passive: false });
+        });
+        
+        container.addEventListener('mouseleave', () => {
+            isPanning = false;
+            container.style.cursor = 'grab';
+        });
+        
+        container.addEventListener('mouseup', () => {
+            isPanning = false;
+            container.style.cursor = 'grab';
+        });
+        
+        container.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            e.preventDefault();
+            const x = e.pageX - container.offsetLeft;
+            const y = e.pageY - container.offsetTop;
+            const walkX = (x - startX) * 2; // Multiply for faster scrolling
+            const walkY = (y - startY) * 2;
+            container.scrollLeft = scrollLeft - walkX;
+            container.scrollTop = scrollTop - walkY;
+        });
+        
+        // Set container cursor
+        container.style.cursor = 'grab';
         
         // Keyboard shortcuts (Ctrl+ and Ctrl-)
         document.addEventListener('keydown', keyboardZoomHandler);
-        
-        // Panning with mouse
-        img.addEventListener('mousedown', (e) => {
-            if (zoomLevel > 1) {
-                isPanning = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                currentTranslateX = translateX;
-                currentTranslateY = translateY;
-                img.style.cursor = 'grabbing';
-                img.style.transition = 'none';
-                e.preventDefault();
-            }
-        });
-        
-        document.addEventListener('mousemove', (e) => {
-            if (isPanning && zoomLevel > 1) {
-                const deltaX = (e.clientX - startX) / zoomLevel;
-                const deltaY = (e.clientY - startY) / zoomLevel;
-                translateX = currentTranslateX + deltaX;
-                translateY = currentTranslateY + deltaY;
-                img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
-            }
-        });
-        
-        document.addEventListener('mouseup', () => {
-            if (isPanning) {
-                isPanning = false;
-                img.style.cursor = 'grab';
-                img.style.transition = 'transform 0.2s';
-            }
-        });
         
         // Download button
         document.getElementById('dashboard-download-btn').onclick = () => {
@@ -1038,9 +1193,27 @@ function debounce(func, wait) {
     };
 }
 
-// Reset results and filters function (clears all data and shows zero results)
-function resetResults() {
-    const confirmReset = confirm('Clear all displayed results and reset to zero?\n\nThis will only clear the UI. Database data will remain safe and can be reloaded.');
+// Reset results and filters function (clears all data from UI AND database)
+async function resetResults() {
+    // Check if there's an active session
+    const activeSession = localStorage.getItem('active_test_session');
+    let sessionId = null;
+    
+    if (activeSession) {
+        try {
+            const parsed = JSON.parse(activeSession);
+            sessionId = parsed.sessionId || parsed;
+        } catch (e) {
+            sessionId = activeSession;
+        }
+    }
+    
+    // Confirm deletion
+    const message = sessionId
+        ? `Delete all test results for this session from the database?\n\nThis will:\n• Delete all ${currentData.length} results from database\n• Clear the UI\n• Cannot be undone\n\nDelete permanently?`
+        : 'Delete all displayed results from the database?\n\nThis will:\n• Delete all results from database\n• Clear the UI\n• Cannot be undone\n\nDelete permanently?';
+    
+    const confirmReset = confirm(message);
     
     if (!confirmReset) {
         return;
@@ -1048,7 +1221,29 @@ function resetResults() {
     
     try {
         elements.resetResultsBtn.disabled = true;
-        elements.resetResultsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+        elements.resetResultsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        
+        if (sessionId) {
+            // Delete the specific session from database
+            console.log(`🗑️ [Dashboard] Deleting session data from database: ${sessionId}`);
+            
+            const response = await fetch(`/api/sessions/${sessionId}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to delete session: ${response.statusText}`);
+            }
+            
+            console.log('✅ [Dashboard] Session data deleted from database');
+        }
+        
+        // Clear localStorage
+        localStorage.removeItem('active_test_session');
+        localStorage.setItem('dashboard_cleared', 'true');
+        dataClearedManually = true;
+        
+        console.log('🧹 [Dashboard] Clearing all data from UI and database');
         
         // Clear all data arrays
         currentData = [];
@@ -1087,13 +1282,89 @@ function resetResults() {
         elements.nextPageBtn.disabled = true;
         
         // Show success message
-        alert('✅ Results cleared successfully! UI reset to zero. Database data is safe.');
+        alert('✅ Results permanently deleted from database and UI cleared!');
         
     } catch (error) {
-        console.error('Error resetting results:', error);
-        alert('❌ Error resetting results: ' + error.message);
+        console.error('Error deleting results:', error);
+        alert('❌ Error deleting results: ' + error.message);
     } finally {
         elements.resetResultsBtn.disabled = false;
         elements.resetResultsBtn.innerHTML = '<i class="fas fa-broom"></i> Clear Results';
     }
 }
+
+// Auto-refresh functionality for live test updates
+function startPolling() {
+    // Check if there's an active test session
+    checkForActiveTest();
+    
+    // Poll every 3 seconds
+    pollInterval = setInterval(checkForActiveTest, 3000);
+}
+
+async function checkForActiveTest() {
+    try {
+        const activeSession = localStorage.getItem('active_test_session');
+        
+        if (activeSession) {
+            // There's an active test - check its status
+            const sessionData = JSON.parse(activeSession);
+            const response = await fetch(`/api/sessions/${sessionData.sessionId}/status`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                // If test is running or paused, refresh data in real-time
+                if (data.status === 'running' || data.status === 'paused') {
+                    console.log(`🔄 Active test running - session ${sessionData.sessionId} - refreshing dashboard...`);
+                    // Clear the manually cleared flag since we have an active test
+                    dataClearedManually = false;
+                    localStorage.removeItem('dashboard_cleared');
+                    
+                    // Force reload from THIS session only
+                    await loadData();
+                    
+                    // Make sure to show the loading spinner briefly
+                    showLoading(false);
+                    
+                } else if (data.status === 'completed' || data.status === 'stopped') {
+                    console.log(`✅ Test ${data.status} - session ${sessionData.sessionId} - final refresh`);
+                    // Clear the manually cleared flag for final refresh
+                    dataClearedManually = false;
+                    localStorage.removeItem('dashboard_cleared');
+                    
+                    // Load final results from this session
+                    await loadData();
+                    
+                    // Stop polling after test is done
+                    stopPolling();
+                }
+            } else {
+                // ✅ DON'T clear localStorage - session might just be new/not written yet
+                console.log('⚠️ Session not found in database yet - will check again next poll');
+                // Keep polling - the session might appear soon
+            }
+        } else {
+            console.log('ℹ️ No active test session - stopping polling');
+            stopPolling();
+        }
+    } catch (error) {
+        console.error('Error checking for active test:', error);
+    }
+}
+
+function stopPolling() {
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+    }
+}
+
+// Stop polling when page is hidden (save resources)
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopPolling();
+    } else {
+        startPolling();
+    }
+});

@@ -234,10 +234,6 @@
                     <div class="stat-number" id="flagged-count">0</div>
                     <div class="stat-label">Flagged</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="progress-percent">0%</div>
-                    <div class="stat-label">Progress</div>
-                </div>
             </div>
 
             <div class="current-test">
@@ -248,22 +244,21 @@
                         <div class="merchant-url" id="current-url"></div>
                         <div class="merchant-details" id="current-details"></div>
                     </div>
-                    <div class="test-actions">
-                        <button id="pass-current-btn" class="btn btn-success btn-sm">
-                            <i class="fas fa-check"></i> Pass Current
-                        </button>
-                        <button id="preview-website-btn" class="btn btn-info btn-sm" disabled>
-                            <i class="fas fa-external-link-alt"></i> Preview Website
-                        </button>
-                    </div>
                 </div>
             </div>
 
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
-
             <div class="live-results">
+                <!-- Search bar for filtering results -->
+                <div class="results-search-container">
+                    <input 
+                        type="text" 
+                        id="results-search-input" 
+                        class="results-search-input" 
+                        placeholder="🔍 Search results by merchant name or URL..."
+                    />
+                    <span id="results-search-count" class="search-count"></span>
+                </div>
+                
                 <div class="results-tabs">
                     <button class="tab-btn" data-tab="successful">
                         <i class="fas fa-check-circle"></i> Successful (<span id="successful-tab-count">0</span>)

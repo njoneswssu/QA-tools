@@ -104,68 +104,138 @@ app.get('/api/merchant-results', async (req, res) => {
             limit = 50
         } = req.query;
 
-        // Use DISTINCT ON for PostgreSQL or GROUP BY for SQLite to prevent duplicates
+        let params = [];
+        let paramIndex = 1;
+        
+        // Build a simple, guaranteed-deduplication query
         let query;
+        
         if (USE_POSTGRES) {
+            // PostgreSQL: Simple DISTINCT ON approach
             query = `
-                SELECT DISTINCT ON (mtr.merchant_id) mtr.*, mmd.primary_category, mmd.parent_category, mmd.max_rate, mmd.max_rate_kind
+                SELECT DISTINCT ON (mtr.merchant_id)
+                    mtr.id,
+                    mtr.session_id,
+                    mtr.merchant_id,
+                    mtr.merchant_name,
+                    mtr.merchant_url,
+                    mtr.app_id,
+                    mtr.test_status,
+                    mtr.test_result,
+                    mtr.test_duration_ms,
+                    mtr.is_user_passed,
+                    mtr.screenshot_path,
+                    mtr.video_path,
+                    mtr.tested_at,
+                    mmd.primary_category,
+                    mmd.parent_category,
+                    mmd.max_rate,
+                    mmd.max_rate_kind
                 FROM merchant_test_results mtr
                 LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
                 WHERE 1=1
             `;
-        } else {
-            query = `
-                SELECT mtr.*, mmd.primary_category, mmd.parent_category, mmd.max_rate, mmd.max_rate_kind
-                FROM merchant_test_results mtr
-                LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
-                WHERE mtr.id IN (
-                    SELECT MAX(id) FROM merchant_test_results GROUP BY merchant_id
-                )
-            `;
-        }
-        const params = [];
-        let paramIndex = 1;
-
-        // Apply filters
-        if (session_id) {
-            query += ` AND mtr.session_id = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
-            params.push(session_id);
-        }
-
-        if (status) {
-            if (status === 'user_passed') {
-                query += ` AND mtr.is_user_passed = ${USE_POSTGRES ? 'TRUE' : '1'}`;
-            } else {
-                query += ` AND mtr.test_status = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
-                params.push(status);
+            
+            // Apply all filters
+            if (session_id) {
+                query += ` AND mtr.session_id = $${paramIndex++}`;
+                params.push(session_id);
             }
-        }
-
-        if (category) {
-            query += ` AND (mtr.primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OR mmd.primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'})`;
-            params.push(category, category);
-        }
-
-        if (search) {
-            query += ` AND (mtr.merchant_name ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OR mtr.merchant_url ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'})`;
-            params.push(`%${search}%`, `%${search}%`);
-        }
-
-        if (date_from) {
-            query += ` AND mtr.tested_at >= ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
-            params.push(date_from);
-        }
-
-        if (date_to) {
-            query += ` AND mtr.tested_at <= ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
-            params.push(date_to + ' 23:59:59');
-        }
-
-        // Add ordering - for PostgreSQL DISTINCT ON requires ORDER BY to match
-        if (USE_POSTGRES) {
-            query += ' ORDER BY mtr.merchant_id, mtr.tested_at DESC';
+            if (status) {
+                if (status === 'user_passed') {
+                    query += ` AND mtr.is_user_passed = TRUE`;
+                } else {
+                    query += ` AND mtr.test_status = $${paramIndex++}`;
+                    params.push(status);
+                }
+            }
+            if (category) {
+                query += ` AND (mtr.primary_category = $${paramIndex++} OR mmd.primary_category = $${paramIndex++})`;
+                params.push(category, category);
+            }
+            if (search) {
+                query += ` AND (mtr.merchant_name ILIKE $${paramIndex++} OR mtr.merchant_url ILIKE $${paramIndex++})`;
+                params.push(`%${search}%`, `%${search}%`);
+            }
+            if (date_from) {
+                query += ` AND mtr.tested_at >= $${paramIndex++}`;
+                params.push(date_from);
+            }
+            if (date_to) {
+                query += ` AND mtr.tested_at <= $${paramIndex++}`;
+                params.push(date_to + ' 23:59:59');
+            }
+            
+            // Order by merchant_id first (required for DISTINCT ON), then by tested_at DESC
+            query += ` ORDER BY mtr.merchant_id, mtr.tested_at DESC`;
+            
         } else {
-            query += ' ORDER BY mtr.tested_at DESC';
+            // SQLite: Use a CTE to get the most recent test per merchant
+            query = `
+                WITH latest_tests AS (
+                    SELECT merchant_id, MAX(tested_at) as latest_date
+                    FROM merchant_test_results
+                    WHERE 1=1
+            `;
+            
+            if (session_id) {
+                query += ` AND session_id = ?`;
+                params.push(session_id);
+            }
+            if (status) {
+                if (status === 'user_passed') {
+                    query += ` AND is_user_passed = 1`;
+                } else {
+                    query += ` AND test_status = ?`;
+                    params.push(status);
+                }
+            }
+            
+            query += `
+                    GROUP BY merchant_id
+                )
+                SELECT 
+                    mtr.id,
+                    mtr.session_id,
+                    mtr.merchant_id,
+                    mtr.merchant_name,
+                    mtr.merchant_url,
+                    mtr.app_id,
+                    mtr.test_status,
+                    mtr.test_result,
+                    mtr.test_duration_ms,
+                    mtr.is_user_passed,
+                    mtr.screenshot_path,
+                    mtr.video_path,
+                    mtr.tested_at,
+                    mmd.primary_category,
+                    mmd.parent_category,
+                    mmd.max_rate,
+                    mmd.max_rate_kind
+                FROM merchant_test_results mtr
+                INNER JOIN latest_tests lt ON mtr.merchant_id = lt.merchant_id AND mtr.tested_at = lt.latest_date
+                LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
+                WHERE 1=1
+            `;
+            
+            if (category) {
+                query += ` AND (mtr.primary_category = ? OR mmd.primary_category = ?)`;
+                params.push(category, category);
+            }
+            if (search) {
+                query += ` AND (mtr.merchant_name LIKE ? OR mtr.merchant_url LIKE ?)`;
+                params.push(`%${search}%`, `%${search}%`);
+            }
+            if (date_from) {
+                query += ` AND mtr.tested_at >= ?`;
+                params.push(date_from);
+            }
+            if (date_to) {
+                query += ` AND mtr.tested_at <= ?`;
+                params.push(date_to + ' 23:59:59');
+            }
+            
+            query += ` ORDER BY mtr.tested_at DESC`;
         }
 
         // Add pagination
@@ -173,51 +243,66 @@ app.get('/api/merchant-results', async (req, res) => {
         query += ` LIMIT ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OFFSET ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
         params.push(parseInt(limit), offset);
 
+        console.log('🔍 Query:', query);
+        console.log('🔍 Params:', params);
+        console.log(`🔍 Session filter: ${session_id ? `'${session_id}'` : 'NONE - loading all results!'}`);
+
         const rows = await queryAll(query, params);
-
-        // Get total count for pagination
-        let countQuery = `
-            SELECT COUNT(*) as total
-            FROM merchant_test_results mtr
-            LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
-            WHERE 1=1
-        `;
-        const countParams = params.slice(0, -2); // Remove LIMIT and OFFSET params
-
-        // Re-apply the same filters for count
-        paramIndex = 1;
-        if (session_id) {
-            countQuery += ` AND mtr.session_id = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+        
+        console.log(`✅ [Server] Returned ${rows.length} unique merchants for session: ${session_id || 'ALL'}`);
+        
+        // Log first few results for debugging
+        if (rows.length > 0 && rows.length <= 5) {
+            rows.forEach(row => {
+                console.log(`   - ${row.merchant_name} (ID: ${row.merchant_id}, Session: ${row.session_id})`);
+            });
         }
-        if (status) {
-            if (status === 'user_passed') {
-                countQuery += ` AND mtr.is_user_passed = ${USE_POSTGRES ? 'TRUE' : '1'}`;
-            } else {
-                countQuery += ` AND mtr.test_status = ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+
+        // Simple count of unique merchants
+        let countQuery;
+        let countParams = [];
+        
+        if (USE_POSTGRES) {
+            countQuery = `SELECT COUNT(DISTINCT merchant_id) as total FROM merchant_test_results WHERE 1=1`;
+            let countIndex = 1;
+            if (session_id) {
+                countQuery += ` AND session_id = $${countIndex++}`;
+                countParams.push(session_id);
             }
-        }
-        if (category) {
-            countQuery += ` AND (mtr.primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OR mmd.primary_category = ${USE_POSTGRES ? `$${paramIndex++}` : '?'})`;
-        }
-        if (search) {
-            countQuery += ` AND (mtr.merchant_name ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'} OR mtr.merchant_url ${USE_POSTGRES ? 'ILIKE' : 'LIKE'} ${USE_POSTGRES ? `$${paramIndex++}` : '?'})`;
-        }
-        if (date_from) {
-            countQuery += ` AND mtr.tested_at >= ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
-        }
-        if (date_to) {
-            countQuery += ` AND mtr.tested_at <= ${USE_POSTGRES ? `$${paramIndex++}` : '?'}`;
+            if (status) {
+                if (status === 'user_passed') {
+                    countQuery += ` AND is_user_passed = TRUE`;
+                } else {
+                    countQuery += ` AND test_status = $${countIndex++}`;
+                    countParams.push(status);
+                }
+            }
+        } else {
+            countQuery = `SELECT COUNT(DISTINCT merchant_id) as total FROM merchant_test_results WHERE 1=1`;
+            if (session_id) {
+                countQuery += ` AND session_id = ?`;
+                countParams.push(session_id);
+            }
+            if (status) {
+                if (status === 'user_passed') {
+                    countQuery += ` AND is_user_passed = 1`;
+                } else {
+                    countQuery += ` AND test_status = ?`;
+                    countParams.push(status);
+                }
+            }
         }
 
         const countResult = await queryOne(countQuery, countParams);
+        const total = countResult ? countResult.total : 0;
 
         res.json({
             data: rows,
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),
-                total: countResult.total,
-                pages: Math.ceil(countResult.total / limit)
+                total: total,
+                pages: Math.ceil(total / limit)
             }
         });
     } catch (err) {
@@ -382,30 +467,50 @@ app.put('/api/sessions/:sessionId', async (req, res) => {
 app.delete('/api/sessions/:sessionId', async (req, res) => {
     const { sessionId } = req.params;
     
+    console.log(`🗑️ [Server] DELETE request for session: ${sessionId}`);
+    
     try {
         // Delete all merchant results for this session first
         if (USE_POSTGRES) {
+            const resultCount = await pgPool.query('SELECT COUNT(*) FROM merchant_test_results WHERE session_id = $1', [sessionId]);
+            console.log(`📊 [Server] Found ${resultCount.rows[0].count} results to delete for session ${sessionId}`);
+            
             await pgPool.query('DELETE FROM merchant_test_results WHERE session_id = $1', [sessionId]);
+            console.log(`✅ [Server] Deleted merchant_test_results for session ${sessionId}`);
+            
             await pgPool.query('DELETE FROM test_sessions WHERE session_id = $1', [sessionId]);
+            console.log(`✅ [Server] Deleted test_sessions entry for session ${sessionId}`);
         } else {
+            // Count first for logging
+            const resultCount = await new Promise((resolve, reject) => {
+                db.get('SELECT COUNT(*) as count FROM merchant_test_results WHERE session_id = ?', [sessionId], (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+            console.log(`📊 [Server] Found ${resultCount.count} results to delete for session ${sessionId}`);
+            
             await new Promise((resolve, reject) => {
                 db.run('DELETE FROM merchant_test_results WHERE session_id = ?', [sessionId], (err) => {
                     if (err) reject(err);
                     else resolve();
                 });
             });
+            console.log(`✅ [Server] Deleted merchant_test_results for session ${sessionId}`);
+            
             await new Promise((resolve, reject) => {
                 db.run('DELETE FROM test_sessions WHERE session_id = ?', [sessionId], (err) => {
                     if (err) reject(err);
                     else resolve();
                 });
             });
+            console.log(`✅ [Server] Deleted test_sessions entry for session ${sessionId}`);
         }
         
-        console.log(`✅ Deleted session and results: ${sessionId}`);
+        console.log(`✅ [Server] Successfully deleted session and all results: ${sessionId}`);
         res.json({ success: true, message: 'Session and results deleted' });
     } catch (error) {
-        console.error('Error deleting session:', error);
+        console.error('❌ [Server] Error deleting session:', error);
         res.status(500).json({ error: 'Failed to delete session' });
     }
 });
@@ -439,12 +544,13 @@ app.put('/api/merchant-results/:merchantId/status', async (req, res) => {
             return res.status(400).json({ error: 'Session ID is required' });
         }
         
-        // Update the test status in database
+        // Update the test status in database with manual review note
+        const manualReviewNote = 'Status changed by user manual review';
         let result;
         if (USE_POSTGRES) {
-            result = await pgPool.query(
-                'UPDATE merchant_test_results SET test_status = $1 WHERE merchant_id = $2 AND session_id = $3',
-                [status, parseInt(merchantId), session_id]
+            result = await db.query(
+                'UPDATE merchant_test_results SET test_status = $1, details = $2 WHERE merchant_id = $3 AND session_id = $4',
+                [status, manualReviewNote, parseInt(merchantId), session_id]
             );
             console.log(`✅ Updated ${result.rowCount} row(s) for merchant ${merchantId}`);
             
@@ -454,8 +560,8 @@ app.put('/api/merchant-results/:merchantId/status', async (req, res) => {
         } else {
             await new Promise((resolve, reject) => {
                 db.run(
-                    'UPDATE merchant_test_results SET test_status = ? WHERE merchant_id = ? AND session_id = ?',
-                    [status, parseInt(merchantId), session_id],
+                    'UPDATE merchant_test_results SET test_status = ?, details = ? WHERE merchant_id = ? AND session_id = ?',
+                    [status, manualReviewNote, parseInt(merchantId), session_id],
                     function(err) {
                         if (err) {
                             reject(err);
@@ -620,6 +726,13 @@ app.post('/api/start-test', async (req, res) => {
         console.log(`📊 Merchants: ${merchants.length}`);
         console.log(`🆔 Session: ${sessionId}`);
         console.log(`📝 Test Name: ${testName}`);
+        
+        // Clear the log file for this session if it exists (for fresh start on restart)
+        const logFile = path.join(__dirname, 'logs', `test-${sessionId}.log`);
+        if (fs.existsSync(logFile)) {
+            console.log(`🧹 Clearing existing log file: ${logFile}`);
+            fs.writeFileSync(logFile, ''); // Truncate the log file
+        }
         
         // Create test session in database
         try {

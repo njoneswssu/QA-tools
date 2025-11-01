@@ -206,9 +206,16 @@ test.describe('API Merchant Tester - UI Generated', () => {
 
       // Function to save merchant result to database
       async function saveMerchantToDatabase(website, status, reason, errorPattern = null, duration = null, mediaFiles = {}) {
-        if (!dbModule || !dbSessionCreated) {
-          console.log('⚠️ Database not available or session not created');
-          return;
+        if (!dbModule) {
+          console.log('❌ Database module not loaded - RESULT NOT SAVED');
+          console.log('   Make sure database is properly initialized');
+          return false;
+        }
+        
+        if (!dbSessionCreated) {
+          console.log('❌ Database session not created - RESULT NOT SAVED');
+          console.log('   Session ID:', sessionId);
+          return false;
         }
         
         try {
@@ -236,9 +243,11 @@ test.describe('API Merchant Tester - UI Generated', () => {
           
           await dbModule.saveMerchantTestResult(testData);
           console.log(\`✅ Successfully saved: \${website.name}\`);
+          return true;
         } catch (error) {
           console.log(\`❌ Failed to save to database: \${error.message}\`);
           console.error('Full error:', error);
+          return false;
         }
       }
 
@@ -274,6 +283,47 @@ test.describe('API Merchant Tester - UI Generated', () => {
         if (browserClosed) {
           console.log('🛑 Stopping test - browser was closed');
           break;
+        }
+        
+        // Check if test is paused
+        try {
+          if (dbModule && dbModule.queryOne) {
+            const sessionStatus = await dbModule.queryOne(
+              'SELECT status FROM test_sessions WHERE session_id = ' + (process.env.USE_POSTGRES === 'true' ? '$1' : '?'),
+              [sessionId]
+            );
+            
+            if (sessionStatus && sessionStatus.status === 'paused') {
+              console.log('⏸️ Test paused - waiting for resume...');
+              
+              // Wait until resumed or stopped
+              while (true) {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Check every 2 seconds
+                
+                const updatedSession = await dbModule.queryOne(
+                  'SELECT status FROM test_sessions WHERE session_id = ' + (process.env.USE_POSTGRES === 'true' ? '$1' : '?'),
+                  [sessionId]
+                );
+                
+                if (!updatedSession) {
+                  console.log('🛑 Session deleted - stopping test');
+                  return; // Exit test completely
+                }
+                
+                if (updatedSession.status === 'running') {
+                  console.log('▶️ Test resumed - continuing...');
+                  break; // Continue with testing
+                }
+                
+                if (updatedSession.status === 'stopped') {
+                  console.log('🛑 Test stopped - exiting');
+                  return; // Exit test completely
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Failed to check pause status:', error);
         }
         
         const testStartTime = Date.now();
@@ -312,7 +362,6 @@ test.describe('API Merchant Tester - UI Generated', () => {
             
             // Wait for database save to complete
             await new Promise(resolve => setTimeout(resolve, 500));
-            console.log('💾 Result saved to database');
             
             userPassedWebsites.push({ name: website.name, url: website.url });
             checkedWebsites.push({ name: website.name, url: website.url });
@@ -404,7 +453,6 @@ test.describe('API Merchant Tester - UI Generated', () => {
             
             // Wait for database save to complete
             await new Promise(resolve => setTimeout(resolve, 500));
-            console.log('💾 Result saved to database');
             
             checkedWebsites.push({ name: website.name, url: website.url });
             continue;
@@ -631,7 +679,6 @@ test.describe('API Merchant Tester - UI Generated', () => {
             
             // Wait for database save to complete
             await new Promise(resolve => setTimeout(resolve, 500));
-            console.log('💾 Result saved to database');
           }
 
           checkedWebsites.push({ name: website.name, url: website.url });
@@ -639,6 +686,44 @@ test.describe('API Merchant Tester - UI Generated', () => {
           // Add delay between merchants to ensure everything is processed
           console.log('⏳ Waiting 2 seconds before next merchant...');
           await page.waitForTimeout(2000);
+          
+          // Check if test is paused AFTER finishing this merchant
+          try {
+            if (dbModule && dbModule.queryOne) {
+              const sessionStatus = await dbModule.queryOne(
+                'SELECT status FROM test_sessions WHERE session_id = ' + (process.env.USE_POSTGRES === 'true' ? '$1' : '?'),
+                [sessionId]
+              );
+              
+              if (sessionStatus && sessionStatus.status === 'paused') {
+                console.log('⏸️ Test paused after completing merchant - waiting for resume...');
+                
+                // Wait until resumed or stopped
+                while (true) {
+                  await new Promise(resolve => setTimeout(resolve, 2000)); // Check every 2 seconds
+                  
+                  const updatedSession = await dbModule.queryOne(
+                    'SELECT status FROM test_sessions WHERE session_id = ' + (process.env.USE_POSTGRES === 'true' ? '$1' : '?'),
+                    [sessionId]
+                  );
+                  
+                  if (!updatedSession || updatedSession.status === 'stopped') {
+                    console.log('🛑 Test stopped while paused');
+                    break;
+                  }
+                  
+                  if (updatedSession.status === 'running') {
+                    console.log('▶️ Test resumed');
+                    break;
+                  }
+                  
+                  console.log('⏸️ Still paused... checking again in 2 seconds');
+                }
+              }
+            }
+          } catch (pauseError) {
+            console.log(\`⚠️ Error checking pause status: \${pauseError.message}\`);
+          }
 
         } catch (error) {
           console.log(\`❌ Error checking \${website.name}: \${error.message}\`);
@@ -676,13 +761,50 @@ test.describe('API Merchant Tester - UI Generated', () => {
           
           // Wait for database save to complete
           await new Promise(resolve => setTimeout(resolve, 500));
-          console.log('💾 Error result saved to database');
           
           checkedWebsites.push({ name: website.name, url: website.url });
           
           // Add delay before continuing
           console.log('⏳ Waiting 2 seconds before next merchant...');
           await page.waitForTimeout(2000);
+          
+          // Check if test is paused AFTER finishing this merchant (even after error)
+          try {
+            if (dbModule && dbModule.queryOne) {
+              const sessionStatus = await dbModule.queryOne(
+                'SELECT status FROM test_sessions WHERE session_id = ' + (process.env.USE_POSTGRES === 'true' ? '$1' : '?'),
+                [sessionId]
+              );
+              
+              if (sessionStatus && sessionStatus.status === 'paused') {
+                console.log('⏸️ Test paused after error - waiting for resume...');
+                
+                // Wait until resumed or stopped
+                while (true) {
+                  await new Promise(resolve => setTimeout(resolve, 2000)); // Check every 2 seconds
+                  
+                  const updatedSession = await dbModule.queryOne(
+                    'SELECT status FROM test_sessions WHERE session_id = ' + (process.env.USE_POSTGRES === 'true' ? '$1' : '?'),
+                    [sessionId]
+                  );
+                  
+                  if (!updatedSession || updatedSession.status === 'stopped') {
+                    console.log('🛑 Test stopped while paused');
+                    break;
+                  }
+                  
+                  if (updatedSession.status === 'running') {
+                    console.log('▶️ Test resumed');
+                    break;
+                  }
+                  
+                  console.log('⏸️ Still paused... checking again in 2 seconds');
+                }
+              }
+            }
+          } catch (pauseError) {
+            console.log(\`⚠️ Error checking pause status: \${pauseError.message}\`);
+          }
         }
 
         // Progress checkpoint every 10 websites
