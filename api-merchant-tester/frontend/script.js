@@ -1179,23 +1179,8 @@ function debounce(func, wait) {
 
 // Reset results and filters function (clears all data from UI AND database)
 async function resetResults() {
-    // Check if there's an active session
-    const activeSession = localStorage.getItem('active_test_session');
-    let sessionId = null;
-    
-    if (activeSession) {
-        try {
-            const parsed = JSON.parse(activeSession);
-            sessionId = parsed.sessionId || parsed;
-        } catch (e) {
-            sessionId = activeSession;
-        }
-    }
-    
-    // Confirm deletion
-    const message = sessionId
-        ? `Delete all test results for this session from the database?\n\nThis will:\n• Delete all ${currentData.length} results from database\n• Clear the UI\n• Cannot be undone\n\nDelete permanently?`
-        : 'Delete all displayed results from the database?\n\nThis will:\n• Delete all results from database\n• Clear the UI\n• Cannot be undone\n\nDelete permanently?';
+    // Confirm deletion - always delete ALL results from all sessions
+    const message = `Delete ALL test results from the database?\n\nThis will:\n• Delete all ${currentData.length} displayed results\n• Delete all test results from ALL sessions\n• Keep merchant master data (merchants remain in system)\n• Clear the UI\n• Cannot be undone\n\nDelete permanently?`;
     
     const confirmReset = confirm(message);
     
@@ -1207,27 +1192,26 @@ async function resetResults() {
         elements.resetResultsBtn.disabled = true;
         elements.resetResultsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
         
-        if (sessionId) {
-            // Delete the specific session from database
-            console.log(`🗑️ [Dashboard] Deleting session data from database: ${sessionId}`);
-            
-            const response = await fetch(`/api/sessions/${sessionId}`, {
-                method: 'DELETE'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to delete session: ${response.statusText}`);
-            }
-            
-            console.log('✅ [Dashboard] Session data deleted from database');
+        // Delete ALL test results and sessions from database
+        console.log(`🗑️ [Dashboard] Deleting ALL test results from database`);
+        
+        const response = await fetch('/api/clear-all-results', {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Failed to clear results: ${response.statusText}`);
         }
+        
+        console.log('✅ [Dashboard] All test results deleted from database');
         
         // Clear localStorage
         localStorage.removeItem('active_test_session');
         localStorage.setItem('dashboard_cleared', 'true');
         dataClearedManually = true;
         
-        console.log('🧹 [Dashboard] Clearing all data from UI and database');
+        console.log('🧹 [Dashboard] Clearing all data from UI');
         
         // Clear all data arrays
         currentData = [];

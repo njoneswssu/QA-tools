@@ -475,13 +475,13 @@ app.delete('/api/sessions/:sessionId', async (req, res) => {
     try {
         // Delete all merchant results for this session first
         if (USE_POSTGRES) {
-            const resultCount = await pgPool.query('SELECT COUNT(*) FROM merchant_test_results WHERE session_id = $1', [sessionId]);
+            const resultCount = await db.query('SELECT COUNT(*) FROM merchant_test_results WHERE session_id = $1', [sessionId]);
             console.log(`📊 [Server] Found ${resultCount.rows[0].count} results to delete for session ${sessionId}`);
             
-            await pgPool.query('DELETE FROM merchant_test_results WHERE session_id = $1', [sessionId]);
+            await db.query('DELETE FROM merchant_test_results WHERE session_id = $1', [sessionId]);
             console.log(`✅ [Server] Deleted merchant_test_results for session ${sessionId}`);
             
-            await pgPool.query('DELETE FROM test_sessions WHERE session_id = $1', [sessionId]);
+            await db.query('DELETE FROM test_sessions WHERE session_id = $1', [sessionId]);
             console.log(`✅ [Server] Deleted test_sessions entry for session ${sessionId}`);
         } else {
             // Count first for logging
@@ -515,6 +515,66 @@ app.delete('/api/sessions/:sessionId', async (req, res) => {
     } catch (error) {
         console.error('❌ [Server] Error deleting session:', error);
         res.status(500).json({ error: 'Failed to delete session' });
+    }
+});
+
+// Clear all test results and sessions (keeps merchant master data)
+app.delete('/api/clear-all-results', async (req, res) => {
+    try {
+        console.log('🗑️ [Server] Clearing ALL test results and sessions from database');
+        
+        // Delete all merchant test results and sessions
+        if (USE_POSTGRES) {
+            const resultCount = await db.query('SELECT COUNT(*) FROM merchant_test_results');
+            const sessionCount = await db.query('SELECT COUNT(*) FROM test_sessions');
+            
+            console.log(`📊 [Server] Found ${resultCount.rows[0].count} results and ${sessionCount.rows[0].count} sessions to delete`);
+            
+            await db.query('DELETE FROM merchant_test_results');
+            console.log(`✅ [Server] Deleted all merchant_test_results`);
+            
+            await db.query('DELETE FROM test_sessions');
+            console.log(`✅ [Server] Deleted all test_sessions`);
+        } else {
+            // SQLite - count first for logging
+            const resultCount = await new Promise((resolve, reject) => {
+                db.get('SELECT COUNT(*) as count FROM merchant_test_results', (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+            
+            const sessionCount = await new Promise((resolve, reject) => {
+                db.get('SELECT COUNT(*) as count FROM test_sessions', (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+            
+            console.log(`📊 [Server] Found ${resultCount.count} results and ${sessionCount.count} sessions to delete`);
+            
+            await new Promise((resolve, reject) => {
+                db.run('DELETE FROM merchant_test_results', (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+            console.log(`✅ [Server] Deleted all merchant_test_results`);
+            
+            await new Promise((resolve, reject) => {
+                db.run('DELETE FROM test_sessions', (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+            console.log(`✅ [Server] Deleted all test_sessions`);
+        }
+        
+        console.log(`✅ [Server] Successfully cleared all test results and sessions`);
+        res.json({ success: true, message: 'All test results and sessions cleared' });
+    } catch (error) {
+        console.error('❌ [Server] Error clearing all results:', error);
+        res.status(500).json({ error: 'Failed to clear all results' });
     }
 });
 
@@ -779,7 +839,7 @@ app.post('/api/start-test', async (req, res) => {
                 console.log(`🗑️ Clearing old test results for session ${sessionId}...`);
                 try {
                     if (USE_POSTGRES) {
-                        const deleteResult = await pgPool.query('DELETE FROM merchant_test_results WHERE session_id = $1', [sessionId]);
+                        const deleteResult = await db.query('DELETE FROM merchant_test_results WHERE session_id = $1', [sessionId]);
                         console.log(`✅ Deleted ${deleteResult.rowCount} old test results`);
                     } else {
                         await new Promise((resolve, reject) => {
@@ -934,9 +994,9 @@ app.post('/api/reset-database', async (req, res) => {
         // Clear all tables
         if (USE_POSTGRES) {
             // PostgreSQL version
-            await pgPool.query('DELETE FROM merchant_test_results');
-            await pgPool.query('DELETE FROM test_sessions');
-            await pgPool.query('DELETE FROM merchant_master_data');
+            await db.query('DELETE FROM merchant_test_results');
+            await db.query('DELETE FROM test_sessions');
+            await db.query('DELETE FROM merchant_master_data');
             console.log('✅ PostgreSQL database reset completed');
         } else {
             // SQLite version
