@@ -26,6 +26,9 @@ const APITestRunner = require('./api-test-runner');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Track running test instances by session ID
+const runningTests = new Map(); // sessionId -> { runner: APITestRunner, cancel: Function }
+
 // Database query helpers that work with both PostgreSQL and SQLite
 async function queryAll(query, params = []) {
     if (USE_POSTGRES) {
@@ -727,6 +730,30 @@ app.post('/api/start-test', async (req, res) => {
         console.log(`🆔 Session: ${sessionId}`);
         console.log(`📝 Test Name: ${testName}`);
         
+        // ✨ NEW: Check if a test is already running for this session and stop it
+        if (runningTests.has(sessionId)) {
+            console.log(`⚠️ Found existing test running for session ${sessionId} - stopping it first`);
+            const existingTest = runningTests.get(sessionId);
+            
+            try {
+                // Call the browser close method if available
+                if (existingTest.runner && existingTest.runner.browser) {
+                    console.log('🔴 Closing existing browser...');
+                    await existingTest.runner.browser.close();
+                }
+                
+                // Remove from tracking
+                runningTests.delete(sessionId);
+                console.log('✅ Existing test stopped successfully');
+                
+                // Wait a moment for cleanup
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            } catch (stopError) {
+                console.log(`⚠️ Error stopping existing test: ${stopError.message}`);
+                // Continue anyway
+            }
+        }
+        
         // Clear the log file for this session if it exists (for fresh start on restart)
         const logFile = path.join(__dirname, 'logs', `test-${sessionId}.log`);
         if (fs.existsSync(logFile)) {
@@ -734,24 +761,77 @@ app.post('/api/start-test', async (req, res) => {
             fs.writeFileSync(logFile, ''); // Truncate the log file
         }
         
-        // Create test session in database
+        // Create or update test session in database
         try {
-            await createTestSession(sessionId, testName);
-            console.log(`✅ Database session created: ${sessionId}`);
+            // Check if session exists
+            const existingSession = await queryOne(
+                USE_POSTGRES 
+                    ? 'SELECT id, status FROM test_sessions WHERE session_id = $1'
+                    : 'SELECT id, status FROM test_sessions WHERE session_id = ?',
+                [sessionId]
+            );
+            
+            if (existingSession) {
+                // Session exists - update it to running status and clear completion data
+                console.log(`📝 Updating existing session ${sessionId} (current status: ${existingSession.status})`);
+                
+                // ✨ IMPORTANT: Delete old test results for this session before restarting
+                console.log(`🗑️ Clearing old test results for session ${sessionId}...`);
+                try {
+                    if (USE_POSTGRES) {
+                        const deleteResult = await pgPool.query('DELETE FROM merchant_test_results WHERE session_id = $1', [sessionId]);
+                        console.log(`✅ Deleted ${deleteResult.rowCount} old test results`);
+                    } else {
+                        await new Promise((resolve, reject) => {
+                            db.run('DELETE FROM merchant_test_results WHERE session_id = ?', [sessionId], function(err) {
+                                if (err) {
+                                    reject(err);
+                                } else {
+                                    console.log(`✅ Deleted ${this.changes} old test results`);
+                                    resolve();
+                                }
+                            });
+                        });
+                    }
+                } catch (deleteError) {
+                    console.log(`⚠️ Failed to delete old results: ${deleteError.message}`);
+                }
+                
+                await updateTestSession(sessionId, { 
+                    status: 'running',
+                    completed_at: null
+                });
+                console.log(`✅ Session updated to running status: ${sessionId}`);
+            } else {
+                // New session - create it
+                console.log(`🆕 Creating new session: ${sessionId}`);
+                await createTestSession(sessionId, testName);
+                console.log(`✅ New session created: ${sessionId}`);
+            }
         } catch (dbError) {
-            console.log(`⚠️ Database session creation failed: ${dbError.message}`);
+            console.log(`⚠️ Database session setup failed: ${dbError.message}`);
         }
         
         // Import and use the API test runner
         const testRunner = new APITestRunner();
         
+        // Track this running test
+        runningTests.set(sessionId, { runner: testRunner });
+        console.log(`📝 Tracking new test instance for session ${sessionId}`);
+        
         // Start the test asynchronously (don't wait for completion)
         testRunner.runTest(merchants, sessionId, testName)
             .then(result => {
                 console.log('✅ Test completed:', result);
+                // Remove from tracking when complete
+                runningTests.delete(sessionId);
+                console.log(`🗑️ Removed completed test from tracking: ${sessionId}`);
             })
             .catch(error => {
                 console.error('❌ Test failed:', error);
+                // Remove from tracking on error
+                runningTests.delete(sessionId);
+                console.log(`🗑️ Removed failed test from tracking: ${sessionId}`);
             });
         
         res.json({ 

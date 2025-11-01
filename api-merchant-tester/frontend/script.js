@@ -242,47 +242,31 @@ async function loadData() {
     
     showLoading(true);
     try {
-        // Check if there's an active test session
-        const activeSession = localStorage.getItem('active_test_session');
+        // ✨ ALWAYS load ALL historical data to maintain history across sessions
+        console.log('📊 [Dashboard] Loading ALL historical results from database');
         
-        if (activeSession) {
-            // Load results from the active session ONLY
-            const sessionData = JSON.parse(activeSession);
-            const sessionId = sessionData.sessionId || sessionData;
-            const apiUrl = `/api/merchant-results?session_id=${sessionId}&limit=10000`;
+        const response = await fetch('/api/merchant-results?limit=10000');
+        if (response.ok) {
+            const data = await response.json();
+            let rawData = Array.isArray(data) ? data : (data.data || []);
             
-            console.log(`📊 [Dashboard] Loading results for session: ${sessionId}`);
+            console.log(`📦 [Dashboard] Received ${rawData.length} raw historical results`);
             
-            const response = await fetch(apiUrl);
-            if (response.ok) {
-                const data = await response.json();
-                let rawData = Array.isArray(data) ? data : (data.data || []);
-                
-                console.log(`📦 [Dashboard] Received ${rawData.length} raw results from API`);
-                
-                // Deduplicate by merchant_id (keep first/most recent)
-                const seenIds = new Set();
-                currentData = rawData.filter(item => {
-                    if (seenIds.has(item.merchant_id)) {
-                        console.warn(`⚠️ [Dashboard] Duplicate merchant_id ${item.merchant_id} (${item.merchant_name}) removed from session ${sessionId}`);
-                        return false;
-                    }
-                    seenIds.add(item.merchant_id);
-                    return true;
-                });
-                
-                console.log(`✅ [Dashboard] Loaded ${currentData.length} unique results from session ${sessionId}`);
-                if (rawData.length > currentData.length) {
-                    console.log(`🔍 [Dashboard] ${rawData.length - currentData.length} duplicates removed`);
+            // Deduplicate by merchant_id (keep most recent test per merchant)
+            const merchantMap = new Map();
+            rawData.forEach(item => {
+                const existingItem = merchantMap.get(item.merchant_id);
+                if (!existingItem || new Date(item.tested_at) > new Date(existingItem.tested_at)) {
+                    // Keep the most recent test result for this merchant
+                    merchantMap.set(item.merchant_id, item);
                 }
-            } else {
-                console.error(`❌ [Dashboard] Failed to fetch results: ${response.status}`);
-                currentData = [];
-            }
+            });
+            
+            currentData = Array.from(merchantMap.values());
+            
+            console.log(`✅ [Dashboard] Loaded ${currentData.length} unique merchants (${rawData.length - currentData.length} duplicates merged)`);
         } else {
-            // No active session - DON'T load historical data automatically
-            console.log('📊 [Dashboard] No active session - showing empty state');
-            console.log('💡 [Dashboard] Click "Refresh" to load all historical results');
+            console.error(`❌ [Dashboard] Failed to fetch results: ${response.status}`);
             currentData = [];
         }
         

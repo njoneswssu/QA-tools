@@ -61,10 +61,57 @@ test.describe('API Merchant Tester - UI Generated', () => {
   test('Test merchants from UI with database integration', async () => {
     test.setTimeout(3600000); // 1 hour timeout
     
-    const browser = await chromium.launch({
-      headless: false,
-      slowMo: 2000  // Slow down to 2 seconds between actions
-    });
+    // Try to launch browser with different strategies if one fails
+    let browser;
+    let launchError;
+    
+    // Strategy 1: Try regular chromium with crash reporter disabled
+    try {
+      console.log('🚀 Attempting to launch Chromium browser...');
+      browser = await chromium.launch({
+        headless: false,
+        slowMo: 2000,  // Slow down to 2 seconds between actions
+        args: [
+          '--disable-crash-reporter',
+          '--disable-breakpad',
+          '--no-crash-upload',
+          '--disable-gpu',
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-blink-features=AutomationControlled'
+        ],
+        chromiumSandbox: false,
+        // Use a custom user data directory in the project folder
+        channel: undefined // Use default Chromium
+      });
+      console.log('✅ Chromium browser launched successfully');
+    } catch (error) {
+      console.log('⚠️ Failed to launch Chromium: ' + error.message);
+      launchError = error;
+      
+      // Strategy 2: Try headless mode
+      try {
+        console.log('🚀 Attempting to launch Chromium in headless mode...');
+        browser = await chromium.launch({
+          headless: true,
+          slowMo: 500,
+          args: [
+            '--disable-crash-reporter',
+            '--disable-breakpad',
+            '--no-crash-upload',
+            '--disable-gpu',
+            '--no-sandbox',
+            '--disable-setuid-sandbox'
+          ],
+          chromiumSandbox: false
+        });
+        console.log('✅ Chromium launched in headless mode');
+      } catch (headlessError) {
+        console.log('⚠️ Failed to launch headless: ' + headlessError.message);
+        // Re-throw the original error
+        throw launchError;
+      }
+    }
     
     const context = await browser.newContext({
       viewport: { width: 1200, height: 800 },

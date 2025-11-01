@@ -1116,23 +1116,6 @@ async function startTest() {
     console.log(`📊 Filtered: ${filteredMerchants.length} total, ${uniqueMerchants.length} unique merchants to test`);
     addLogEntry(`📊 Testing ${uniqueMerchants.length} unique merchants (${filteredMerchants.length - uniqueMerchants.length} duplicates removed)`, 'info');
     
-    // Update test state with unique merchant count
-    // If there's an existing session, preserve the counts and just update total
-    if (testSession && testSession.session_id) {
-        // Keep existing counts, just update total
-        testResults.total = uniqueMerchants.length;
-        console.log('📊 Preserving existing test counts:', testResults);
-    } else {
-        // Reset test state for new session
-        testResults = {
-            total: uniqueMerchants.length,
-            successful: 0,
-            flagged: 0,
-            current: 0
-        };
-        console.log('📊 Initialized new test counts:', testResults);
-    }
-    
     // Prepare merchants list - priority queue first, then others
     let merchantsToTest = [];
     
@@ -1167,32 +1150,26 @@ async function startTest() {
     // Create or reuse test session
     const sessionName = elements.testName.value.trim() || 'API Merchant Test';
     
-    // Check if there's an existing session to continue
-    if (testSession && testSession.session_id) {
-        // Reuse existing session - don't create a new one
-        console.log('♻️ Reusing existing session:', testSession.session_id);
-        addLogEntry(`♻️ Continuing with existing session (keeping previous results)`, 'info');
-    } else {
-        // Create new session only if no existing session
-        try {
-            const response = await fetch('/api/sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    session_id: `api-ui-${Date.now()}`,
-                    notes: `${sessionName} - ${filteredMerchants.length} merchants`
-                })
-            });
-            
-            if (!response.ok) throw new Error('Failed to create session');
-            testSession = await response.json();
-            console.log('✨ Created new session:', testSession.session_id);
-            addLogEntry(`✨ Created new test session`, 'success');
-        } catch (error) {
-            console.error('Failed to create session:', error);
-            showError('Failed to create test session');
-            return;
-        }
+    // ✨ IMPORTANT: Always create a NEW session to preserve historical data
+    // Even if there's an existing session, create a new one so old results stay in database
+    try {
+        const response = await fetch('/api/sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: `api-ui-${Date.now()}`,
+                notes: `${sessionName} - ${filteredMerchants.length} merchants`
+            })
+        });
+        
+        if (!response.ok) throw new Error('Failed to create session');
+        testSession = await response.json();
+        console.log('✨ Created new session:', testSession.session_id);
+        addLogEntry(`✨ Created new test session (old results preserved)`, 'success');
+    } catch (error) {
+        console.error('Failed to create session:', error);
+        showError('Failed to create test session');
+        return;
     }
     
     // ✨ IMPORTANT: Save session to localStorage IMMEDIATELY after creation
@@ -1207,6 +1184,19 @@ async function startTest() {
     // Clear test log and hide completion section when starting/restarting test
     clearLog();
     elements.completionSection.style.display = 'none';
+    
+    // ✨ Initialize test results to zero for this new session
+    testResults = {
+        total: uniqueMerchants.length,
+        successful: 0,
+        flagged: 0,
+        current: 0
+    };
+    updateStats();
+    clearResultsLists(); // Clear the results UI
+    
+    console.log('🔄 [Start Test] Initialized test results for new session:', testResults);
+    addLogEntry('🔄 Starting fresh test session...', 'info');
     
     // Show pause/stop buttons, hide restart button
     elements.pauseTestBtn.style.display = 'inline-block';
@@ -1228,8 +1218,7 @@ async function startTest() {
 async function runTest(merchantsToTest = filteredMerchants) {
     testStartTime = Date.now();
     updateStats();
-    clearResultsLists();
-    clearLog();
+    // Note: clearResultsLists() and clearLog() are now called in startTest/restartTest
     
     addLogEntry(`Starting test with ${merchantsToTest.length} merchants`, 'info');
     
@@ -1252,6 +1241,10 @@ async function runTest(merchantsToTest = filteredMerchants) {
         }
         
         const result = await response.json();
+        
+        // ✨ IMPORTANT: Clear log again after backend starts (ensures fresh log after server truncation)
+        clearLog();
+        
         addLogEntry(`Playwright test started successfully (Session: ${result.sessionId})`, 'success');
         
         // Show message that real test is running
@@ -1261,6 +1254,9 @@ async function runTest(merchantsToTest = filteredMerchants) {
         
         addLogEntry('Browser automation started - check the opened browser window', 'info');
         addLogEntry('Polling for results every 2 seconds...', 'info');
+        
+        // ✨ NEW: Wait a moment for backend to fully clear log file before starting polling
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // Start polling for results
         pollForResults();
@@ -2145,55 +2141,16 @@ async function restartTest() {
         return;
     }
     
-    // Check if there's a current session to continue
-    if (!testSession || !testSession.session_id) {
-        // No existing session, create a new one
-        addLogEntry('🔄 Starting new test session...', 'info');
-        await startTest();
-        return;
-    }
+    // ✨ IMPORTANT: Always create a NEW session when restarting to preserve old results
+    // Don't reuse the old session - let startTest() create a fresh one
+    console.log('🔄 [Restart Test] Creating new session to preserve old results');
+    addLogEntry('🔄 Starting new test session (old results preserved)...', 'info');
     
-    // Hide restart button, show stop/pause buttons
-    elements.restartTestBtn.style.display = 'none';
-    elements.stopTestBtn.style.display = 'inline-block';
-    elements.pauseTestBtn.style.display = 'inline-block';
-    elements.resumeTestBtn.style.display = 'none'; // Make sure resume is hidden
+    // Clear the testSession so startTest creates a new one
+    testSession = null;
     
-    // Hide completion section and clear log
-    elements.completionSection.style.display = 'none';
-    clearLog();
-    
-    // Hide setup section during testing
-    elements.setupSection.style.display = 'none';
-    elements.resultsSection.style.display = 'block';
-    
-    addLogEntry('🔄 Restarting test with current merchants (keeping existing results)...', 'info');
-    
-    // Mark as running again
-    isTestRunning = true;
-    
-    // Deduplicate merchants by MerchantID before testing
-    const seenMerchantIds = new Set();
-    const uniqueMerchants = filteredMerchants.filter(merchant => {
-        if (seenMerchantIds.has(merchant.MerchantID)) {
-            return false;
-        }
-        seenMerchantIds.add(merchant.MerchantID);
-        return true;
-    });
-    
-    // Update test results total (keep existing counts)
-    testResults.total = uniqueMerchants.length;
-    
-    // Prepare merchants list
-    let merchantsToTest = [...uniqueMerchants];
-    if (elements.shuffleMerchants.checked) {
-        merchantsToTest = shuffleArray(merchantsToTest);
-        addLogEntry('🔀 Merchants shuffled for random testing order', 'info');
-    }
-    
-    // Start the actual testing with SAME session
-    runTest(merchantsToTest);
+    // Call startTest which will create a new session
+    await startTest();
 }
 
 // Download results
@@ -2526,18 +2483,9 @@ async function syncMerchantResultsFromDatabase() {
     try {
         console.log('🔄 Syncing merchant results from database...');
         
-        // Only sync if there's an active test session
-        const activeSession = localStorage.getItem('active_test_session');
-        if (!activeSession) {
-            console.log('ℹ️ No active test session - skipping sync');
-            return;
-        }
-        
-        const sessionData = JSON.parse(activeSession);
-        const sessionId = sessionData.sessionId;
-        
-        // Fetch test results for the active session only
-        const response = await fetch(`/api/merchant-results?session_id=${sessionId}&limit=10000`);
+        // ✨ ALWAYS fetch ALL historical test results to maintain history
+        console.log('📊 Fetching ALL historical test results for merchant preview');
+        const response = await fetch(`/api/merchant-results?limit=10000`);
         if (!response.ok) {
             console.log('⚠️ Could not fetch test results');
             return;
@@ -2547,16 +2495,27 @@ async function syncMerchantResultsFromDatabase() {
         const results = data.data || data;
         
         if (results.length > 0) {
-            console.log(`✓ Found ${results.length} test results for active session`);
+            console.log(`✓ Found ${results.length} total test results across all sessions`);
             
             // Update merchantStatuses and merchantScreenshots Maps with results from database
+            // Keep the most recent test result for each merchant
+            const merchantResultMap = new Map();
             results.forEach(result => {
                 if (result.merchant_id) {
-                    const status = result.is_user_passed ? 'success' : result.test_status;
-                    merchantStatuses.set(result.merchant_id, status);
-                    if (result.screenshot_path) {
-                        merchantScreenshots.set(result.merchant_id, result.screenshot_path);
+                    const existing = merchantResultMap.get(result.merchant_id);
+                    // Keep the most recent test result
+                    if (!existing || new Date(result.tested_at) > new Date(existing.tested_at)) {
+                        merchantResultMap.set(result.merchant_id, result);
                     }
+                }
+            });
+            
+            // Apply the most recent results to our maps
+            merchantResultMap.forEach((result, merchantId) => {
+                const status = result.is_user_passed ? 'success' : result.test_status;
+                merchantStatuses.set(merchantId, status);
+                if (result.screenshot_path) {
+                    merchantScreenshots.set(merchantId, result.screenshot_path);
                 }
             });
             
@@ -2566,9 +2525,9 @@ async function syncMerchantResultsFromDatabase() {
                 filterMerchants(); // Apply current filters with new statuses
             }
             
-            console.log(`✅ Synced ${merchantStatuses.size} merchant statuses from active session`);
+            console.log(`✅ Synced ${merchantStatuses.size} merchant statuses from all sessions`);
         } else {
-            console.log('ℹ️ No test results found for active session');
+            console.log('ℹ️ No test results found in database');
         }
     } catch (error) {
         console.error('❌ Error syncing merchant results:', error);
