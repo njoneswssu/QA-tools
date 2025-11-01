@@ -104,12 +104,25 @@ app.get('/api/merchant-results', async (req, res) => {
             limit = 50
         } = req.query;
 
-        let query = `
-            SELECT mtr.*, mmd.primary_category, mmd.parent_category, mmd.max_rate, mmd.max_rate_kind
-            FROM merchant_test_results mtr
-            LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
-            WHERE 1=1
-        `;
+        // Use DISTINCT ON for PostgreSQL or GROUP BY for SQLite to prevent duplicates
+        let query;
+        if (USE_POSTGRES) {
+            query = `
+                SELECT DISTINCT ON (mtr.merchant_id) mtr.*, mmd.primary_category, mmd.parent_category, mmd.max_rate, mmd.max_rate_kind
+                FROM merchant_test_results mtr
+                LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
+                WHERE 1=1
+            `;
+        } else {
+            query = `
+                SELECT mtr.*, mmd.primary_category, mmd.parent_category, mmd.max_rate, mmd.max_rate_kind
+                FROM merchant_test_results mtr
+                LEFT JOIN merchant_master_data mmd ON mtr.merchant_id = mmd.merchant_id
+                WHERE mtr.id IN (
+                    SELECT MAX(id) FROM merchant_test_results GROUP BY merchant_id
+                )
+            `;
+        }
         const params = [];
         let paramIndex = 1;
 
@@ -148,8 +161,12 @@ app.get('/api/merchant-results', async (req, res) => {
             params.push(date_to + ' 23:59:59');
         }
 
-        // Add ordering
-        query += ' ORDER BY mtr.tested_at DESC';
+        // Add ordering - for PostgreSQL DISTINCT ON requires ORDER BY to match
+        if (USE_POSTGRES) {
+            query += ' ORDER BY mtr.merchant_id, mtr.tested_at DESC';
+        } else {
+            query += ' ORDER BY mtr.tested_at DESC';
+        }
 
         // Add pagination
         const offset = (page - 1) * limit;

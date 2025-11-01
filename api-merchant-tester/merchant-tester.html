@@ -26,50 +26,24 @@
                 <h2><i class="fas fa-cog"></i> Test Configuration</h2>
                 
                 <div class="form-group">
-                    <label for="api-data">
-                        <i class="fas fa-code"></i> API Data (JSON)
-                        <span class="required">*</span>
+                    <label for="api-url">
+                        <i class="fas fa-link"></i> API URL or Cloud Storage Link
                     </label>
-                    <textarea 
-                        id="api-data" 
-                        placeholder='Paste your merchant API JSON here, e.g.:
-{
-  "Merchants": [...],
-  "PageCount": 1,
-  "PageSize": 50,
-  "TotalCount": 10000
-}
-
-For multiple pages, separate with --- on new lines:
-Page 1 JSON
----
-Page 2 JSON
----
-Page 3 JSON'
-                        rows="12"
-                    ></textarea>
-                <div class="input-help">
-                    <i class="fas fa-info-circle"></i>
-                    Paste your complete merchant API response here, or use bulk fetch below.
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="api-url">
-                    <i class="fas fa-link"></i> Bulk API Fetch (Optional)
-                </label>
                 <input 
                     type="text" 
                     id="api-url" 
-                    placeholder="https://your-api.com/merchants?page={page}&pageSize=50"
+                    placeholder="https://storage.googleapis.com/wildlink/cloud-db/1/206/active-domain/..."
                 >
                 <div class="input-help">
                     <i class="fas fa-magic"></i>
-                    Use {page} placeholder - system will fetch all pages automatically
+                    Supports paginated APIs with {page} placeholder or direct Google Cloud Storage JSON URLs
                 </div>
-                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" id="fetch-cloud-storage-btn" class="btn btn-secondary">
+                        <i class="fas fa-cloud-download-alt"></i> Fetch from Cloud Storage
+                    </button>
                     <button type="button" id="fetch-all-btn" class="btn btn-secondary">
-                        <i class="fas fa-download"></i> Fetch All Pages
+                        <i class="fas fa-download"></i> Fetch All Pages (API)
                     </button>
                     <button type="button" id="test-api-btn" class="btn btn-outline">
                         <i class="fas fa-flask"></i> Test API (Page 1)
@@ -211,9 +185,6 @@ Page 3 JSON'
                 <div class="action-buttons">
                     <button id="load-stored-btn" class="btn btn-info">
                         <i class="fas fa-database"></i> Load Stored Merchants
-                    </button>
-                    <button id="clear-merchants-btn" class="btn btn-warning" title="Clear all loaded merchants">
-                        <i class="fas fa-trash"></i> Clear Merchants
                     </button>
                     <button id="save-to-database-btn" class="btn btn-success" disabled title="Save merchants to database">
                         <i class="fas fa-save"></i> Save to Database

@@ -45,6 +45,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Event listeners
 function initializeEventListeners() {
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Escape key to close modals
+        if (e.key === 'Escape') {
+            const mediaModal = document.querySelector('.media-modal');
+            if (mediaModal && mediaModal.style.display === 'block') {
+                document.body.removeChild(mediaModal);
+                e.preventDefault();
+                return;
+            }
+            
+            const detailsModal = document.getElementById('result-details-modal');
+            if (detailsModal && detailsModal.style.display === 'block') {
+                detailsModal.style.display = 'none';
+                e.preventDefault();
+                return;
+            }
+            
+            if (elements.modal.style.display === 'block') {
+                closeModal();
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+    
     // Filter events
     elements.sessionFilter.addEventListener('change', applyFilters);
     elements.statusFilter.addEventListener('change', applyFilters);
@@ -328,62 +354,348 @@ function getStatusChangeButtons(item) {
     }
 }
 
+// Show detailed result card modal for dashboard
+function showResultDetailsModal(item) {
+    // Create or get modal
+    let modal = document.getElementById('result-details-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'result-details-modal';
+        modal.className = 'media-modal';
+        document.body.appendChild(modal);
+    }
+    
+    // Build media section
+    let mediaSection = '';
+    if (item.screenshot_path) {
+        mediaSection += `
+            <div class="detail-media-item">
+                <h4><i class="fas fa-camera"></i> Screenshot</h4>
+                <div class="detail-screenshot-preview" onclick="event.stopPropagation(); showMedia('${item.screenshot_path}', 'screenshot')">
+                    <img src="/${item.screenshot_path.startsWith('media/') ? item.screenshot_path : 'media/' + item.screenshot_path}" alt="Website Screenshot" onerror="this.parentElement.innerHTML='<p>Screenshot not available</p>'">
+                    <div class="detail-screenshot-overlay">
+                        <i class="fas fa-search-plus"></i> Click to view full size
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (item.video_path) {
+        mediaSection += `
+            <div class="detail-media-item">
+                <h4><i class="fas fa-video"></i> Recording</h4>
+                <button class="btn btn-secondary" onclick="showMedia('${item.video_path}', 'video')">
+                    <i class="fas fa-play"></i> Watch Recording
+                </button>
+            </div>
+        `;
+    }
+    
+    if (!item.screenshot_path && !item.video_path) {
+        mediaSection = '<p class="no-media"><i class="fas fa-info-circle"></i> No media available for this result</p>';
+    }
+    
+    // Create status change buttons
+    const statusButtons = (item.is_user_passed ||item.test_status === 'success')
+        ? `<button class="status-change-btn btn-flag" onclick="changeResultStatus(${item.merchant_id}, '${item.session_id}', 'flagged'); document.getElementById('result-details-modal').style.display='none';" title="Mark as Flagged">
+            <i class="fas fa-flag"></i> Mark as Flagged
+           </button>`
+        : `<button class="status-change-btn btn-success" onclick="changeResultStatus(${item.merchant_id}, '${item.session_id}', 'success'); document.getElementById('result-details-modal').style.display='none';" title="Mark as Success">
+            <i class="fas fa-check"></i> Mark as Success
+           </button>`;
+    
+    const statusClass = (item.is_user_passed || item.test_status === 'success') ? 'success' : 'flagged';
+    const statusIcon = (item.is_user_passed || item.test_status === 'success') ? 'check-circle' : 'exclamation-triangle';
+    const status = (item.is_user_passed || item.test_status === 'success') ? 'SUCCESS' : 'FLAGGED';
+    
+    modal.innerHTML = `
+        <div class="media-modal-content result-detail-card">
+            <div class="media-modal-header">
+                <h3><i class="fas fa-info-circle"></i> Test Result Details</h3>
+                <span class="media-modal-close" onclick="document.getElementById('result-details-modal').style.display='none'">&times;</span>
+            </div>
+            <div class="result-detail-body">
+                <div class="detail-section">
+                    <div class="detail-header">
+                        <h2>${escapeHtml(item.merchant_name)}</h2>
+                        <span class="detail-status ${statusClass}">
+                            <i class="fas fa-${statusIcon}"></i> ${status}
+                        </span>
+                    </div>
+                    
+                    <div class="detail-info-grid">
+                        <div class="detail-info-item">
+                            <span class="detail-label"><i class="fas fa-globe"></i> Domain</span>
+                            <span class="detail-value">${item.merchant_url ? new URL(item.merchant_url).hostname : 'No domain'}</span>
+                        </div>
+                        <div class="detail-info-item">
+                            <span class="detail-label"><i class="fas fa-link"></i> URL</span>
+                            <span class="detail-value"><a href="${item.merchant_url}" target="_blank" rel="noopener noreferrer">${item.merchant_url || 'N/A'}</a></span>
+                        </div>
+                        <div class="detail-info-item">
+                            <span class="detail-label"><i class="fas fa-hashtag"></i> Merchant ID</span>
+                            <span class="detail-value">${item.merchant_id || 'N/A'}</span>
+                        </div>
+                        <div class="detail-info-item">
+                            <span class="detail-label"><i class="fas fa-tags"></i> Category</span>
+                            <span class="detail-value">${escapeHtml(item.primary_category || 'N/A')}</span>
+                        </div>
+                        <div class="detail-info-item">
+                            <span class="detail-label"><i class="fas fa-clock"></i> Tested At</span>
+                            <span class="detail-value">${formatDate(item.tested_at)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-clipboard-list"></i> Test Result</h4>
+                    <div class="detail-reason-box ${statusClass}">
+                        ${escapeHtml(item.test_result || 'No result provided')}
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-images"></i> Media</h4>
+                    ${mediaSection}
+                </div>
+                
+                <div class="detail-actions">
+                    ${statusButtons}
+                    <button class="btn btn-outline" onclick="document.getElementById('result-details-modal').style.display='none'">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Close modal when clicking outside
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+    
+    // Show modal
+    modal.style.display = 'block';
+}
+
 // Show media file in modal
 function showMedia(mediaPath, mediaType) {
     const modal = document.createElement('div');
     modal.className = 'media-modal';
-    modal.onclick = (e) => {
-        if (e.target === modal) {
-            document.body.removeChild(modal);
-        }
-    };
+    modal.id = 'dashboard-media-modal';
     
     // Clean up path - remove leading slash or 'media/' if already present
     const cleanPath = mediaPath.startsWith('/') ? mediaPath.substring(1) : mediaPath;
     const finalPath = cleanPath.startsWith('media/') ? `/${cleanPath}` : `/media/${cleanPath}`;
     
-    let mediaContent;
-    if (mediaType === 'screenshot') {
-        mediaContent = `<img src="${finalPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh; cursor: zoom-in;" id="dashboard-media-img">`;
-    } else if (mediaType === 'video') {
-        mediaContent = `
-            <video controls style="max-width: 100%; max-height: 80vh;">
-                <source src="${finalPath}" type="video/webm">
-                Your browser does not support the video tag.
-            </video>
-        `;
-    }
-    
     modal.innerHTML = `
         <div class="media-modal-content">
-            <button class="media-modal-close" onclick="document.body.removeChild(this.closest('.media-modal'))">
-                <i class="fas fa-times"></i>
-            </button>
-            ${mediaContent}
+            <div class="media-modal-header">
+                <div class="media-modal-controls" id="dashboard-media-controls">
+                    <button class="media-btn" id="dashboard-zoom-in-btn" title="Zoom In (Ctrl+)"><i class="fas fa-search-plus"></i></button>
+                    <button class="media-btn" id="dashboard-zoom-out-btn" title="Zoom Out (Ctrl-)"><i class="fas fa-search-minus"></i></button>
+                    <button class="media-btn" id="dashboard-reset-zoom-btn" title="Reset Zoom"><i class="fas fa-expand"></i></button>
+                    <div class="zoom-slider-container" id="dashboard-zoom-slider-container">
+                        <span class="zoom-label">50%</span>
+                        <input type="range" id="dashboard-zoom-slider" class="zoom-slider" min="50" max="300" value="100" step="5">
+                        <span class="zoom-label">300%</span>
+                    </div>
+                    <button class="media-btn" id="dashboard-download-btn" title="Download"><i class="fas fa-download"></i></button>
+                </div>
+                <button class="media-modal-close" id="dashboard-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="media-container" id="dashboard-media-container"></div>
         </div>
     `;
     
     document.body.appendChild(modal);
     
-    // Add zoom functionality for images
-    if (mediaType === 'screenshot') {
-        const img = document.getElementById('dashboard-media-img');
-        let isZoomed = false;
-        
-        img.onclick = (e) => {
-            e.stopPropagation();
-            isZoomed = !isZoomed;
-            if (isZoomed) {
-                img.style.cursor = 'zoom-out';
-                img.style.maxWidth = 'none';
-                img.style.maxHeight = 'none';
-                img.style.width = 'auto';
-            } else {
-                img.style.cursor = 'zoom-in';
-                img.style.maxWidth = '100%';
-                img.style.maxHeight = '80vh';
-                img.style.width = 'auto';
+    const container = document.getElementById('dashboard-media-container');
+    const zoomSliderContainer = document.getElementById('dashboard-zoom-slider-container');
+    const zoomSlider = document.getElementById('dashboard-zoom-slider');
+    let zoomLevel = 1;
+    let translateX = 0;
+    let translateY = 0;
+    
+    // Keyboard zoom handler
+    const keyboardZoomHandler = (e) => {
+        if ((e.ctrlKey || e.metaKey) && mediaType === 'screenshot') {
+            if (e.key === '=' || e.key === '+') {
+                e.preventDefault();
+                zoomLevel = Math.min(zoomLevel + 0.1, 3);
+                updateZoom();
+            } else if (e.key === '-' || e.key === '_') {
+                e.preventDefault();
+                zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
+                updateZoom();
             }
+        }
+    };
+    
+    // Close handlers
+    const closeModal = () => {
+        document.removeEventListener('keydown', keyboardZoomHandler);
+        document.body.removeChild(modal);
+    };
+    
+    document.getElementById('dashboard-close-btn').onclick = closeModal;
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    };
+    
+    if (mediaType === 'screenshot') {
+        container.innerHTML = `<img id="dashboard-media-img" src="${finalPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh; transform: scale(1) translate(0px, 0px); transition: transform 0.2s; cursor: grab;">`;
+        
+        const img = document.getElementById('dashboard-media-img');
+        
+        // Show zoom controls
+        zoomSliderContainer.style.display = 'flex';
+        document.getElementById('dashboard-zoom-in-btn').style.display = 'inline-flex';
+        document.getElementById('dashboard-zoom-out-btn').style.display = 'inline-flex';
+        document.getElementById('dashboard-reset-zoom-btn').style.display = 'inline-flex';
+        
+        // Panning variables
+        let isPanning = false;
+        let startX = 0;
+        let startY = 0;
+        let currentTranslateX = 0;
+        let currentTranslateY = 0;
+        
+        // Update transform and slider
+        const updateZoom = () => {
+            img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
+            zoomSlider.value = zoomLevel * 100;
+            
+            if (zoomLevel > 1) {
+                img.style.cursor = 'grab';
+            } else {
+                img.style.cursor = 'default';
+                translateX = 0;
+                translateY = 0;
+                img.style.transform = `scale(${zoomLevel}) translate(0px, 0px)`;
+            }
+        };
+        
+        // Zoom in button
+        document.getElementById('dashboard-zoom-in-btn').onclick = () => {
+            zoomLevel = Math.min(zoomLevel + 0.25, 3);
+            updateZoom();
+        };
+        
+        // Zoom out button
+        document.getElementById('dashboard-zoom-out-btn').onclick = () => {
+            zoomLevel = Math.max(zoomLevel - 0.25, 0.5);
+            updateZoom();
+        };
+        
+        // Reset zoom button
+        document.getElementById('dashboard-reset-zoom-btn').onclick = () => {
+            zoomLevel = 1;
+            translateX = 0;
+            translateY = 0;
+            img.style.cursor = 'default';
+            updateZoom();
+        };
+        
+        // Zoom slider
+        zoomSlider.addEventListener('input', (e) => {
+            zoomLevel = parseInt(e.target.value) / 100;
+            img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
+            
+            if (zoomLevel > 1) {
+                img.style.cursor = 'grab';
+            } else {
+                img.style.cursor = 'default';
+                translateX = 0;
+                translateY = 0;
+                img.style.transform = `scale(${zoomLevel}) translate(0px, 0px)`;
+            }
+        });
+        
+        // Mouse wheel zoom (hover over image)
+        img.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            if (e.deltaY < 0) {
+                // Scroll up - zoom in
+                zoomLevel = Math.min(zoomLevel + 0.1, 3);
+            } else {
+                // Scroll down - zoom out
+                zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
+            }
+            
+            updateZoom();
+        }, { passive: false });
+        
+        // Keyboard shortcuts (Ctrl+ and Ctrl-)
+        document.addEventListener('keydown', keyboardZoomHandler);
+        
+        // Panning with mouse
+        img.addEventListener('mousedown', (e) => {
+            if (zoomLevel > 1) {
+                isPanning = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                currentTranslateX = translateX;
+                currentTranslateY = translateY;
+                img.style.cursor = 'grabbing';
+                img.style.transition = 'none';
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (isPanning && zoomLevel > 1) {
+                const deltaX = (e.clientX - startX) / zoomLevel;
+                const deltaY = (e.clientY - startY) / zoomLevel;
+                translateX = currentTranslateX + deltaX;
+                translateY = currentTranslateY + deltaY;
+                img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isPanning) {
+                isPanning = false;
+                img.style.cursor = 'grab';
+                img.style.transition = 'transform 0.2s';
+            }
+        });
+        
+        // Download button
+        document.getElementById('dashboard-download-btn').onclick = () => {
+            const link = document.createElement('a');
+            link.href = finalPath;
+            link.download = mediaPath.split('/').pop();
+            link.click();
+        };
+    } else if (mediaType === 'video') {
+        container.innerHTML = `
+            <video controls style="max-width: 100%; max-height: 80vh;">
+                <source src="${finalPath}" type="video/webm">
+                Your browser does not support the video tag.
+            </video>
+        `;
+        
+        // Hide zoom controls for video
+        zoomSliderContainer.style.display = 'none';
+        document.getElementById('dashboard-zoom-in-btn').style.display = 'none';
+        document.getElementById('dashboard-zoom-out-btn').style.display = 'none';
+        document.getElementById('dashboard-reset-zoom-btn').style.display = 'none';
+        
+        // Download button
+        document.getElementById('dashboard-download-btn').onclick = () => {
+            const link = document.createElement('a');
+            link.href = finalPath;
+            link.download = mediaPath.split('/').pop();
+            link.click();
         };
     }
 }
@@ -394,6 +706,8 @@ function renderTableView(data) {
 
     data.forEach(item => {
         const row = document.createElement('tr');
+        row.style.cursor = 'pointer';
+        row.onclick = () => showResultDetailsModal(item);
         row.innerHTML = `
             <td>
                 <div class="font-bold">${escapeHtml(item.merchant_name)}</div>
@@ -407,11 +721,11 @@ function renderTableView(data) {
             <td>${escapeHtml(item.primary_category || 'N/A')}</td>
             <td>${formatDate(item.tested_at)}</td>
             <td>
-                <a href="${item.merchant_url}" target="_blank" class="url-link">
+                <a href="${item.merchant_url}" target="_blank" class="url-link" onclick="event.stopPropagation()">
                     ${truncateUrl(item.merchant_url)}
                 </a>
             </td>
-            <td>
+            <td onclick="event.stopPropagation()">
                 <div class="action-buttons">
                     ${getStatusChangeButtons(item)}
                     ${getMediaIcons(item)}

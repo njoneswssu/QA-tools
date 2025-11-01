@@ -4,6 +4,7 @@ let allMerchants = [];
 let filteredMerchants = [];
 let priorityQueue = []; // Priority queue for merchants to test first
 let merchantStatuses = new Map(); // Track merchant test statuses
+let merchantScreenshots = new Map(); // Track merchant screenshot paths
 let isValidating = false; // Prevent recursive validation calls
 let testSession = null;
 let testResults = {
@@ -193,7 +194,7 @@ function clearAllMerchants() {
         merchantStatuses.clear();
         
         // Clear UI
-        elements.apiData.value = '';
+        // elements.apiData.value = ''; // Removed - element no longer exists
         elements.merchantPreview.innerHTML = `
             <div class="preview-placeholder">
                 <i class="fas fa-upload"></i>
@@ -229,9 +230,10 @@ function clearAllMerchants() {
 
 // DOM elements
 const elements = {
-    apiData: document.getElementById('api-data'),
+    // apiData: document.getElementById('api-data'), // Removed - no longer needed
     apiUrl: document.getElementById('api-url'),
     fetchAllBtn: document.getElementById('fetch-all-btn'),
+    fetchCloudStorageBtn: document.getElementById('fetch-cloud-storage-btn'),
     testApiBtn: document.getElementById('test-api-btn'),
     fetchProgress: document.getElementById('fetch-progress'),
     fetchProgressFill: document.getElementById('fetch-progress-fill'),
@@ -249,7 +251,7 @@ const elements = {
     startTestBtn: document.getElementById('start-test-btn'),
     resetDatabaseBtn: document.getElementById('reset-database-btn'),
     loadStoredBtn: document.getElementById('load-stored-btn'),
-    clearMerchantsBtn: document.getElementById('clear-merchants-btn'),
+    // clearMerchantsBtn: document.getElementById('clear-merchants-btn'), // Removed - button no longer exists
     pauseTestBtn: document.getElementById('pause-test-btn'),
     resumeTestBtn: document.getElementById('resume-test-btn'),
     logContainer: document.getElementById('log-container'),
@@ -456,7 +458,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Event listeners
 function initializeEventListeners() {
     // Setup events - auto-validate on input
-    elements.apiData.addEventListener('input', debounce(validateAndPreview, 500));
+    // elements.apiData.addEventListener('input', debounce(validateAndPreview, 500)); // Removed - element no longer exists
     elements.appIdFilter.addEventListener('input', debounce(applyFiltersAndPreview, 300));
     elements.categoryFilter.addEventListener('change', applyFiltersAndPreview);
     elements.merchantLimit.addEventListener('input', debounce(applyFiltersAndPreview, 300));
@@ -467,9 +469,10 @@ function initializeEventListeners() {
     elements.saveToDbBtn.addEventListener('click', saveToDatabase);
     elements.startTestBtn.addEventListener('click', startTest);
     elements.loadStoredBtn.addEventListener('click', loadStoredMerchants);
-    elements.clearMerchantsBtn.addEventListener('click', clearAllMerchants);
+    // elements.clearMerchantsBtn.addEventListener('click', clearAllMerchants); // Removed - button no longer exists
     elements.resetDatabaseBtn.addEventListener('click', handleDatabaseReset);
     elements.fetchAllBtn.addEventListener('click', fetchAllPages);
+    elements.fetchCloudStorageBtn.addEventListener('click', fetchFromCloudStorage);
     elements.testApiBtn.addEventListener('click', testApiEndpoint);
     elements.pauseTestBtn.addEventListener('click', pauseTest);
     elements.resumeTestBtn.addEventListener('click', resumeTest);
@@ -488,6 +491,25 @@ function initializeEventListeners() {
     
     // Global keyboard shortcuts
     document.addEventListener('keydown', (e) => {
+        // Escape key to close modals
+        if (e.key === 'Escape') {
+            // Close media modal
+            const mediaModal = document.getElementById('media-modal');
+            if (mediaModal && mediaModal.style.display === 'block') {
+                mediaModal.style.display = 'none';
+                e.preventDefault();
+                return;
+            }
+            
+            // Close result details modal
+            const detailsModal = document.getElementById('result-details-modal');
+            if (detailsModal && detailsModal.style.display === 'block') {
+                detailsModal.style.display = 'none';
+                e.preventDefault();
+                return;
+            }
+        }
+        
         // Ctrl+C to stop testing
         if (e.ctrlKey && e.key === 'c' && isTestRunning) {
             e.preventDefault();
@@ -543,7 +565,8 @@ function validateAndPreview() {
     if (isValidating) return;
     isValidating = true;
     
-    const apiText = elements.apiData.value.trim();
+    // const apiText = elements.apiData.value.trim(); // Removed - element no longer exists
+    const apiText = ''; // API data input removed, merchants loaded from database
     
     if (!apiText) {
         showPreviewPlaceholder();
@@ -1115,7 +1138,18 @@ function updateResultsFromDatabase(results) {
     // Clear existing results
     clearResultsLists();
     
-    results.forEach(result => {
+    // Filter out duplicates by merchant_id (keep only the first/most recent for each merchant)
+    // This prevents showing duplicate entries for merchants that exist in multiple App IDs
+    const seenMerchants = new Set();
+    const uniqueResults = results.filter(result => {
+        if (seenMerchants.has(result.merchant_id)) {
+            return false; // Skip duplicate
+        }
+        seenMerchants.add(result.merchant_id);
+        return true;
+    });
+    
+    uniqueResults.forEach(result => {
         const merchant = {
             MerchantName: result.merchant_name,
             MerchantDomains: [result.merchant_url?.replace('https://', '') || ''],
@@ -1129,9 +1163,12 @@ function updateResultsFromDatabase(results) {
             video_path: result.video_path
         };
         
-        // Update merchant status in Map
+        // Update merchant status and screenshot in Maps
         if (result.merchant_id) {
             merchantStatuses.set(result.merchant_id, testResult.status);
+            if (result.screenshot_path) {
+                merchantScreenshots.set(result.merchant_id, result.screenshot_path);
+            }
         }
         
         addResultToList(merchant, testResult);
@@ -1284,6 +1321,15 @@ function updateStats() {
 
 // Add result to appropriate list
 function addResultToList(merchant, result) {
+    const merchantId = merchant.MerchantID;
+    
+    // Check if this merchant already exists in the lists to prevent duplicates
+    const existingInAll = elements.allList.querySelector(`[data-merchant-id="${merchantId}"]`);
+    if (existingInAll) {
+        // Merchant already exists, skip adding duplicate
+        return;
+    }
+    
     // Create media icons if available
     let mediaIcons = '';
     if (result.screenshot_path) {
@@ -1294,24 +1340,38 @@ function addResultToList(merchant, result) {
     }
     
     // Create status change buttons
-    const merchantId = merchant.MerchantID;
     const currentStatus = result.status;
     const statusButtons = currentStatus === 'success' 
         ? `<button class="status-change-btn btn-flag" onclick="changeResultStatus('${merchantId}', 'flagged')" title="Mark as Flagged"><i class="fas fa-flag"></i></button>`
         : `<button class="status-change-btn btn-success" onclick="changeResultStatus('${merchantId}', 'success')" title="Mark as Success"><i class="fas fa-check"></i></button>`;
     
-    const resultHtml = `
-        <div class="result-item ${result.status}" data-merchant-id="${merchantId}">
-            <div class="result-header">
-                <div class="result-name">${escapeHtml(merchant.MerchantName)}</div>
-                <div class="result-actions">
-                    ${statusButtons}
-                    ${mediaIcons}
-                    <div class="result-status ${result.status}">${result.status}</div>
-                </div>
+    // Create screenshot preview if available
+    let screenshotPreview = '';
+    if (result.screenshot_path) {
+        screenshotPreview = `
+            <div class="result-screenshot-preview" onclick="event.stopPropagation(); showMedia('${result.screenshot_path}', 'image')" title="Click to view full size">
+                <img src="/${result.screenshot_path}" alt="Website Preview" onerror="this.parentElement.style.display='none'">
             </div>
-            <div class="result-url">${merchant.MerchantDomains[0] ? `https://${merchant.MerchantDomains[0]}` : 'No domain'}</div>
-            <div class="result-reason">${escapeHtml(result.reason)}</div>
+        `;
+    }
+    
+    const resultHtml = `
+        <div class="result-item ${result.status}" data-merchant-id="${merchantId}" onclick="showResultDetails('${merchantId}', '${escapeHtml(merchant.MerchantName).replace(/'/g, "\\'")}', '${merchant.MerchantDomains[0] || ''}', '${escapeHtml(result.reason).replace(/'/g, "\\'")}', '${result.status}', '${result.screenshot_path || ''}', '${result.video_path || ''}')" style="cursor: pointer;">
+            <div class="result-content">
+                <div class="result-info">
+                    <div class="result-header">
+                        <div class="result-name">${escapeHtml(merchant.MerchantName)}</div>
+                        <div class="result-actions" onclick="event.stopPropagation()">
+                            ${statusButtons}
+                            ${mediaIcons}
+                            <div class="result-status ${result.status}">${result.status}</div>
+                        </div>
+                    </div>
+                    <div class="result-url">${merchant.MerchantDomains[0] ? `https://${merchant.MerchantDomains[0]}` : 'No domain'}</div>
+                    <div class="result-reason">${escapeHtml(result.reason)}</div>
+                </div>
+                ${screenshotPreview}
+            </div>
         </div>
     `;
     
@@ -1378,6 +1438,128 @@ async function changeResultStatus(merchantId, newStatus) {
     }
 }
 
+// Show detailed result card modal
+function showResultDetails(merchantId, merchantName, domain, reason, status, screenshotPath, videoPath) {
+    // Create or get modal
+    let modal = document.getElementById('result-details-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'result-details-modal';
+        modal.className = 'media-modal';
+        document.body.appendChild(modal);
+    }
+    
+    // Unescape HTML entities in the displayed text
+    const decodedName = merchantName.replace(/\\'/g, "'");
+    const decodedReason = reason.replace(/\\'/g, "'");
+    
+    // Build media section
+    let mediaSection = '';
+    if (screenshotPath) {
+        mediaSection += `
+            <div class="detail-media-item">
+                <h4><i class="fas fa-camera"></i> Screenshot</h4>
+                <div class="detail-screenshot-preview" onclick="event.stopPropagation(); showMedia('${screenshotPath}', 'image')">
+                    <img src="/${screenshotPath}" alt="Website Screenshot" onerror="this.parentElement.innerHTML='<p>Screenshot not available</p>'">
+                    <div class="detail-screenshot-overlay">
+                        <i class="fas fa-search-plus"></i> Click to view full size
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (videoPath) {
+        mediaSection += `
+            <div class="detail-media-item">
+                <h4><i class="fas fa-video"></i> Recording</h4>
+                <button class="btn btn-secondary" onclick="showMedia('${videoPath}', 'video')">
+                    <i class="fas fa-play"></i> Watch Recording
+                </button>
+            </div>
+        `;
+    }
+    
+    if (!screenshotPath && !videoPath) {
+        mediaSection = '<p class="no-media"><i class="fas fa-info-circle"></i> No media available for this result</p>';
+    }
+    
+    // Create status change buttons
+    const statusButtons = status === 'success'
+        ? `<button class="status-change-btn btn-flag" onclick="changeResultStatus('${merchantId}', 'flagged'); document.getElementById('result-details-modal').style.display='none';" title="Mark as Flagged">
+            <i class="fas fa-flag"></i> Mark as Flagged
+           </button>`
+        : `<button class="status-change-btn btn-success" onclick="changeResultStatus('${merchantId}', 'success'); document.getElementById('result-details-modal').style.display='none';" title="Mark as Success">
+            <i class="fas fa-check"></i> Mark as Success
+           </button>`;
+    
+    const statusClass = status === 'success' ? 'success' : 'flagged';
+    const statusIcon = status === 'success' ? 'check-circle' : 'exclamation-triangle';
+    
+    modal.innerHTML = `
+        <div class="media-modal-content result-detail-card">
+            <div class="media-modal-header">
+                <h3><i class="fas fa-info-circle"></i> Test Result Details</h3>
+                <span class="media-modal-close" onclick="document.getElementById('result-details-modal').style.display='none'">&times;</span>
+            </div>
+            <div class="result-detail-body">
+                <div class="detail-section">
+                    <div class="detail-header">
+                        <h2>${decodedName}</h2>
+                        <span class="detail-status ${statusClass}">
+                            <i class="fas fa-${statusIcon}"></i> ${status.toUpperCase()}
+                        </span>
+                    </div>
+                    
+                    <div class="detail-info-grid">
+                        <div class="detail-info-item">
+                            <span class="detail-label"><i class="fas fa-globe"></i> Domain</span>
+                            <span class="detail-value">${domain || 'No domain'}</span>
+                        </div>
+                        <div class="detail-info-item">
+                            <span class="detail-label"><i class="fas fa-link"></i> URL</span>
+                            <span class="detail-value"><a href="https://${domain}" target="_blank" rel="noopener noreferrer">https://${domain}</a></span>
+                        </div>
+                        <div class="detail-info-item">
+                            <span class="detail-label"><i class="fas fa-hashtag"></i> Merchant ID</span>
+                            <span class="detail-value">${merchantId}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-clipboard-list"></i> Test Result</h4>
+                    <div class="detail-reason-box ${statusClass}">
+                        ${decodedReason}
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-images"></i> Media</h4>
+                    ${mediaSection}
+                </div>
+                
+                <div class="detail-actions">
+                    ${statusButtons}
+                    <button class="btn btn-outline" onclick="document.getElementById('result-details-modal').style.display='none'">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Close modal when clicking outside
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+    
+    // Show modal
+    modal.style.display = 'block';
+}
+
 // Show media file in modal
 function showMedia(mediaPath, mediaType) {
     // Create modal if it doesn't exist
@@ -1390,9 +1572,14 @@ function showMedia(mediaPath, mediaType) {
             <div class="media-modal-content">
                 <div class="media-modal-header">
                     <div class="media-modal-controls">
-                        <button class="media-btn" id="zoom-in-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
-                        <button class="media-btn" id="zoom-out-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                        <button class="media-btn" id="zoom-in-btn" title="Zoom In (Ctrl+)"><i class="fas fa-search-plus"></i></button>
+                        <button class="media-btn" id="zoom-out-btn" title="Zoom Out (Ctrl-)"><i class="fas fa-search-minus"></i></button>
                         <button class="media-btn" id="reset-zoom-btn" title="Reset Zoom"><i class="fas fa-expand"></i></button>
+                        <div class="zoom-slider-container" id="zoom-slider-container">
+                            <span class="zoom-label">50%</span>
+                            <input type="range" id="zoom-slider" class="zoom-slider" min="50" max="300" value="100" step="5">
+                            <span class="zoom-label">300%</span>
+                        </div>
                         <button class="media-btn" id="download-media-btn" title="Download"><i class="fas fa-download"></i></button>
                     </div>
                     <span class="media-modal-close">&times;</span>
@@ -1405,24 +1592,50 @@ function showMedia(mediaPath, mediaType) {
         // Add close functionality
         modal.querySelector('.media-modal-close').onclick = () => {
             modal.style.display = 'none';
+            // Remove keyboard listener when modal closes
+            document.removeEventListener('keydown', keyboardZoomHandler);
         };
         modal.onclick = (e) => {
             if (e.target === modal) {
                 modal.style.display = 'none';
+                document.removeEventListener('keydown', keyboardZoomHandler);
             }
         };
     }
     
     // Set media content
     const container = modal.querySelector('#media-container');
+    const zoomSliderContainer = document.getElementById('zoom-slider-container');
+    const zoomSlider = document.getElementById('zoom-slider');
     let zoomLevel = 1;
     let translateX = 0;
     let translateY = 0;
+    
+    // Keyboard zoom handler
+    const keyboardZoomHandler = (e) => {
+        if ((e.ctrlKey || e.metaKey) && mediaType === 'image') {
+            if (e.key === '=' || e.key === '+') {
+                e.preventDefault();
+                zoomLevel = Math.min(zoomLevel + 0.1, 3);
+                updateZoom();
+            } else if (e.key === '-' || e.key === '_') {
+                e.preventDefault();
+                zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
+                updateZoom();
+            }
+        }
+    };
     
     if (mediaType === 'image') {
         container.innerHTML = `<img id="modal-image" src="/${mediaPath}" alt="Screenshot" style="max-width: 100%; max-height: 80vh; transform: scale(1) translate(0px, 0px); transition: transform 0.2s; cursor: grab;">`;
         
         const img = container.querySelector('#modal-image');
+        
+        // Show zoom controls
+        zoomSliderContainer.style.display = 'flex';
+        document.getElementById('zoom-in-btn').style.display = 'inline-flex';
+        document.getElementById('zoom-out-btn').style.display = 'inline-flex';
+        document.getElementById('reset-zoom-btn').style.display = 'inline-flex';
         
         // Panning variables
         let isPanning = false;
@@ -1431,38 +1644,74 @@ function showMedia(mediaPath, mediaType) {
         let currentTranslateX = 0;
         let currentTranslateY = 0;
         
-        // Update transform
-        const updateTransform = () => {
+        // Update transform and slider
+        const updateZoom = () => {
             img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
-        };
-        
-        // Zoom controls
-        document.getElementById('zoom-in-btn').onclick = () => {
-            zoomLevel = Math.min(zoomLevel + 0.25, 3);
-            updateTransform();
+            zoomSlider.value = zoomLevel * 100;
+            
             if (zoomLevel > 1) {
                 img.style.cursor = 'grab';
-            }
-        };
-        
-        document.getElementById('zoom-out-btn').onclick = () => {
-            zoomLevel = Math.max(zoomLevel - 0.25, 0.5);
-            updateTransform();
-            if (zoomLevel <= 1) {
+            } else {
                 img.style.cursor = 'default';
                 translateX = 0;
                 translateY = 0;
-                updateTransform();
+                img.style.transform = `scale(${zoomLevel}) translate(0px, 0px)`;
             }
         };
         
+        // Zoom in button
+        document.getElementById('zoom-in-btn').onclick = () => {
+            zoomLevel = Math.min(zoomLevel + 0.25, 3);
+            updateZoom();
+        };
+        
+        // Zoom out button
+        document.getElementById('zoom-out-btn').onclick = () => {
+            zoomLevel = Math.max(zoomLevel - 0.25, 0.5);
+            updateZoom();
+        };
+        
+        // Reset zoom button
         document.getElementById('reset-zoom-btn').onclick = () => {
             zoomLevel = 1;
             translateX = 0;
             translateY = 0;
             img.style.cursor = 'default';
-            updateTransform();
+            updateZoom();
         };
+        
+        // Zoom slider
+        zoomSlider.addEventListener('input', (e) => {
+            zoomLevel = parseInt(e.target.value) / 100;
+            img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
+            
+            if (zoomLevel > 1) {
+                img.style.cursor = 'grab';
+            } else {
+                img.style.cursor = 'default';
+                translateX = 0;
+                translateY = 0;
+                img.style.transform = `scale(${zoomLevel}) translate(0px, 0px)`;
+            }
+        });
+        
+        // Mouse wheel zoom (hover over image)
+        img.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            if (e.deltaY < 0) {
+                // Scroll up - zoom in
+                zoomLevel = Math.min(zoomLevel + 0.1, 3);
+            } else {
+                // Scroll down - zoom out
+                zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
+            }
+            
+            updateZoom();
+        }, { passive: false });
+        
+        // Keyboard shortcuts (Ctrl+ and Ctrl-)
+        document.addEventListener('keydown', keyboardZoomHandler);
         
         // Panning with mouse
         img.addEventListener('mousedown', (e) => {
@@ -1484,7 +1733,7 @@ function showMedia(mediaPath, mediaType) {
                 const deltaY = (e.clientY - startY) / zoomLevel;
                 translateX = currentTranslateX + deltaX;
                 translateY = currentTranslateY + deltaY;
-                updateTransform();
+                img.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
             }
         });
         
@@ -1507,6 +1756,7 @@ function showMedia(mediaPath, mediaType) {
         container.innerHTML = `<video id="modal-video" controls style="max-width: 100%; max-height: 80vh;"><source src="/${mediaPath}" type="video/webm"></video>`;
         
         // Hide zoom controls for video
+        zoomSliderContainer.style.display = 'none';
         document.getElementById('zoom-in-btn').style.display = 'none';
         document.getElementById('zoom-out-btn').style.display = 'none';
         document.getElementById('reset-zoom-btn').style.display = 'none';
@@ -1901,18 +2151,28 @@ async function loadStoredMerchants(isAutoLoad = false) {
         const data = await response.json();
         
         if (data.merchants && data.merchants.length > 0) {
+            // Deduplicate merchants by MerchantID (keep first occurrence)
+            const seenMerchantIds = new Set();
+            const uniqueMerchants = data.merchants.filter(merchant => {
+                if (seenMerchantIds.has(merchant.MerchantID)) {
+                    return false; // Skip duplicate
+                }
+                seenMerchantIds.add(merchant.MerchantID);
+                return true;
+            });
+            
             // Directly set merchantsData instead of going through JSON string conversion
             merchantsData = {
-                Merchants: data.merchants,
+                Merchants: uniqueMerchants,
                 PageCount: 1,
-                PageSize: data.merchants.length,
-                TotalCount: data.merchants.length
+                PageSize: uniqueMerchants.length,
+                TotalCount: uniqueMerchants.length
             };
             
-            console.log('Loaded merchantsData:', merchantsData);
+            console.log(`Loaded ${data.merchants.length} total merchants, ${uniqueMerchants.length} unique merchants`);
             
             // Auto-detect and set AppID
-            autoDetectAppId(data.merchants);
+            autoDetectAppId(uniqueMerchants);
             
             // Populate categories
             populateCategories();
@@ -1930,14 +2190,17 @@ async function loadStoredMerchants(isAutoLoad = false) {
             elements.saveToDbBtn.disabled = false;
             
             if (!isAutoLoad) {
-                addLogEntry(`Loaded ${data.merchants.length} stored merchants`, 'success');
-                showSuccess(`Loaded ${data.merchants.length} stored merchants from database`);
+                addLogEntry(`Loaded ${uniqueMerchants.length} unique merchants (${data.merchants.length} total in database)`, 'success');
+                showSuccess(`Loaded ${uniqueMerchants.length} unique merchants from database`);
             } else {
-                console.log(`✅ Auto-loaded ${data.merchants.length} stored merchants from database`);
+                console.log(`✅ Auto-loaded ${uniqueMerchants.length} unique merchants from database`);
             }
             
             // Save to cache for persistence across navigation
             saveMerchantsToCache();
+            
+            // Load and sync recent test results from database
+            await syncMerchantResultsFromDatabase();
         } else {
             if (!isAutoLoad) {
                 addLogEntry('No stored merchants found in database', 'warning');
@@ -1951,6 +2214,50 @@ async function loadStoredMerchants(isAutoLoad = false) {
             showError('Failed to load stored merchants');
         }
         throw error; // Re-throw for the calling code to handle
+    }
+}
+
+// Sync merchant results from database to update status badges
+async function syncMerchantResultsFromDatabase() {
+    try {
+        console.log('🔄 Syncing merchant results from database...');
+        
+        // Fetch recent test results for all merchants
+        const response = await fetch('/api/merchant-results?limit=10000');
+        if (!response.ok) {
+            console.log('⚠️ Could not fetch test results');
+            return;
+        }
+        
+        const data = await response.json();
+        const results = data.data || data;
+        
+        if (results.length > 0) {
+            console.log(`✓ Found ${results.length} test results in database`);
+            
+            // Update merchantStatuses and merchantScreenshots Maps with results from database
+            results.forEach(result => {
+                if (result.merchant_id) {
+                    const status = result.is_user_passed ? 'success' : result.test_status;
+                    merchantStatuses.set(result.merchant_id, status);
+                    if (result.screenshot_path) {
+                        merchantScreenshots.set(result.merchant_id, result.screenshot_path);
+                    }
+                }
+            });
+            
+            // Refresh the merchant display to show updated statuses
+            if (filteredMerchants.length > 0) {
+                displayMerchantList(filteredMerchants);
+                filterMerchants(); // Apply current filters with new statuses
+            }
+            
+            console.log(`✅ Synced ${merchantStatuses.size} merchant statuses from database`);
+        } else {
+            console.log('ℹ️ No test results found in database');
+        }
+    } catch (error) {
+        console.error('❌ Error syncing merchant results:', error);
     }
 }
 
@@ -2045,7 +2352,7 @@ async function handleDatabaseReset() {
             merchantStatuses.clear();
             
             // Reset UI elements
-            elements.apiData.value = '';
+            // elements.apiData.value = ''; // Removed - element no longer exists
             elements.merchantLimit.value = '';
             elements.merchantSearch.value = '';
             elements.statusFilter.value = '';
@@ -2173,13 +2480,24 @@ function displayMerchantList(merchants) {
         merchantItem.className = 'merchant-item merchant-card';
         merchantItem.dataset.merchantId = merchant.MerchantID || '';
         merchantItem.dataset.merchantName = merchant.MerchantName;
+        
+        // Check if merchant has a screenshot from test results
+        let cameraIcon = '';
+        const screenshotPath = merchantScreenshots.get(merchant.MerchantID);
+        if (screenshotPath) {
+            cameraIcon = `<i class="fas fa-camera media-icon-preview" title="View Screenshot" onclick="showMedia('${screenshotPath}', 'image')" style="cursor: pointer; color: #3b82f6; margin-left: 8px; font-size: 1.1rem;"></i>`;
+        }
+        
         merchantItem.innerHTML = `
             <div class="merchant-info-item">
                 <div class="merchant-name-item">${escapeHtml(merchant.MerchantName)}</div>
                 <div class="merchant-url-item">${escapeHtml(domain)}</div>
                 <div class="merchant-category-item">${escapeHtml(merchant.PrimaryCategory || 'No category')}</div>
             </div>
-            <div class="merchant-status ${status}">${status}</div>
+            <div class="merchant-actions-item">
+                ${cameraIcon}
+                <div class="merchant-status ${status}">${status}</div>
+            </div>
         `;
         
         merchantList.appendChild(merchantItem);
@@ -2239,7 +2557,7 @@ async function handleDatabaseReset() {
             allMerchants = [];
             filteredMerchants = [];
             merchantStatuses.clear();
-            elements.apiData.value = '';
+            // elements.apiData.value = ''; // Removed - element no longer exists
             elements.merchantPreview.innerHTML = `
                 <div class="preview-placeholder">
                     <i class="fas fa-upload"></i>
@@ -2402,6 +2720,179 @@ async function testApiEndpoint() {
     }
 }
 
+// Fetch merchants from Google Cloud Storage JSON URL
+async function fetchFromCloudStorage() {
+    const cloudUrl = elements.apiUrl.value.trim();
+    
+    if (!cloudUrl) {
+        showError('Please enter a Cloud Storage URL first');
+        return;
+    }
+    
+    // Validate it's a cloud storage URL
+    if (!cloudUrl.includes('storage.googleapis.com')) {
+        showError('Please enter a valid Google Cloud Storage URL');
+        return;
+    }
+    
+    // Disable buttons during fetch
+    elements.fetchCloudStorageBtn.disabled = true;
+    elements.fetchCloudStorageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
+    
+    // Show progress
+    elements.fetchProgress.style.display = 'block';
+    elements.fetchProgressFill.style.width = '10%';
+    elements.fetchStatus.textContent = 'Fetching from Cloud Storage...';
+    
+    try {
+        addLogEntry('🌐 Fetching merchants from Cloud Storage...', 'info');
+        
+        const response = await fetch(cloudUrl);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        elements.fetchProgressFill.style.width = '30%';
+        elements.fetchStatus.textContent = 'Parsing JSON data...';
+        
+        const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+            throw new Error('Invalid response: Expected an array of merchants');
+        }
+        
+        addLogEntry(`✓ Found ${data.length} merchants in Cloud Storage`, 'success');
+        elements.fetchProgressFill.style.width = '50%';
+        elements.fetchStatus.textContent = 'Converting merchant data...';
+        
+        // Convert cloud storage format to internal format
+        const convertedMerchants = data.map(item => {
+            // Extract App ID from URL if available (it's in the path structure)
+            const urlMatch = cloudUrl.match(/cloud-db\/(\d+)\/(\d+)\//);
+            const appId = urlMatch ? parseInt(urlMatch[2]) : 206; // Default to 206 if not found
+            
+            return {
+                AppID: appId,
+                MerchantID: item.Merchant?.ID || item.ID,
+                MerchantName: item.Merchant?.Name || 'Unknown',
+                MerchantDomains: item.Domain ? [item.Domain] : [],
+                MerchantScore: 0,
+                IsFeaturedMerchant: false,
+                PrimaryCategory: '',
+                PrimaryCategoryID: null,
+                ParentCategory: '',
+                ParentCategoryID: null,
+                MaxRate: item.Merchant?.MaxRate?.Amount || '0',
+                MaxRateKind: item.Merchant?.MaxRate?.Kind || 'PERCENTAGE',
+                MaxRateCurrency: item.Merchant?.MaxRate?.Currency || '',
+                MaxRateLedgerID: null,
+                Boosted: false,
+                MaxOfferScore: 0,
+                DetailedRates: [],
+                Coupons: [],
+                BrandColor: '',
+                TextColor: '',
+                FeaturedImageURL: '',
+                LogoImageExists: false,
+                Images: [],
+                CreatedDate: new Date().toISOString(),
+                ModifiedDate: new Date().toISOString()
+            };
+        });
+        
+        elements.fetchProgressFill.style.width = '70%';
+        elements.fetchStatus.textContent = 'Checking for duplicates in database...';
+        
+        // Check which merchants are already in the database
+        addLogEntry('🔍 Checking for existing merchants in database...', 'info');
+        const existingResponse = await fetch('/api/stored-merchants');
+        const existingData = await existingResponse.json();
+        const existingMerchants = existingData.merchants || [];
+        
+        // Create a Set of existing merchant combinations (MerchantID + AppID) for fast lookup
+        // This ensures the same merchant can exist in multiple App IDs
+        const existingCombinations = new Set(
+            existingMerchants.map(m => `${m.MerchantID}-${m.AppID}`)
+        );
+        
+        // Filter out merchants that already exist with the same MerchantID AND AppID combination
+        const newMerchants = convertedMerchants.filter(m => 
+            !existingCombinations.has(`${m.MerchantID}-${m.AppID}`)
+        );
+        
+        elements.fetchProgressFill.style.width = '85%';
+        
+        if (newMerchants.length === 0) {
+            addLogEntry('ℹ️ All merchants from Cloud Storage already exist in database for this App ID', 'info');
+            showInfo('No new merchants to add - all merchants already exist in database for this App ID');
+            elements.fetchProgressFill.style.width = '100%';
+            elements.fetchStatus.textContent = 'No new merchants found';
+        } else {
+            const duplicateCount = convertedMerchants.length - newMerchants.length;
+            addLogEntry(`✓ Found ${newMerchants.length} new merchant entries (${duplicateCount} already exist with same App ID)`, 'success');
+            
+            // Count how many are truly new merchants vs. existing merchants in different App IDs
+            const existingMerchantIds = new Set(existingMerchants.map(m => m.MerchantID));
+            const newMerchantCount = newMerchants.filter(m => !existingMerchantIds.has(m.MerchantID)).length;
+            const crossAppCount = newMerchants.length - newMerchantCount;
+            
+            if (crossAppCount > 0) {
+                addLogEntry(`📊 ${crossAppCount} merchants already exist in other App IDs (will be added to App ID ${newMerchants[0].AppID})`, 'info');
+            }
+            
+            elements.fetchStatus.textContent = `Storing ${newMerchants.length} new merchant entries...`;
+            
+            // Store only new merchants in the database
+            const storeResponse = await fetch('/api/store-merchants', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ merchants: newMerchants })
+            });
+            
+            if (!storeResponse.ok) {
+                throw new Error('Failed to store merchants in database');
+            }
+            
+            const storeResult = await storeResponse.json();
+            
+            elements.fetchProgressFill.style.width = '100%';
+            elements.fetchStatus.textContent = `Successfully added ${newMerchants.length} new merchant entries!`;
+            
+            addLogEntry(`✅ Successfully stored ${newMerchants.length} new merchant entries in database`, 'success');
+            if (duplicateCount > 0) {
+                addLogEntry(`📊 Skipped ${duplicateCount} merchants that already exist with this App ID`, 'info');
+            }
+            
+            let successMessage = `Added ${newMerchants.length} new merchant entries to database`;
+            if (duplicateCount > 0) {
+                successMessage += ` (${duplicateCount} already existed with same App ID)`;
+            }
+            showSuccess(successMessage);
+            
+            // Reload merchants to show the new data
+            await loadStoredMerchants();
+        }
+        
+    } catch (error) {
+        console.error('Cloud Storage fetch error:', error);
+        addLogEntry(`❌ Error: ${error.message}`, 'error');
+        showError(`Failed to fetch from Cloud Storage: ${error.message}`);
+        elements.fetchProgressFill.style.width = '0%';
+        elements.fetchStatus.textContent = 'Fetch failed';
+    } finally {
+        // Re-enable buttons
+        elements.fetchCloudStorageBtn.disabled = false;
+        elements.fetchCloudStorageBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Fetch from Cloud Storage';
+        
+        // Hide progress after a delay
+        setTimeout(() => {
+            elements.fetchProgress.style.display = 'none';
+        }, 3000);
+    }
+}
+
+// Fetch all pages from paginated API
 async function fetchAllPages() {
     const apiUrl = elements.apiUrl.value.trim();
     
