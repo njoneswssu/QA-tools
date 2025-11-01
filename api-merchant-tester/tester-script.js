@@ -939,13 +939,11 @@ function autoDetectAppId(merchants) {
         addLogEntry(`🎯 Auto-detected AppID: ${appId} - ${merchants.length} merchants loaded`, 'info');
         
     } else if (appIds.length > 1) {
-        // Multiple AppIDs found
-        showWarning(`Multiple AppIDs found: ${appIds.join(', ')}. Please select one manually.`);
-        addLogEntry(`⚠️ Multiple AppIDs detected: ${appIds.join(', ')} - ${merchants.length} merchants loaded`, 'warning');
+        // Multiple AppIDs found - just log it, don't show warning toast
+        addLogEntry(`ℹ️ Multiple AppIDs detected: ${appIds.join(', ')} - ${merchants.length} merchants loaded`, 'info');
     } else {
-        // No AppIDs found
-        showWarning('No AppIDs found in merchant data. All merchants will be included.');
-        addLogEntry(`❌ No AppIDs found - ${merchants.length} merchants loaded`, 'warning');
+        // No AppIDs found - just log it, don't show warning toast
+        addLogEntry(`ℹ️ No AppIDs found - ${merchants.length} merchants loaded`, 'info');
     }
 }
 
@@ -2670,12 +2668,14 @@ async function pauseTest() {
         return;
     }
     
+    console.log(`⏸️ [Pause] Pausing test session: ${testSession.session_id}`);
     testPaused = true;
     elements.pauseTestBtn.style.display = 'none';
     elements.resumeTestBtn.style.display = 'inline-block';
     
     // Update session status in database
     try {
+        console.log(`⏸️ [Pause] Sending PUT request to /api/sessions/${testSession.session_id}`);
         const response = await fetch(`/api/sessions/${testSession.session_id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -2683,13 +2683,23 @@ async function pauseTest() {
         });
         
         if (response.ok) {
+            console.log('✅ [Pause] Session status updated to "paused" in database');
             addLogEntry('⏸️ Test paused by user - will pause after current merchant', 'warning');
             showInfo('Test will pause after current merchant completes.');
+            
+            // Verify the update by reading back the status
+            const verifyResponse = await fetch(`/api/sessions/${testSession.session_id}/status`);
+            if (verifyResponse.ok) {
+                const statusData = await verifyResponse.json();
+                console.log(`✅ [Pause] Verified session status in DB: ${statusData.status}`);
+            }
         } else {
+            const errorText = await response.text();
+            console.error(`❌ [Pause] Failed to update session status: ${response.status} - ${errorText}`);
             throw new Error('Failed to update session status');
         }
     } catch (error) {
-        console.error('Error pausing test:', error);
+        console.error('❌ [Pause] Error pausing test:', error);
         addLogEntry('⚠️ Failed to pause test', 'error');
         showError('Failed to pause test');
     }

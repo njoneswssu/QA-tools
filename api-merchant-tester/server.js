@@ -452,16 +452,42 @@ app.post('/api/sessions', async (req, res) => {
     }
 });
 
+// Get session status
+app.get('/api/sessions/:sessionId/status', async (req, res) => {
+    const { sessionId } = req.params;
+    
+    try {
+        const session = await queryOne(
+            USE_POSTGRES 
+                ? 'SELECT status FROM test_sessions WHERE session_id = $1'
+                : 'SELECT status FROM test_sessions WHERE session_id = ?',
+            [sessionId]
+        );
+        
+        if (!session) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+        
+        res.json({ status: session.status });
+    } catch (error) {
+        console.error('Error fetching session status:', error);
+        res.status(500).json({ error: 'Failed to fetch session status' });
+    }
+});
+
 // Update a test session
 app.put('/api/sessions/:sessionId', async (req, res) => {
     const { sessionId } = req.params;
     const updateData = req.body;
     
+    console.log(`📝 [Server] PUT /api/sessions/${sessionId} - Update data:`, updateData);
+    
     try {
         await updateTestSession(sessionId, updateData);
+        console.log(`✅ [Server] Session ${sessionId} updated successfully`);
         res.json({ success: true });
     } catch (error) {
-        console.error('Error updating session:', error);
+        console.error(`❌ [Server] Error updating session ${sessionId}:`, error);
         res.status(500).json({ error: 'Failed to update session' });
     }
 });
