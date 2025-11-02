@@ -769,11 +769,11 @@ test.describe('API Merchant Tester - UI Generated', () => {
               }
             }
           } catch (pauseError) {
-            console.log(`⚠️ Error checking pause status: ${pauseError.message}`);
+            console.log('⚠️ Error checking pause status: ' + pauseError.message);
           }
 
         } catch (error) {
-          console.log(`❌ Error checking ${website.name}: ${error.message}`);
+          console.log('❌ Error checking ' + website.name + ': ' + error.message);
           
           let errorType = 'network error';
           if (error.message.includes('Timeout') || error.message.includes('timeout')) {
