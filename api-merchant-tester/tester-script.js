@@ -621,7 +621,25 @@ function getToastIcon(type) {
 async function loadQuickStats() {
     try {
         console.log('📊 Loading quick stats...');
-        const response = await fetch('/api/stats');
+        
+        // Check for active test session to scope stats properly
+        const activeSession = localStorage.getItem('active_test_session');
+        let statsUrl = '/api/stats';
+        
+        if (activeSession) {
+            try {
+                const sessionData = JSON.parse(activeSession);
+                const sessionId = sessionData.sessionId || sessionData;
+                statsUrl += `?session_id=${encodeURIComponent(sessionId)}`;
+                console.log('📊 Loading stats for active session:', sessionId);
+            } catch (parseError) {
+                console.warn('⚠️ Could not parse active session, loading all stats');
+            }
+        } else {
+            console.log('📊 No active session, loading all stats');
+        }
+        
+        const response = await fetch(statsUrl);
         if (response.ok) {
             const stats = await response.json();
             console.log('📊 Quick stats loaded:', stats);
@@ -3159,10 +3177,17 @@ function displayMerchantList(merchants) {
         return;
     }
     
+    // Implement pagination to prevent page freezing with large datasets
+    const INITIAL_DISPLAY_LIMIT = 100; // Only show first 100 merchants initially
+    const displayMerchants = merchants.slice(0, INITIAL_DISPLAY_LIMIT);
+    const hasMore = merchants.length > INITIAL_DISPLAY_LIMIT;
+    
+    console.log(`📋 Displaying ${displayMerchants.length} of ${merchants.length} merchants (${hasMore ? 'with load more option' : 'all shown'})`);
+    
     const merchantList = document.createElement('div');
     merchantList.className = 'merchant-list';
     
-    merchants.forEach(merchant => {
+    displayMerchants.forEach(merchant => {
         const status = merchantStatuses.get(merchant.MerchantID) || 'untested';
         const domain = merchant.MerchantDomains && merchant.MerchantDomains[0] ? merchant.MerchantDomains[0] : 'No domain';
         
@@ -3193,15 +3218,102 @@ function displayMerchantList(merchants) {
         merchantList.appendChild(merchantItem);
     });
     
-    console.log('About to update merchantPreview with', merchants.length, 'merchants');
+    console.log('About to update merchantPreview with', displayMerchants.length, 'of', merchants.length, 'merchants');
     elements.merchantPreview.innerHTML = '';
     elements.merchantPreview.appendChild(merchantList);
+    
+    // Add "Load More" button if there are more merchants
+    if (hasMore) {
+        const loadMoreContainer = document.createElement('div');
+        loadMoreContainer.className = 'load-more-container';
+        loadMoreContainer.style.cssText = 'text-align: center; padding: 20px; border-top: 1px solid #e5e7eb;';
+        
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.className = 'btn btn-secondary load-more-btn';
+        loadMoreBtn.innerHTML = `<i class="fas fa-chevron-down"></i> Load More (${merchants.length - INITIAL_DISPLAY_LIMIT} remaining)`;
+        loadMoreBtn.style.cssText = 'padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer;';
+        
+        loadMoreBtn.addEventListener('click', () => {
+            // Show all merchants by re-calling displayMerchantList with full list
+            console.log('🔄 Loading all merchants...');
+            displayAllMerchants(merchants);
+        });
+        
+        loadMoreContainer.appendChild(loadMoreBtn);
+        elements.merchantPreview.appendChild(loadMoreContainer);
+    }
+    
     console.log('merchantPreview updated, innerHTML length:', elements.merchantPreview.innerHTML.length);
     
     // Update queue buttons after rendering
     if (typeof updateMerchantCards === 'function') {
         updateMerchantCards();
     }
+}
+
+// Display all merchants (used when "Load More" is clicked)
+function displayAllMerchants(merchants) {
+    if (!elements.merchantPreview) {
+        console.error('merchantPreview element not found');
+        return;
+    }
+    
+    console.log(`📋 Loading all ${merchants.length} merchants...`);
+    
+    // Show loading indicator
+    elements.merchantPreview.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; color: #3498db;"></i>
+            <p>Loading all ${merchants.length} merchants...</p>
+        </div>
+    `;
+    
+    // Use setTimeout to make the loading non-blocking
+    setTimeout(() => {
+        const merchantList = document.createElement('div');
+        merchantList.className = 'merchant-list';
+        
+        merchants.forEach(merchant => {
+            const status = merchantStatuses.get(merchant.MerchantID) || 'untested';
+            const domain = merchant.MerchantDomains && merchant.MerchantDomains[0] ? merchant.MerchantDomains[0] : 'No domain';
+            
+            const merchantItem = document.createElement('div');
+            merchantItem.className = 'merchant-item merchant-card';
+            merchantItem.dataset.merchantId = merchant.MerchantID || '';
+            merchantItem.dataset.merchantName = merchant.MerchantName;
+            
+            // Check if merchant has a screenshot from test results
+            let cameraIcon = '';
+            const screenshotPath = merchantScreenshots.get(merchant.MerchantID);
+            if (screenshotPath) {
+                cameraIcon = `<i class="fas fa-camera media-icon-preview" title="View Screenshot" onclick="showMedia('${screenshotPath}', 'image')" style="cursor: pointer; color: #3b82f6; margin-left: 8px; font-size: 1.1rem;"></i>`;
+            }
+            
+            merchantItem.innerHTML = `
+                <div class="merchant-info-item">
+                    <div class="merchant-name-item">${escapeHtml(merchant.MerchantName)}</div>
+                    <div class="merchant-url-item">${escapeHtml(domain)}</div>
+                    <div class="merchant-category-item">${escapeHtml(merchant.PrimaryCategory || 'No category')}</div>
+                </div>
+                <div class="merchant-actions-item">
+                    ${cameraIcon}
+                    <div class="merchant-status ${status}">${status}</div>
+                </div>
+            `;
+            
+            merchantList.appendChild(merchantItem);
+        });
+        
+        elements.merchantPreview.innerHTML = '';
+        elements.merchantPreview.appendChild(merchantList);
+        
+        console.log(`✅ All ${merchants.length} merchants loaded`);
+        
+        // Update queue buttons after rendering
+        if (typeof updateMerchantCards === 'function') {
+            updateMerchantCards();
+        }
+    }, 50); // Small delay to show loading indicator
 }
 
 // Database reset with confirmation
