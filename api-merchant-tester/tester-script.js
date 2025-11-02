@@ -662,6 +662,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Only load basic data if there's no active test running
     if (!isTestRunning) {
+        // Show loading toast immediately so users know why page might be slow
+        showToast('Loading merchants from database...', 'info', 0); // 0 = don't auto-hide
+        
         // Add a small delay to ensure all DOM elements are ready
         setTimeout(async () => {
             console.log('⏰ Initializing tester page...');
@@ -679,12 +682,11 @@ document.addEventListener('DOMContentLoaded', async function() {
                     displayMerchantList(filteredMerchants);
                     elements.startTestBtn.disabled = false;
                 }
+                // Hide loading toast since cache was used
+                showToast('Merchants loaded from cache!', 'success', 3000);
             } else {
-                // No cache found, load from database with toast notification
+                // No cache found, load from database
                 console.log('📥 No cache found, loading from database...');
-                
-                // Show toast notification immediately
-                showToast('Loading merchants from database...', 'info', 0); // 0 = don't auto-hide
                 
                 // Show loading state in preview
                 if (elements.merchantPreview) {
