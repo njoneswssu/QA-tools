@@ -29,6 +29,80 @@ const PORT = process.env.PORT || 3000;
 // Track running test instances by session ID
 const runningTests = new Map(); // sessionId -> { runner: APITestRunner, cancel: Function }
 
+// Merchant cache system for instant loading
+let merchantCache = {
+    data: null,
+    lastUpdated: null,
+    isLoading: false
+};
+
+// Cache refresh interval (5 minutes)
+const CACHE_REFRESH_INTERVAL = 5 * 60 * 1000;
+
+// Load merchants into cache
+async function loadMerchantsIntoCache() {
+    if (merchantCache.isLoading) {
+        console.log('🔄 Merchant cache is already loading, skipping...');
+        return;
+    }
+    
+    merchantCache.isLoading = true;
+    console.log('📦 Loading merchants into cache...');
+    
+    try {
+        const query = 'SELECT * FROM merchant_master_data ORDER BY merchant_name LIMIT 50000';
+        const merchants = await queryAll(query, []);
+        
+        // Convert to API format
+        const apiFormat = merchants.map(merchant => {
+            const safeJsonParse = (jsonString, fallback = []) => {
+                try {
+                    return JSON.parse(jsonString || JSON.stringify(fallback));
+                } catch (error) {
+                    return fallback;
+                }
+            };
+            
+            return {
+                AppID: merchant.app_id,
+                MerchantID: merchant.merchant_id,
+                MerchantName: merchant.merchant_name,
+                MerchantDomains: safeJsonParse(merchant.merchant_domains, []),
+                MerchantScore: merchant.merchant_score,
+                IsFeaturedMerchant: merchant.is_featured_merchant === 1 || merchant.is_featured_merchant === true,
+                PrimaryCategory: merchant.primary_category,
+                PrimaryCategoryID: merchant.primary_category_id,
+                ParentCategory: merchant.parent_category,
+                ParentCategoryID: merchant.parent_category_id,
+                MaxRate: merchant.max_rate,
+                MaxRateKind: merchant.max_rate_kind,
+                MaxRateCurrency: merchant.max_rate_currency,
+                MaxRateLedgerID: merchant.max_rate_ledger_id,
+                Boosted: merchant.boosted === 1 || merchant.boosted === true,
+                MaxOfferScore: merchant.max_offer_score,
+                DetailedRates: safeJsonParse(merchant.detailed_rates, []),
+                Coupons: safeJsonParse(merchant.coupons, []),
+                BrandColor: merchant.brand_color,
+                TextColor: merchant.text_color,
+                FeaturedImageURL: merchant.featured_image_url,
+                LogoImageExists: merchant.logo_image_exists === 1 || merchant.logo_image_exists === true,
+                Images: safeJsonParse(merchant.images, []),
+                CreatedDate: merchant.created_date,
+                ModifiedDate: merchant.modified_date
+            };
+        });
+        
+        merchantCache.data = apiFormat;
+        merchantCache.lastUpdated = new Date();
+        merchantCache.isLoading = false;
+        
+        console.log(`✅ Loaded ${apiFormat.length} merchants into cache`);
+    } catch (error) {
+        console.error('❌ Error loading merchants into cache:', error);
+        merchantCache.isLoading = false;
+    }
+}
+
 // Database query helpers that work with both PostgreSQL and SQLite
 async function queryAll(query, params = []) {
     if (USE_POSTGRES) {
@@ -775,23 +849,59 @@ app.post('/api/store-merchants', async (req, res) => {
     }
 });
 
-// Get stored merchants
+// Get stored merchants (now using cache for instant response)
 app.get('/api/stored-merchants', async (req, res) => {
     try {
-        const { app_id, limit = 50000 } = req.query; // High default limit to load all merchants
+        const { app_id, limit = 50000 } = req.query;
+        
+        // If cache is empty or stale, load it
+        if (!merchantCache.data || !merchantCache.lastUpdated || 
+            (Date.now() - merchantCache.lastUpdated.getTime()) > CACHE_REFRESH_INTERVAL) {
+            console.log('🔄 Cache is stale or empty, refreshing...');
+            await loadMerchantsIntoCache();
+        }
+        
+        // Serve from cache (instant response)
+        let merchants = merchantCache.data || [];
+        
+        // Apply app_id filter if specified
+        if (app_id) {
+            merchants = merchants.filter(merchant => merchant.AppID == app_id);
+        }
+        
+        // Apply limit
+        const limitNum = parseInt(limit);
+        if (limitNum && limitNum < merchants.length) {
+            merchants = merchants.slice(0, limitNum);
+        }
+        
+        console.log(`📦 Served ${merchants.length} merchants from cache (filtered by app_id: ${app_id || 'none'})`);
+        
+        res.json({
+            merchants: merchants,
+            total: merchants.length,
+            cached: true,
+            lastUpdated: merchantCache.lastUpdated
+        });
+        
+    } catch (error) {
+        console.error('Error serving cached merchants:', error);
+        
+        // Fallback to direct database query if cache fails
+        console.log('⚠️ Cache failed, falling back to database query...');
         
         let query = 'SELECT * FROM merchant_master_data';
         let params = [];
         let paramIndex = 1;
         
-        if (app_id) {
+        if (req.query.app_id) {
             query += ` WHERE app_id = ${USE_POSTGRES ? '$1' : '?'}`;
-            params.push(app_id);
+            params.push(req.query.app_id);
             paramIndex++;
         }
         
         query += ` ORDER BY merchant_name LIMIT ${USE_POSTGRES ? `$${paramIndex}` : '?'}`;
-        params.push(parseInt(limit));
+        params.push(parseInt(req.query.limit || 50000));
         
         const merchants = await queryAll(query, params);
         
@@ -1180,9 +1290,21 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log('Dashboard available at: http://localhost:3000');
+    
+    // Initialize merchant cache on server startup
+    console.log('🚀 Initializing merchant cache...');
+    await loadMerchantsIntoCache();
+    
+    // Set up periodic cache refresh
+    setInterval(async () => {
+        console.log('🔄 Refreshing merchant cache...');
+        await loadMerchantsIntoCache();
+    }, CACHE_REFRESH_INTERVAL);
+    
+    console.log(`✅ Server ready with merchant cache (refreshes every ${CACHE_REFRESH_INTERVAL / 1000 / 60} minutes)`);
 });
 
 module.exports = app;
