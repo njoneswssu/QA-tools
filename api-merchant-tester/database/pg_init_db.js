@@ -51,8 +51,10 @@ async function initializeTables() {
       CREATE TABLE IF NOT EXISTS test_sessions (
         id SERIAL PRIMARY KEY,
         session_id VARCHAR(255) UNIQUE NOT NULL,
+        session_name TEXT,
         started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         completed_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         total_merchants INTEGER DEFAULT 0,
         successful_merchants INTEGER DEFAULT 0,
         flagged_merchants INTEGER DEFAULT 0,
@@ -62,6 +64,13 @@ async function initializeTables() {
         current_url TEXT,
         notes TEXT
       )
+    `);
+
+    // Add missing columns to existing test_sessions table if they don't exist
+    await client.query(`
+      ALTER TABLE test_sessions 
+      ADD COLUMN IF NOT EXISTS session_name TEXT,
+      ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     `);
 
     // Merchant test results table
@@ -229,10 +238,10 @@ async function populateMerchantMasterData(merchantsData) {
 }
 
 // Function to create a new test session
-async function createTestSession(sessionId, notes = null) {
+async function createTestSession(sessionId, sessionName = null, notes = null) {
   const result = await pool.query(
-    `INSERT INTO test_sessions (session_id, notes) VALUES ($1, $2) RETURNING id`,
-    [sessionId, notes]
+    `INSERT INTO test_sessions (session_id, session_name, notes) VALUES ($1, $2, $3) RETURNING id`,
+    [sessionId, sessionName, notes]
   );
   return result.rows[0].id;
 }

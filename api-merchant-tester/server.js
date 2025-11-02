@@ -469,10 +469,10 @@ app.get('/api/stats', async (req, res) => {
 
 // Create a new test session
 app.post('/api/sessions', async (req, res) => {
-    const { session_id, notes } = req.body;
+    const { session_id, session_name, notes } = req.body;
     
     try {
-        const sessionDbId = await createTestSession(session_id, notes);
+        const sessionDbId = await createTestSession(session_id, session_name, notes);
         res.json({ id: sessionDbId, session_id });
     } catch (error) {
         console.error('Error creating session:', error);
@@ -963,7 +963,7 @@ app.post('/api/start-test', async (req, res) => {
             } else {
                 // New session - create it
                 console.log(`🆕 Creating new session: ${sessionId}`);
-                await createTestSession(sessionId, testName);
+                await createTestSession(sessionId, testName, null);
                 console.log(`✅ New session created: ${sessionId}`);
             }
         } catch (dbError) {
