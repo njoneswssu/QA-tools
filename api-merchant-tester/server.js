@@ -888,83 +888,76 @@ app.get('/api/stored-merchants', async (req, res) => {
         console.error('Error serving cached merchants:', error);
         
         // Fallback to direct database query if cache fails
-        console.log('⚠️ Cache failed, falling back to database query...');
-        
-        let query = 'SELECT * FROM merchant_master_data';
-        let params = [];
-        let paramIndex = 1;
-        
-        if (req.query.app_id) {
-            query += ` WHERE app_id = ${USE_POSTGRES ? '$1' : '?'}`;
-            params.push(req.query.app_id);
-            paramIndex++;
-        }
-        
-        query += ` ORDER BY merchant_name LIMIT ${USE_POSTGRES ? `$${paramIndex}` : '?'}`;
-        params.push(parseInt(req.query.limit || 50000));
-        
-        const merchants = await queryAll(query, params);
-        
-        // Convert back to API format with safe JSON parsing
-        const apiFormat = merchants.map(merchant => {
-            // Safe JSON parsing function
-            const safeJsonParse = (jsonString, fallback = []) => {
-                try {
-                    return JSON.parse(jsonString || JSON.stringify(fallback));
-                } catch (error) {
-                    console.warn(`JSON parse error for merchant ${merchant.merchant_name}:`, error.message);
-                    return fallback;
-                }
-            };
+        try {
+            console.log('⚠️ Cache failed, falling back to database query...');
             
-            return {
-                AppID: merchant.app_id,
-                MerchantID: merchant.merchant_id,
-                MerchantName: merchant.merchant_name,
-                MerchantDomains: safeJsonParse(merchant.merchant_domains, []),
-                MerchantScore: merchant.merchant_score,
-                IsFeaturedMerchant: merchant.is_featured_merchant === 1 || merchant.is_featured_merchant === true,
-                PrimaryCategory: merchant.primary_category,
-                PrimaryCategoryID: merchant.primary_category_id,
-                ParentCategory: merchant.parent_category,
-                ParentCategoryID: merchant.parent_category_id,
-                MaxRate: merchant.max_rate,
-                MaxRateKind: merchant.max_rate_kind,
-                MaxRateCurrency: merchant.max_rate_currency,
-                MaxRateLedgerID: merchant.max_rate_ledger_id,
-                Boosted: merchant.boosted === 1 || merchant.boosted === true,
-                MaxOfferScore: merchant.max_offer_score,
-                DetailedRates: safeJsonParse(merchant.detailed_rates, []),
-                Coupons: safeJsonParse(merchant.coupons, []),
-                BrandColor: merchant.brand_color,
-                TextColor: merchant.text_color,
-                FeaturedImageURL: merchant.featured_image_url,
-                LogoImageExists: merchant.logo_image_exists === 1 || merchant.logo_image_exists === true,
-                Images: safeJsonParse(merchant.images, []),
-                CreatedDate: merchant.created_date,
-                ModifiedDate: merchant.modified_date
-            };
-        });
-        
-        // If limit is 1, get the total count for the response
-        let totalCount = apiFormat.length;
-        if (parseInt(limit) === 1 && apiFormat.length > 0) {
-            const countQuery = app_id ? 
-                `SELECT COUNT(*) as total FROM merchant_master_data WHERE app_id = ${USE_POSTGRES ? '$1' : '?'}` :
-                'SELECT COUNT(*) as total FROM merchant_master_data';
-            const countParams = app_id ? [app_id] : [];
+            let query = 'SELECT * FROM merchant_master_data';
+            let params = [];
+            let paramIndex = 1;
             
-            const countResult = await queryOne(countQuery, countParams);
-            totalCount = countResult.total;
+            if (req.query.app_id) {
+                query += ` WHERE app_id = ${USE_POSTGRES ? '$1' : '?'}`;
+                params.push(req.query.app_id);
+                paramIndex++;
+            }
+            
+            query += ` ORDER BY merchant_name LIMIT ${USE_POSTGRES ? `$${paramIndex}` : '?'}`;
+            params.push(parseInt(req.query.limit || 50000));
+            
+            const merchants = await queryAll(query, params);
+            
+            // Convert back to API format with safe JSON parsing
+            const apiFormat = merchants.map(merchant => {
+                // Safe JSON parsing function
+                const safeJsonParse = (jsonString, fallback = []) => {
+                    try {
+                        return JSON.parse(jsonString || JSON.stringify(fallback));
+                    } catch (error) {
+                        console.warn(`JSON parse error for merchant ${merchant.merchant_name}:`, error.message);
+                        return fallback;
+                    }
+                };
+                
+                return {
+                    AppID: merchant.app_id,
+                    MerchantID: merchant.merchant_id,
+                    MerchantName: merchant.merchant_name,
+                    MerchantDomains: safeJsonParse(merchant.merchant_domains, []),
+                    MerchantScore: merchant.merchant_score,
+                    IsFeaturedMerchant: merchant.is_featured_merchant === 1 || merchant.is_featured_merchant === true,
+                    PrimaryCategory: merchant.primary_category,
+                    PrimaryCategoryID: merchant.primary_category_id,
+                    ParentCategory: merchant.parent_category,
+                    ParentCategoryID: merchant.parent_category_id,
+                    MaxRate: merchant.max_rate,
+                    MaxRateKind: merchant.max_rate_kind,
+                    MaxRateCurrency: merchant.max_rate_currency,
+                    MaxRateLedgerID: merchant.max_rate_ledger_id,
+                    Boosted: merchant.boosted === 1 || merchant.boosted === true,
+                    MaxOfferScore: merchant.max_offer_score,
+                    DetailedRates: safeJsonParse(merchant.detailed_rates, []),
+                    Coupons: safeJsonParse(merchant.coupons, []),
+                    BrandColor: merchant.brand_color,
+                    TextColor: merchant.text_color,
+                    FeaturedImageURL: merchant.featured_image_url,
+                    LogoImageExists: merchant.logo_image_exists === 1 || merchant.logo_image_exists === true,
+                    Images: safeJsonParse(merchant.images, []),
+                    CreatedDate: merchant.created_date,
+                    ModifiedDate: merchant.modified_date
+                };
+            });
+            
+            res.json({
+                merchants: apiFormat,
+                total: apiFormat.length,
+                cached: false,
+                fallback: true
+            });
+            
+        } catch (fallbackError) {
+            console.error('Error in fallback database query:', fallbackError);
+            res.status(500).json({ error: 'Failed to fetch stored merchants' });
         }
-        
-        res.json({
-            merchants: apiFormat,
-            count: totalCount
-        });
-    } catch (error) {
-        console.error('Error fetching stored merchants:', error);
-        res.status(500).json({ error: 'Failed to fetch stored merchants' });
     }
 });
 
