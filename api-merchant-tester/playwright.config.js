@@ -40,6 +40,13 @@ module.exports = defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'chromium',
+      use: { 
+        ...devices['Desktop Chrome'],
+        headless: false, // Keep visible for manual review
+      },
+    },
+    {
       name: 'chromium-with-extension',
       use: { 
         ...devices['Desktop Chrome'],
