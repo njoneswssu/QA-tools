@@ -1204,7 +1204,9 @@ async function resetResults() {
             throw new Error(errorData.error || `Failed to clear results: ${response.statusText}`);
         }
         
+        const result = await response.json();
         console.log('✅ [Dashboard] All test results deleted from database');
+        console.log(`🗑️ [Dashboard] Deleted ${result.deletedScreenshots || 0} screenshots and ${result.deletedVideos || 0} videos`);
         
         // Clear localStorage
         localStorage.removeItem('active_test_session');

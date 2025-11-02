@@ -244,7 +244,7 @@ const elements = {
     categoryFilter: document.getElementById('category-filter'),
     merchantLimit: document.getElementById('merchant-limit'),
     testerName: document.getElementById('tester-name'),
-    testName: document.getElementById('test-name'),
+    // testName: document.getElementById('test-name'), // REMOVED - element no longer in HTML
     shuffleMerchants: document.getElementById('shuffle-merchants'),
     merchantPreview: document.getElementById('merchant-preview'),
     merchantSearch: document.getElementById('merchant-search'),
@@ -534,7 +534,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 DOM Content Loaded - Initializing tester...');
     
     initializeEventListeners();
-    generateDefaultTestName();
+    // generateDefaultTestName(); // REMOVED - no longer needed, session name is auto-generated from tester name
     
     // Clear any default values that might limit merchants
     elements.merchantLimit.value = '';
@@ -794,33 +794,23 @@ function initializeEventListeners() {
     elements.startNewTestBtn.addEventListener('click', startNewTest);
 }
 
-// Generate default test name
-function generateDefaultTestName() {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    });
-    elements.testName.value = `Merchant Test - ${dateStr}`;
-}
+// Generate default test name - NO LONGER NEEDED (test name is auto-generated from tester name)
+// function generateDefaultTestName() {
+//     const now = new Date();
+//     const dateStr = now.toLocaleDateString('en-US', { 
+//         year: 'numeric', 
+//         month: 'short', 
+//         day: 'numeric' 
+//     });
+//     elements.testName.value = `Merchant Test - ${dateStr}`;
+// }
 
 // Update test name based on tester name
 function updateTestName() {
+    // Only save tester name to localStorage for persistence
     const testerName = elements.testerName.value.trim();
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    });
-    
     if (testerName) {
-        elements.testName.value = `${testerName} - ${dateStr}`;
-        // Save tester name to localStorage for persistence
         localStorage.setItem('tester_name', testerName);
-    } else {
-        elements.testName.value = `Merchant Test - ${dateStr}`;
     }
 }
 
@@ -1295,7 +1285,8 @@ async function startTest() {
     }
     
     // Create or reuse test session
-    const sessionName = elements.testName.value.trim() || 'API Merchant Test';
+    const testerName = elements.testerName?.value.trim() || 'Tester';
+    const sessionName = `${testerName} - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
     
     // ✨ IMPORTANT: Always create a NEW session to preserve historical data
     // Even if there's an existing session, create a new one so old results stay in database
@@ -1305,14 +1296,16 @@ async function startTest() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 session_id: `api-ui-${Date.now()}`,
-                notes: `${sessionName} - ${filteredMerchants.length} merchants`
+                session_name: sessionName,
+                notes: `${filteredMerchants.length} merchants`
             })
         });
         
         if (!response.ok) throw new Error('Failed to create session');
         testSession = await response.json();
         console.log('✨ Created new session:', testSession.session_id);
-        addLogEntry(`✨ Created new test session (old results preserved)`, 'success');
+        console.log('📝 Session name:', sessionName);
+        addLogEntry(`✨ Created new test session: ${sessionName}`, 'success');
     } catch (error) {
         console.error('Failed to create session:', error);
         showError('Failed to create test session');
@@ -1379,7 +1372,7 @@ async function runTest(merchantsToTest = filteredMerchants) {
             body: JSON.stringify({
                 merchants: merchantsToTest,
                 sessionId: testSession.session_id,
-                testName: elements.testName.value.trim() || 'API Merchant Test'
+                testName: testSession.session_name || 'API Merchant Test'
             })
         });
         
@@ -3818,11 +3811,23 @@ async function loadTesterStats(range = '1m', customFrom = null, customTo = null)
             }
         }
         
-        // Calculate stats
+        // Deduplicate by merchant_id (keep most recent test per merchant)
+        const merchantMap = new Map();
+        allResults.forEach(item => {
+            const existingItem = merchantMap.get(item.merchant_id);
+            if (!existingItem || new Date(item.tested_at) > new Date(existingItem.tested_at)) {
+                merchantMap.set(item.merchant_id, item);
+            }
+        });
+        const uniqueResults = Array.from(merchantMap.values());
+        
+        console.log(`📦 [loadTesterStats] Total raw results: ${allResults.length}, Unique merchants: ${uniqueResults.length}`);
+        
+        // Calculate stats from deduplicated results
         const totalTests = filteredSessions.length;
-        const totalMerchants = allResults.length;
-        const successfulMerchants = allResults.filter(r => r.test_status === 'success').length;
-        const flaggedMerchants = allResults.filter(r => r.test_status === 'flagged').length;
+        const totalMerchants = uniqueResults.length;
+        const successfulMerchants = uniqueResults.filter(r => r.test_status === 'success').length;
+        const flaggedMerchants = uniqueResults.filter(r => r.test_status === 'flagged').length;
         
         // Update summary cards
         document.getElementById('total-tests-stat').textContent = totalTests;
@@ -3830,8 +3835,8 @@ async function loadTesterStats(range = '1m', customFrom = null, customTo = null)
         document.getElementById('successful-merchants-stat').textContent = successfulMerchants;
         document.getElementById('flagged-merchants-stat').textContent = flaggedMerchants;
         
-        // Prepare chart data
-        const chartData = prepareChartData(allResults, fromDate, toDate);
+        // Prepare chart data (use deduplicated results)
+        const chartData = prepareChartData(uniqueResults, fromDate, toDate);
         renderStatsChart(chartData);
         
         // Display recent sessions

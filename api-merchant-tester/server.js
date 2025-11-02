@@ -627,8 +627,49 @@ app.delete('/api/clear-all-results', async (req, res) => {
             console.log(`✅ [Server] Deleted all test_sessions`);
         }
         
+        // Delete all screenshot and video files
+        let deletedScreenshots = 0;
+        let deletedVideos = 0;
+        
+        try {
+            const screenshotsDir = path.join(__dirname, 'media', 'screenshots');
+            const videosDir = path.join(__dirname, 'media', 'videos');
+            
+            // Delete screenshots
+            if (fs.existsSync(screenshotsDir)) {
+                const screenshotFiles = fs.readdirSync(screenshotsDir);
+                for (const file of screenshotFiles) {
+                    if (file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg')) {
+                        fs.unlinkSync(path.join(screenshotsDir, file));
+                        deletedScreenshots++;
+                    }
+                }
+                console.log(`🗑️ [Server] Deleted ${deletedScreenshots} screenshot files`);
+            }
+            
+            // Delete videos
+            if (fs.existsSync(videosDir)) {
+                const videoFiles = fs.readdirSync(videosDir);
+                for (const file of videoFiles) {
+                    if (file.endsWith('.webm') || file.endsWith('.mp4')) {
+                        fs.unlinkSync(path.join(videosDir, file));
+                        deletedVideos++;
+                    }
+                }
+                console.log(`🗑️ [Server] Deleted ${deletedVideos} video files`);
+            }
+        } catch (fileError) {
+            console.error('⚠️ [Server] Error deleting media files:', fileError);
+            // Continue even if file deletion fails
+        }
+        
         console.log(`✅ [Server] Successfully cleared all test results and sessions`);
-        res.json({ success: true, message: 'All test results and sessions cleared' });
+        res.json({ 
+            success: true, 
+            message: 'All test results and sessions cleared',
+            deletedScreenshots,
+            deletedVideos
+        });
     } catch (error) {
         console.error('❌ [Server] Error clearing all results:', error);
         res.status(500).json({ error: 'Failed to clear all results' });
