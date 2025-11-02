@@ -683,34 +683,48 @@ document.addEventListener('DOMContentLoaded', async function() {
                 // No cache found, load from database with toast notification
                 console.log('📥 No cache found, loading from database...');
                 
-                // Show toast notification
+                // Show toast notification immediately
                 showToast('Loading merchants from database...', 'info', 0); // 0 = don't auto-hide
                 
-                try {
-                    await loadStoredMerchants(true);
-                    console.log('✅ Auto-loaded merchants from database');
-                    showToast('Merchants loaded successfully!', 'success', 3000);
-                } catch (error) {
-                    console.log('ℹ️ No stored merchants available:', error.message);
-                    console.log('💡 Please load merchants using API data or "Load from Database" button');
-                    showToast('No stored merchants found. Use "Fetch All Pages" or "Load from Database" to get started.', 'warning', 5000);
-                    
-                    // Show a helpful message to the user
-                    if (elements.merchantPreview) {
-                        elements.merchantPreview.innerHTML = `
-                            <div style="text-align: center; padding: 40px; color: #666;">
-                                <i class="fas fa-database" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
-                                <h3>No Merchants Found</h3>
-                                <p>To get started, use one of these options:</p>
-                                <ul style="text-align: left; display: inline-block; margin-top: 20px;">
-                                    <li><strong>Load from Database:</strong> Click "Load from Database" to load stored merchants</li>
-                                    <li><strong>Fetch from API:</strong> Use "Fetch All Pages" to get fresh merchant data</li>
-                                    <li><strong>Cloud Storage:</strong> Use "Fetch from Cloud Storage" for specific datasets</li>
-                                </ul>
-                            </div>
-                        `;
-                    }
+                // Show loading state in preview
+                if (elements.merchantPreview) {
+                    elements.merchantPreview.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #666;">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 48px; margin-bottom: 20px; color: #3498db;"></i>
+                            <h3>Loading Merchants...</h3>
+                            <p>Please wait while we load merchants from the database.</p>
+                        </div>
+                    `;
                 }
+                
+                // Use setTimeout to make loading non-blocking
+                setTimeout(async () => {
+                    try {
+                        await loadStoredMerchants(true);
+                        console.log('✅ Auto-loaded merchants from database');
+                        showToast('Merchants loaded successfully!', 'success', 3000);
+                    } catch (error) {
+                        console.log('ℹ️ No stored merchants available:', error.message);
+                        console.log('💡 Please load merchants using API data or "Load from Database" button');
+                        showToast('No stored merchants found. Use "Fetch All Pages" or "Load from Database" to get started.', 'warning', 5000);
+                        
+                        // Show a helpful message to the user
+                        if (elements.merchantPreview) {
+                            elements.merchantPreview.innerHTML = `
+                                <div style="text-align: center; padding: 40px; color: #666;">
+                                    <i class="fas fa-database" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                                    <h3>No Merchants Found</h3>
+                                    <p>To get started, use one of these options:</p>
+                                    <ul style="text-align: left; display: inline-block; margin-top: 20px;">
+                                        <li><strong>Load from Database:</strong> Click "Load from Database" to load stored merchants</li>
+                                        <li><strong>Fetch from API:</strong> Use "Fetch All Pages" to get fresh merchant data</li>
+                                        <li><strong>Cloud Storage:</strong> Use "Fetch from Cloud Storage" for specific datasets</li>
+                                    </ul>
+                                </div>
+                            `;
+                        }
+                    }
+                }, 50); // Small delay to allow UI to update
             }
         }, 100); // Small delay to ensure DOM is fully ready
     } else {
