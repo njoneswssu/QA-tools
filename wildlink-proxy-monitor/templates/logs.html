@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildlink Proxy Monitor - Logs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        }
+        .filter-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .log-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .log-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .method-badge {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+        .log-url {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        .log-timestamp {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .important-params {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 8px;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-network-wired me-2"></i>
+                Wildlink Proxy Monitor
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+                <a class="nav-link active" href="/logs">
+                    <i class="fas fa-list me-1"></i>Logs
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">
+                    <i class="fas fa-list me-2"></i>
+                    Network Traffic Logs
+                </h1>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row">
+            <div class="col-12">
+                <div class="filter-card">
+                    <h5><i class="fas fa-filter me-2"></i>Filters</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="domain-filter" class="form-label">Domain</label>
+                            <select id="domain-filter" class="form-select">
+                                <option value="">All Domains</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="method-filter" class="form-label">Method</label>
+                            <select id="method-filter" class="form-select">
+                                <option value="">All Methods</option>
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                                <option value="PATCH">PATCH</option>
+                                <option value="OPTIONS">OPTIONS</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="status-filter" class="form-label">Status Code</label>
+                            <select id="status-filter" class="form-select">
+                                <option value="">All Status</option>
+                                <option value="200">200 OK</option>
+                                <option value="201">201 Created</option>
+                                <option value="400">400 Bad Request</option>
+                                <option value="401">401 Unauthorized</option>
+                                <option value="404">404 Not Found</option>
+                                <option value="500">500 Server Error</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="search-filter" class="form-label">Search</label>
+                            <input type="text" id="search-filter" class="form-control" placeholder="Search URLs, headers, body...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="limit-filter" class="form-label">Limit</label>
+                            <select id="limit-filter" class="form-select">
+                                <option value="50">50 results</option>
+                                <option value="100" selected>100 results</option>
+                                <option value="200">200 results</option>
+                                <option value="500">500 results</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button id="apply-filters" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Apply Filters
+                            </button>
+                            <button id="clear-filters" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times me-1"></i>Clear Filters
+                            </button>
+                            <button id="refresh-logs" class="btn btn-outline-primary ms-2">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="row">
+            <div class="col-12">
+                <div id="logs-container">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p class="mt-2">Loading logs...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allDomains = new Set();
+
+        // Format timestamp
+        function formatTimestamp(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        }
+
+        // Get method badge class
+        function getMethodBadge(method) {
+            const badges = {
+                'GET': 'bg-success',
+                'POST': 'bg-primary',
+                'PUT': 'bg-warning text-dark',
+                'DELETE': 'bg-danger',
+                'PATCH': 'bg-info',
+                'OPTIONS': 'bg-secondary'
+            };
+            return badges[method] || 'bg-secondary';
+        }
+
+        // Get status badge class
+        function getStatusBadge(statusCode) {
+            if (!statusCode) return 'bg-warning text-dark';
+            if (statusCode >= 200 && statusCode < 300) return 'bg-success';
+            if (statusCode >= 300 && statusCode < 400) return 'bg-info';
+            if (statusCode >= 400 && statusCode < 500) return 'bg-warning text-dark';
+            if (statusCode >= 500) return 'bg-danger';
+            return 'bg-secondary';
+        }
+
+        // Format important parameters
+        function formatImportantParams(params) {
+            if (!params || Object.keys(params).length === 0) {
+                return '<em class="text-muted">None</em>';
+            }
+            return Object.entries(params)
+                .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+                .join(', ');
+        }
+
+        // Truncate text
+        function truncateText(text, maxLength = 100) {
+            if (!text) return '';
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // Render logs
+        function renderLogs(logs) {
+            const container = document.getElementById('logs-container');
+            
+            if (logs.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <h4>No logs found</h4>
+                        <p>Try adjusting your filters or check if the proxy is capturing traffic.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = logs.map(log => `
+                <div class="log-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="badge method-badge ${getMethodBadge(log.method)}">${log.method}</span>
+                            ${log.completed ? 
+                                `<span class="badge status-badge ${getStatusBadge(log.statusCode)} ms-2">${log.statusCode}</span>` :
+                                `<span class="badge status-badge bg-warning text-dark ms-2">Pending</span>`
+                            }
+                            <strong class="ms-2">${log.hostname}</strong>
+                        </div>
+                        <div class="log-timestamp">
+                            <i class="fas fa-clock me-1"></i>
+                            ${formatTimestamp(log.timestamp)}
+                        </div>
+                    </div>
+                    
+                    <div class="log-url mb-2">
+                        <strong>URL:</strong> ${log.url}
+                    </div>
+                    
+                    ${Object.keys(log.importantParams || {}).length > 0 ? `
+                        <div class="important-params">
+                            <strong>Important Parameters:</strong> ${formatImportantParams(log.importantParams)}
+                        </div>
+                    ` : ''}
+                    
+                    ${log.requestBody ? `
+                        <div class="mt-2">
+                            <strong>Request Body:</strong>
+                            <div class="important-params">
+                                ${truncateText(log.requestBody, 200)}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${log.responseBody && log.completed ? `
+                        <div class="mt-2">
+                            <strong>Response Body:</strong>
+                            <div class="important-params">
+                                ${truncateText(log.responseBody, 200)}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="mt-3">
+                        <a href="/log/${log.id}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>View Details
+                        </a>
+                        <small class="text-muted ms-3">
+                            <i class="fas fa-fingerprint me-1"></i>ID: ${log.id}
+                        </small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update domain filter options
+        function updateDomainFilter(logs) {
+            const domainFilter = document.getElementById('domain-filter');
+            const currentValue = domainFilter.value;
+            
+            // Collect all unique domains
+            logs.forEach(log => {
+                if (log.hostname) {
+                    allDomains.add(log.hostname);
+                }
+            });
+            
+            // Update options
+            domainFilter.innerHTML = '<option value="">All Domains</option>';
+            Array.from(allDomains).sort().forEach(domain => {
+                const option = document.createElement('option');
+                option.value = domain;
+                option.textContent = domain;
+                if (domain === currentValue) {
+                    option.selected = true;
+                }
+                domainFilter.appendChild(option);
+            });
+        }
+
+        // Fetch logs with filters
+        async function fetchLogs() {
+            const container = document.getElementById('logs-container');
+            container.innerHTML = `
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p class="mt-2">Loading logs...</p>
+                </div>
+            `;
+
+            try {
+                const params = new URLSearchParams();
+                
+                const domain = document.getElementById('domain-filter').value;
+                const method = document.getElementById('method-filter').value;
+                const statusCode = document.getElementById('status-filter').value;
+                const search = document.getElementById('search-filter').value;
+                const limit = document.getElementById('limit-filter').value;
+                
+                if (domain) params.append('domain', domain);
+                if (method) params.append('method', method);
+                if (statusCode) params.append('status_code', statusCode);
+                if (search) params.append('search', search);
+                if (limit) params.append('limit', limit);
+                
+                const response = await fetch(`/api/logs?${params.toString()}`);
+                const logs = await response.json();
+                
+                updateDomainFilter(logs);
+                renderLogs(logs);
+                
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
+                        <h4>Error Loading Logs</h4>
+                        <p>There was an error loading the logs. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('domain-filter').value = '';
+            document.getElementById('method-filter').value = '';
+            document.getElementById('status-filter').value = '';
+            document.getElementById('search-filter').value = '';
+            document.getElementById('limit-filter').value = '100';
+            fetchLogs();
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchLogs();
+            
+            // Event listeners
+            document.getElementById('apply-filters').addEventListener('click', fetchLogs);
+            document.getElementById('clear-filters').addEventListener('click', clearFilters);
+            document.getElementById('refresh-logs').addEventListener('click', fetchLogs);
+            
+            // Enter key in search field
+            document.getElementById('search-filter').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    fetchLogs();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

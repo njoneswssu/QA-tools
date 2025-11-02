@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildlink Proxy Monitor - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .activity-item {
+            border-left: 4px solid #667eea;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 0 10px 10px 0;
+        }
+        .method-badge {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+        .status-success { color: #28a745; }
+        .status-error { color: #dc3545; }
+        .status-pending { color: #ffc107; }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-network-wired me-2"></i>
+                Wildlink Proxy Monitor
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+                <a class="nav-link" href="/logs">
+                    <i class="fas fa-list me-1"></i>Logs
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Network Traffic Dashboard
+                </h1>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row" id="stats-cards">
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <h3 id="total-requests">-</h3>
+                    <p class="mb-0">Total Requests</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <h3 id="completed-requests">-</h3>
+                    <p class="mb-0">Completed</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <h3 id="pending-requests">-</h3>
+                    <p class="mb-0">Pending</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <h3 id="log-file-size">-</h3>
+                    <p class="mb-0">Log Size</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Domain Breakdown Chart -->
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-globe me-2"></i>Domain Breakdown</h4>
+                    <canvas id="domainChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Method Breakdown Chart -->
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-exchange-alt me-2"></i>HTTP Methods</h4>
+                    <canvas id="methodChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Code Breakdown -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-code me-2"></i>Status Codes</h4>
+                    <canvas id="statusChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-clock me-2"></i>Recent Activity</h4>
+                    <div id="recent-activity" style="max-height: 400px; overflow-y: auto;">
+                        <div class="text-center text-muted">
+                            <i class="fas fa-spinner fa-spin"></i> Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auto-refresh controls -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="chart-container">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5><i class="fas fa-sync-alt me-2"></i>Auto Refresh</h5>
+                            <p class="text-muted mb-0">Dashboard updates automatically every 5 seconds</p>
+                        </div>
+                        <div>
+                            <button id="refresh-btn" class="btn btn-primary">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh Now
+                            </button>
+                            <button id="toggle-auto-refresh" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-pause me-1"></i>Pause Auto-refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let autoRefreshInterval;
+        let autoRefreshEnabled = true;
+        let domainChart, methodChart, statusChart;
+
+        // Initialize charts
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            };
+
+            // Domain chart
+            const domainCtx = document.getElementById('domainChart').getContext('2d');
+            domainChart = new Chart(domainCtx, {
+                type: 'doughnut',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+                options: chartOptions
+            });
+
+            // Method chart
+            const methodCtx = document.getElementById('methodChart').getContext('2d');
+            methodChart = new Chart(methodCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: '#667eea' }] },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Status chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(statusCtx, {
+                type: 'pie',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+                options: chartOptions
+            });
+        }
+
+        // Generate colors for charts
+        function generateColors(count) {
+            const colors = [
+                '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3'
+            ];
+            return colors.slice(0, count);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Format timestamp
+        function formatTimestamp(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        }
+
+        // Get method badge class
+        function getMethodBadge(method) {
+            const badges = {
+                'GET': 'bg-success',
+                'POST': 'bg-primary',
+                'PUT': 'bg-warning',
+                'DELETE': 'bg-danger',
+                'PATCH': 'bg-info',
+                'OPTIONS': 'bg-secondary'
+            };
+            return badges[method] || 'bg-secondary';
+        }
+
+        // Update dashboard with stats
+        function updateDashboard(stats) {
+            // Update stat cards
+            document.getElementById('total-requests').textContent = stats.total_requests;
+            document.getElementById('completed-requests').textContent = stats.completed_requests;
+            document.getElementById('pending-requests').textContent = stats.pending_requests;
+            document.getElementById('log-file-size').textContent = formatFileSize(stats.log_file_size);
+
+            // Update domain chart
+            const domainLabels = Object.keys(stats.domain_breakdown);
+            const domainData = Object.values(stats.domain_breakdown);
+            domainChart.data.labels = domainLabels;
+            domainChart.data.datasets[0].data = domainData;
+            domainChart.data.datasets[0].backgroundColor = generateColors(domainLabels.length);
+            domainChart.update();
+
+            // Update method chart
+            const methodLabels = Object.keys(stats.method_breakdown);
+            const methodData = Object.values(stats.method_breakdown);
+            methodChart.data.labels = methodLabels;
+            methodChart.data.datasets[0].data = methodData;
+            methodChart.update();
+
+            // Update status chart
+            const statusLabels = Object.keys(stats.status_code_breakdown);
+            const statusData = Object.values(stats.status_code_breakdown);
+            statusChart.data.labels = statusLabels;
+            statusChart.data.datasets[0].data = statusData;
+            statusChart.data.datasets[0].backgroundColor = generateColors(statusLabels.length);
+            statusChart.update();
+
+            // Update recent activity
+            const activityContainer = document.getElementById('recent-activity');
+            if (stats.recent_activity.length === 0) {
+                activityContainer.innerHTML = '<div class="text-center text-muted">No recent activity</div>';
+            } else {
+                activityContainer.innerHTML = stats.recent_activity.map(activity => `
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="badge method-badge ${getMethodBadge(activity.method)}">${activity.method}</span>
+                                <strong class="ms-2">${activity.hostname}</strong>
+                            </div>
+                            <small class="text-muted">${formatTimestamp(activity.timestamp)}</small>
+                        </div>
+                        <div class="mt-1">
+                            <small class="text-muted">${activity.path}</small>
+                            ${activity.completed ? 
+                                `<span class="status-success ms-2"><i class="fas fa-check-circle"></i> ${activity.statusCode}</span>` :
+                                `<span class="status-pending ms-2"><i class="fas fa-clock"></i> Pending</span>`
+                            }
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Fetch and update stats
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                updateDashboard(stats);
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            const button = document.getElementById('toggle-auto-refresh');
+            if (autoRefreshEnabled) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshEnabled = false;
+                button.innerHTML = '<i class="fas fa-play me-1"></i>Resume Auto-refresh';
+                button.classList.remove('btn-outline-secondary');
+                button.classList.add('btn-outline-success');
+            } else {
+                startAutoRefresh();
+                autoRefreshEnabled = true;
+                button.innerHTML = '<i class="fas fa-pause me-1"></i>Pause Auto-refresh';
+                button.classList.remove('btn-outline-success');
+                button.classList.add('btn-outline-secondary');
+            }
+        }
+
+        // Start auto-refresh
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(fetchStats, 5000);
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            fetchStats();
+            startAutoRefresh();
+
+            // Event listeners
+            document.getElementById('refresh-btn').addEventListener('click', fetchStats);
+            document.getElementById('toggle-auto-refresh').addEventListener('click', toggleAutoRefresh);
+        });
+    </script>
+</body>
+</html>

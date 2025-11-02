@@ -1135,10 +1135,10 @@ body {
 .modal-content {
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     border-radius: 12px;
-    width: 90%;
-    max-width: 1000px;
-    height: auto;
-    max-height: 90vh;
+    width: 95%;
+    max-width: none;
+    height: 95%;
+    max-height: none;
     display: flex;
     flex-direction: column;
     border: 1px solid rgba(255, 255, 255, 0.1);
