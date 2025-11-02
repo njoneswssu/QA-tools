@@ -1722,9 +1722,22 @@ function updateCurrentMerchant(merchant) {
 
 // Update statistics display
 function updateStats() {
-    elements.totalTested.textContent = testResults.current;
-    elements.successfulCount.textContent = testResults.successful;
-    elements.flaggedCount.textContent = testResults.flagged;
+    console.log('📊 [updateStats] Updating with:', testResults);
+    
+    // Force update DOM elements with current values
+    if (elements.totalTested) {
+        elements.totalTested.textContent = testResults.current;
+        // Force repaint
+        void elements.totalTested.offsetHeight;
+    }
+    if (elements.successfulCount) {
+        elements.successfulCount.textContent = testResults.successful;
+        void elements.successfulCount.offsetHeight;
+    }
+    if (elements.flaggedCount) {
+        elements.flaggedCount.textContent = testResults.flagged;
+        void elements.flaggedCount.offsetHeight;
+    }
     
     const progress = testResults.total > 0 ? (testResults.current / testResults.total) * 100 : 0;
     // Progress percent element was removed from UI
@@ -1734,9 +1747,17 @@ function updateStats() {
     }
     
     // Update tab counts
-    elements.successfulTabCount.textContent = testResults.successful;
-    elements.flaggedTabCount.textContent = testResults.flagged;
-    elements.allTabCount.textContent = testResults.current;
+    if (elements.successfulTabCount) {
+        elements.successfulTabCount.textContent = testResults.successful;
+    }
+    if (elements.flaggedTabCount) {
+        elements.flaggedTabCount.textContent = testResults.flagged;
+    }
+    if (elements.allTabCount) {
+        elements.allTabCount.textContent = testResults.current;
+    }
+    
+    console.log('✅ [updateStats] DOM updated successfully');
 }
 
 // Add result to appropriate list
