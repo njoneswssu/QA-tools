@@ -17,6 +17,8 @@ let currentTestingUrl = null;
 let testStartTime = null;
 let autoScroll = true;
 let testPaused = false;
+let selectedResultIndex = -1; // For arrow navigation in test results
+let selectedMerchantIndex = -1; // For arrow navigation in merchant preview
 
 // Cache keys for localStorage
 const CACHE_KEYS = {
@@ -234,13 +236,14 @@ const elements = {
     apiUrl: document.getElementById('api-url'),
     fetchAllBtn: document.getElementById('fetch-all-btn'),
     fetchCloudStorageBtn: document.getElementById('fetch-cloud-storage-btn'),
-    testApiBtn: document.getElementById('test-api-btn'),
+    // testApiBtn: document.getElementById('test-api-btn'), // REMOVED - button no longer in HTML
     fetchProgress: document.getElementById('fetch-progress'),
     fetchProgressFill: document.getElementById('fetch-progress-fill'),
     fetchStatus: document.getElementById('fetch-status'),
     appIdFilter: document.getElementById('app-id-filter'),
     categoryFilter: document.getElementById('category-filter'),
     merchantLimit: document.getElementById('merchant-limit'),
+    testerName: document.getElementById('tester-name'),
     testName: document.getElementById('test-name'),
     shuffleMerchants: document.getElementById('shuffle-merchants'),
     merchantPreview: document.getElementById('merchant-preview'),
@@ -668,6 +671,20 @@ function initializeEventListeners() {
     elements.merchantSearch.addEventListener('input', filterMerchants);
     elements.statusFilter.addEventListener('change', filterMerchants);
     
+    // Tester name auto-generates test name
+    if (elements.testerName) {
+        elements.testerName.addEventListener('input', updateTestName);
+        // Load saved tester name from localStorage
+        const savedTesterName = localStorage.getItem('tester_name');
+        if (savedTesterName) {
+            elements.testerName.value = savedTesterName;
+            updateTestName();
+        } else {
+            // Set default test name
+            updateTestName();
+        }
+    }
+    
     // Button events
     elements.saveToDbBtn.addEventListener('click', saveToDatabase);
     elements.startTestBtn.addEventListener('click', startTest);
@@ -676,7 +693,7 @@ function initializeEventListeners() {
     elements.resetDatabaseBtn.addEventListener('click', handleDatabaseReset);
     elements.fetchAllBtn.addEventListener('click', fetchAllPages);
     elements.fetchCloudStorageBtn.addEventListener('click', fetchFromCloudStorage);
-    elements.testApiBtn.addEventListener('click', testApiEndpoint);
+    // elements.testApiBtn.addEventListener('click', testApiEndpoint); // REMOVED - button no longer exists
     elements.pauseTestBtn.addEventListener('click', pauseTest);
     elements.resumeTestBtn.addEventListener('click', resumeTest);
     elements.restartTestBtn.addEventListener('click', restartTest);
@@ -718,6 +735,35 @@ function initializeEventListeners() {
             }
         }
         
+        // Command+P (Mac) or Ctrl+P (Windows) to pause/resume testing
+        if ((e.metaKey || e.ctrlKey) && e.key === 'p' && testSession) {
+            e.preventDefault();
+            if (testPaused) {
+                resumeTest();
+            } else {
+                pauseTest();
+            }
+        }
+        
+        // Arrow navigation in test results
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+            
+            // Check if we're focused on the test results area
+            const resultsArea = document.getElementById('results-section');
+            if (resultsArea && (document.activeElement === document.body || resultsArea.contains(document.activeElement))) {
+                e.preventDefault();
+                navigateResults(e.key === 'ArrowDown' ? 1 : -1);
+            }
+            
+            // Check if we're focused on the merchant preview area
+            const merchantPreviewArea = document.getElementById('merchant-preview');
+            if (merchantPreviewArea && (document.activeElement === document.body || merchantPreviewArea.contains(document.activeElement))) {
+                e.preventDefault();
+                navigateMerchantPreview(e.key === 'ArrowDown' ? 1 : -1);
+            }
+        }
+        
         // Ctrl+C to stop testing
         if (e.ctrlKey && e.key === 'c' && isTestRunning) {
             e.preventDefault();
@@ -733,7 +779,9 @@ function initializeEventListeners() {
     
     // Tab events
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            console.log('Tab clicked:', this.dataset.tab);
+            e.stopPropagation(); // Prevent any parent handlers from interfering
             switchTab(this.dataset.tab);
         });
     });
@@ -755,6 +803,99 @@ function generateDefaultTestName() {
         day: 'numeric' 
     });
     elements.testName.value = `Merchant Test - ${dateStr}`;
+}
+
+// Update test name based on tester name
+function updateTestName() {
+    const testerName = elements.testerName.value.trim();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+    
+    if (testerName) {
+        elements.testName.value = `${testerName} - ${dateStr}`;
+        // Save tester name to localStorage for persistence
+        localStorage.setItem('tester_name', testerName);
+    } else {
+        elements.testName.value = `Merchant Test - ${dateStr}`;
+    }
+}
+
+// Navigate through test results with arrow keys
+function navigateResults(direction) {
+    const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+    let resultsList;
+    
+    if (activeTab === 'successful') {
+        resultsList = elements.successfulList.querySelectorAll('.result-item');
+    } else if (activeTab === 'flagged') {
+        resultsList = elements.flaggedList.querySelectorAll('.result-item');
+    } else {
+        resultsList = elements.allResultsList.querySelectorAll('.result-item');
+    }
+    
+    if (resultsList.length === 0) return;
+    
+    // Remove previous selection
+    resultsList.forEach(item => item.classList.remove('selected'));
+    
+    // Update index with wraparound
+    if (selectedResultIndex === -1) {
+        selectedResultIndex = direction > 0 ? 0 : resultsList.length - 1;
+    } else {
+        selectedResultIndex += direction;
+        
+        // Wraparound logic
+        if (selectedResultIndex >= resultsList.length) {
+            selectedResultIndex = 0; // Go back to top
+        } else if (selectedResultIndex < 0) {
+            selectedResultIndex = resultsList.length - 1; // Go to bottom
+        }
+    }
+    
+    // Select and scroll to the new item
+    const selectedItem = resultsList[selectedResultIndex];
+    if (selectedItem) {
+        selectedItem.classList.add('selected');
+        selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        // Trigger click to show details
+        selectedItem.click();
+    }
+}
+
+// Navigate through merchant preview with arrow keys
+function navigateMerchantPreview(direction) {
+    const merchantItems = elements.merchantPreview.querySelectorAll('.merchant-item');
+    
+    if (merchantItems.length === 0) return;
+    
+    // Remove previous selection
+    merchantItems.forEach(item => item.classList.remove('selected'));
+    
+    // Update index with wraparound
+    if (selectedMerchantIndex === -1) {
+        selectedMerchantIndex = direction > 0 ? 0 : merchantItems.length - 1;
+    } else {
+        selectedMerchantIndex += direction;
+        
+        // Wraparound logic
+        if (selectedMerchantIndex >= merchantItems.length) {
+            selectedMerchantIndex = 0; // Go back to top
+        } else if (selectedMerchantIndex < 0) {
+            selectedMerchantIndex = merchantItems.length - 1; // Go to bottom
+        }
+    }
+    
+    // Select and scroll to the new item
+    const selectedItem = merchantItems[selectedMerchantIndex];
+    if (selectedItem) {
+        selectedItem.classList.add('selected');
+        selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 }
 
 // Shuffle array using Fisher-Yates algorithm
@@ -925,17 +1066,25 @@ function autoDetectAppId(merchants) {
     const appIds = [...new Set(merchants
         .map(m => m.AppID)
         .filter(id => id !== null && id !== undefined)
-    )];
+    )].sort();
+    
+    // Always populate the dropdown with available AppIDs
+    elements.appIdFilter.innerHTML = '<option value="">All App IDs</option>';
+    appIds.forEach(appId => {
+        const option = document.createElement('option');
+        option.value = appId;
+        option.textContent = appId;
+        elements.appIdFilter.appendChild(option);
+    });
+    
+    console.log(`Populated ${appIds.length} App ID(s) in filter dropdown`);
     
     if (appIds.length === 1) {
         // If all merchants have the same AppID, auto-select it
         const appId = appIds[0];
         elements.appIdFilter.value = appId;
         
-        // Show success message
-        showSuccess(`Auto-detected AppID: ${appId} (${merchants.length} merchants)`);
-        
-        // Log the detection
+        // Log the detection (no toast message)
         addLogEntry(`🎯 Auto-detected AppID: ${appId} - ${merchants.length} merchants loaded`, 'info');
         
     } else if (appIds.length > 1) {
@@ -3597,3 +3746,306 @@ async function clearTest() {
     addLogEntry('🔄 Test cleared - ready to start new test', 'success');
     showSuccess('Test cleared successfully');
 }
+
+// ==================== TESTER STATS FUNCTIONALITY ====================
+
+let statsChart = null;
+let currentStatsRange = '1m';
+
+// Open stats modal
+async function openTesterStats() {
+    const testerName = localStorage.getItem('tester_name') || 'Tester';
+    document.getElementById('stats-tester-name').textContent = `${testerName}'s Testing Stats`;
+    document.getElementById('tester-stats-modal').style.display = 'block';
+    
+    await loadTesterStats(currentStatsRange);
+}
+
+// Close stats modal
+function closeTesterStats() {
+    document.getElementById('tester-stats-modal').style.display = 'none';
+}
+
+// Load tester stats
+async function loadTesterStats(range = '1m', customFrom = null, customTo = null) {
+    const testerName = localStorage.getItem('tester_name');
+    
+    if (!testerName) {
+        showInfo('Please set your tester name in the configuration section first');
+        closeTesterStats();
+        return;
+    }
+    
+    try {
+        // Calculate date range
+        let fromDate, toDate;
+        toDate = new Date();
+        
+        if (range === 'custom' && customFrom && customTo) {
+            fromDate = new Date(customFrom);
+            toDate = new Date(customTo);
+        } else {
+            fromDate = new Date();
+            const months = range === '1m' ? 1 : (range === '3m' ? 3 : 6);
+            fromDate.setMonth(fromDate.getMonth() - months);
+        }
+        
+        // Fetch test sessions for this tester
+        const response = await fetch('/api/test-sessions');
+        if (!response.ok) throw new Error('Failed to fetch test sessions');
+        
+        const sessions = await response.json();
+        
+        // Filter sessions by tester name (case-insensitive partial match)
+        const testerSessions = sessions.filter(s => 
+            s.session_name && s.session_name.toLowerCase().includes(testerName.toLowerCase())
+        );
+        
+        // Filter by date range
+        const filteredSessions = testerSessions.filter(s => {
+            const sessionDate = new Date(s.created_at);
+            return sessionDate >= fromDate && sessionDate <= toDate;
+        });
+        
+        // Fetch all merchant results for these sessions
+        const allResults = [];
+        for (const session of filteredSessions) {
+            const resultsResponse = await fetch(`/api/merchant-results?sessionId=${session.session_id}&limit=10000`);
+            if (resultsResponse.ok) {
+                const data = await resultsResponse.json();
+                const results = data.data || data;
+                allResults.push(...results);
+            }
+        }
+        
+        // Calculate stats
+        const totalTests = filteredSessions.length;
+        const totalMerchants = allResults.length;
+        const successfulMerchants = allResults.filter(r => r.test_status === 'success').length;
+        const flaggedMerchants = allResults.filter(r => r.test_status === 'flagged').length;
+        
+        // Update summary cards
+        document.getElementById('total-tests-stat').textContent = totalTests;
+        document.getElementById('total-merchants-stat').textContent = totalMerchants;
+        document.getElementById('successful-merchants-stat').textContent = successfulMerchants;
+        document.getElementById('flagged-merchants-stat').textContent = flaggedMerchants;
+        
+        // Prepare chart data
+        const chartData = prepareChartData(allResults, fromDate, toDate);
+        renderStatsChart(chartData);
+        
+        // Display recent sessions
+        displayRecentSessions(filteredSessions.slice(0, 10));
+        
+    } catch (error) {
+        console.error('Error loading tester stats:', error);
+        showError('Failed to load testing statistics');
+    }
+}
+
+// Prepare chart data
+function prepareChartData(results, fromDate, toDate) {
+    // Group results by date
+    const dailyStats = {};
+    
+    results.forEach(result => {
+        const date = new Date(result.tested_at).toISOString().split('T')[0];
+        if (!dailyStats[date]) {
+            dailyStats[date] = { total: 0, successful: 0, flagged: 0 };
+        }
+        dailyStats[date].total++;
+        if (result.test_status === 'success') dailyStats[date].successful++;
+        if (result.test_status === 'flagged') dailyStats[date].flagged++;
+    });
+    
+    // Generate labels for all dates in range
+    const labels = [];
+    const totalData = [];
+    const successData = [];
+    const flaggedData = [];
+    
+    const currentDate = new Date(fromDate);
+    while (currentDate <= toDate) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        labels.push(dateStr);
+        
+        const stats = dailyStats[dateStr] || { total: 0, successful: 0, flagged: 0 };
+        totalData.push(stats.total);
+        successData.push(stats.successful);
+        flaggedData.push(stats.flagged);
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    return { labels, totalData, successData, flaggedData };
+}
+
+// Render stats chart
+function renderStatsChart(data) {
+    const ctx = document.getElementById('stats-chart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (statsChart) {
+        statsChart.destroy();
+    }
+    
+    statsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+            datasets: [
+                {
+                    label: 'Total Merchants',
+                    data: data.totalData,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Successful',
+                    data: data.successData,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Flagged',
+                    data: data.flaggedData,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Display recent sessions
+function displayRecentSessions(sessions) {
+    const container = document.getElementById('recent-sessions-list');
+    
+    if (sessions.length === 0) {
+        container.innerHTML = '<p class="no-data">No test sessions found in this period</p>';
+        return;
+    }
+    
+    container.innerHTML = sessions.map(session => {
+        const date = new Date(session.created_at).toLocaleString();
+        return `
+            <div class="session-item">
+                <div class="session-header">
+                    <div class="session-name">${session.session_name || 'Unnamed Test'}</div>
+                    <div class="session-date">${date}</div>
+                </div>
+                <div class="session-stats">
+                    <div class="session-stat">
+                        <i class="fas fa-vial"></i>
+                        <span>Status: ${session.status}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Initialize stats modal event listeners
+function initStatsModalListeners() {
+    // Stats button click
+    const statsBtn = document.getElementById('tester-stats-btn');
+    if (statsBtn) {
+        statsBtn.addEventListener('click', openTesterStats);
+    }
+    
+    // Close button
+    const closeBtn = document.getElementById('close-stats-modal');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeTesterStats);
+    }
+    
+    // Click outside modal to close
+    const modal = document.getElementById('tester-stats-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeTesterStats();
+            }
+        });
+    }
+    
+    // Range buttons
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const range = this.dataset.range;
+            
+            // Update active state
+            document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            if (range === 'custom') {
+                document.getElementById('custom-date-range').style.display = 'block';
+            } else {
+                document.getElementById('custom-date-range').style.display = 'none';
+                currentStatsRange = range;
+                await loadTesterStats(range);
+            }
+        });
+    });
+    
+    // Apply custom range
+    const applyBtn = document.getElementById('apply-custom-range');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', async () => {
+            const fromDate = document.getElementById('stats-date-from').value;
+            const toDate = document.getElementById('stats-date-to').value;
+            
+            if (!fromDate || !toDate) {
+                showError('Please select both start and end dates');
+                return;
+            }
+            
+            if (new Date(fromDate) > new Date(toDate)) {
+                showError('Start date must be before end date');
+                return;
+            }
+            
+            currentStatsRange = 'custom';
+            await loadTesterStats('custom', fromDate, toDate);
+        });
+    }
+    
+    // Set default date values
+    const today = new Date().toISOString().split('T')[0];
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const oneMonthAgoStr = oneMonthAgo.toISOString().split('T')[0];
+    
+    document.getElementById('stats-date-from').value = oneMonthAgoStr;
+    document.getElementById('stats-date-to').value = today;
+}
+
+// Initialize stats listeners on page load
+initStatsModalListeners();

@@ -14,6 +14,9 @@
                 <h1><i class="fas fa-rocket"></i> API Merchant Tester</h1>
             </div>
             <div class="header-nav">
+                <button id="tester-stats-btn" class="nav-link stats-btn" title="View Your Testing Stats">
+                    <i class="fas fa-user-chart"></i> My Stats
+                </button>
                 <a href="/" class="nav-link">
                     <i class="fas fa-chart-line"></i> Dashboard
                 </a>
@@ -43,9 +46,6 @@
                     </button>
                     <button type="button" id="fetch-all-btn" class="btn btn-secondary">
                         <i class="fas fa-download"></i> Fetch All Pages (API)
-                    </button>
-                    <button type="button" id="test-api-btn" class="btn btn-outline">
-                        <i class="fas fa-flask"></i> Test API (Page 1)
                     </button>
                 </div>
                 <div id="fetch-progress" style="margin-top: 10px; display: none;">
@@ -92,16 +92,30 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="tester-name">
+                        <i class="fas fa-user"></i> Tester Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="tester-name" 
+                        placeholder="e.g., NeilQA"
+                        value=""
+                    >
+                    <div class="input-help">Your name to identify this test session</div>
+                </div>
+                
+                <div class="form-group">
                     <label for="test-name">
                         <i class="fas fa-tag"></i> Test Session Name
                     </label>
                     <input 
                         type="text" 
                         id="test-name" 
-                        placeholder="e.g., Q4 2025 Merchant Validation"
+                        placeholder="Auto-generated from tester name + date"
                         value=""
+                        readonly
                     >
-                    <div class="input-help">Optional name for this test session</div>
+                    <div class="input-help">Automatically generated: [Tester Name] - [Date]</div>
                 </div>
 
                 <div class="form-group">
@@ -387,6 +401,90 @@
         </div>
     </div>
 
+    <!-- Tester Stats Modal -->
+    <div id="tester-stats-modal" class="modal" style="display: none;">
+        <div class="modal-content stats-modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-chart"></i> <span id="stats-tester-name">My Testing Stats</span></h3>
+                <button class="modal-close" id="close-stats-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-summary">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-vial"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="total-tests-stat">0</div>
+                            <div class="stat-label">Total Tests</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success"><i class="fas fa-store"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="total-merchants-stat">0</div>
+                            <div class="stat-label">Merchants Tested</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="successful-merchants-stat">0</div>
+                            <div class="stat-label">Successful</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon flagged"><i class="fas fa-flag"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="flagged-merchants-stat">0</div>
+                            <div class="stat-label">Flagged</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-chart-section">
+                    <div class="chart-header">
+                        <h4><i class="fas fa-chart-line"></i> Testing Activity Over Time</h4>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" data-range="1m">1M</button>
+                            <button class="chart-btn" data-range="3m">3M</button>
+                            <button class="chart-btn" data-range="6m">6M</button>
+                            <button class="chart-btn" data-range="custom" id="custom-range-btn">
+                                <i class="fas fa-calendar-alt"></i> Custom
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="custom-date-range" id="custom-date-range" style="display: none;">
+                        <div class="date-inputs">
+                            <div class="date-input-group">
+                                <label>From:</label>
+                                <input type="date" id="stats-date-from" />
+                            </div>
+                            <div class="date-input-group">
+                                <label>To:</label>
+                                <input type="date" id="stats-date-to" />
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="apply-custom-range">Apply</button>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="stats-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="stats-details">
+                    <h4><i class="fas fa-list"></i> Recent Test Sessions</h4>
+                    <div class="recent-sessions-list" id="recent-sessions-list">
+                        <p class="no-data">No test sessions found</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="tester-script.js"></script>
     <script src="queue-and-logging.js"></script>
 </body>

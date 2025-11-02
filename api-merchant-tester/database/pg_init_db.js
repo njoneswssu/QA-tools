@@ -266,12 +266,15 @@ async function updateTestSession(sessionId, data) {
   if (data.status !== undefined) {
     fields.push(`status = $${paramIndex++}`);
     values.push(data.status);
+    console.log(`🔄 [DB] Updating session ${sessionId} status to: ${data.status}`);
   }
 
   values.push(sessionId);
 
   const query = `UPDATE test_sessions SET ${fields.join(', ')} WHERE session_id = $${paramIndex}`;
+  console.log(`📝 [DB] Executing query: ${query} with values:`, values);
   const result = await pool.query(query, values);
+  console.log(`✅ [DB] Updated ${result.rowCount} row(s) for session ${sessionId}`);
   return result.rowCount;
 }
 

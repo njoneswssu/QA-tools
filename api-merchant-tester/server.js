@@ -73,6 +73,15 @@ async function queryRun(query, params = []) {
 }
 
 // Middleware
+// Global request logger to debug missing PUT requests
+app.use((req, res, next) => {
+    if (req.method === 'PUT' && req.url.includes('/api/sessions')) {
+        console.error(`🚨🚨🚨 GLOBAL MIDDLEWARE - ${req.method} ${req.url} 🚨🚨🚨`);
+        console.error('🚨 Body:', JSON.stringify(req.body));
+    }
+    next();
+});
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Increased limit for large merchant datasets
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -318,11 +327,30 @@ app.get('/api/merchant-results', async (req, res) => {
 app.get('/api/sessions', async (req, res) => {
     try {
         const query = `
-            SELECT session_id, started_at, completed_at, status, 
+            SELECT session_id, session_name, started_at, completed_at, status, created_at,
                    total_merchants, successful_merchants, flagged_merchants, user_passed_merchants,
                    current_merchant, current_url, notes
             FROM test_sessions 
             ORDER BY started_at DESC
+        `;
+
+        const rows = await queryAll(query, []);
+        res.json(rows);
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get test sessions (for compatibility)
+app.get('/api/test-sessions', async (req, res) => {
+    try {
+        const query = `
+            SELECT session_id, session_name, started_at, completed_at, status, created_at,
+                   total_merchants, successful_merchants, flagged_merchants, user_passed_merchants,
+                   current_merchant, current_url, notes
+            FROM test_sessions 
+            ORDER BY created_at DESC
         `;
 
         const rows = await queryAll(query, []);
@@ -477,9 +505,12 @@ app.get('/api/sessions/:sessionId/status', async (req, res) => {
 
 // Update a test session
 app.put('/api/sessions/:sessionId', async (req, res) => {
+    console.error('🔥🔥🔥 [DEBUG] PUT /api/sessions endpoint HIT - ERROR STREAM! 🔥🔥🔥');
+    console.log('🔥 [DEBUG] PUT /api/sessions endpoint HIT!');
     const { sessionId } = req.params;
     const updateData = req.body;
     
+    console.error(`📝 [Server ERROR] PUT /api/sessions/${sessionId} - Update data:`, JSON.stringify(updateData));
     console.log(`📝 [Server] PUT /api/sessions/${sessionId} - Update data:`, updateData);
     
     try {
