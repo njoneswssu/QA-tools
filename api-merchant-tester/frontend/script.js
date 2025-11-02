@@ -179,12 +179,12 @@ function initializeEventListeners() {
                     
                     console.log(`✅ [Dashboard] Loaded ${currentData.length} unique historical results`);
                     
-                    populateFilters();
+                    await populateFilters();
                     updateStats();
                     applyFilters();
                 } else {
                     currentData = [];
-                    populateFilters();
+                    await populateFilters();
                     updateStats();
                     applyFilters();
                 }
@@ -270,14 +270,14 @@ async function loadData() {
             currentData = [];
         }
         
-        populateFilters();
+        await populateFilters();
         updateStats();
         applyFilters();
     } catch (error) {
         console.error('❌ [Dashboard] Error loading data:', error);
         // Show empty state instead of sample data
         currentData = [];
-        populateFilters();
+        await populateFilters();
         updateStats();
         applyFilters();
     } finally {
@@ -326,10 +326,29 @@ function generateSampleData() {
 }
 
 // Populate filter dropdowns
-function populateFilters() {
-    // Populate sessions
-    const sessions = [...new Set(currentData.map(item => item.session_id))];
-    populateSelect(elements.sessionFilter, sessions);
+async function populateFilters() {
+    // Populate sessions with session names
+    try {
+        const response = await fetch('/api/test-sessions');
+        if (response.ok) {
+            const sessions = await response.json();
+            // Create options with session names, but use session_id as value
+            const sessionOptions = sessions.map(session => ({
+                value: session.session_id,
+                text: session.session_name || session.session_id
+            }));
+            populateSelectWithOptions(elements.sessionFilter, sessionOptions);
+        } else {
+            // Fallback to session IDs if API fails
+            const sessions = [...new Set(currentData.map(item => item.session_id))];
+            populateSelect(elements.sessionFilter, sessions);
+        }
+    } catch (error) {
+        console.error('Error loading sessions:', error);
+        // Fallback to session IDs if API fails
+        const sessions = [...new Set(currentData.map(item => item.session_id))];
+        populateSelect(elements.sessionFilter, sessions);
+    }
 
     // Populate categories
     const categories = [...new Set(currentData.map(item => item.primary_category).filter(Boolean))];
@@ -346,6 +365,20 @@ function populateSelect(selectElement, options) {
         const optionElement = document.createElement('option');
         optionElement.value = option;
         optionElement.textContent = option;
+        selectElement.appendChild(optionElement);
+    });
+}
+
+function populateSelectWithOptions(selectElement, optionsArray) {
+    // Keep the first option (All)
+    const firstOption = selectElement.children[0];
+    selectElement.innerHTML = '';
+    selectElement.appendChild(firstOption);
+
+    optionsArray.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
         selectElement.appendChild(optionElement);
     });
 }

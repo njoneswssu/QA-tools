@@ -103,13 +103,45 @@ function closeProfileModal() {
     }
 }
 
+// Check if tester name is currently in use
+async function checkTesterNameInUse(name) {
+    try {
+        const response = await fetch('/api/test-sessions');
+        if (!response.ok) return false;
+        
+        const sessions = await response.json();
+        
+        // Check if any recent session (last 24 hours) uses this name
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const recentSessions = sessions.filter(session => {
+            const sessionDate = new Date(session.created_at);
+            return sessionDate > oneDayAgo && 
+                   session.session_name && 
+                   session.session_name.toLowerCase().includes(name.toLowerCase()) &&
+                   (session.status === 'running' || session.status === 'active');
+        });
+        
+        return recentSessions.length > 0;
+    } catch (error) {
+        console.error('Error checking tester name:', error);
+        return false; // If we can't check, allow the name
+    }
+}
+
 // Save profile name
-function saveProfileName() {
+async function saveProfileName() {
     const input = document.getElementById('profile-name-input');
     const name = input.value.trim();
     
     if (!name) {
         alert('Please enter a name');
+        return;
+    }
+    
+    // Check if name is currently in use
+    const nameInUse = await checkTesterNameInUse(name);
+    if (nameInUse) {
+        alert(`The name "${name}" is currently in use by an active test session. Please choose a different name or wait for the current session to complete.`);
         return;
     }
     
