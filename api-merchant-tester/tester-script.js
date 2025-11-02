@@ -1285,9 +1285,30 @@ async function startTest() {
     }
     
     // Create or reuse test session
-    const testerName = elements.testerName?.value.trim() || 'Tester';
-    const sessionName = `${testerName} - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+    // Get tester name from input or localStorage
+    const testerNameInput = elements.testerName?.value.trim();
+    if (testerNameInput) {
+        // Save to localStorage for persistence
+        localStorage.setItem('tester_name', testerNameInput);
+    }
     
+    const testerName = testerNameInput || localStorage.getItem('tester_name') || 'Tester';
+    
+    // Generate session name with proper formatting
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+    const timeStr = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+    const sessionName = `${testerName} - ${dateStr} ${timeStr}`;
+    
+    console.log('📝 [Start Test] Generated session name:', sessionName);
     // ✨ IMPORTANT: Always create a NEW session to preserve historical data
     // Even if there's an existing session, create a new one so old results stay in database
     try {
@@ -1528,6 +1549,8 @@ async function pollForResults() {
 
 // Update stats from database results
 function updateStatsFromResults(results) {
+    console.log('📊 [updateStatsFromResults] Received results:', results.length);
+    
     // First deduplicate by merchant_id to get accurate counts
     const seenMerchants = new Set();
     const uniqueResults = results.filter(result => {
@@ -1543,9 +1566,13 @@ function updateStatsFromResults(results) {
     const successful = uniqueResults.filter(r => r.test_status === 'success' || r.is_user_passed).length;
     const flagged = uniqueResults.filter(r => r.test_status === 'flagged').length;
     
+    console.log(`📊 [Tester] Calculated - Total: ${uniqueResults.length}, Successful: ${successful}, Flagged: ${flagged}`);
+    
     testResults.current = uniqueResults.length;  // Use deduplicated count
     testResults.successful = successful;
     testResults.flagged = flagged;
+    
+    console.log(`📊 [Tester] Updated testResults:`, testResults);
     
     updateStats();
 }
