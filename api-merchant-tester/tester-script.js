@@ -529,6 +529,94 @@ async function checkForActiveTestSession() {
     }
 }
 
+// Show toast notification
+function showToast(message, type = 'info', duration = 3000) {
+    // Remove any existing toast
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-content">
+            <i class="fas ${getToastIcon(type)}"></i>
+            <span class="toast-message">${message}</span>
+            <button class="toast-close" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    // Add styles if not already present
+    if (!document.querySelector('#toast-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'toast-styles';
+        styles.textContent = `
+            .toast-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                min-width: 300px;
+                max-width: 500px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideInRight 0.3s ease-out;
+            }
+            .toast-info { background: #3498db; color: white; }
+            .toast-success { background: #27ae60; color: white; }
+            .toast-warning { background: #f39c12; color: white; }
+            .toast-error { background: #e74c3c; color: white; }
+            .toast-content {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+                gap: 10px;
+            }
+            .toast-message { flex: 1; font-weight: 500; }
+            .toast-close {
+                background: none;
+                border: none;
+                color: inherit;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 4px;
+                opacity: 0.8;
+            }
+            .toast-close:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    // Add to page
+    document.body.appendChild(toast);
+    
+    // Auto-hide if duration is set
+    if (duration > 0) {
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, duration);
+    }
+}
+
+function getToastIcon(type) {
+    switch (type) {
+        case 'success': return 'fa-check-circle';
+        case 'warning': return 'fa-exclamation-triangle';
+        case 'error': return 'fa-times-circle';
+        default: return 'fa-info-circle';
+    }
+}
+
 // Load quick stats for immediate feedback (lightweight)
 async function loadQuickStats() {
     try {
@@ -592,24 +680,36 @@ document.addEventListener('DOMContentLoaded', async function() {
                     elements.startTestBtn.disabled = false;
                 }
             } else {
-                // No cache found - DON'T auto-load from database to avoid freezing
-                console.log('ℹ️ No cached merchants found');
-                console.log('💡 Use "Load from Database" or "Fetch All Pages" to load merchants');
+                // No cache found, load from database with toast notification
+                console.log('📥 No cache found, loading from database...');
                 
-                // Show a helpful message to the user
-                if (elements.merchantPreview) {
-                    elements.merchantPreview.innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: #666;">
-                            <i class="fas fa-database" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
-                            <h3>No Merchants Loaded</h3>
-                            <p>To get started, use one of these options:</p>
-                            <ul style="text-align: left; display: inline-block; margin-top: 20px;">
-                                <li><strong>Load from Database:</strong> Click "Load from Database" to load stored merchants</li>
-                                <li><strong>Fetch from API:</strong> Use "Fetch All Pages" to get fresh merchant data</li>
-                                <li><strong>Cloud Storage:</strong> Use "Fetch from Cloud Storage" for specific datasets</li>
-                            </ul>
-                        </div>
-                    `;
+                // Show toast notification
+                showToast('Loading merchants from database...', 'info', 0); // 0 = don't auto-hide
+                
+                try {
+                    await loadStoredMerchants(true);
+                    console.log('✅ Auto-loaded merchants from database');
+                    showToast('Merchants loaded successfully!', 'success', 3000);
+                } catch (error) {
+                    console.log('ℹ️ No stored merchants available:', error.message);
+                    console.log('💡 Please load merchants using API data or "Load from Database" button');
+                    showToast('No stored merchants found. Use "Fetch All Pages" or "Load from Database" to get started.', 'warning', 5000);
+                    
+                    // Show a helpful message to the user
+                    if (elements.merchantPreview) {
+                        elements.merchantPreview.innerHTML = `
+                            <div style="text-align: center; padding: 40px; color: #666;">
+                                <i class="fas fa-database" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                                <h3>No Merchants Found</h3>
+                                <p>To get started, use one of these options:</p>
+                                <ul style="text-align: left; display: inline-block; margin-top: 20px;">
+                                    <li><strong>Load from Database:</strong> Click "Load from Database" to load stored merchants</li>
+                                    <li><strong>Fetch from API:</strong> Use "Fetch All Pages" to get fresh merchant data</li>
+                                    <li><strong>Cloud Storage:</strong> Use "Fetch from Cloud Storage" for specific datasets</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
                 }
             }
         }, 100); // Small delay to ensure DOM is fully ready
