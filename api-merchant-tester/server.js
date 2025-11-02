@@ -778,7 +778,7 @@ app.post('/api/store-merchants', async (req, res) => {
 // Get stored merchants
 app.get('/api/stored-merchants', async (req, res) => {
     try {
-        const { app_id, limit = 50000 } = req.query; // Increased default limit
+        const { app_id, limit = 1000 } = req.query; // Reduced default limit for better performance
         
         let query = 'SELECT * FROM merchant_master_data';
         let params = [];

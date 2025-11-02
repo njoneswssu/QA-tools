@@ -529,6 +529,33 @@ async function checkForActiveTestSession() {
     }
 }
 
+// Load quick stats for immediate feedback (lightweight)
+async function loadQuickStats() {
+    try {
+        console.log('📊 Loading quick stats...');
+        const response = await fetch('/api/stats');
+        if (response.ok) {
+            const stats = await response.json();
+            console.log('📊 Quick stats loaded:', stats);
+            
+            // Update stats display immediately
+            if (elements.totalTested) {
+                elements.totalTested.textContent = stats.total || '0';
+            }
+            if (elements.successfulCount) {
+                elements.successfulCount.textContent = stats.successful || '0';
+            }
+            if (elements.flaggedCount) {
+                elements.flaggedCount.textContent = stats.flagged || '0';
+            }
+            
+            console.log('✅ Quick stats displayed');
+        }
+    } catch (error) {
+        console.warn('⚠️ Failed to load quick stats:', error.message);
+    }
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 DOM Content Loaded - Initializing tester...');
@@ -542,16 +569,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Check for active test session on page load
     await checkForActiveTestSession();
     
-    // Only load merchants if there's no active test running
+    // Load stats immediately for quick feedback (lightweight)
+    await loadQuickStats();
+    
+    // Only load basic data if there's no active test running
     if (!isTestRunning) {
         // Add a small delay to ensure all DOM elements are ready
         setTimeout(async () => {
-            console.log('⏰ Attempting to load merchants...');
+            console.log('⏰ Initializing tester page...');
             
-            // Try to load merchants from cache first
+            // Try to load merchants from cache first (fast)
             const cacheLoaded = loadMerchantsFromCache();
             
-            // Populate dropdowns
+            // Always populate App ID dropdown (lightweight)
             populateAppIdDropdown();
             
             // If cache loaded successfully, display merchants
@@ -562,14 +592,24 @@ document.addEventListener('DOMContentLoaded', async function() {
                     elements.startTestBtn.disabled = false;
                 }
             } else {
-                // No cache found, load from database
-                console.log('📥 No cache found, loading from database...');
-                try {
-                    await loadStoredMerchants(true);
-                    console.log('✅ Auto-loaded merchants from database');
-                } catch (error) {
-                    console.log('ℹ️ No stored merchants available:', error.message);
-                    console.log('💡 Please load merchants using API data or "Load from Database" button');
+                // No cache found - DON'T auto-load from database to avoid freezing
+                console.log('ℹ️ No cached merchants found');
+                console.log('💡 Use "Load from Database" or "Fetch All Pages" to load merchants');
+                
+                // Show a helpful message to the user
+                if (elements.merchantPreview) {
+                    elements.merchantPreview.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #666;">
+                            <i class="fas fa-database" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                            <h3>No Merchants Loaded</h3>
+                            <p>To get started, use one of these options:</p>
+                            <ul style="text-align: left; display: inline-block; margin-top: 20px;">
+                                <li><strong>Load from Database:</strong> Click "Load from Database" to load stored merchants</li>
+                                <li><strong>Fetch from API:</strong> Use "Fetch All Pages" to get fresh merchant data</li>
+                                <li><strong>Cloud Storage:</strong> Use "Fetch from Cloud Storage" for specific datasets</li>
+                            </ul>
+                        </div>
+                    `;
                 }
             }
         }, 100); // Small delay to ensure DOM is fully ready
