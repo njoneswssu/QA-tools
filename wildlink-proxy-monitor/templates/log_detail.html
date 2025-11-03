@@ -122,9 +122,12 @@
                         <i class="fas fa-file-alt me-2"></i>
                         Log Detail
                     </h1>
-                    <a href="/logs" class="btn btn-outline-primary">
-                        <i class="fas fa-arrow-left me-1"></i>Back to Logs
-                    </a>
+                        <a href="/" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-tachometer-alt me-1"></i>Back to Dashboard
+                        </a>
+                        <a href="/logs" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Logs
+                        </a>
                 </div>
             </div>
         </div>
@@ -236,7 +239,6 @@
                     </h3>
                     <div class="row">
                         <div class="col-md-6">
-                            <h6><i class="fas fa-info-circle me-2"></i>Basic Info</h6>
                             <p><strong>Taken:</strong> ${formatTimestamp(log.timestamp)}</p>
                             <p><strong>Method:</strong> <span class="badge method-badge ${getMethodBadge(log.method)}">${log.method}</span></p>
                             <p><strong>Status:</strong> 
@@ -493,7 +495,7 @@
 
         // Keyboard navigation
         document.addEventListener('keydown', function(event) {
-            // Only handle arrow keys if no input/textarea is focused
+            // Only handle keys if no input/textarea is focused
             if (document.activeElement.tagName === 'INPUT' || 
                 document.activeElement.tagName === 'TEXTAREA') {
                 return;
@@ -505,6 +507,10 @@
             } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
                 event.preventDefault();
                 navigateLog('next');
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                // Go back to logs page
+                window.location.href = '/logs';
             }
         });
 
