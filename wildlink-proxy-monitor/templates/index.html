@@ -26,6 +26,20 @@
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+        .chart-container canvas {
+            max-height: 350px !important;
+            width: 100% !important;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                min-height: 300px;
+                padding: 15px;
+            }
+            .chart-container canvas {
+                max-height: 250px !important;
+            }
         }
         .activity-item {
             border-left: 4px solid #667eea;
@@ -33,6 +47,12 @@
             margin-bottom: 10px;
             background: #f8f9fa;
             border-radius: 0 10px 10px 0;
+            transition: all 0.2s ease;
+        }
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .method-badge {
             font-size: 0.8rem;
@@ -59,6 +79,12 @@
                 Wildlink Proxy Monitor
             </a>
             <div class="navbar-nav ms-auto">
+                <button id="refresh-btn" class="btn btn-outline-light btn-sm me-2">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh Now
+                </button>
+                <button id="toggle-auto-refresh" class="btn btn-outline-light btn-sm me-3">
+                    <i class="fas fa-pause me-1"></i>Pause Auto-refresh
+                </button>
                 <a class="nav-link" href="/">
                     <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                 </a>
@@ -147,24 +173,29 @@
             </div>
         </div>
 
-        <!-- Auto-refresh controls -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="chart-container">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5><i class="fas fa-sync-alt me-2"></i>Auto Refresh</h5>
-                            <p class="text-muted mb-0">Dashboard updates automatically every 5 seconds</p>
-                        </div>
-                        <div>
-                            <button id="refresh-btn" class="btn btn-primary">
-                                <i class="fas fa-sync-alt me-1"></i>Refresh Now
-                            </button>
-                            <button id="toggle-auto-refresh" class="btn btn-outline-secondary ms-2">
-                                <i class="fas fa-pause me-1"></i>Pause Auto-refresh
-                            </button>
-                        </div>
+    </div>
+
+    <!-- Log Details Modal -->
+    <div class="modal fade" id="logDetailsModal" tabindex="-1" aria-labelledby="logDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logDetailsModalLabel">
+                        <i class="fas fa-info-circle me-2"></i>Log Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="logDetailsContent">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p class="mt-2">Loading log details...</p>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="copyLogDetails()">
+                        <i class="fas fa-copy me-1"></i>Copy JSON
+                    </button>
                 </div>
             </div>
         </div>
@@ -182,10 +213,20 @@
             const chartOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 300 // Faster animations
+                },
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 10
+                        }
                     }
+                },
+                layout: {
+                    padding: 10
                 }
             };
 
@@ -193,7 +234,15 @@
             const domainCtx = document.getElementById('domainChart').getContext('2d');
             domainChart = new Chart(domainCtx, {
                 type: 'doughnut',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+                data: { 
+                    labels: ['No Data'], 
+                    datasets: [{ 
+                        data: [1], 
+                        backgroundColor: ['#e9ecef'],
+                        borderWidth: 1,
+                        borderColor: ['#dee2e6']
+                    }] 
+                },
                 options: chartOptions
             });
 
@@ -201,11 +250,31 @@
             const methodCtx = document.getElementById('methodChart').getContext('2d');
             methodChart = new Chart(methodCtx, {
                 type: 'bar',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: '#667eea' }] },
+                data: { 
+                    labels: ['No Data'], 
+                    datasets: [{ 
+                        data: [1], 
+                        backgroundColor: '#e9ecef',
+                        label: 'HTTP Methods'
+                    }] 
+                },
                 options: {
                     ...chartOptions,
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { 
+                            beginAtZero: true,
+                            display: true
+                        },
+                        x: {
+                            display: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                     }
                 }
             });
@@ -214,7 +283,15 @@
             const statusCtx = document.getElementById('statusChart').getContext('2d');
             statusChart = new Chart(statusCtx, {
                 type: 'pie',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+                data: { 
+                    labels: ['No Data'], 
+                    datasets: [{ 
+                        data: [1], 
+                        backgroundColor: ['#e9ecef'],
+                        borderWidth: 1,
+                        borderColor: ['#dee2e6']
+                    }] 
+                },
                 options: chartOptions
             });
         }
@@ -262,38 +339,87 @@
             document.getElementById('total-requests').textContent = stats.total_requests;
             document.getElementById('completed-requests').textContent = stats.completed_requests;
             document.getElementById('pending-requests').textContent = stats.pending_requests;
-            document.getElementById('log-file-size').textContent = formatFileSize(stats.log_file_size);
+            document.getElementById('log-file-size').textContent = formatFileSize(stats.log_file_size || 0);
 
             // Update domain chart
-            const domainLabels = Object.keys(stats.domain_breakdown);
-            const domainData = Object.values(stats.domain_breakdown);
-            domainChart.data.labels = domainLabels;
-            domainChart.data.datasets[0].data = domainData;
-            domainChart.data.datasets[0].backgroundColor = generateColors(domainLabels.length);
+            const domainLabels = Object.keys(stats.domain_breakdown || {});
+            const domainData = Object.values(stats.domain_breakdown || {});
+            
+            if (domainLabels.length === 0) {
+                domainChart.data.labels = ['No Data'];
+                domainChart.data.datasets[0].data = [1];
+                domainChart.data.datasets[0].backgroundColor = ['#e9ecef'];
+            } else {
+                domainChart.data.labels = domainLabels;
+                domainChart.data.datasets[0].data = domainData;
+                domainChart.data.datasets[0].backgroundColor = generateColors(domainLabels.length);
+            }
             domainChart.update();
 
             // Update method chart
-            const methodLabels = Object.keys(stats.method_breakdown);
-            const methodData = Object.values(stats.method_breakdown);
-            methodChart.data.labels = methodLabels;
-            methodChart.data.datasets[0].data = methodData;
-            methodChart.update();
+            const methodLabels = Object.keys(stats.method_breakdown || {});
+            const methodData = Object.values(stats.method_breakdown || {});
+            
+            if (methodLabels.length === 0) {
+                methodChart.data.labels = ['No Data'];
+                methodChart.data.datasets[0].data = [1];
+                methodChart.data.datasets[0].backgroundColor = ['#e9ecef'];
+                methodChart.data.datasets[0].borderColor = ['#dee2e6'];
+                methodChart.data.datasets[0].borderWidth = 1;
+            } else {
+                methodChart.data.labels = methodLabels;
+                methodChart.data.datasets[0].data = methodData;
+                // Different colors for different HTTP methods
+                const methodColors = methodLabels.map(method => {
+                    switch(method) {
+                        case 'GET': return '#28a745';
+                        case 'POST': return '#007bff';
+                        case 'PUT': return '#ffc107';
+                        case 'DELETE': return '#dc3545';
+                        case 'PATCH': return '#17a2b8';
+                        default: return '#6c757d';
+                    }
+                });
+                methodChart.data.datasets[0].backgroundColor = methodColors;
+                methodChart.data.datasets[0].borderColor = methodColors.map(color => color);
+                methodChart.data.datasets[0].borderWidth = 1;
+            }
+            methodChart.update('none'); // Use 'none' animation for better performance
 
             // Update status chart
-            const statusLabels = Object.keys(stats.status_code_breakdown);
-            const statusData = Object.values(stats.status_code_breakdown);
-            statusChart.data.labels = statusLabels;
-            statusChart.data.datasets[0].data = statusData;
-            statusChart.data.datasets[0].backgroundColor = generateColors(statusLabels.length);
+            const statusLabels = Object.keys(stats.status_code_breakdown || {});
+            const statusData = Object.values(stats.status_code_breakdown || {});
+            
+            if (statusLabels.length === 0) {
+                statusChart.data.labels = ['No Data'];
+                statusChart.data.datasets[0].data = [1];
+                statusChart.data.datasets[0].backgroundColor = ['#e9ecef'];
+            } else {
+                statusChart.data.labels = statusLabels;
+                statusChart.data.datasets[0].data = statusData;
+                statusChart.data.datasets[0].backgroundColor = generateColors(statusLabels.length);
+            }
             statusChart.update();
 
             // Update recent activity
             const activityContainer = document.getElementById('recent-activity');
             if (stats.recent_activity.length === 0) {
-                activityContainer.innerHTML = '<div class="text-center text-muted">No recent activity</div>';
+                activityContainer.innerHTML = `
+                    <div class="text-center text-muted">
+                        <i class="fas fa-info-circle mb-2" style="font-size: 2rem;"></i>
+                        <h5>No Traffic Captured Yet</h5>
+                        <p class="mb-2">To start monitoring Wildlink traffic:</p>
+                        <ol class="text-start" style="display: inline-block;">
+                            <li>Configure your browser proxy to <code>localhost:8080</code></li>
+                            <li>Visit Wildlink domains (wildlink.me, wild.link, etc.)</li>
+                            <li>Traffic will appear here automatically</li>
+                        </ol>
+                        <p class="mt-2"><small>Or test with: <code>curl --proxy localhost:8080 https://wildlink.me</code></small></p>
+                    </div>
+                `;
             } else {
                 activityContainer.innerHTML = stats.recent_activity.map(activity => `
-                    <div class="activity-item">
+                    <div class="activity-item" onclick="showLogDetails('${activity.id}')" style="cursor: pointer;" title="Click to view full details">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <span class="badge method-badge ${getMethodBadge(activity.method)}">${activity.method}</span>
@@ -318,6 +444,8 @@
             try {
                 const response = await fetch('/api/stats');
                 const stats = await response.json();
+                console.log('Dashboard stats received:', stats);
+                console.log('Recent activity count:', stats.recent_activity?.length || 0);
                 updateDashboard(stats);
             } catch (error) {
                 console.error('Error fetching stats:', error);
@@ -347,12 +475,162 @@
             autoRefreshInterval = setInterval(fetchStats, 5000);
         }
 
+        // Show log details in modal
+        async function showLogDetails(logId) {
+            const modal = new bootstrap.Modal(document.getElementById('logDetailsModal'));
+            const content = document.getElementById('logDetailsContent');
+            
+            // Show loading state
+            content.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p class="mt-2">Loading log details...</p>
+                </div>
+            `;
+            
+            modal.show();
+            
+            try {
+                const response = await fetch(`/api/log/${logId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const log = await response.json();
+                displayLogDetails(log);
+                
+            } catch (error) {
+                console.error('Error fetching log details:', error);
+                content.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Error loading log details:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Display log details in the modal
+        function displayLogDetails(log) {
+            const content = document.getElementById('logDetailsContent');
+            
+            content.innerHTML = `
+                <div class="row">
+                    <!-- Basic Info -->
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Method:</strong> <span class="badge method-badge ${getMethodBadge(log.method)}">${log.method}</span></p>
+                                <p><strong>URL:</strong> <code>${log.url}</code></p>
+                                <p><strong>Hostname:</strong> ${log.hostname}</p>
+                                <p><strong>Path:</strong> ${log.path}</p>
+                                <p><strong>Status:</strong> ${log.completed ? 
+                                    `<span class="badge bg-success">${log.statusCode}</span>` : 
+                                    '<span class="badge bg-warning">Pending</span>'
+                                }</p>
+                                <p><strong>Timestamp:</strong> ${formatTimestamp(log.timestamp)}</p>
+                                <p><strong>Client IP:</strong> ${log.clientIp}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Query Parameters -->
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-search me-2"></i>Query Parameters</h6>
+                            </div>
+                            <div class="card-body">
+                                ${Object.keys(log.queryParams || {}).length > 0 ? 
+                                    Object.entries(log.queryParams).map(([key, value]) => 
+                                        `<p><strong>${key}:</strong> <code>${value}</code></p>`
+                                    ).join('') : 
+                                    '<p class="text-muted">No query parameters</p>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Request Headers -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-arrow-up me-2"></i>Request Headers</h6>
+                    </div>
+                    <div class="card-body">
+                        <pre class="bg-light p-3 rounded"><code>${JSON.stringify(log.headers, null, 2)}</code></pre>
+                    </div>
+                </div>
+                
+                ${log.requestBody ? `
+                    <!-- Request Body -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>Request Body</h6>
+                        </div>
+                        <div class="card-body">
+                            <pre class="bg-light p-3 rounded"><code>${log.requestBody}</code></pre>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${log.completed ? `
+                    <!-- Response Headers -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-arrow-down me-2"></i>Response Headers</h6>
+                        </div>
+                        <div class="card-body">
+                            <pre class="bg-light p-3 rounded"><code>${JSON.stringify(log.responseHeaders, null, 2)}</code></pre>
+                        </div>
+                    </div>
+                    
+                    <!-- Response Body -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-code me-2"></i>Response Body</h6>
+                        </div>
+                        <div class="card-body">
+                            <pre class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto;"><code>${log.responseBody || 'No response body'}</code></pre>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            // Store log data for copying
+            window.currentLogData = log;
+        }
+
+        // Copy log details to clipboard
+        function copyLogDetails() {
+            if (window.currentLogData) {
+                navigator.clipboard.writeText(JSON.stringify(window.currentLogData, null, 2)).then(() => {
+                    // Show success feedback
+                    const button = event.target.closest('button');
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+                    button.className = 'btn btn-success';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.className = 'btn btn-primary';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy to clipboard');
+                });
+            }
+        }
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             initCharts();
             fetchStats();
             startAutoRefresh();
-
+            
             // Event listeners
             document.getElementById('refresh-btn').addEventListener('click', fetchStats);
             document.getElementById('toggle-auto-refresh').addEventListener('click', toggleAutoRefresh);

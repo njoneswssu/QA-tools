@@ -12,7 +12,9 @@ if ! command -v python3 &> /dev/null; then
 fi
 
 # Check if mitmproxy is installed
-if ! command -v mitmproxy &> /dev/null; then
+MITMDUMP_PATH="/Users/neiljones/Library/Python/3.9/bin/mitmdump"
+MITMPROXY_PATH="/Users/neiljones/Library/Python/3.9/bin/mitmproxy"
+if ! command -v mitmdump &> /dev/null && [ ! -f "$MITMDUMP_PATH" ]; then
     echo "⚠️  mitmproxy not found. Installing dependencies..."
     pip3 install -r requirements.txt
 fi
@@ -39,15 +41,19 @@ echo "🔧 Starting mitmproxy with Wildlink monitor addon..."
 echo "ℹ️  Press Ctrl+C to stop the proxy"
 echo ""
 
-# Run mitmproxy in transparent mode with web interface
-mitmproxy \
+# Run mitmdump (non-interactive) for better background operation
+# Use full path if mitmdump is not in PATH
+if command -v mitmdump &> /dev/null; then
+    MITMDUMP_CMD="mitmdump"
+else
+    MITMDUMP_CMD="$MITMDUMP_PATH"
+fi
+
+echo "🔧 Starting mitmdump with Wildlink monitor addon..."
+$MITMDUMP_CMD \
     --listen-port $PROXY_PORT \
-    --web-port $WEB_PORT \
     --set confdir=~/.mitmproxy \
-    --set web_open_browser=false \
-    --scripts proxy_service.py \
-    --set console_eventlog_verbosity=info \
-    --set termlog_verbosity=info
+    --scripts proxy_service.py
 
 echo ""
 echo "👋 Wildlink Proxy Monitor stopped."

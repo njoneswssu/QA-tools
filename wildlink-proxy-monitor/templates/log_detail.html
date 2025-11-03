@@ -132,8 +132,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
     <script>
         const logId = '{{ log_id }}';
 
@@ -292,7 +290,7 @@
                         <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('${formatJSON(log.headers).replace(/'/g, "\\'")}')">
                             <i class="fas fa-copy me-1"></i>Copy
                         </button>
-                        <pre class="json-viewer"><code class="language-json">${formatJSON(log.headers)}</code></pre>
+                        <pre class="json-viewer">${formatJSON(log.headers)}</pre>
                     </div>
                 </div>
 
@@ -306,7 +304,7 @@
                             <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('${log.requestBody.replace(/'/g, "\\'")}')">
                                 <i class="fas fa-copy me-1"></i>Copy
                             </button>
-                            <pre class="json-viewer"><code class="language-json">${log.requestBody}</code></pre>
+                            <pre class="json-viewer">${log.requestBody}</pre>
                         </div>
                     </div>
                 ` : ''}
@@ -321,7 +319,7 @@
                             <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('${formatJSON(log.responseHeaders).replace(/'/g, "\\'")}')">
                                 <i class="fas fa-copy me-1"></i>Copy
                             </button>
-                            <pre class="json-viewer"><code class="language-json">${formatJSON(log.responseHeaders)}</code></pre>
+                            <pre class="json-viewer">${formatJSON(log.responseHeaders)}</pre>
                         </div>
                     </div>
                 ` : ''}
@@ -336,7 +334,7 @@
                             <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('${log.responseBody.replace(/'/g, "\\'")}')">
                                 <i class="fas fa-copy me-1"></i>Copy
                             </button>
-                            <pre class="json-viewer"><code class="language-json">${log.responseBody}</code></pre>
+                            <pre class="json-viewer">${log.responseBody}</pre>
                         </div>
                     </div>
                 ` : ''}
@@ -350,13 +348,12 @@
                         <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('${formatJSON(log).replace(/'/g, "\\'")}')">
                             <i class="fas fa-copy me-1"></i>Copy
                         </button>
-                        <pre class="json-viewer"><code class="language-json">${formatJSON(log)}</code></pre>
+                        <pre class="json-viewer">${formatJSON(log)}</pre>
                     </div>
                 </div>
             `;
 
-            // Apply syntax highlighting
-            Prism.highlightAll();
+            // No syntax highlighting needed - using simple pre-formatted text
         }
 
         // Fetch log detail

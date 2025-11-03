@@ -59,7 +59,7 @@ echo "📡 Starting proxy service on port $PROXY_PORT..."
 echo "ℹ️  Press Ctrl+C to stop all services"
 echo ""
 
-PROXY_PORT=$PROXY_PORT WEB_PORT=$MITMWEB_PORT ./start_proxy.sh
+PROXY_PORT=$PROXY_PORT ./start_proxy.sh
 
 # If we reach here, proxy stopped, so cleanup
 cleanup

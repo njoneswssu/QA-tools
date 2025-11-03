@@ -160,6 +160,9 @@
                             <button id="refresh-logs" class="btn btn-outline-primary ms-2">
                                 <i class="fas fa-sync-alt me-1"></i>Refresh
                             </button>
+                            <button id="clear-logs" class="btn btn-danger ms-2">
+                                <i class="fas fa-trash me-1"></i>Clear All Logs
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -244,7 +247,7 @@
             }
 
             container.innerHTML = logs.map(log => `
-                <div class="log-card">
+                <div class="log-card" onclick="viewLogDetail('${log.id}')" style="cursor: pointer;" title="Click to view details">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
                             <span class="badge method-badge ${getMethodBadge(log.method)}">${log.method}</span>
@@ -350,8 +353,15 @@
                 if (search) params.append('search', search);
                 if (limit) params.append('limit', limit);
                 
+                console.log('Fetching logs with params:', params.toString());
                 const response = await fetch(`/api/logs?${params.toString()}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const logs = await response.json();
+                console.log('Received logs:', logs.length, 'entries');
                 
                 updateDomainFilter(logs);
                 renderLogs(logs);
@@ -362,7 +372,8 @@
                     <div class="no-results">
                         <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
                         <h4>Error Loading Logs</h4>
-                        <p>There was an error loading the logs. Please try again.</p>
+                        <p>There was an error loading the logs: ${error.message}</p>
+                        <p><small>Check the browser console for more details.</small></p>
                     </div>
                 `;
             }
@@ -378,14 +389,49 @@
             fetchLogs();
         }
 
+        // View log detail
+        function viewLogDetail(logId) {
+            window.open(`/log/${logId}`, '_blank');
+        }
+
+        // Clear all logs
+        async function clearAllLogs() {
+            if (!confirm('Are you sure you want to clear all logs? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/clear-logs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                alert(`Successfully cleared ${result.cleared_count} logs`);
+                fetchLogs(); // Refresh the logs display
+
+            } catch (error) {
+                console.error('Error clearing logs:', error);
+                alert(`Error clearing logs: ${error.message}`);
+            }
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Logs page loaded, fetching logs...');
             fetchLogs();
             
             // Event listeners
             document.getElementById('apply-filters').addEventListener('click', fetchLogs);
             document.getElementById('clear-filters').addEventListener('click', clearFilters);
             document.getElementById('refresh-logs').addEventListener('click', fetchLogs);
+            document.getElementById('clear-logs').addEventListener('click', clearAllLogs);
             
             // Enter key in search field
             document.getElementById('search-filter').addEventListener('keypress', function(e) {

@@ -30,6 +30,14 @@ class ProxyLogViewer:
         except (json.JSONDecodeError, FileNotFoundError):
             return []
     
+    def save_logs(self, logs: List[Dict[str, Any]]) -> None:
+        """Save proxy logs to JSON file."""
+        try:
+            with open(self.log_file, 'w', encoding='utf-8') as f:
+                json.dump(logs, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            raise Exception(f"Failed to save logs: {str(e)}")
+    
     def get_stats(self) -> Dict[str, Any]:
         """Get statistics about the logged traffic."""
         logs = self.load_logs()
@@ -167,6 +175,27 @@ def api_log_detail(log_id):
     
     return jsonify({"error": "Log not found"}), 404
 
+@app.route('/api/clear-logs', methods=['POST'])
+def api_clear_logs():
+    """API endpoint to clear all logs."""
+    try:
+        logs = log_viewer.load_logs()
+        cleared_count = len(logs)
+        
+        # Clear the logs by writing an empty list
+        log_viewer.save_logs([])
+        
+        return jsonify({
+            'success': True,
+            'cleared_count': cleared_count,
+            'message': f'Successfully cleared {cleared_count} logs'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/logs')
 def logs_page():
     """Logs viewing page."""
@@ -176,6 +205,11 @@ def logs_page():
 def log_detail_page(log_id):
     """Individual log detail page."""
     return render_template('log_detail.html', log_id=log_id)
+
+@app.route('/test-api')
+def test_api():
+    """Test page for debugging API issues."""
+    return send_from_directory('.', 'test_logs_api.html')
 
 @app.route('/static/<path:filename>')
 def static_files(filename):
@@ -191,4 +225,5 @@ if __name__ == '__main__':
     Path("templates").mkdir(exist_ok=True)
     Path("static").mkdir(exist_ok=True)
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('WEB_PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
