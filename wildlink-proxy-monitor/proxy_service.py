@@ -77,7 +77,7 @@ class WildlinkProxyMonitor:
             
         # Special case for Google Cloud Storage wildlink bucket
         if (hostname == 'storage.googleapis.com' and 
-            '/wildlink' in flow.request.path):
+            ('/wildlink' in flow.request.path or flow.request.path.startswith('/wildlink'))):
             return True
             
         return False
