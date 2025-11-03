@@ -882,8 +882,22 @@ function initializeEventListeners() {
             // Close result details modal
             const detailsModal = document.getElementById('result-details-modal');
             if (detailsModal && detailsModal.style.display === 'block') {
-                detailsModal.style.display = 'none';
+                closeResultModal();
                 e.preventDefault();
+                return;
+            }
+        }
+        
+        // Arrow key navigation in result details modal
+        if (isResultModalOpen) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                navigateResult(-1); // Previous result
+                return;
+            }
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                navigateResult(1); // Next result
                 return;
             }
         }
@@ -2059,6 +2073,11 @@ async function changeResultStatus(merchantId, newStatus) {
     }
 }
 
+// Global variables for navigation
+let currentResultIndex = -1;
+let currentResultsList = [];
+let isResultModalOpen = false;
+
 // Show detailed result card modal
 function showResultDetails(merchantId, merchantName, domain, reason, status, screenshotPath, videoPath) {
     // Create or get modal
@@ -2069,6 +2088,9 @@ function showResultDetails(merchantId, merchantName, domain, reason, status, scr
         modal.className = 'media-modal';
         document.body.appendChild(modal);
     }
+    
+    // Set up navigation context
+    setupResultNavigation(merchantId);
     
     // Unescape HTML entities in the displayed text
     const decodedName = merchantName.replace(/\\'/g, "'");
@@ -2107,22 +2129,40 @@ function showResultDetails(merchantId, merchantName, domain, reason, status, scr
     
     // Create status change buttons
     const statusButtons = status === 'success'
-        ? `<button class="status-change-btn btn-flag" onclick="changeResultStatus('${merchantId}', 'flagged'); document.getElementById('result-details-modal').style.display='none';" title="Mark as Flagged">
+        ? `<button class="status-change-btn btn-flag" onclick="changeResultStatus('${merchantId}', 'flagged'); closeResultModal();" title="Mark as Flagged">
             <i class="fas fa-flag"></i> Mark as Flagged
            </button>`
-        : `<button class="status-change-btn btn-success" onclick="changeResultStatus('${merchantId}', 'success'); document.getElementById('result-details-modal').style.display='none';" title="Mark as Success">
+        : `<button class="status-change-btn btn-success" onclick="changeResultStatus('${merchantId}', 'success'); closeResultModal();" title="Mark as Success">
             <i class="fas fa-check"></i> Mark as Success
            </button>`;
     
     const statusClass = status === 'success' ? 'success' : 'flagged';
     const statusIcon = status === 'success' ? 'check-circle' : 'exclamation-triangle';
     
+    // Navigation buttons
+    const navButtons = `
+        <div class="result-nav-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #e5e7eb;">
+            <button class="nav-btn prev-btn" onclick="navigateResult(-1)" title="Previous Result (← or ↑)" ${currentResultIndex <= 0 ? 'disabled' : ''} 
+                    style="padding: 8px 16px; background: ${currentResultIndex <= 0 ? '#e5e7eb' : '#3b82f6'}; color: ${currentResultIndex <= 0 ? '#9ca3af' : 'white'}; border: none; border-radius: 6px; cursor: ${currentResultIndex <= 0 ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <span class="nav-counter" style="font-weight: 600; color: #374151; font-size: 14px;">
+                ${currentResultIndex + 1} of ${currentResultsList.length}
+            </span>
+            <button class="nav-btn next-btn" onclick="navigateResult(1)" title="Next Result (→ or ↓)" ${currentResultIndex >= currentResultsList.length - 1 ? 'disabled' : ''} 
+                    style="padding: 8px 16px; background: ${currentResultIndex >= currentResultsList.length - 1 ? '#e5e7eb' : '#3b82f6'}; color: ${currentResultIndex >= currentResultsList.length - 1 ? '#9ca3af' : 'white'}; border: none; border-radius: 6px; cursor: ${currentResultIndex >= currentResultsList.length - 1 ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; gap: 8px;">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    `;
+
     modal.innerHTML = `
         <div class="media-modal-content result-detail-card">
             <div class="media-modal-header">
                 <h3><i class="fas fa-info-circle"></i> Test Result Details</h3>
-                <span class="media-modal-close" onclick="document.getElementById('result-details-modal').style.display='none'">&times;</span>
+                <span class="media-modal-close" onclick="closeResultModal()">&times;</span>
             </div>
+            ${navButtons}
             <div class="result-detail-body">
                 <div class="detail-section">
                     <div class="detail-header">
@@ -2162,7 +2202,7 @@ function showResultDetails(merchantId, merchantName, domain, reason, status, scr
                 
                 <div class="detail-actions">
                     ${statusButtons}
-                    <button class="btn btn-outline" onclick="document.getElementById('result-details-modal').style.display='none'">
+                    <button class="btn btn-outline" onclick="closeResultModal()">
                         <i class="fas fa-times"></i> Close
                     </button>
                 </div>
@@ -2173,12 +2213,74 @@ function showResultDetails(merchantId, merchantName, domain, reason, status, scr
     // Close modal when clicking outside
     modal.onclick = (e) => {
         if (e.target === modal) {
-            modal.style.display = 'none';
+            closeResultModal();
         }
     };
     
-    // Show modal
+    // Show modal and set flag
     modal.style.display = 'block';
+    isResultModalOpen = true;
+    
+    // Focus the modal for keyboard navigation
+    modal.focus();
+}
+
+// Set up navigation context for result modal
+function setupResultNavigation(currentMerchantId) {
+    // Determine which results list is currently active
+    const activeTab = document.querySelector('.results-tab.active')?.dataset.tab || 'all';
+    
+    let resultsList;
+    if (activeTab === 'successful') {
+        resultsList = elements.successfulList.querySelectorAll('.result-item');
+    } else if (activeTab === 'flagged') {
+        resultsList = elements.flaggedList.querySelectorAll('.result-item');
+    } else {
+        resultsList = elements.allList.querySelectorAll('.result-item');
+    }
+    
+    // Convert NodeList to Array and extract merchant data
+    currentResultsList = Array.from(resultsList).map(item => ({
+        merchantId: item.dataset.merchantId,
+        element: item
+    }));
+    
+    // Find current index
+    currentResultIndex = currentResultsList.findIndex(item => item.merchantId === currentMerchantId);
+    
+    console.log(`📍 Navigation setup: ${currentResultIndex + 1} of ${currentResultsList.length} results (tab: ${activeTab})`);
+}
+
+// Navigate to next/previous result
+function navigateResult(direction) {
+    const newIndex = currentResultIndex + direction;
+    
+    // Check bounds
+    if (newIndex < 0 || newIndex >= currentResultsList.length) {
+        console.log('📍 Navigation: Reached end of results');
+        return;
+    }
+    
+    // Get the target result element
+    const targetResult = currentResultsList[newIndex];
+    if (!targetResult || !targetResult.element) {
+        console.log('📍 Navigation: Target result not found');
+        return;
+    }
+    
+    // Simulate click on the target result to open its details
+    targetResult.element.click();
+}
+
+// Close result modal
+function closeResultModal() {
+    const modal = document.getElementById('result-details-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    isResultModalOpen = false;
+    currentResultIndex = -1;
+    currentResultsList = [];
 }
 
 // Show media file in modal
