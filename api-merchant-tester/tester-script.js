@@ -888,8 +888,8 @@ function initializeEventListeners() {
             }
         }
         
-        // Arrow key navigation in result details modal
-        if (isResultModalOpen) {
+        // Arrow key navigation in result details modal (only when focused)
+        if (isResultModalOpen && isResultModalFocused) {
             if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
                 e.preventDefault();
                 navigateResult(-1); // Previous result
@@ -2077,6 +2077,7 @@ async function changeResultStatus(merchantId, newStatus) {
 let currentResultIndex = -1;
 let currentResultsList = [];
 let isResultModalOpen = false;
+let isResultModalFocused = false;
 
 // Show detailed result card modal
 function showResultDetails(merchantId, merchantName, domain, reason, status, screenshotPath, videoPath) {
@@ -2146,9 +2147,14 @@ function showResultDetails(merchantId, merchantName, domain, reason, status, scr
                     style="padding: 8px 16px; background: ${currentResultIndex <= 0 ? '#e5e7eb' : '#3b82f6'}; color: ${currentResultIndex <= 0 ? '#9ca3af' : 'white'}; border: none; border-radius: 6px; cursor: ${currentResultIndex <= 0 ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-chevron-left"></i> Previous
             </button>
-            <span class="nav-counter" style="font-weight: 600; color: #374151; font-size: 14px;">
-                ${currentResultIndex + 1} of ${currentResultsList.length}
-            </span>
+            <div style="text-align: center;">
+                <div class="nav-counter" style="font-weight: 600; color: #374151; font-size: 14px;">
+                    ${currentResultIndex + 1} of ${currentResultsList.length}
+                </div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">
+                    Click here, then use arrow keys
+                </div>
+            </div>
             <button class="nav-btn next-btn" onclick="navigateResult(1)" title="Next Result (→ or ↓)" ${currentResultIndex >= currentResultsList.length - 1 ? 'disabled' : ''} 
                     style="padding: 8px 16px; background: ${currentResultIndex >= currentResultsList.length - 1 ? '#e5e7eb' : '#3b82f6'}; color: ${currentResultIndex >= currentResultsList.length - 1 ? '#9ca3af' : 'white'}; border: none; border-radius: 6px; cursor: ${currentResultIndex >= currentResultsList.length - 1 ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; gap: 8px;">
                 Next <i class="fas fa-chevron-right"></i>
@@ -2157,7 +2163,7 @@ function showResultDetails(merchantId, merchantName, domain, reason, status, scr
     `;
 
     modal.innerHTML = `
-        <div class="media-modal-content result-detail-card">
+        <div class="media-modal-content result-detail-card" tabindex="0" id="result-modal-content">
             <div class="media-modal-header">
                 <h3><i class="fas fa-info-circle"></i> Test Result Details</h3>
                 <span class="media-modal-close" onclick="closeResultModal()">&times;</span>
@@ -2221,8 +2227,25 @@ function showResultDetails(merchantId, merchantName, domain, reason, status, scr
     modal.style.display = 'block';
     isResultModalOpen = true;
     
-    // Focus the modal for keyboard navigation
-    modal.focus();
+    // Set up focus management for keyboard navigation
+    setTimeout(() => {
+        const modalContent = document.getElementById('result-modal-content');
+        if (modalContent) {
+            // Add focus/blur event listeners
+            modalContent.addEventListener('focus', () => {
+                isResultModalFocused = true;
+                console.log('📍 Result modal focused - arrow navigation enabled');
+            });
+            
+            modalContent.addEventListener('blur', () => {
+                isResultModalFocused = false;
+                console.log('📍 Result modal blurred - arrow navigation disabled');
+            });
+            
+            // Focus the modal content to enable keyboard navigation
+            modalContent.focus();
+        }
+    }, 50);
 }
 
 // Set up navigation context for result modal
@@ -2279,6 +2302,7 @@ function closeResultModal() {
         modal.style.display = 'none';
     }
     isResultModalOpen = false;
+    isResultModalFocused = false;
     currentResultIndex = -1;
     currentResultsList = [];
 }
