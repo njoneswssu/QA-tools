@@ -25,9 +25,8 @@ class WildlinkProxyMonitor:
         self.max_requests = max_requests
         self.requests_data = []
         
-        # Target domains to monitor
+        # Target domains to monitor (storage.googleapis.com handled separately with path filtering)
         self.target_domains = {
-            'storage.googleapis.com',  # For /wildlink paths
             'wildlink.me',
             'www.wildlink.me', 
             'wildlink.ai',
@@ -54,8 +53,14 @@ class WildlinkProxyMonitor:
         if self.log_file.exists():
             try:
                 with open(self.log_file, 'r', encoding='utf-8') as f:
-                    self.requests_data = json.load(f)
-                print(f"📂 Loaded {len(self.requests_data)} existing requests")
+                    data = json.load(f)
+                    # Only load data if it's not empty (respects manual clearing)
+                    if data:
+                        self.requests_data = data
+                        print(f"📂 Loaded {len(self.requests_data)} existing requests")
+                    else:
+                        self.requests_data = []
+                        print("📂 Log file exists but is empty - starting fresh")
             except (json.JSONDecodeError, FileNotFoundError):
                 print("⚠️  Could not load existing data, starting fresh")
                 self.requests_data = []
@@ -75,10 +80,14 @@ class WildlinkProxyMonitor:
             hostname.endswith('.wildlink.ai')):
             return True
             
-        # Special case for Google Cloud Storage wildlink bucket
-        if (hostname == 'storage.googleapis.com' and 
-            ('/wildlink' in flow.request.path or flow.request.path.startswith('/wildlink'))):
-            return True
+        # Special case for Google Cloud Storage wildlink bucket - be more specific
+        if hostname == 'storage.googleapis.com':
+            path = flow.request.path
+            # Only monitor paths that start with /wildlink/ or are exactly /wildlink
+            if path.startswith('/wildlink/') or path == '/wildlink':
+                return True
+            else:
+                return False
             
         return False
 
@@ -141,8 +150,24 @@ class WildlinkProxyMonitor:
         except Exception as e:
             print(f"❌ Error saving data: {e}")
 
+    def _check_for_external_clear(self):
+        """Check if logs were cleared externally and reload if needed."""
+        try:
+            if self.log_file.exists():
+                with open(self.log_file, 'r', encoding='utf-8') as f:
+                    file_data = json.load(f)
+                    # If file is empty but we have data in memory, we were cleared externally
+                    if not file_data and self.requests_data:
+                        print("📂 Detected external log clearing - resetting in-memory data")
+                        self.requests_data = []
+        except (json.JSONDecodeError, FileNotFoundError):
+            pass
+
     def request(self, flow: http.HTTPFlow):
         """Called when a request is made."""
+        # Check if logs were cleared externally
+        self._check_for_external_clear()
+        
         if not self._should_monitor_request(flow):
             return
 

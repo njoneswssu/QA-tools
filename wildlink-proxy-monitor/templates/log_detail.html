@@ -104,9 +104,6 @@
                 <button id="nextLog" class="btn btn-outline-light me-2" onclick="navigateLog('next')" title="Next Log">
                     <i class="fas fa-chevron-right"></i>
                 </button>
-                <button id="takeSnapshot" class="btn btn-outline-light me-2" onclick="takeSnapshot()" title="Take Snapshot">
-                    <i class="fas fa-camera"></i>
-                </button>
                 <a class="nav-link" href="/">
                     <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                 </a>
@@ -132,13 +129,6 @@
             </div>
         </div>
 
-        <!-- Snapshot Card -->
-        <div id="snapshotCard" class="detail-card" style="display: none;">
-            <h4><i class="fas fa-camera me-2"></i>Request Snapshot</h4>
-            <div id="snapshotContent" class="mt-3">
-                <!-- Snapshot content will be inserted here -->
-            </div>
-        </div>
 
         <div id="log-content">
             <div class="loading-spinner">
@@ -239,47 +229,46 @@
             const container = document.getElementById('log-content');
             
             container.innerHTML = `
-                <!-- Basic Information -->
+                <!-- Log Information Card -->
                 <div class="detail-card">
                     <h3 class="section-header">
-                        <i class="fas fa-info-circle me-2"></i>Basic Information
+                        <i class="fas fa-info-circle me-2"></i>Log Information
                     </h3>
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>ID:</strong> ${log.id}</p>
-                            <p><strong>Timestamp:</strong> ${formatTimestamp(log.timestamp)}</p>
-                            <p><strong>Method:</strong> 
-                                <span class="badge method-badge ${getMethodBadge(log.method)}">${log.method}</span>
-                            </p>
+                            <h6><i class="fas fa-info-circle me-2"></i>Basic Info</h6>
+                            <p><strong>Taken:</strong> ${formatTimestamp(log.timestamp)}</p>
+                            <p><strong>Method:</strong> <span class="badge method-badge ${getMethodBadge(log.method)}">${log.method}</span></p>
                             <p><strong>Status:</strong> 
                                 ${log.completed ? 
                                     `<span class="badge status-badge ${getStatusBadge(log.statusCode)}">${log.statusCode}</span>` :
                                     `<span class="badge status-badge bg-warning text-dark">Pending</span>`
                                 }
                             </p>
+                            <p><strong>URL:</strong> <a href="${log.url}" target="_blank" class="text-decoration-none">${log.url}</a></p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Hostname:</strong> ${log.hostname}</p>
-                            <p><strong>Path:</strong> ${log.path}</p>
-                            <p><strong>Client IP:</strong> ${log.clientIp}</p>
-                            <p><strong>Source:</strong> ${log.source}</p>
-                            ${log.completedTimestamp ? `<p><strong>Completed:</strong> ${formatTimestamp(log.completedTimestamp)}</p>` : ''}
+                            <h6><i class="fas fa-download me-2"></i>Actions</h6>
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="downloadLogData()">
+                                <i class="fas fa-download me-1"></i>Download JSON
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyLogData()">
+                                <i class="fas fa-copy me-1"></i>Copy to Clipboard
+                            </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- URL Information -->
-                <div class="detail-card">
-                    <h3 class="section-header">
-                        <i class="fas fa-link me-2"></i>URL Information
-                    </h3>
-                    <div class="code-container">
-                        <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('${log.url}')">
-                            <i class="fas fa-copy me-1"></i>Copy
-                        </button>
-                        <div class="code-block">
-                            <a href="${log.url}" target="_blank" class="text-decoration-none">${log.url}</a>
-                        </div>
+                    <div class="mt-3">
+                        <h6><i class="fas fa-code me-2"></i>Log Data</h6>
+                        <pre class="code-block">${JSON.stringify({
+                            timestamp: log.timestamp,
+                            logId: log.id,
+                            method: log.method,
+                            url: log.url,
+                            status: log.statusCode,
+                            headers: log.headers,
+                            queryParams: log.queryParams,
+                            requestBody: log.requestBody
+                        }, null, 2)}</pre>
                     </div>
                 </div>
 
@@ -373,6 +362,9 @@
             `;
 
             // No syntax highlighting needed - using simple pre-formatted text
+            
+            // Store log data globally for snapshot functionality
+            window.logData = log;
         }
 
         // Navigation and snapshot variables
@@ -406,15 +398,12 @@
             window.location.href = `/log/${newLogId}`;
         }
 
-        // Take snapshot of current request
-        function takeSnapshot() {
-            if (!window.logData) {
-                alert('No log data available for snapshot');
-                return;
-            }
-
-            const snapshot = {
-                timestamp: new Date().toISOString(),
+        // Download log data as JSON file
+        function downloadLogData() {
+            if (!window.logData) return;
+            
+            const logSnapshot = {
+                timestamp: window.logData.timestamp,
                 logId: window.logData.id,
                 method: window.logData.method,
                 url: window.logData.url,
@@ -423,64 +412,35 @@
                 queryParams: window.logData.queryParams,
                 requestBody: window.logData.requestBody
             };
-
-            // Display snapshot in card
-            const snapshotCard = document.getElementById('snapshotCard');
-            const snapshotContent = document.getElementById('snapshotContent');
             
-            snapshotContent.innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6><i class="fas fa-info-circle me-2"></i>Snapshot Info</h6>
-                        <p><strong>Taken:</strong> ${formatTimestamp(snapshot.timestamp)}</p>
-                        <p><strong>Method:</strong> <span class="badge bg-primary">${snapshot.method}</span></p>
-                        <p><strong>Status:</strong> <span class="badge bg-success">${snapshot.status}</span></p>
-                        <p><strong>URL:</strong> <a href="${snapshot.url}" target="_blank" class="text-decoration-none">${snapshot.url}</a></p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6><i class="fas fa-download me-2"></i>Actions</h6>
-                        <button class="btn btn-sm btn-outline-primary me-2" onclick="downloadSnapshot()">
-                            <i class="fas fa-download me-1"></i>Download JSON
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copySnapshot()">
-                            <i class="fas fa-copy me-1"></i>Copy to Clipboard
-                        </button>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <h6><i class="fas fa-code me-2"></i>Snapshot Data</h6>
-                    <pre class="code-block">${JSON.stringify(snapshot, null, 2)}</pre>
-                </div>
-            `;
-            
-            snapshotCard.style.display = 'block';
-            snapshotCard.scrollIntoView({ behavior: 'smooth' });
-            
-            // Store snapshot for download/copy
-            window.currentSnapshot = snapshot;
-        }
-
-        // Download snapshot as JSON file
-        function downloadSnapshot() {
-            if (!window.currentSnapshot) return;
-            
-            const blob = new Blob([JSON.stringify(window.currentSnapshot, null, 2)], 
+            const blob = new Blob([JSON.stringify(logSnapshot, null, 2)], 
                                 { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `snapshot-${window.currentSnapshot.logId}-${Date.now()}.json`;
+            a.download = `log-${window.logData.id}-${Date.now()}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
-        // Copy snapshot to clipboard
-        function copySnapshot() {
-            if (!window.currentSnapshot) return;
+        // Copy log data to clipboard
+        function copyLogData() {
+            if (!window.logData) return;
             
-            navigator.clipboard.writeText(JSON.stringify(window.currentSnapshot, null, 2))
+            const logSnapshot = {
+                timestamp: window.logData.timestamp,
+                logId: window.logData.id,
+                method: window.logData.method,
+                url: window.logData.url,
+                status: window.logData.statusCode,
+                headers: window.logData.headers,
+                queryParams: window.logData.queryParams,
+                requestBody: window.logData.requestBody
+            };
+            
+            navigator.clipboard.writeText(JSON.stringify(logSnapshot, null, 2))
                 .then(() => {
                     // Show success feedback
                     const button = event.target.closest('button');
@@ -530,6 +490,23 @@
                 `;
             }
         }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            // Only handle arrow keys if no input/textarea is focused
+            if (document.activeElement.tagName === 'INPUT' || 
+                document.activeElement.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                navigateLog('prev');
+            } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                navigateLog('next');
+            }
+        });
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
