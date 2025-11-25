@@ -1,0 +1,210 @@
+{
+  "testUrl": "https://www.cubtale.com/collections/the-cubs",
+  "timestamp": "2025-11-25T16:15:53.906Z",
+  "totalRequests": 15,
+  "wildlinkRequests": 0,
+  "allRequests": [
+    {
+      "url": "https://www.cubtale.com/collections/the-cubs",
+      "method": "GET",
+      "headers": {
+        "accept-language": "en-US",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "timestamp": "2025-11-25T16:15:49.091Z"
+    },
+    {
+      "url": "https://static.parastorage.com/polyfill/v2/polyfill.min.js?features=default,es6,es7,es2017&flags=gated&unknown=polyfill&rum=0",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg-semver/fedops-logger@5/fedops-logger.bundle.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg-semver/header-footer-provider/app.bundle.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/react@18.2.0/umd/react.production.min.js",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/react-dom@18.2.0/umd/react-dom.production.min.js",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/services/classic-error-pages-statics/1.84.0/app.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/@wix/wix-fonts@1.14.0/media/WixMadeforTextVF_W_Wght.8022447a.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/@wix/wix-fonts@1.14.0/media/WixMadeforDisplayVF_W_Wght.ab35e4df.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/@wix/wix-fonts@1.14.0/madefor.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/@wix/wix-fonts@1.14.0/madeforDisplay.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://static.parastorage.com/services/classic-error-pages-statics/1.84.0/app.bundle.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.368Z"
+    },
+    {
+      "url": "https://frog.wix.com/fed?appName=classic-error-pages-statics&src=72&evid=14&session_id=7372a33b-bfe9-497b-b162-35c0d50ef28d&_=0.7953782810629715&is_rollout=false",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.530Z"
+    },
+    {
+      "url": "https://static.parastorage.com/services/classic-error-pages-statics/76f03b95134a5be73c112c65f57772d81bd669e5f10a3b3774837aeb/852.chunk.min.js",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:15:49.553Z"
+    },
+    {
+      "url": "https://frog.wix.com/fed",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "content-type": "text/plain;charset=UTF-8",
+        "sec-ch-ua-mobile": "?0",
+        "accept-language": "en-US"
+      },
+      "timestamp": "2025-11-25T16:15:49.860Z"
+    }
+  ],
+  "wildlinkRequestsDetails": []
+}

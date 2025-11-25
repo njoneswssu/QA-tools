@@ -1,0 +1,1566 @@
+{
+  "testUrl": "https://www.cubtale.com/collections/the-cubs",
+  "timestamp": "2025-11-25T16:16:38.043Z",
+  "totalRequests": 77,
+  "wildlinkRequests": 41,
+  "allRequests": [
+    {
+      "url": "https://wildlink.me/",
+      "method": "GET",
+      "headers": {
+        "accept-language": "en-US",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "timestamp": "2025-11-25T16:16:28.330Z"
+    },
+    {
+      "url": "https://wildlink.ai/",
+      "method": "GET",
+      "headers": {
+        "accept-language": "en-US",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "timestamp": "2025-11-25T16:16:28.468Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153032705/1752017295146/template_main.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.814Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153109265/1752017295586/template_library.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.814Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153032723/1752017292679/template_theme-overrides.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.814Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153109344/1751566048710/module_header-toggler.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.814Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153032821/1751566048783/module_header-controls.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.815Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153109349/1751566048889/module_banner.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.815Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153032827/1751566048713/module_partner.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.815Z"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.815Z"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192151768595/1751566048783/module_title-content.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192151768597/1751566048715/module_card.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153032829/1751566048802/module_button.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153109346/1751566048711/module_copyright.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153109131/1752017291626/template_library.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/hsstatic/cms-free-branding-lib/static-1.2918/js/index.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/hsstatic/content-cwv-embed/static-1.1293/embed.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153032582/1752017294983/template_main.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/hsstatic/cos-i18n/static-1.53/bundles/project.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/scriptloader/39847641.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/hsstatic/HubspotToolsMenu/static-1.432/js/index.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.828Z"
+    },
+    {
+      "url": "https://wildlink.ai/_hcms/googlefonts/Bricolage_Grotesque/600.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.006Z"
+    },
+    {
+      "url": "https://wildlink.ai/_hcms/googlefonts/Bricolage_Grotesque/500.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.007Z"
+    },
+    {
+      "url": "https://wildlink.ai/_hcms/googlefonts/Bricolage_Grotesque/700.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/_hcms/googlefonts/Bricolage_Grotesque/regular.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/wildlink%20primary%20logo.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/Generic-AI-Mockup.png",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/Gemini.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/chatgpt-logo2.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/copilot-logo.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/perplexity-logo2.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/claude-logo2.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/AI%20Alert%20Examples-1.png",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs-fs/hubfs/wildlink%20assets/wildlink-ux-experience-with-background.gif?width=1200&height=576&name=wildlink-ux-experience-with-background.gif",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://static.hsappstatic.net/cms-free-branding-lib/static-1.2918/css/hsCmsFreeBranding.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.087Z"
+    },
+    {
+      "url": "https://api.hubspot.com/viral-links/v1/tracking?deviceId=35e4fcd2-5b2a-475e-8071-e7f51b369043&viralLinkType=builder",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.087Z"
+    },
+    {
+      "url": "https://static.hsappstatic.net/cms-free-branding-lib/static-1.2918/assets/sprocket_white.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.087Z"
+    },
+    {
+      "url": "https://app.hubspot.com/content-tools-menu/api/v1/tools-menu/has-permission-json?portalId=39847641",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.096Z"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/ajax-loader.gif",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.120Z"
+    },
+    {
+      "url": "https://js.hscollectedforms.net/collectedforms.js",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.152Z"
+    },
+    {
+      "url": "https://js.hs-analytics.net/analytics/1764087300000/39847641.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.152Z"
+    },
+    {
+      "url": "https://js.hubspot.com/web-interactives-embed.js",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.152Z"
+    },
+    {
+      "url": "https://js.hs-banner.com/v2/39847641/banner.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.152Z"
+    },
+    {
+      "url": "https://js.hsadspixel.net/fb.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.152Z"
+    },
+    {
+      "url": "https://js.hs-banner.com/v2/cf-location",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.371Z"
+    },
+    {
+      "url": "https://www.googletagmanager.com/gtm.js?id=GTM-PDS27JWW",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.371Z"
+    },
+    {
+      "url": "https://api.hubapi.com/hs-script-loader-public/v2/config/pixels-and-events/json?portalId=39847641",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.371Z"
+    },
+    {
+      "url": "https://forms.hscollectedforms.net/collected-forms/v1/config/json?portalId=39847641&utk=",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "accept": "application/json, text/plain, */*",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.415Z"
+    },
+    {
+      "url": "https://cta-service-cms2.hubspot.com/web-interactives/public/v1/embed/combinedConfigs?portalId=39847641&currentUrl=https%3A%2F%2Fwildlink.ai%2F&contentId=192319291755",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.418Z"
+    },
+    {
+      "url": "https://perf-na1.hsforms.com/embed/v3/counters.gif?key=config-loaded-success&value=1",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.522Z"
+    },
+    {
+      "url": "https://www.googletagmanager.com/gtag/js?id=AW-11368714224",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.649Z"
+    },
+    {
+      "url": "https://www.googletagmanager.com/gtag/js?id=G-PGF2K2W67Y&cx=c&gtm=4e5bi1",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.649Z"
+    },
+    {
+      "url": "https://www.googletagmanager.com/gtag/js?id=AW-11368714224&cx=c&gtm=4e5bi1",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.649Z"
+    },
+    {
+      "url": "https://www.google.com/ccm/collect?frm=0&tid=AW-11368714224&en=page_view&dl=https%3A%2F%2Fwildlink.ai%2F&scrsrc=www.googletagmanager.com&rnd=645409176.1764087390&dt=Home&auid=1842176765.1764087390&navt=n&npa=0&did=dZTQ1Zm&gdid=dZTQ1Zm&gtm=45be5bi1v9214043512za200zb9146485141zd9146485141xec&gcs=G111&gcd=13r3r3r3r5l1&dma=0&tag_exp=103116026~103200004~104527906~104528500~104684208~104684211~105322302~115583767~115616986~115938466~115938469~116184927~116184929~116217636~116217638~116251938~116251940&tft=1764087389842&tfd=1519&apve=1&apvf=f",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.864Z"
+    },
+    {
+      "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/11368714224/?random=1764087389836&cv=11&fst=1764087389836&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be5bi1v9214043512za200zb9146485141zd9146485141xec&gcd=13r3r3r3r5l1&dma=0&tag_exp=103116026~103200004~104527906~104528500~104684208~104684211~105322302~115583767~115616986~115938466~115938469~116184927~116184929~116217636~116217638~116251938~116251940&u_w=1200&u_h=800&url=https%3A%2F%2Fwildlink.ai%2F&frm=0&tiba=Home&did=dZTQ1Zm&gdid=dZTQ1Zm&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1842176765.1764087390&data=event%3Dgtag.config&rfmt=3&fmt=4",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.864Z"
+    },
+    {
+      "url": "https://www.googletagmanager.com/static/service_worker/5ba0/sw_iframe.html?origin=https%3A%2F%2Fwildlink.ai",
+      "method": "GET",
+      "headers": {
+        "accept-language": "en-US",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "timestamp": "2025-11-25T16:16:29.937Z"
+    },
+    {
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-PGF2K2W67Y&gtm=45je5bi1v9146522724z89146485141za200zb9146485141zd9146485141&_p=1764087389370&gcs=G111&gcd=13r3r3r3r5l1&npa=0&dma=0&gdid=dZTQ1Zm&cid=1843541555.1764087390&ul=en-us&sr=1200x800&uaa=x86&uab=64&uafvl=Chromium%3B141.0.7390.37%7CNot%253FA_Brand%3B8.0.0.0&uamb=0&uam=&uap=Windows&uapv=10.0&uaw=0&are=1&frm=0&pscdl=noapi&_s=1&tag_exp=103116026~103200004~104527906~104528500~104684208~104684211~105322303~105391252~115495938~115583767~115616985~115938466~115938469~116184927~116184929~116217636~116217638&sid=1764087389&sct=1&seg=0&dl=https%3A%2F%2Fwildlink.ai%2F&dt=Home&en=page_view&_fv=1&_nsi=1&_ss=1&tfd=1558",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.938Z"
+    },
+    {
+      "url": "https://www.google.com/pagead/1p-user-list/11368714224/?random=1764087389836&cv=11&fst=1764086400000&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be5bi1v9214043512za200zb9146485141zd9146485141xec&gcd=13r3r3r3r5l1&dma=0&tag_exp=103116026~103200004~104527906~104528500~104684208~104684211~105322302~115583767~115616986~115938466~115938469~116184927~116184929~116217636~116217638~116251938~116251940&u_w=1200&u_h=800&url=https%3A%2F%2Fwildlink.ai%2F&frm=0&tiba=Home&did=dZTQ1Zm&gdid=dZTQ1Zm&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1842176765.1764087390&data=event%3Dgtag.config&rfmt=3&fmt=3&is_vtc=1&cid=CAQSfwDCSxrRUc44r_-YB3pCh9z9v3c6bkpsCIFeKOvBtcvyOBoJWwy2YD1GMa4RPUh7zBu9Em4_IyIqFfKuunPAi3nYEZomjAuOfM__2bl8P5_QUX4KgFu5bWtz6cZt3jyrgK8HqseXnebR7m-Tjj0uQuBTGtHMI51XGj10dOetsJ8&random=2653010723&rmt_tld=0&ipr=y",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.987Z"
+    },
+    {
+      "url": "https://track.hubspot.com/__ptq.gif?k=1&sd=1200x800&cd=24-bit&cs=UTF-8&ln=en-us&bfp=3593561137&v=1.1&a=39847641&pi=192319291755&ct=standard-page&ccu=https%3A%2F%2Fwildlink.ai&cpi=192319291755&lpi=192319291755&lvi=192319291755&pu=https%3A%2F%2Fwildlink.ai%2F&t=Home&cts=1764087390087&vi=69dc508d3578f03a69ce25b53b7dfac9&nc=true&u=215076168.69dc508d3578f03a69ce25b53b7dfac9.1764087390085.1764087390085.1764087390085.1&b=215076168.1.1764087390086&cc=15",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:30.089Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/favicon.png",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:30.089Z"
+    },
+    {
+      "url": "https://www.cubtale.com/collections/the-cubs",
+      "method": "GET",
+      "headers": {
+        "accept-language": "en-US",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "timestamp": "2025-11-25T16:16:33.290Z"
+    },
+    {
+      "url": "https://static.parastorage.com/polyfill/v2/polyfill.min.js?features=default,es6,es7,es2017&flags=gated&unknown=polyfill&rum=0",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.507Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg-semver/fedops-logger@5/fedops-logger.bundle.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.507Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg-semver/header-footer-provider/app.bundle.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.507Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/react@18.2.0/umd/react.production.min.js",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.508Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/react-dom@18.2.0/umd/react-dom.production.min.js",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.508Z"
+    },
+    {
+      "url": "https://static.parastorage.com/services/classic-error-pages-statics/1.84.0/app.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.508Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/@wix/wix-fonts@1.14.0/media/WixMadeforTextVF_W_Wght.8022447a.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.508Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/@wix/wix-fonts@1.14.0/media/WixMadeforDisplayVF_W_Wght.ab35e4df.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.508Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/@wix/wix-fonts@1.14.0/madefor.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.508Z"
+    },
+    {
+      "url": "https://static.parastorage.com/unpkg/@wix/wix-fonts@1.14.0/madeforDisplay.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.508Z"
+    },
+    {
+      "url": "https://static.parastorage.com/services/classic-error-pages-statics/1.84.0/app.bundle.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.508Z"
+    },
+    {
+      "url": "https://frog.wix.com/fed?appName=classic-error-pages-statics&src=72&evid=14&session_id=1a4406c6-439d-47d9-8323-c70feea02c33&_=0.09978271577861564&is_rollout=false",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.665Z"
+    },
+    {
+      "url": "https://static.parastorage.com/services/classic-error-pages-statics/76f03b95134a5be73c112c65f57772d81bd669e5f10a3b3774837aeb/852.chunk.min.js",
+      "method": "GET",
+      "headers": {
+        "origin": "https://www.cubtale.com",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:33.686Z"
+    },
+    {
+      "url": "https://frog.wix.com/fed",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://www.cubtale.com/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "content-type": "text/plain;charset=UTF-8",
+        "sec-ch-ua-mobile": "?0",
+        "accept-language": "en-US"
+      },
+      "timestamp": "2025-11-25T16:16:33.986Z"
+    }
+  ],
+  "wildlinkRequestsDetails": [
+    {
+      "url": "https://wildlink.me/",
+      "method": "GET",
+      "headers": {
+        "accept-language": "en-US",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "timestamp": "2025-11-25T16:16:28.330Z"
+    },
+    {
+      "url": "https://wildlink.ai/",
+      "method": "GET",
+      "headers": {
+        "accept-language": "en-US",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "timestamp": "2025-11-25T16:16:28.468Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153032705/1752017295146/template_main.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.814Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153109265/1752017295586/template_library.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.814Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153032723/1752017292679/template_theme-overrides.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.814Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153109344/1751566048710/module_header-toggler.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.814Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153032821/1751566048783/module_header-controls.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.815Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153109349/1751566048889/module_banner.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.815Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153032827/1751566048713/module_partner.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.815Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192151768595/1751566048783/module_title-content.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192151768597/1751566048715/module_card.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153032829/1751566048802/module_button.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/module_assets/1/192153109346/1751566048711/module_copyright.min.css",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153109131/1752017291626/template_library.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/hsstatic/cms-free-branding-lib/static-1.2918/js/index.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/hsstatic/content-cwv-embed/static-1.1293/embed.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/hub_generated/template_assets/1/192153032582/1752017294983/template_main.min.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/hsstatic/cos-i18n/static-1.53/bundles/project.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/scriptloader/39847641.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.827Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs/hsstatic/HubspotToolsMenu/static-1.432/js/index.js",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:28.828Z"
+    },
+    {
+      "url": "https://wildlink.ai/_hcms/googlefonts/Bricolage_Grotesque/600.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.006Z"
+    },
+    {
+      "url": "https://wildlink.ai/_hcms/googlefonts/Bricolage_Grotesque/500.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.007Z"
+    },
+    {
+      "url": "https://wildlink.ai/_hcms/googlefonts/Bricolage_Grotesque/700.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/_hcms/googlefonts/Bricolage_Grotesque/regular.woff2",
+      "method": "GET",
+      "headers": {
+        "origin": "https://wildlink.ai",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/wildlink%20primary%20logo.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/Generic-AI-Mockup.png",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/Gemini.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/chatgpt-logo2.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/copilot-logo.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/perplexity-logo2.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/claude-logo2.svg",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/wildlink%20assets/AI%20Alert%20Examples-1.png",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://wildlink.ai/hs-fs/hubfs/wildlink%20assets/wildlink-ux-experience-with-background.gif?width=1200&height=576&name=wildlink-ux-experience-with-background.gif",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.008Z"
+    },
+    {
+      "url": "https://cta-service-cms2.hubspot.com/web-interactives/public/v1/embed/combinedConfigs?portalId=39847641&currentUrl=https%3A%2F%2Fwildlink.ai%2F&contentId=192319291755",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.418Z"
+    },
+    {
+      "url": "https://www.google.com/ccm/collect?frm=0&tid=AW-11368714224&en=page_view&dl=https%3A%2F%2Fwildlink.ai%2F&scrsrc=www.googletagmanager.com&rnd=645409176.1764087390&dt=Home&auid=1842176765.1764087390&navt=n&npa=0&did=dZTQ1Zm&gdid=dZTQ1Zm&gtm=45be5bi1v9214043512za200zb9146485141zd9146485141xec&gcs=G111&gcd=13r3r3r3r5l1&dma=0&tag_exp=103116026~103200004~104527906~104528500~104684208~104684211~105322302~115583767~115616986~115938466~115938469~116184927~116184929~116217636~116217638~116251938~116251940&tft=1764087389842&tfd=1519&apve=1&apvf=f",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.864Z"
+    },
+    {
+      "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/11368714224/?random=1764087389836&cv=11&fst=1764087389836&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be5bi1v9214043512za200zb9146485141zd9146485141xec&gcd=13r3r3r3r5l1&dma=0&tag_exp=103116026~103200004~104527906~104528500~104684208~104684211~105322302~115583767~115616986~115938466~115938469~116184927~116184929~116217636~116217638~116251938~116251940&u_w=1200&u_h=800&url=https%3A%2F%2Fwildlink.ai%2F&frm=0&tiba=Home&did=dZTQ1Zm&gdid=dZTQ1Zm&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1842176765.1764087390&data=event%3Dgtag.config&rfmt=3&fmt=4",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.864Z"
+    },
+    {
+      "url": "https://www.googletagmanager.com/static/service_worker/5ba0/sw_iframe.html?origin=https%3A%2F%2Fwildlink.ai",
+      "method": "GET",
+      "headers": {
+        "accept-language": "en-US",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      },
+      "timestamp": "2025-11-25T16:16:29.937Z"
+    },
+    {
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-PGF2K2W67Y&gtm=45je5bi1v9146522724z89146485141za200zb9146485141zd9146485141&_p=1764087389370&gcs=G111&gcd=13r3r3r3r5l1&npa=0&dma=0&gdid=dZTQ1Zm&cid=1843541555.1764087390&ul=en-us&sr=1200x800&uaa=x86&uab=64&uafvl=Chromium%3B141.0.7390.37%7CNot%253FA_Brand%3B8.0.0.0&uamb=0&uam=&uap=Windows&uapv=10.0&uaw=0&are=1&frm=0&pscdl=noapi&_s=1&tag_exp=103116026~103200004~104527906~104528500~104684208~104684211~105322303~105391252~115495938~115583767~115616985~115938466~115938469~116184927~116184929~116217636~116217638&sid=1764087389&sct=1&seg=0&dl=https%3A%2F%2Fwildlink.ai%2F&dt=Home&en=page_view&_fv=1&_nsi=1&_ss=1&tfd=1558",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.938Z"
+    },
+    {
+      "url": "https://www.google.com/pagead/1p-user-list/11368714224/?random=1764087389836&cv=11&fst=1764086400000&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be5bi1v9214043512za200zb9146485141zd9146485141xec&gcd=13r3r3r3r5l1&dma=0&tag_exp=103116026~103200004~104527906~104528500~104684208~104684211~105322302~115583767~115616986~115938466~115938469~116184927~116184929~116217636~116217638~116251938~116251940&u_w=1200&u_h=800&url=https%3A%2F%2Fwildlink.ai%2F&frm=0&tiba=Home&did=dZTQ1Zm&gdid=dZTQ1Zm&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1842176765.1764087390&data=event%3Dgtag.config&rfmt=3&fmt=3&is_vtc=1&cid=CAQSfwDCSxrRUc44r_-YB3pCh9z9v3c6bkpsCIFeKOvBtcvyOBoJWwy2YD1GMa4RPUh7zBu9Em4_IyIqFfKuunPAi3nYEZomjAuOfM__2bl8P5_QUX4KgFu5bWtz6cZt3jyrgK8HqseXnebR7m-Tjj0uQuBTGtHMI51XGj10dOetsJ8&random=2653010723&rmt_tld=0&ipr=y",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:29.987Z"
+    },
+    {
+      "url": "https://track.hubspot.com/__ptq.gif?k=1&sd=1200x800&cd=24-bit&cs=UTF-8&ln=en-us&bfp=3593561137&v=1.1&a=39847641&pi=192319291755&ct=standard-page&ccu=https%3A%2F%2Fwildlink.ai&cpi=192319291755&lpi=192319291755&lvi=192319291755&pu=https%3A%2F%2Fwildlink.ai%2F&t=Home&cts=1764087390087&vi=69dc508d3578f03a69ce25b53b7dfac9&nc=true&u=215076168.69dc508d3578f03a69ce25b53b7dfac9.1764087390085.1764087390085.1764087390085.1&b=215076168.1.1764087390086&cc=15",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:30.089Z"
+    },
+    {
+      "url": "https://wildlink.ai/hubfs/favicon.png",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://wildlink.ai/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+        "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+        "accept-language": "en-US",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "timestamp": "2025-11-25T16:16:30.089Z"
+    }
+  ],
+  "summary": {
+    "message": "✅ SUCCESS: Wildlink traffic was captured without proxy!",
+    "networkMonitoringWorking": true,
+    "proxyUsed": false
+  }
+}

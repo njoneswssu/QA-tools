@@ -1,0 +1,5020 @@
+================================================================================
+MERCHANT WEBSITE TESTING RESULTS (INTERRUPTED)
+================================================================================
+Generated: 11/6/2025, 3:41:23 PM
+Total Merchants Tested: 627
+Successful: 619 (98.7%)
+Flagged: 5 (0.8%)
+Status: Test interrupted by user (Ctrl+C)
+
+✅ SUCCESSFUL MERCHANTS:
+--------------------------------------------------
+1. Visible
+   URL: https://www.visible.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+2. WinZip
+   URL: https://www.winzip.com/win/en
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+3. Evolve Skateboards
+   URL: https://www.rideevolve.com.au/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+4. Dagsmejan
+   URL: https://www.dagsmejan.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+5. Notarize
+   URL: https://www.notarize.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+6. Buster and Punch
+   URL: https://www.busterandpunch.com/us/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+7. Tumi
+   URL: https://www.tumi.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+8. VOS Body Care
+   URL: https://www.vosbody.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+9. Yoga Hustle
+   URL: https://yogahustle.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+10. EduBirdie
+   URL: https://edubirdie.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+11. Keto Brainz Nootropics
+   URL: https://ketobrainz.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+12. Craft Sportswear
+   URL: https://craftsports.us/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+13. InsecureWeb.com
+   URL: https://www.insecureweb.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+14. PARKIT
+   URL: https://parkitmovement.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+15. bombusbee
+   URL: https://www.bombusbee.net
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+16. 27 Miles Malibu
+   URL: https://27milesmalibu.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+17. VectorStock
+   URL: https://vectorstock.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+18. Varsity Pets
+   URL: https://www.varsitypetsonline.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+19. Milla
+   URL: https://itsmilla.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+20. Pure & Cimple
+   URL: https://pureandcimple.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+21. DEDICATED Brand
+   URL: https://www.dedicatedbrand.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+22. DocHub
+   URL: https://dochub.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+23. Traveling Baby Company
+   URL: https://www.travelingbaby.com
+   Status: AUTO SUCCESS
+   Analysis: Functional travel booking features detected (GOOD protection)
+
+24. Simple App
+   URL: https://simple.life/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+25. DirectDeals
+   URL: https://www.directdeals.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+26. FOPOMonitor (US)
+   URL: https://fopomonitor.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+27. Tenkara Rod Co.
+   URL: https://www.tenkararodco.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+28. Nutra Remedies
+   URL: https://enjoyseamoss.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+29. ModaDiAndrea
+   URL: https://modadiandrea.com/en/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+30. LSKD
+   URL: https://us.lskd.co/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+31. BRUNT Workwear
+   URL: https://bruntworkwear.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+32. Trainline
+   URL: https://www.thetrainline.com/pzaffiliate/redirect
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+33. Culligan ZeroWater
+   URL: https://shop.culligan.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+34. Bark Parental Controls
+   URL: https://www.bark.us
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+35. A-Sha Foods
+   URL: https://ashadrynoodle.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+36. Homewater
+   URL: https://www.homewater.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+37. Pit Command
+   URL: https://pitcommand.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+38. Wrappily
+   URL: https://wrappily.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+39. Falco
+   URL: https://www.falcoholsters.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+40. AquaTru
+   URL: https://aquatruwater.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+41. TAFER Hotels & Resorts
+   URL: https://www.taferresorts.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional hotel booking features detected (STRONG protection)
+
+42. Alphalete Athletics
+   URL: https://alphaleteathletics.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+43. dermavitality
+   URL: https://dermavitality.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+44. Metabolic
+   URL: https://www.metabolic.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+45. Carrie Elizabeth
+   URL: https://carrieelizabeth.co.uk/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+46. My Magic Carpet
+   URL: https://buymymagiccarpet.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+47. AquaVault
+   URL: https://theaquavault.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+48. Foster Grant
+   URL: https://www.fostergrant.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+49. Coastline Academy
+   URL: https://coastlineacademy.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+50. Rave Sports
+   URL: https://www.ravesports.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+51. PowerA
+   URL: https://www.powera.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+52. Green Water Sports
+   URL: https://greenwatersports.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+53. F1 Store
+   URL: https://f1store.formula1.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+54. Lopesan
+   URL: https://www.lopesan.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+55. ModaMia
+   URL: https://modamia.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+56. Scandinavian Biolabs
+   URL: https://scandinavianbiolabs.co.uk/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+57. Spot Hero
+   URL: https://spothero.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+58. Jennifer Furniture
+   URL: https://www.jenniferfurniture.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+59. Lytmi
+   URL: https://www.lytmi.co/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+60. Aquaroo
+   URL: https://aquaroobabycarrier.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+61. Base Blu
+   URL: https://www.baseblu.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+62. Uplyft Capital
+   URL: https://www.uplyftcapital.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+63. CoinFlip
+   URL: https://coinflip.tech/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+64. Vertagear
+   URL: https://www.vertagear.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+65. Davines
+   URL: https://us.davines.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+66. Top Mobility
+   URL: https://www.topmobility.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+67. Manhattan Prep
+   URL: https://www.manhattanprep.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+68. Lichi
+   URL: https://lichi.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+69. BioWorld
+   URL: https://www.bioworld.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+70. Allied Real Estate Schools
+   URL: https://www.alliedschools.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+71. Burning River Foods
+   URL: https://burningriverfoods.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+72. Contemporary Art by Christine
+   URL: https://www.contemporaryartbychristine.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+73. Fresh Rags
+   URL: https://freshragsfl.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+74. Honey Badger
+   URL: https://drinkhoneybadger.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+75. Feed Me More
+   URL: https://feedmemore.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+76. Digital RSVP
+   URL: https://digital-rsvp.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+77. Kimera Koffee
+   URL: https://kimerakoffee.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+78. Vanity Fair Lingerie
+   URL: https://www.vanityfairlingerie.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+79. EZRI
+   URL: https://www.ezri.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+80. Leanin/ Tree
+   URL: https://www.leanintree.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+81. MESHKI
+   URL: https://www.meshki.us/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+82. Spacial Audio
+   URL: https://spacial.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+83. BDraddy
+   URL: https://bdraddy.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+84. Gerber Childrenswear
+   URL: https://www.gerberchildrenswear.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+85. Liquid Web
+   URL: https://liquidweb.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+86. Meloway Makeup
+   URL: https://melowaymakeup.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+87. BlueCosmo
+   URL: https://www.bluecosmo.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+88. LivFresh
+   URL: https://www.getlivfresh.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+89. Rafi Nova
+   URL: https://rafinova.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+90. Three Dots
+   URL: https://www.threedots.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+91. Blade City
+   URL: https://www.blade-city.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+92. Gruff + Tumble
+   URL: https://gruffandtumble.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+93. Discount Electronics
+   URL: https://discountelectronics.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+94. Armament Systems & Procedures
+   URL: https://www.asp-usa.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+95. ElleVet Sciences
+   URL: https://www.ellevetsciences.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+96. UniDoc
+   URL: https://unidoc.io
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+97. Kiss
+   URL: https://www.KISSusa.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+98. Sharp Home Appliances
+   URL: https://shop.sharpusa.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+99. Beverly Hills MD
+   URL: https://beverlyhillsmd.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+100. Brave New Look
+   URL: https://www.bravenewlook.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+101. JustAnswer
+   URL: https://www.justanswer.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+102. MissFox
+   URL: https://www.missfoxshop.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+103. Routledge
+   URL: https://www.routledge.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+104. VersedSkin.com
+   URL: https://versedskin.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+105. Jayson Home
+   URL: https://www.jaysonhome.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+106. Plaza Premium
+   URL: https://plazapremiumlounge.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+107. Maidenform
+   URL: https://maidenform.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+108. beek
+   URL: https://www.beekshop.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+109. Brochu Walker
+   URL: https://www.brochuwalker.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+110. Yarnspirations
+   URL: https://www.yarnspirations.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+111. Carbon38
+   URL: https://www.carbon38.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+112. CodaKid
+   URL: https://codakid.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+113. JuJuBe
+   URL: https://jujube.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+114. Athletic Propulsion Labs
+   URL: https://www.athleticpropulsionlabs.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+115. Campus Protein
+   URL: https://www.campusprotein.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+116. ShopSonix
+   URL: https://shopsonix.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+117. Genie Traveler
+   URL: https://genietraveler.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional travel booking features detected (GOOD protection)
+
+118. ValueMags
+   URL: https://www.valuemags.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+119. Paessler
+   URL: https://www.paessler.com/prtg
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+120. PatBO
+   URL: https://patbo.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+121. Mailbird
+   URL: https://www.getmailbird.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+122. Goal Zero
+   URL: https://www.goalzero.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+123. Beachly
+   URL: https://beachly.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+124. myAutoloan
+   URL: https://www.myautoloan.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+125. Argentum
+   URL: https://argentum.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+126. Holiday Taxis
+   URL: https://www.holidaytaxis.com/en/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+127. SwimZip
+   URL: https://www.SwimZip.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+128. Linky
+   URL: https://www.linkyinnovation.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+129. shop-olivia
+   URL: https://shop-olivia.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+130. art.Drops
+   URL: https://www.myartdrops.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+131. Tuft & Needle
+   URL: https://www.tuftandneedle.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+132. Remitly
+   URL: https://www.remitly.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+133. PK Grills
+   URL: https://pkgrills.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+134. Harney & Sons
+   URL: https://www.harney.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+135. Blue Sky Vitamin
+   URL: https://blueskyvitamin.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+136. Lily & Roo
+   URL: https://www.lilyandroo.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+137. SoKawaii
+   URL: https://sokawaii.com/
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+138. WiseCleaner
+   URL: https://www.wisecleaner.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+139. Survivor Filter
+   URL: https://www.survivorfilter.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+140. behno
+   URL: https://behno.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+141. Ellia
+   URL: https://www.ellia.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+142. Kissed Earth
+   URL: https://kissedearth.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+143. Industry West
+   URL: https://industrywest.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+144. Ivosight
+   URL: https://ivosight.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+145. Fanatical
+   URL: https://www.fanatical.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+146. Star Conflict
+   URL: https://star-conflict.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+147. Carbonite
+   URL: https://www.carbonite.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+148. Scopelist
+   URL: https://scopelist.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+149. REVER
+   URL: https://www.rever.co
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+150. Chirp
+   URL: https://www.gochirp.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+151. NorthOne Business Banking
+   URL: https://www.northone.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+152. Mono B
+   URL: https://www.mymonob.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+153. Viome
+   URL: https://www.viome.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+154. MicroPerfumes
+   URL: https://microperfumes.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+155. Internxt
+   URL: https://internxt.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+156. Aleck
+   URL: https://www.aleck.io/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+157. NF Sports
+   URL: https://nfsports.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+158. The Tiffen Company
+   URL: https://tiffen.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+159. AfroMerch
+   URL: https://www.afro-merch.shop
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+160. Dress A Med
+   URL: https://scrubsnow.myshopify.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+161. Zero Fucks Coin
+   URL: https://www.zerofuckscoin.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+162. Leaf & Clay
+   URL: https://www.leafandclay.co
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+163. Standard Luggage Co.
+   URL: https://www.standardluggage.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+164. Bad Ass Extension Cords
+   URL: https://www.badassextensioncords.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+165. Fast Bar
+   URL: https://www.FastBar.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+166. RIPT Skin Systems
+   URL: https://riptskinsystems.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+167. Horsefeathers
+   URL: https://www.horsefeathers.eu/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+168. Estella Bartlett
+   URL: https://estellabartlett.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+169. The Gift Basket Store
+   URL: https://giftbasketstore.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+170. Onnit
+   URL: https://www.onnit.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+171. Cotosen
+   URL: https://www.cotosen.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+172. Mushroom Revival
+   URL: https://www.mushroomrevival.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+173. PrettyGarden
+   URL: https://www.prettygarden.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+174. Food Lion
+   URL: https://foodlion.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+175. Fold3 by Ancestry
+   URL: https://www.Fold3.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+176. Juvenon
+   URL: https://juvenon.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+177. Glamermaid
+   URL: https://glamermaid.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+178. Joie
+   URL: https://www.joie.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+179. Ferguson Home
+   URL: https://www.fergusonhome.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+180. Peugeot Saveurs
+   URL: https://us.peugeot-saveurs.com/en_us/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+181. Bubba
+   URL: https://www.bubba.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+182. Montway Auto Transport
+   URL: https://www.montway.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+183. Wiggle Kingdom
+   URL: https://wigglekingdom.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+184. TIKI Brand
+   URL: https://www.tikibrand.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+185. Hillberg&Berk
+   URL: https://hillbergandberk.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+186. Oskar&Friends
+   URL: https://oskarfriends.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+187. Arizona School of Real Estate & Business
+   URL: https://www.asreb.com/programs
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+188. Copamarina Beach Resort & Spa
+   URL: https://www.copamarina.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional hotel booking features detected (STRONG protection)
+
+189. Vyotech
+   URL: https://vyotechusa.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+190. Ballsy
+   URL: https://Ballwash.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+191. MX Naturals
+   URL: https://shopmxnaturals.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+192. KOR Medical
+   URL: https://www.kormedical.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+193. FlutterHabit
+   URL: https://flutterhabit.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+194. Epoch Batteries
+   URL: https://www.epochbatteries.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+195. CAROL Bike
+   URL: https://carolbike.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+196. Beachbound
+   URL: https://www.beachbound.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+197. AirHelp
+   URL: https://www.airhelp.com/en/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+198. Baggu
+   URL: https://www.baggu.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+199. wifiCFI
+   URL: https://www.wificfi.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+200. X-Vision Optics
+   URL: https://xvisionoptics.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+201. Ancient DNA Origins
+   URL: https://www.ancientdnahub.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+202. Neutypechic
+   URL: https://www.neutypechic.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+203. Progurt
+   URL: https://www.progurt.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+204. Spatarella Shop
+   URL: https://spatarella.eu/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+205. Stutterheim
+   URL: https://stutterheim.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+206. HowManyExtension
+   URL: https://howmanyextension.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+207. Mizzen + Main
+   URL: https://www.mizzenandmain.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+208. BODi
+   URL: https://www.bodi.com/us/en/s/subscription
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+209. Polk Audio
+   URL: https://www.polkaudio.com/en-us/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+210. EquitySet
+   URL: https://equityset.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+211. HelloTech
+   URL: https://www.hellotech.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+212. Eu Natural
+   URL: https://www.EuNatural.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+213. Parachute Home
+   URL: https://www.parachutehome.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+214. Velia
+   URL: https://www.velia.net/shop/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+215. Compex
+   URL: https://www.compex.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+216. Luminox
+   URL: https://luminox.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+217. TAFT Clothing
+   URL: https://taftclothing.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+218. KastKing
+   URL: https://kastking.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+219. AirPhysio
+   URL: https://deals.getairphysiokids.io/27ZKGGX2/243NWFN/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+220. Whippy Charge
+   URL: https://www.gu-ecom.com/27ZKGGX2/2GHBF16/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+221. TheraICE
+   URL: https://deals.gettheraiceheadreliefhat.io/27ZKGGX2/235B4G5/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+222. Duo Cover
+   URL: https://deals.getduocover.io/27ZKGGX2/25F6QB3/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+223. NewRuleFX.com
+   URL: https://www.newrulefx.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+224. GaaLa
+   URL: https://gaala.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+225. MURF Electric Bikes
+   URL: https://www.murfelectricbikes.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+226. CLMBR
+   URL: https://shop.clmbr.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+227. Eric Javits
+   URL: https://ericjavits.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+228. THEBS
+   URL: https://www.thebs.com/us
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+229. Simtek
+   URL: https://www.simtek.io
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+230. Shu Uemura
+   URL: https://www.shuuemuraartofhair-usa.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+231. Coldture
+   URL: https://coldture.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+232. Particula
+   URL: https://particula-tech.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+233. The HOTH
+   URL: https://www.thehoth.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+234. Rhino
+   URL: https://rhinousainc.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+235. TIDIO
+   URL: https://tidio.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+236. Native To Wear
+   URL: https://www.nativetowear.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+237. ThickTails
+   URL: https://www.thicktails.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+238. The Bills Store
+   URL: https://shop.buffalobills.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+239. Big Furniture Warehouse
+   URL: https://www.bigfurniturewarehouse.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+240. Mudpuppy
+   URL: https://www.mudpuppy.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+241. Escape the Room
+   URL: https://escapetheroom.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+242. YSE Beauty
+   URL: https://www.ysebeauty.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+243. Senseng Apparel
+   URL: https://www.senseng-apparel.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+244. Thermowave
+   URL: https://us.thermowave.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+245. SIGNM
+   URL: https://signm.io
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+246. Trends Critical
+   URL: https://trendscritical.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+247. Graficona
+   URL: https://graficona.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+248. Relief Factor
+   URL: https://www.relieffactor.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+249. Facetune
+   URL: https://www.lightricks.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+250. Thortful
+   URL: https://www.thortful.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+251. POWR
+   URL: https://www.powr.io/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+252. Joanie
+   URL: https://joanieclothing.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+253. Just Men Shoes
+   URL: https://www.justmenshoes.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+254. Yoolax
+   URL: https://www.yoolax.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+255. Plum Diamonds
+   URL: https://www.plumdiamonds.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+256. PuroAir
+   URL: https://getpuroair.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+257. Dunlop Sports
+   URL: https://us.dunlopsports.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+258. Philo
+   URL: https://www.philo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+259. 4giveness
+   URL: https://4giveness.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+260. Geologie
+   URL: https://geologie.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+261. Zarges
+   URL: https://www.zargesusa.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+262. The Zero Proof
+   URL: https://www.thezeroproof.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+263. Cheap Cruises
+   URL: https://www.cheapcruises.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+264. Box Components
+   URL: https://boxcomponents.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+265. Credit Stacking
+   URL: https://www.CreditStacking.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+266. DrHouse
+   URL: https://www.drhouse.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+267. ABCya
+   URL: https://www.abcya.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+268. Mezlan
+   URL: https://www.mezlan.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+269. Apos Audio
+   URL: https://apos.audio/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+270. Uber Eats
+   URL: https://www.ubereats.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+271. Mammut
+   URL: https://mammut.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+272. Pulsetto
+   URL: https://pulsetto.tech
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+273. Online Shoes
+   URL: https://www.onlineshoes.com/US/en/home
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+274. KOMMA
+   URL: https://www.kommaofficial.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+275. Daysmoon
+   URL: https://daysmoon.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+276. The Battalion
+   URL: https://thebattalion.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+277. Outprfrm
+   URL: https://outprfrm.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+278. Treat My UTI
+   URL: https://www.treatmyuti.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+279. RayNeo
+   URL: https://www.rayneo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+280. Befbee Rug
+   URL: https://comiliving.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+281. Ozark Armament
+   URL: https://ozarkarmament.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+282. Else Nutrition
+   URL: https://elsenutrition.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+283. Zendrop
+   URL: https://www.zendrop.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+284. Proteus Snowboards
+   URL: https://proteussnowboards.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+285. Ubersuggest by Neil Patel
+   URL: https://neilpatel.com/ubersuggest/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+286. Unity
+   URL: https://assetstore.unity.com/
+   Status: AUTO SUCCESS
+   Analysis: Has functional features
+
+287. Make Up For Ever
+   URL: https://www.makeupforever.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+288. Campspot
+   URL: https://www.campspot.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+289. The WOD Life
+   URL: https://www.thewodlife.com.au/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+290. Nalgene
+   URL: https://nalgene.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+291. William May
+   URL: https://www.william-may.co.uk/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+292. Nextbase
+   URL: https://www.nextbase.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+293. Maria Black
+   URL: https://www.maria-black.com/en/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+294. JuiceStore
+   URL: https://www.juicestore.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+295. Because Market
+   URL: https://becausemarket.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+296. HBM Machines
+   URL: https://www.hbm-machines.com/nl/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+297. Sorare
+   URL: https://sorare.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+298. Renderforest
+   URL: https://www.renderforest.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+299. Silencer Central
+   URL: https://www.silencercentral.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+300. Breville
+   URL: https://www.breville.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+301. CHI
+   URL: https://chi.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+302. CJS-CDKeys
+   URL: https://www.cjs-cdkeys.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+303. Trident Fly Fishing
+   URL: https://tridentflyfishing.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+304. PowerStep
+   URL: https://powerstep.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+305. Mario Badescu
+   URL: https://www.mariobadescu.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+306. The Game Collection
+   URL: https://www.thegamecollection.net/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+307. Universal Music
+   URL: https://www.umusicstore.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+308. Ultimate Ears
+   URL: https://www.ultimateears.com/en-us
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+309. Popsa
+   URL: https://popsa.app/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+310. 360TotalSecurity
+   URL: https://www.360totalsecurity.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+311. NBA Store
+   URL: https://store.nba.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+312. Slider Revolution
+   URL: https://sliderrevolution.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+313. Territorial Seed Company
+   URL: https://territorialseed.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+314. Laco
+   URL: https://www.laco-watches.com/en/index
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+315. Garnet Hill
+   URL: https://www.garnethill.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+316. Johnny Was
+   URL: https://www.johnnywas.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+317. Sittercity
+   URL: https://sittercity.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+318. Golden Goose
+   URL: https://www.goldengoose.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+319. Boka
+   URL: https://www.boka.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+320. Simone I. Smith
+   URL: https://simoneismith.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+321. Education.com
+   URL: https://www.education.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+322. Bio Bidet
+   URL: https://www.biobidet.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+323. Kintsugi Hair
+   URL: https://kintsugihair.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+324. Nudestix
+   URL: https://www.nudestix.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional ticket booking features detected (STRONG protection)
+
+325. Frame Denim
+   URL: https://www.frame-store.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+326. Foot Store
+   URL: https://foot-store.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+327. Cushy Home Decor
+   URL: https://www.shopcushy.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+328. American Leather Co.
+   URL: https://www.americanleatherco.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+329. Everhem
+   URL: https://www.everhem.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+330. la Vie en Rose
+   URL: https://www.lavieenrose.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+331. Assouline
+   URL: https://www.assouline.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+332. Sibionics
+   URL: https://www.sibionicscgm.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+333. Handball-Store
+   URL: https://handball-store.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+334. Lenses For Less
+   URL: https://www.lensesforless.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+335. National Vision
+   URL: https://www.nationalvision.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+336. The Hair Diagram
+   URL: https://thehairdiagram.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+337. Vitrea Vision (US)
+   URL: https://vitreavision.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+338. Compression Sale
+   URL: https://www.compressionsale.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+339. The Vermont Country Store
+   URL: https://vermontcountrystore.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+340. Volcano Lodge
+   URL: https://www.volcanolodge.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+341. BabyBjörn
+   URL: https://www.babybjorn.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+342. Schwinn
+   URL: https://www.schwinnfitness.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+343. AlivingHome
+   URL: https://alivinghome.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+344. BUILT (US)
+   URL: https://built.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+345. Sam Mcknight
+   URL: https://www.sammcknight.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+346. Hurtigruten Expeditions
+   URL: https://www.hurtigruten.com/en-us
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+347. Tiny Land
+   URL: https://www.tinylandus.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+348. Greenfee365
+   URL: https://greenfee365.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+349. Gelato
+   URL: https://www.gelato.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+350. CINCOM
+   URL: https://www.cincomshop.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+351. SnoreLessNow (US)
+   URL: https://snorelessnow.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+352. ROLI
+   URL: https://www.roli.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+353. Olivieri 1882
+   URL: https://www.olivieri1882.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+354. Glassguard
+   URL: https://glassguard.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+355. Touring Tech
+   URL: https://touringtech.com
+   Status: AUTO SUCCESS
+   Analysis: Has functional features
+
+356. Caribbean Lake Park
+   URL: https://caribbeanlakepark.com/en/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+357. WeMod
+   URL: https://wemod.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+358. HotelsByDay
+   URL: https://www.hotelsbyday.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional hotel booking features detected (STRONG protection)
+
+359. Tameson
+   URL: https://tameson.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+360. Swany
+   URL: https://swanyamerica.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+361. Tifosi Optics
+   URL: https://tifosioptics.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+362. Sundaze
+   URL: https://sundazerays.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+363. italki
+   URL: https://www.italki.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+364. Basic Honey
+   URL: https://basichoney.com/
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+365. Henry Beguelin
+   URL: https://www.henrybeguelin.it
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+366. Kustomz
+   URL: https://kustomz.co/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+367. Country Life Vitamins
+   URL: https://countrylifevitamins.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+368. Healthy Bud
+   URL: https://us.healthybud.co/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+369. Marlies Dekkers
+   URL: https://www.marliesdekkers.com/en-us/home
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+370. AnkerSOLIX
+   URL: https://www.ankersolix.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+371. Helios
+   URL: https://heliospickleball.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+372. Luggage Forward
+   URL: https://www.luggageforward.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+373. Archives
+   URL: https://www.archives.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+374. Schwank Grills (US)
+   URL: https://schwankgrills.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+375. Gisada US
+   URL: https://gisada.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+376. Alpinistas
+   URL: https://www.thealpinistas.com
+   Status: AUTO SUCCESS
+   Analysis: Has functional features
+
+377. Lifeboost Coffee
+   URL: https://lifeboostcoffee.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+378. Rage Fitness
+   URL: https://www.ragefitness.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+379. Furcy Botanik
+   URL: https://furcybotanik.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+380. Everest
+   URL: https://www.everest.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+381. Blue Lagoon Skincare
+   URL: https://skincare.bluelagoon.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+382. Quark Software
+   URL: https://www.quark.com/affiliate?utm_source=cj&utm_medium=website
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+383. Reef Sandals
+   URL: https://reef.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+384. Braun
+   URL: https://us.braun.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+385. Ucciyo
+   URL: https://ucciyo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+386. LightingWill
+   URL: https://www.lightingwill.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+387. Wolfbox
+   URL: https://wolfbox.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+388. easy-peasy
+   URL: https://easypeasy.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+389. Origin Mattress
+   URL: https://originmattress.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+390. Doba
+   URL: https://www.doba.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+391. Hello.cv
+   URL: https://www.hello.cv/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+392. Maya Bath
+   URL: https://www.mayabath.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+393. GPO USA
+   URL: https://gpo-usa.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+394. The Digitize Center (US)
+   URL: https://thedigitizecenter.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+395. Gravity Stunts
+   URL: https://gravitystunts.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+396. StoreYourBoard
+   URL: https://www.storeyourboard.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+397. CUNFON
+   URL: https://mall.cunfon.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+398. Buena Cura
+   URL: https://buenacura.co/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+399. Armed American Supply
+   URL: https://armedamerican.supply/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+400. Eddie by Giddy
+   URL: https://store.eddiebygiddy.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+401. La Joya Jewelry
+   URL: https://www.lajoyajewelry.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+402. Flamingo
+   URL: https://www.shopflamingo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+403. Our Heritage Homes (US)
+   URL: https://ourheritagehomes.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+404. I Heart Jewels
+   URL: https://www.iheartjewels.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+405. B/alam
+   URL: https://balam.co/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+406. Usercentrics
+   URL: https://www.usercentrics.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+407. General Assembly
+   URL: https://generalassemb.ly/students
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+408. NOGU
+   URL: https://www.nogu.studio?utm_source=shareasale&utm_medium=affiliate&nb_platform=shareasale
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+409. Lockin
+   URL: https://lockin.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+410. Interactive Aquarium Cancun
+   URL: https://www.interactiveaquariumcancun.com/swim-with-dolphins
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+411. HotelBooker
+   URL: https://www.hotelbooker.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional hotel booking features detected (GOOD protection)
+
+412. EcoReco Scooter
+   URL: https://www.ecorecoscooter.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+413. Viscata
+   URL: https://www.viscata.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+414. Lullaby Earth
+   URL: https://www.lullabyearth.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+415. SwifDoo
+   URL: https://www.swifdoo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+416. JiaroPack
+   URL: https://jiaropack.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+417. Bala Enzyme
+   URL: https://balaenzyme.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+418. Movich Hotels
+   URL: https://www.movichhotels.com/en/
+   Status: AUTO SUCCESS
+   Analysis: Functional hotel booking features detected (STRONG protection)
+
+419. ProWritingAid
+   URL: https://prowritingaid.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+420. Sabo Skirt
+   URL: https://us.saboskirt.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+421. Amana
+   URL: https://www.amana.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+422. Garden In Minutes
+   URL: https://GardenInMinutes.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+423. embarkvet
+   URL: https://embarkvet.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+424. Ring Concierge
+   URL: https://ringconcierge.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+425. Olive & Crate
+   URL: https://oliveandcrate.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+426. Max and Lily
+   URL: https://maxandlily.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+427. Reima
+   URL: https://us.reima.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+428. SET Active
+   URL: https://www.setactive.co
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+429. Monument Grills
+   URL: https://monumentgrills.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+430. Fahlo
+   URL: https://myfahlo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+431. Luosophy
+   URL: https://luosophy.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+432. Wheel Hero
+   URL: https://www.wheelhero.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+433. Huion
+   URL: https://store.huion.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+434. Osmology
+   URL: https://osmology.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+435. Flower Knows
+   URL: https://flowerknows.co/?utm_source=sas&utm_medium=text&utm_campaign=0517
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+436. Numi
+   URL: https://wearnumi.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+437. MELT Method
+   URL: https://www.meltmethod.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+438. Maxtrix Kids
+   URL: https://www.MaxtrixKids.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+439. Onlymaker
+   URL: https://www.onlymaker.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+440. Nature/s Body
+   URL: https://naturesbody.com.au/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+441. L/AVANT Collective
+   URL: https://lavantcollective.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+442. Medical Spanish
+   URL: https://www.medicalspanish.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+443. Plant Paper
+   URL: https://plantpaper.us
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+444. NICECNC
+   URL: https://www.nicecnc.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+445. Aligner32
+   URL: https://aligner32.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+446. Rio Beverages
+   URL: https://riobeverages.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+447. ScentAir
+   URL: https://scentair.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+448. Laird Superfood
+   URL: https://lairdsuperfood.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+449. Sympli
+   URL: https://sympli.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+450. Kulfi Beauty
+   URL: https://kulfibeauty.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+451. Coolzy.com
+   URL: https://www.coolzy.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+452. DermRays
+   URL: https://www.dermrays.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+453. Untangled Coaching
+   URL: https://untangled-coaching.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+454. Kentfaith
+   URL: https://www.kentfaith.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+455. Oh Beauty
+   URL: https://ohbeauty.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+456. Makeblock
+   URL: https://www.makeblock.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+457. Sparkle Wellness
+   URL: https://www.lovesparkle.life
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+458. Hermoza
+   URL: https://thehermoza.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+459. OBSBOT
+   URL: https://www.obsbot.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+460. Nature/s Generator
+   URL: https://www.naturesgenerator.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+461. Vesta Living, Corp.
+   URL: https://vesta-sleep.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+462. Aray
+   URL: https://arayroller.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+463. Félix Technologies (US)
+   URL: https://www.felixpago.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+464. Pixellot You
+   URL: http://www.pixellot.tv/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+465. Ming Wang Knits
+   URL: https://mingwang.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+466. Kingston
+   URL: https://www.kingstonbrass.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+467. Nguyen Coffee Supply
+   URL: https://www.nguyencoffeesupply.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+468. Paragon Group USA
+   URL: https://paragon-outdoor.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+469. Stylevana
+   URL: https://www.stylevana.com/en_US
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+470. DOKODEMO
+   URL: https://dokodemo.world/en/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+471. Boundary Supply
+   URL: https://boundarysupply.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+472. JOI
+   URL: https://www.addjoi.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+473. Smart Playrooms
+   URL: https://www.smartplayrooms.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+474. Q30 Innovations
+   URL: https://q30.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+475. Superfeast
+   URL: https://superfeast.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+476. Livro
+   URL: https://shoplivro.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+477. Swimwear Anywhere
+   URL: https://www.beach2ocean.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+478. Bernardo 1946
+   URL: https://bernardo1946.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+479. Rovsun
+   URL: https://www.rovsun.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+480. Rapid Radios
+   URL: https://rapidradios.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+481. Casasola
+   URL: https://casasola.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+482. Apple Forms
+   URL: https://appleforms.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+483. Brush On Block
+   URL: https://brushonblock.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+484. ober health
+   URL: https://www.oberhealth.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+485. Simplicity Vacuums
+   URL: https://www.simplicityvac.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+486. Arenti
+   URL: https://www.arenti.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+487. Display Market
+   URL: https://www.displaysmarket.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+488. Brooklyn Brew Shop
+   URL: https://farmsteady.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+489. Mission
+   URL: https://mission.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+490. Duncan Toys Company
+   URL: https://duncantoys.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+491. SODI
+   URL: https://sodigear.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+492. Mrs Wordsmith
+   URL: https://mrswordsmith.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+493. Dr. Tom Cowan
+   URL: https://drtomcowan.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+494. Jonissi
+   URL: https://jonissi.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+495. Guibert
+   URL: https://guibert.fr/fr
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+496. Will Leather Goods
+   URL: https://www.willleathergoods.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+497. Nerdy Frames
+   URL: https://nerdyframes.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+498. Milkadamia
+   URL: https://shopmilkadamia.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+499. Kylea Health
+   URL: https://kyleahealth.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+500. AmpAura Energy
+   URL: https://www.ampaura.tech/products/purea-portable-power-station
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+501. Short & Suite
+   URL: https://www.shortandsuite.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+502. COOLCUT
+   URL: https://coolcut.tv/
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+503. MAX TANG TECHNOLOGY LIMITED
+   URL: https://store.maxtangpc.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+504. HZY TRADING LIMITED
+   URL: https://www.chictry.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+505. Paris Rhone
+   URL: https://www.parisrhone.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+506. Foshan City QKE clothing Co., LTD
+   URL: https://www.sthcute.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+507. Hobby Zone
+   URL: https://www.hobbyzone.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+508. NAISIGOO
+   URL: https://www.naisigoo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+509. Huanuo
+   URL: https://www.huanuo.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+510. Yesper Power
+   URL: https://www.yesperpower.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+511. Run United
+   URL: https://rununited.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+512. MukkPet Bike
+   URL: https://www.mukkpetbike.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+513. ReAthlete
+   URL: https://reathlete.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+514. Akaso
+   URL: https://shopakaso.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+515. Dream Tea NYC
+   URL: https://www.dreamteanyc.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+516. Aoocci
+   URL: https://aoocci.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+517. The Good Chocolate
+   URL: https://www.thegoodchocolate.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+518. MeMoi Fashion
+   URL: https://memoi.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+519. Taglia Pasta
+   URL: https://www.tagliapasta.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+520. NOM Maternity
+   URL: https://NOMMaternity.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+521. EKR auto
+   URL: https://ekrcover.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+522. Drop Connect
+   URL: https://dropconnect.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+523. Stormdesire
+   URL: https://www.stormdesire.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+524. Purpose Pet Food LLC
+   URL: https://purposepetfood.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+525. PRI
+   URL: https://www.shoppri.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+526. Local Bag Company
+   URL: https://localbagcompany.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+527. AEMBR
+   URL: https://aembr.co
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+528. GRACE KARIN
+   URL: https://gracekarinonline.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+529. Scribble
+   URL: https://scribble.art
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+530. Blues Hog
+   URL: https://www.blueshog.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+531. UAB Memelio Atelje
+   URL: https://wrinklesshop.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+532. Babs Boutique NYC
+   URL: https://babsboutiquenyc.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+533. SCOPRO Smart Coaching Products
+   URL: https://www.scoprosoccer.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+534. Rob Keller MD
+   URL: https://www.robkellermd.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+535. Lunyee
+   URL: https://www.lunyeecnc.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+536. Guangzhou Anshenger Jewelry Co., Ltd.
+   URL: https://www.imolovejewelry.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+537. Charmo
+   URL: https://mycharmo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+538. Excavating Adventures
+   URL: https://excavatingadventures.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+539. Tacticalxmen.com
+   URL: https://www.tacticalxmen.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+540. TOSOT Direct
+   URL: https://tosotdirect.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+541. ClothDiaper.com
+   URL: https://www.clothdiaper.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+542. Carlinkit
+   URL: https://carlinkitcarplay.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+543. Carved Solutions
+   URL: https://carvedsolutions.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+544. Karma Nuts
+   URL: https://www.karmanuts.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+545. FireAvert
+   URL: https://Www.fireavert.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+546. Activist Skincare
+   URL: https://activistskincare.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+547. About Vintage
+   URL: https://aboutvintage.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+548. GREEN
+   URL: https://drinkgreendaily.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+549. LBE Design
+   URL: https://www.lbedesign.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+550. ASPENX
+   URL: https://www.aspencollection.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+551. Hong Kong Hele Electronics Co., Ltd.
+   URL: https://qcy.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+552. Healthy Extracts
+   URL: https://whitneyjohns.com/products/hormone-support
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+553. Royce and Rocket
+   URL: https://Royceandrocket.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+554. Classic Fella
+   URL: https://www.classicfella.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+555. All About Suit
+   URL: https://www.allaboutsuit.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+556. Retechtronics
+   URL: https://www.Retechtronics.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+557. Dear Perli
+   URL: https://dearperli.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+558. WAIT botanicamente Corp
+   URL: https://waitbotanicamente.shop
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+559. West Bend
+   URL: https://westbend.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+560. HoliFrog
+   URL: https://holifrog.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+561. BONHEUR JEWELRY
+   URL: https://www.bonheurjewelry.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+562. TRANYA
+   URL: https://shop.tranya.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+563. FemmePharma
+   URL: https://www.femmepharma.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+564. Studio Girl Shoes LLC
+   URL: https://www.tanyaheathus.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+565. EpiLynx
+   URL: https://www.epilynx.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+566. Hoolie
+   URL: https://hooliegolf.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+567. Beauty Market Online
+   URL: https://beautymarketonline.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+568. iDeaPLAY
+   URL: https://www.ideausa.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+569. 1212
+   URL: https://shop1212.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+570. Leaf of Life Wellness
+   URL: https://leafoflifewellness.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+571. Kim/C Market
+   URL: https://www.kimcmarket.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+572. DOGTV
+   URL: https://www.dogtv.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+573. Kyria Lingerie
+   URL: https://kyrialingerie.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+574. Kiramoon
+   URL: https://www.kiramoon.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+575. Simple Wishes
+   URL: https://www.simplewishes.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+576. BodyFlow Hydration
+   URL: https://bodyflowhydration.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+577. Belly Sleep
+   URL: https://bellysleep.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+578. Georgie & Lou
+   URL: https://www.georgieandlou.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+579. Brainiac
+   URL: https://www.brainiacfoods.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+580. Flyers Cocktail Co
+   URL: https://drinkflyers.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+581. Lariat Marketing Hub
+   URL: https://www.marketinghub.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+582. Jeff Wan
+   URL: https://www.jeffwan.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+583. Lamomo Neon
+   URL: https://www.lamomoneon.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+584. Egghead Nutrition
+   URL: https://egghead-nutrition.myshopify.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+585. Soulout
+   URL: https://soulouter.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+586. Website Speedy by MakkPress Technologies
+   URL: https://websitespeedy.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+587. GA-DE Cosmetics
+   URL: https://www.gadecosmetics.com/?a=shareasale
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+588. GOLDMoral
+   URL: https://www.goldmoral.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+589. MUNBYN
+   URL: https://www.munbyn.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+590. Rosy Soil
+   URL: https://rosysoil.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+591. The Perfect Haircare
+   URL: https://theperfecthaircare.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+592. Drip Gear Zone
+   URL: https://dripgearzone.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+593. Worm Nerd
+   URL: https://www.wormnerd.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+594. Thread Wallets
+   URL: https://www.threadwallets.com/?gclid=Cj0KCQiA4uCcBhDdARIsAH5jyUlF8SKks22d43b1OqPUYclJBHvowKU6BBnF1Ibax_hkNTLxHEFdDUIaAgnBEALw_wcB
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+595. Once Again Nut Butter
+   URL: https://www.onceagainnutbutter.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+596. Chiyo
+   URL: https://wearechiyo.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+597. mens-weddingbands
+   URL: https://mens-weddingbands.com
+   Status: AUTO SUCCESS
+   Analysis: No severe problems detected
+
+598. My Diet Doc
+   URL: https://mydietdoc.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+599. Lux Unfiltered
+   URL: https://www.luxunfiltered.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+600. AlloyWorks Store
+   URL: https://www.alloyworksplus.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+601. BLACKTIE
+   URL: https://blacktie.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+602. Lilin International Group Limited
+   URL: https://liectrouxrobotics.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+603. My Personal Recruiter
+   URL: https://mypersonalrecruiter.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (GOOD protection)
+
+604. Totality Skincare
+   URL: https://totality-skincare.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+605. CONNEQT Health
+   URL: https://conneqthealth.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+606. Divoom
+   URL: https://divoom.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+607. FastinSupplement.com
+   URL: https://www.fastinsupplement.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+608. Enable Accessible Haircare Products
+   URL: https://enable.shop
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+609. Floleaf Naturals LLC
+   URL: https://stemox.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+610. Humble Brands
+   URL: https://humblebrands.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+611. AL DUCA D/AOSTA
+   URL: https://www.alducadaosta.com/us
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+612. Two Face
+   URL: https://www.us.twofaceaesthetics.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+613. COCOLAB
+   URL: https://cocolab.com/
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+614. EROMMY
+   URL: https://erommy.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+615. JoyTutus
+   URL: https://www.joytutus.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+616. OAKYWOOD
+   URL: https://www.oakywood.shop
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+617. Bestoutdor
+   URL: https://www.bestoutdor.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+618. Unwilted
+   URL: https://unwilted.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+619. SunGoldPower
+   URL: https://sungoldpower.com
+   Status: AUTO SUCCESS
+   Analysis: Functional e-commerce features detected (STRONG protection)
+
+
+🚨 FLAGGED MERCHANTS (REQUIRE REVIEW):
+--------------------------------------------------
+1. PetnPurr
+   URL: https://petnpurr.com
+   Issue: minimal content - likely unavailable
+   Analysis: Site displays unavailability message
+
+2. okingjoy
+   URL: https://okingjoy.com/
+   Issue: minimal content - likely unavailable
+   Analysis: Site displays unavailability message
+
+3. Prime Layers
+   URL: https://primelayers.com/products/100-cotton-face-masks
+   Issue: minimal content - likely unavailable
+   Analysis: Site displays unavailability message
+
+4. Topdon Technology Co., Ltd
+   URL: https://eu.topdon.com
+   Issue: timeout error - site did not load within 30 seconds: page.textContent: Timeout 30000ms exceeded.
+   Analysis: Site failed to load within timeout period
+
+5. KYX World
+   URL: https://www.kyx.world
+   Issue: minimal content - likely unavailable
+   Analysis: Site displays unavailability message
+
+
+📋 COMPLETE TEST ORDER (CHRONOLOGICAL):
+--------------------------------------------------
+  1. [AUTO SUCCESS] Visible
+     https://www.visible.com
+
+  2. [AUTO SUCCESS] WinZip
+     https://www.winzip.com/win/en
+
+  3. [AUTO SUCCESS] Evolve Skateboards
+     https://www.rideevolve.com.au/
+
+  4. [AUTO SUCCESS] Dagsmejan
+     https://www.dagsmejan.com/
+
+  5. [AUTO SUCCESS] Notarize
+     https://www.notarize.com
+
+  6. [AUTO SUCCESS] Buster and Punch
+     https://www.busterandpunch.com/us/
+
+  7. [AUTO SUCCESS] Tumi
+     https://www.tumi.com
+
+  8. [AUTO SUCCESS] VOS Body Care
+     https://www.vosbody.com/
+
+  9. [AUTO SUCCESS] Yoga Hustle
+     https://yogahustle.com/
+
+ 10. [AUTO SUCCESS] EduBirdie
+     https://edubirdie.com
+
+ 11. [AUTO SUCCESS] Keto Brainz Nootropics
+     https://ketobrainz.com
+
+ 12. [AUTO SUCCESS] Craft Sportswear
+     https://craftsports.us/
+
+ 13. [AUTO SUCCESS] InsecureWeb.com
+     https://www.insecureweb.com
+
+ 14. [AUTO SUCCESS] PARKIT
+     https://parkitmovement.com
+
+ 15. [AUTO SUCCESS] bombusbee
+     https://www.bombusbee.net
+
+ 16. [AUTO SUCCESS] 27 Miles Malibu
+     https://27milesmalibu.com/
+
+ 17. [AUTO SUCCESS] VectorStock
+     https://vectorstock.com
+
+ 18. [AUTO SUCCESS] Varsity Pets
+     https://www.varsitypetsonline.com
+
+ 19. [AUTO SUCCESS] Milla
+     https://itsmilla.com/
+
+ 20. [AUTO SUCCESS] Pure & Cimple
+     https://pureandcimple.com/
+
+ 21. [AUTO SUCCESS] DEDICATED Brand
+     https://www.dedicatedbrand.com/
+
+ 22. [AUTO SUCCESS] DocHub
+     https://dochub.com
+
+ 23. [AUTO SUCCESS] Traveling Baby Company
+     https://www.travelingbaby.com
+
+ 24. [AUTO SUCCESS] Simple App
+     https://simple.life/
+
+ 25. [AUTO SUCCESS] DirectDeals
+     https://www.directdeals.com/
+
+ 26. [AUTO SUCCESS] FOPOMonitor (US)
+     https://fopomonitor.com/
+
+ 27. [AUTO SUCCESS] Tenkara Rod Co.
+     https://www.tenkararodco.com/
+
+ 28. [AUTO SUCCESS] Nutra Remedies
+     https://enjoyseamoss.com
+
+ 29. [AUTO SUCCESS] ModaDiAndrea
+     https://modadiandrea.com/en/
+
+ 30. [AUTO SUCCESS] LSKD
+     https://us.lskd.co/
+
+ 31. [AUTO SUCCESS] BRUNT Workwear
+     https://bruntworkwear.com/
+
+ 32. [AUTO SUCCESS] Trainline
+     https://www.thetrainline.com/pzaffiliate/redirect
+
+ 33. [AUTO SUCCESS] Culligan ZeroWater
+     https://shop.culligan.com/
+
+ 34. [AUTO SUCCESS] Bark Parental Controls
+     https://www.bark.us
+
+ 35. [AUTO SUCCESS] A-Sha Foods
+     https://ashadrynoodle.com/
+
+ 36. [AUTO SUCCESS] Homewater
+     https://www.homewater.com
+
+ 37. [AUTO SUCCESS] Pit Command
+     https://pitcommand.com/
+
+ 38. [AUTO SUCCESS] Wrappily
+     https://wrappily.com
+
+ 39. [AUTO SUCCESS] Falco
+     https://www.falcoholsters.com/
+
+ 40. [AUTO SUCCESS] AquaTru
+     https://aquatruwater.com
+
+ 41. [AUTO SUCCESS] TAFER Hotels & Resorts
+     https://www.taferresorts.com/
+
+ 42. [AUTO SUCCESS] Alphalete Athletics
+     https://alphaleteathletics.com
+
+ 43. [AUTO SUCCESS] dermavitality
+     https://dermavitality.com
+
+ 44. [AUTO SUCCESS] Metabolic
+     https://www.metabolic.com
+
+ 45. [AUTO SUCCESS] Carrie Elizabeth
+     https://carrieelizabeth.co.uk/
+
+ 46. [AUTO SUCCESS] My Magic Carpet
+     https://buymymagiccarpet.com/
+
+ 47. [AUTO SUCCESS] AquaVault
+     https://theaquavault.com
+
+ 48. [AUTO SUCCESS] Foster Grant
+     https://www.fostergrant.com
+
+ 49. [AUTO SUCCESS] Coastline Academy
+     https://coastlineacademy.com
+
+ 50. [AUTO SUCCESS] Rave Sports
+     https://www.ravesports.com/
+
+ 51. [AUTO SUCCESS] PowerA
+     https://www.powera.com/
+
+ 52. [AUTO SUCCESS] Green Water Sports
+     https://greenwatersports.com/
+
+ 53. [AUTO SUCCESS] F1 Store
+     https://f1store.formula1.com/
+
+ 54. [AUTO SUCCESS] Lopesan
+     https://www.lopesan.com
+
+ 55. [AUTO SUCCESS] ModaMia
+     https://modamia.com/
+
+ 56. [AUTO SUCCESS] Scandinavian Biolabs
+     https://scandinavianbiolabs.co.uk/
+
+ 57. [AUTO SUCCESS] Spot Hero
+     https://spothero.com/
+
+ 58. [AUTO SUCCESS] Jennifer Furniture
+     https://www.jenniferfurniture.com/
+
+ 59. [AUTO SUCCESS] Lytmi
+     https://www.lytmi.co/
+
+ 60. [AUTO SUCCESS] Aquaroo
+     https://aquaroobabycarrier.com
+
+ 61. [AUTO SUCCESS] Base Blu
+     https://www.baseblu.com/
+
+ 62. [AUTO SUCCESS] Uplyft Capital
+     https://www.uplyftcapital.com/
+
+ 63. [AUTO SUCCESS] CoinFlip
+     https://coinflip.tech/
+
+ 64. [AUTO SUCCESS] Vertagear
+     https://www.vertagear.com
+
+ 65. [AUTO SUCCESS] Davines
+     https://us.davines.com/
+
+ 66. [AUTO SUCCESS] Top Mobility
+     https://www.topmobility.com/
+
+ 67. [AUTO SUCCESS] Manhattan Prep
+     https://www.manhattanprep.com
+
+ 68. [AUTO SUCCESS] Lichi
+     https://lichi.com/
+
+ 69. [AUTO SUCCESS] BioWorld
+     https://www.bioworld.com
+
+ 70. [AUTO SUCCESS] BioWorld
+     https://www.bioworld.com
+
+ 71. [AUTO SUCCESS] Allied Real Estate Schools
+     https://www.alliedschools.com
+
+ 72. [AUTO SUCCESS] Burning River Foods
+     https://burningriverfoods.com/
+
+ 73. [AUTO SUCCESS] Contemporary Art by Christine
+     https://www.contemporaryartbychristine.com
+
+ 74. [AUTO SUCCESS] Fresh Rags
+     https://freshragsfl.com
+
+ 75. [AUTO SUCCESS] Honey Badger
+     https://drinkhoneybadger.com
+
+ 76. [AUTO SUCCESS] Feed Me More
+     https://feedmemore.com
+
+ 77. [AUTO SUCCESS] Digital RSVP
+     https://digital-rsvp.com
+
+ 78. [AUTO SUCCESS] Kimera Koffee
+     https://kimerakoffee.com
+
+ 79. [AUTO SUCCESS] Vanity Fair Lingerie
+     https://www.vanityfairlingerie.com/
+
+ 80. [AUTO SUCCESS] EZRI
+     https://www.ezri.com
+
+ 81. [AUTO SUCCESS] Leanin/ Tree
+     https://www.leanintree.com
+
+ 82. [AUTO SUCCESS] MESHKI
+     https://www.meshki.us/
+
+ 83. [AUTO SUCCESS] Spacial Audio
+     https://spacial.com/
+
+ 84. [AUTO SUCCESS] BDraddy
+     https://bdraddy.com/
+
+ 85. [AUTO SUCCESS] Gerber Childrenswear
+     https://www.gerberchildrenswear.com
+
+ 86. [FLAGGED] PetnPurr
+     https://petnpurr.com
+
+ 87. [AUTO SUCCESS] Liquid Web
+     https://liquidweb.com
+
+ 88. [AUTO SUCCESS] Meloway Makeup
+     https://melowaymakeup.com/
+
+ 89. [AUTO SUCCESS] BlueCosmo
+     https://www.bluecosmo.com/
+
+ 90. [AUTO SUCCESS] LivFresh
+     https://www.getlivfresh.com
+
+ 91. [AUTO SUCCESS] Rafi Nova
+     https://rafinova.com
+
+ 92. [AUTO SUCCESS] Three Dots
+     https://www.threedots.com/
+
+ 93. [AUTO SUCCESS] Blade City
+     https://www.blade-city.com
+
+ 94. [AUTO SUCCESS] Gruff + Tumble
+     https://gruffandtumble.com/
+
+ 95. [AUTO SUCCESS] Discount Electronics
+     https://discountelectronics.com/
+
+ 96. [AUTO SUCCESS] Armament Systems & Procedures
+     https://www.asp-usa.com/
+
+ 97. [AUTO SUCCESS] ElleVet Sciences
+     https://www.ellevetsciences.com/
+
+ 98. [AUTO SUCCESS] UniDoc
+     https://unidoc.io
+
+ 99. [AUTO SUCCESS] Kiss
+     https://www.KISSusa.com
+
+100. [AUTO SUCCESS] Sharp Home Appliances
+     https://shop.sharpusa.com/
+
+101. [AUTO SUCCESS] Beverly Hills MD
+     https://beverlyhillsmd.com/
+
+102. [AUTO SUCCESS] Brave New Look
+     https://www.bravenewlook.com/
+
+103. [AUTO SUCCESS] JustAnswer
+     https://www.justanswer.com
+
+104. [AUTO SUCCESS] MissFox
+     https://www.missfoxshop.com
+
+105. [AUTO SUCCESS] Routledge
+     https://www.routledge.com/
+
+106. [AUTO SUCCESS] VersedSkin.com
+     https://versedskin.com/
+
+107. [AUTO SUCCESS] Jayson Home
+     https://www.jaysonhome.com
+
+108. [AUTO SUCCESS] Plaza Premium
+     https://plazapremiumlounge.com
+
+109. [AUTO SUCCESS] Maidenform
+     https://maidenform.com
+
+110. [AUTO SUCCESS] beek
+     https://www.beekshop.com/
+
+111. [AUTO SUCCESS] Brochu Walker
+     https://www.brochuwalker.com/
+
+112. [AUTO SUCCESS] Yarnspirations
+     https://www.yarnspirations.com/
+
+113. [AUTO SUCCESS] Carbon38
+     https://www.carbon38.com
+
+114. [AUTO SUCCESS] CodaKid
+     https://codakid.com
+
+115. [AUTO SUCCESS] JuJuBe
+     https://jujube.com
+
+116. [AUTO SUCCESS] Athletic Propulsion Labs
+     https://www.athleticpropulsionlabs.com/
+
+117. [AUTO SUCCESS] Campus Protein
+     https://www.campusprotein.com
+
+118. [AUTO SUCCESS] ShopSonix
+     https://shopsonix.com/
+
+119. [AUTO SUCCESS] Genie Traveler
+     https://genietraveler.com/
+
+120. [AUTO SUCCESS] ValueMags
+     https://www.valuemags.com
+
+121. [AUTO SUCCESS] Paessler
+     https://www.paessler.com/prtg
+
+122. [AUTO SUCCESS] PatBO
+     https://patbo.com/
+
+123. [AUTO SUCCESS] Mailbird
+     https://www.getmailbird.com
+
+124. [AUTO SUCCESS] Goal Zero
+     https://www.goalzero.com
+
+125. [AUTO SUCCESS] Beachly
+     https://beachly.com
+
+126. [AUTO SUCCESS] myAutoloan
+     https://www.myautoloan.com
+
+127. [AUTO SUCCESS] Argentum
+     https://argentum.com/
+
+128. [AUTO SUCCESS] Holiday Taxis
+     https://www.holidaytaxis.com/en/
+
+129. [AUTO SUCCESS] SwimZip
+     https://www.SwimZip.com
+
+130. [AUTO SUCCESS] Linky
+     https://www.linkyinnovation.com
+
+131. [AUTO SUCCESS] shop-olivia
+     https://shop-olivia.com/
+
+132. [AUTO SUCCESS] art.Drops
+     https://www.myartdrops.com
+
+133. [AUTO SUCCESS] Tuft & Needle
+     https://www.tuftandneedle.com/
+
+134. [AUTO SUCCESS] Remitly
+     https://www.remitly.com
+
+135. [AUTO SUCCESS] PK Grills
+     https://pkgrills.com
+
+136. [AUTO SUCCESS] Harney & Sons
+     https://www.harney.com
+
+137. [AUTO SUCCESS] Blue Sky Vitamin
+     https://blueskyvitamin.com/
+
+138. [AUTO SUCCESS] Lily & Roo
+     https://www.lilyandroo.com/
+
+139. [AUTO SUCCESS] SoKawaii
+     https://sokawaii.com/
+
+140. [AUTO SUCCESS] SoKawaii
+     https://sokawaii.com/
+
+141. [AUTO SUCCESS] WiseCleaner
+     https://www.wisecleaner.com
+
+142. [AUTO SUCCESS] Survivor Filter
+     https://www.survivorfilter.com/
+
+143. [AUTO SUCCESS] behno
+     https://behno.com
+
+144. [AUTO SUCCESS] Ellia
+     https://www.ellia.com
+
+145. [AUTO SUCCESS] Kissed Earth
+     https://kissedearth.com/
+
+146. [AUTO SUCCESS] Industry West
+     https://industrywest.com
+
+147. [AUTO SUCCESS] Ivosight
+     https://ivosight.com
+
+148. [AUTO SUCCESS] Fanatical
+     https://www.fanatical.com
+
+149. [AUTO SUCCESS] Star Conflict
+     https://star-conflict.com/
+
+150. [AUTO SUCCESS] Carbonite
+     https://www.carbonite.com
+
+151. [AUTO SUCCESS] Scopelist
+     https://scopelist.com/
+
+152. [AUTO SUCCESS] REVER
+     https://www.rever.co
+
+153. [AUTO SUCCESS] Chirp
+     https://www.gochirp.com
+
+154. [AUTO SUCCESS] NorthOne Business Banking
+     https://www.northone.com
+
+155. [AUTO SUCCESS] Mono B
+     https://www.mymonob.com
+
+156. [AUTO SUCCESS] Viome
+     https://www.viome.com/
+
+157. [AUTO SUCCESS] MicroPerfumes
+     https://microperfumes.com
+
+158. [AUTO SUCCESS] Internxt
+     https://internxt.com
+
+159. [AUTO SUCCESS] Aleck
+     https://www.aleck.io/
+
+160. [AUTO SUCCESS] NF Sports
+     https://nfsports.com
+
+161. [AUTO SUCCESS] The Tiffen Company
+     https://tiffen.com
+
+162. [AUTO SUCCESS] AfroMerch
+     https://www.afro-merch.shop
+
+163. [AUTO SUCCESS] Dress A Med
+     https://scrubsnow.myshopify.com
+
+164. [AUTO SUCCESS] Zero Fucks Coin
+     https://www.zerofuckscoin.com
+
+165. [AUTO SUCCESS] Leaf & Clay
+     https://www.leafandclay.co
+
+166. [AUTO SUCCESS] Standard Luggage Co.
+     https://www.standardluggage.com
+
+167. [AUTO SUCCESS] Bad Ass Extension Cords
+     https://www.badassextensioncords.com
+
+168. [AUTO SUCCESS] Fast Bar
+     https://www.FastBar.com
+
+169. [AUTO SUCCESS] RIPT Skin Systems
+     https://riptskinsystems.com
+
+170. [AUTO SUCCESS] Horsefeathers
+     https://www.horsefeathers.eu/
+
+171. [AUTO SUCCESS] Estella Bartlett
+     https://estellabartlett.com/
+
+172. [AUTO SUCCESS] The Gift Basket Store
+     https://giftbasketstore.com/
+
+173. [AUTO SUCCESS] Onnit
+     https://www.onnit.com
+
+174. [AUTO SUCCESS] Cotosen
+     https://www.cotosen.com/
+
+175. [AUTO SUCCESS] Mushroom Revival
+     https://www.mushroomrevival.com/
+
+176. [AUTO SUCCESS] PrettyGarden
+     https://www.prettygarden.com
+
+177. [AUTO SUCCESS] Food Lion
+     https://foodlion.com
+
+178. [AUTO SUCCESS] Fold3 by Ancestry
+     https://www.Fold3.com/
+
+179. [AUTO SUCCESS] Juvenon
+     https://juvenon.com/
+
+180. [AUTO SUCCESS] Glamermaid
+     https://glamermaid.com
+
+181. [AUTO SUCCESS] Joie
+     https://www.joie.com/
+
+182. [AUTO SUCCESS] Ferguson Home
+     https://www.fergusonhome.com
+
+183. [AUTO SUCCESS] Peugeot Saveurs
+     https://us.peugeot-saveurs.com/en_us/
+
+184. [AUTO SUCCESS] Bubba
+     https://www.bubba.com/
+
+185. [AUTO SUCCESS] Montway Auto Transport
+     https://www.montway.com
+
+186. [AUTO SUCCESS] Wiggle Kingdom
+     https://wigglekingdom.com
+
+187. [AUTO SUCCESS] TIKI Brand
+     https://www.tikibrand.com
+
+188. [AUTO SUCCESS] Hillberg&Berk
+     https://hillbergandberk.com/
+
+189. [AUTO SUCCESS] Oskar&Friends
+     https://oskarfriends.com
+
+190. [AUTO SUCCESS] Arizona School of Real Estate & Business
+     https://www.asreb.com/programs
+
+191. [AUTO SUCCESS] Copamarina Beach Resort & Spa
+     https://www.copamarina.com/
+
+192. [AUTO SUCCESS] Vyotech
+     https://vyotechusa.com
+
+193. [AUTO SUCCESS] Ballsy
+     https://Ballwash.com
+
+194. [AUTO SUCCESS] MX Naturals
+     https://shopmxnaturals.com
+
+195. [AUTO SUCCESS] KOR Medical
+     https://www.kormedical.com
+
+196. [AUTO SUCCESS] FlutterHabit
+     https://flutterhabit.com/
+
+197. [AUTO SUCCESS] Epoch Batteries
+     https://www.epochbatteries.com
+
+198. [AUTO SUCCESS] CAROL Bike
+     https://carolbike.com
+
+199. [AUTO SUCCESS] Beachbound
+     https://www.beachbound.com/
+
+200. [AUTO SUCCESS] AirHelp
+     https://www.airhelp.com/en/
+
+201. [AUTO SUCCESS] Baggu
+     https://www.baggu.com/
+
+202. [AUTO SUCCESS] wifiCFI
+     https://www.wificfi.com/
+
+203. [AUTO SUCCESS] X-Vision Optics
+     https://xvisionoptics.com
+
+204. [AUTO SUCCESS] Ancient DNA Origins
+     https://www.ancientdnahub.com/
+
+205. [AUTO SUCCESS] Neutypechic
+     https://www.neutypechic.com
+
+206. [AUTO SUCCESS] Progurt
+     https://www.progurt.com
+
+207. [AUTO SUCCESS] Spatarella Shop
+     https://spatarella.eu/
+
+208. [AUTO SUCCESS] Stutterheim
+     https://stutterheim.com/
+
+209. [AUTO SUCCESS] HowManyExtension
+     https://howmanyextension.com
+
+210. [AUTO SUCCESS] Mizzen + Main
+     https://www.mizzenandmain.com/
+
+211. [AUTO SUCCESS] BODi
+     https://www.bodi.com/us/en/s/subscription
+
+212. [AUTO SUCCESS] Polk Audio
+     https://www.polkaudio.com/en-us/
+
+213. [AUTO SUCCESS] EquitySet
+     https://equityset.com
+
+214. [AUTO SUCCESS] HelloTech
+     https://www.hellotech.com/
+
+215. [AUTO SUCCESS] Eu Natural
+     https://www.EuNatural.com
+
+216. [AUTO SUCCESS] Parachute Home
+     https://www.parachutehome.com/
+
+217. [AUTO SUCCESS] Velia
+     https://www.velia.net/shop/
+
+218. [AUTO SUCCESS] Compex
+     https://www.compex.com/
+
+219. [AUTO SUCCESS] Luminox
+     https://luminox.com/
+
+220. [AUTO SUCCESS] TAFT Clothing
+     https://taftclothing.com/
+
+221. [AUTO SUCCESS] KastKing
+     https://kastking.com/
+
+222. [AUTO SUCCESS] AirPhysio
+     https://deals.getairphysiokids.io/27ZKGGX2/243NWFN/
+
+223. [AUTO SUCCESS] Whippy Charge
+     https://www.gu-ecom.com/27ZKGGX2/2GHBF16/
+
+224. [AUTO SUCCESS] TheraICE
+     https://deals.gettheraiceheadreliefhat.io/27ZKGGX2/235B4G5/
+
+225. [AUTO SUCCESS] Duo Cover
+     https://deals.getduocover.io/27ZKGGX2/25F6QB3/
+
+226. [AUTO SUCCESS] NewRuleFX.com
+     https://www.newrulefx.com/
+
+227. [AUTO SUCCESS] GaaLa
+     https://gaala.com/
+
+228. [AUTO SUCCESS] MURF Electric Bikes
+     https://www.murfelectricbikes.com
+
+229. [AUTO SUCCESS] CLMBR
+     https://shop.clmbr.com/
+
+230. [AUTO SUCCESS] Eric Javits
+     https://ericjavits.com
+
+231. [AUTO SUCCESS] THEBS
+     https://www.thebs.com/us
+
+232. [AUTO SUCCESS] Simtek
+     https://www.simtek.io
+
+233. [AUTO SUCCESS] Shu Uemura
+     https://www.shuuemuraartofhair-usa.com/
+
+234. [AUTO SUCCESS] Coldture
+     https://coldture.com/
+
+235. [AUTO SUCCESS] Particula
+     https://particula-tech.com/
+
+236. [AUTO SUCCESS] The HOTH
+     https://www.thehoth.com
+
+237. [AUTO SUCCESS] Rhino
+     https://rhinousainc.com
+
+238. [AUTO SUCCESS] TIDIO
+     https://tidio.com
+
+239. [AUTO SUCCESS] Native To Wear
+     https://www.nativetowear.com
+
+240. [AUTO SUCCESS] ThickTails
+     https://www.thicktails.com
+
+241. [AUTO SUCCESS] The Bills Store
+     https://shop.buffalobills.com/
+
+242. [AUTO SUCCESS] Big Furniture Warehouse
+     https://www.bigfurniturewarehouse.com
+
+243. [AUTO SUCCESS] Mudpuppy
+     https://www.mudpuppy.com/
+
+244. [AUTO SUCCESS] Escape the Room
+     https://escapetheroom.com/
+
+245. [AUTO SUCCESS] YSE Beauty
+     https://www.ysebeauty.com
+
+246. [AUTO SUCCESS] Senseng Apparel
+     https://www.senseng-apparel.com
+
+247. [AUTO SUCCESS] Thermowave
+     https://us.thermowave.com/
+
+248. [AUTO SUCCESS] SIGNM
+     https://signm.io
+
+249. [AUTO SUCCESS] Trends Critical
+     https://trendscritical.com/
+
+250. [AUTO SUCCESS] Graficona
+     https://graficona.com
+
+251. [AUTO SUCCESS] Relief Factor
+     https://www.relieffactor.com
+
+252. [AUTO SUCCESS] Facetune
+     https://www.lightricks.com
+
+253. [AUTO SUCCESS] Thortful
+     https://www.thortful.com/
+
+254. [AUTO SUCCESS] POWR
+     https://www.powr.io/
+
+255. [AUTO SUCCESS] Joanie
+     https://joanieclothing.com/
+
+256. [AUTO SUCCESS] Just Men Shoes
+     https://www.justmenshoes.com/
+
+257. [AUTO SUCCESS] Yoolax
+     https://www.yoolax.com/
+
+258. [AUTO SUCCESS] Plum Diamonds
+     https://www.plumdiamonds.com
+
+259. [AUTO SUCCESS] PuroAir
+     https://getpuroair.com/
+
+260. [AUTO SUCCESS] Dunlop Sports
+     https://us.dunlopsports.com/
+
+261. [AUTO SUCCESS] Philo
+     https://www.philo.com
+
+262. [FLAGGED] okingjoy
+     https://okingjoy.com/
+
+263. [AUTO SUCCESS] 4giveness
+     https://4giveness.com/
+
+264. [AUTO SUCCESS] Geologie
+     https://geologie.com
+
+265. [AUTO SUCCESS] Zarges
+     https://www.zargesusa.com
+
+266. [AUTO SUCCESS] The Zero Proof
+     https://www.thezeroproof.com
+
+267. [AUTO SUCCESS] Cheap Cruises
+     https://www.cheapcruises.com
+
+268. [AUTO SUCCESS] Box Components
+     https://boxcomponents.com/
+
+269. [AUTO SUCCESS] Credit Stacking
+     https://www.CreditStacking.com
+
+270. [AUTO SUCCESS] DrHouse
+     https://www.drhouse.com/
+
+271. [AUTO SUCCESS] ABCya
+     https://www.abcya.com/
+
+272. [AUTO SUCCESS] Mezlan
+     https://www.mezlan.com/
+
+273. [AUTO SUCCESS] Apos Audio
+     https://apos.audio/
+
+274. [AUTO SUCCESS] Uber Eats
+     https://www.ubereats.com/
+
+275. [AUTO SUCCESS] Mammut
+     https://mammut.com
+
+276. [AUTO SUCCESS] Pulsetto
+     https://pulsetto.tech
+
+277. [AUTO SUCCESS] Online Shoes
+     https://www.onlineshoes.com/US/en/home
+
+278. [AUTO SUCCESS] KOMMA
+     https://www.kommaofficial.com/
+
+279. [AUTO SUCCESS] Daysmoon
+     https://daysmoon.com
+
+280. [AUTO SUCCESS] The Battalion
+     https://thebattalion.com
+
+281. [AUTO SUCCESS] Outprfrm
+     https://outprfrm.com/
+
+282. [AUTO SUCCESS] Treat My UTI
+     https://www.treatmyuti.com/
+
+283. [AUTO SUCCESS] RayNeo
+     https://www.rayneo.com
+
+284. [AUTO SUCCESS] Befbee Rug
+     https://comiliving.com/
+
+285. [AUTO SUCCESS] Ozark Armament
+     https://ozarkarmament.com/
+
+286. [AUTO SUCCESS] Else Nutrition
+     https://elsenutrition.com/
+
+287. [AUTO SUCCESS] Zendrop
+     https://www.zendrop.com
+
+288. [AUTO SUCCESS] Proteus Snowboards
+     https://proteussnowboards.com
+
+289. [AUTO SUCCESS] Ubersuggest by Neil Patel
+     https://neilpatel.com/ubersuggest/
+
+290. [AUTO SUCCESS] Unity
+     https://assetstore.unity.com/
+
+291. [AUTO SUCCESS] Make Up For Ever
+     https://www.makeupforever.com/
+
+292. [AUTO SUCCESS] Campspot
+     https://www.campspot.com/
+
+293. [AUTO SUCCESS] The WOD Life
+     https://www.thewodlife.com.au/
+
+294. [AUTO SUCCESS] Nalgene
+     https://nalgene.com/
+
+295. [AUTO SUCCESS] William May
+     https://www.william-may.co.uk/
+
+296. [AUTO SUCCESS] Nextbase
+     https://www.nextbase.com
+
+297. [AUTO SUCCESS] Maria Black
+     https://www.maria-black.com/en/
+
+298. [AUTO SUCCESS] JuiceStore
+     https://www.juicestore.com
+
+299. [AUTO SUCCESS] Because Market
+     https://becausemarket.com
+
+300. [AUTO SUCCESS] HBM Machines
+     https://www.hbm-machines.com/nl/
+
+301. [AUTO SUCCESS] Sorare
+     https://sorare.com
+
+302. [AUTO SUCCESS] Renderforest
+     https://www.renderforest.com
+
+303. [AUTO SUCCESS] Silencer Central
+     https://www.silencercentral.com
+
+304. [AUTO SUCCESS] Breville
+     https://www.breville.com/
+
+305. [AUTO SUCCESS] CHI
+     https://chi.com/
+
+306. [AUTO SUCCESS] CJS-CDKeys
+     https://www.cjs-cdkeys.com/
+
+307. [AUTO SUCCESS] Trident Fly Fishing
+     https://tridentflyfishing.com
+
+308. [AUTO SUCCESS] PowerStep
+     https://powerstep.com/
+
+309. [AUTO SUCCESS] Mario Badescu
+     https://www.mariobadescu.com/
+
+310. [AUTO SUCCESS] The Game Collection
+     https://www.thegamecollection.net/
+
+311. [AUTO SUCCESS] Universal Music
+     https://www.umusicstore.com/
+
+312. [AUTO SUCCESS] Ultimate Ears
+     https://www.ultimateears.com/en-us
+
+313. [AUTO SUCCESS] Popsa
+     https://popsa.app/
+
+314. [AUTO SUCCESS] 360TotalSecurity
+     https://www.360totalsecurity.com/
+
+315. [AUTO SUCCESS] NBA Store
+     https://store.nba.com
+
+316. [AUTO SUCCESS] Slider Revolution
+     https://sliderrevolution.com
+
+317. [AUTO SUCCESS] Territorial Seed Company
+     https://territorialseed.com/
+
+318. [AUTO SUCCESS] Laco
+     https://www.laco-watches.com/en/index
+
+319. [AUTO SUCCESS] Garnet Hill
+     https://www.garnethill.com
+
+320. [AUTO SUCCESS] Johnny Was
+     https://www.johnnywas.com
+
+321. [AUTO SUCCESS] Sittercity
+     https://sittercity.com
+
+322. [AUTO SUCCESS] Golden Goose
+     https://www.goldengoose.com/
+
+323. [AUTO SUCCESS] Boka
+     https://www.boka.com
+
+324. [AUTO SUCCESS] Simone I. Smith
+     https://simoneismith.com/
+
+325. [AUTO SUCCESS] Education.com
+     https://www.education.com/
+
+326. [AUTO SUCCESS] Bio Bidet
+     https://www.biobidet.com/
+
+327. [AUTO SUCCESS] Kintsugi Hair
+     https://kintsugihair.com/
+
+328. [AUTO SUCCESS] Nudestix
+     https://www.nudestix.com/
+
+329. [AUTO SUCCESS] Frame Denim
+     https://www.frame-store.com/
+
+330. [AUTO SUCCESS] Foot Store
+     https://foot-store.com/
+
+331. [AUTO SUCCESS] Cushy Home Decor
+     https://www.shopcushy.com/
+
+332. [AUTO SUCCESS] American Leather Co.
+     https://www.americanleatherco.com/
+
+333. [AUTO SUCCESS] Everhem
+     https://www.everhem.com
+
+334. [AUTO SUCCESS] la Vie en Rose
+     https://www.lavieenrose.com/
+
+335. [AUTO SUCCESS] Assouline
+     https://www.assouline.com/
+
+336. [AUTO SUCCESS] Sibionics
+     https://www.sibionicscgm.com/
+
+337. [AUTO SUCCESS] Handball-Store
+     https://handball-store.com/
+
+338. [AUTO SUCCESS] Lenses For Less
+     https://www.lensesforless.com
+
+339. [AUTO SUCCESS] National Vision
+     https://www.nationalvision.com
+
+340. [AUTO SUCCESS] The Hair Diagram
+     https://thehairdiagram.com/
+
+341. [AUTO SUCCESS] Vitrea Vision (US)
+     https://vitreavision.com/
+
+342. [AUTO SUCCESS] Compression Sale
+     https://www.compressionsale.com
+
+343. [AUTO SUCCESS] The Vermont Country Store
+     https://vermontcountrystore.com
+
+344. [AUTO SUCCESS] Volcano Lodge
+     https://www.volcanolodge.com
+
+345. [AUTO SUCCESS] BabyBjörn
+     https://www.babybjorn.com/
+
+346. [AUTO SUCCESS] Schwinn
+     https://www.schwinnfitness.com
+
+347. [AUTO SUCCESS] AlivingHome
+     https://alivinghome.com
+
+348. [AUTO SUCCESS] BUILT (US)
+     https://built.com/
+
+349. [AUTO SUCCESS] Sam Mcknight
+     https://www.sammcknight.com
+
+350. [AUTO SUCCESS] Hurtigruten Expeditions
+     https://www.hurtigruten.com/en-us
+
+351. [AUTO SUCCESS] Tiny Land
+     https://www.tinylandus.com/
+
+352. [AUTO SUCCESS] Greenfee365
+     https://greenfee365.com/
+
+353. [AUTO SUCCESS] Gelato
+     https://www.gelato.com/
+
+354. [AUTO SUCCESS] CINCOM
+     https://www.cincomshop.com
+
+355. [AUTO SUCCESS] SnoreLessNow (US)
+     https://snorelessnow.com/
+
+356. [AUTO SUCCESS] ROLI
+     https://www.roli.com
+
+357. [AUTO SUCCESS] Olivieri 1882
+     https://www.olivieri1882.com/
+
+358. [AUTO SUCCESS] Glassguard
+     https://glassguard.com/
+
+359. [AUTO SUCCESS] Touring Tech
+     https://touringtech.com
+
+360. [AUTO SUCCESS] Caribbean Lake Park
+     https://caribbeanlakepark.com/en/
+
+361. [AUTO SUCCESS] WeMod
+     https://wemod.com/
+
+362. [AUTO SUCCESS] HotelsByDay
+     https://www.hotelsbyday.com/
+
+363. [AUTO SUCCESS] Tameson
+     https://tameson.com/
+
+364. [AUTO SUCCESS] Swany
+     https://swanyamerica.com
+
+365. [AUTO SUCCESS] Tifosi Optics
+     https://tifosioptics.com
+
+366. [AUTO SUCCESS] Sundaze
+     https://sundazerays.com
+
+367. [AUTO SUCCESS] italki
+     https://www.italki.com/
+
+368. [AUTO SUCCESS] Basic Honey
+     https://basichoney.com/
+
+369. [AUTO SUCCESS] Basic Honey
+     https://basichoney.com/
+
+370. [AUTO SUCCESS] Henry Beguelin
+     https://www.henrybeguelin.it
+
+371. [AUTO SUCCESS] Kustomz
+     https://kustomz.co/
+
+372. [AUTO SUCCESS] Country Life Vitamins
+     https://countrylifevitamins.com/
+
+373. [AUTO SUCCESS] Healthy Bud
+     https://us.healthybud.co/
+
+374. [AUTO SUCCESS] Marlies Dekkers
+     https://www.marliesdekkers.com/en-us/home
+
+375. [AUTO SUCCESS] AnkerSOLIX
+     https://www.ankersolix.com/
+
+376. [AUTO SUCCESS] Helios
+     https://heliospickleball.com
+
+377. [AUTO SUCCESS] Luggage Forward
+     https://www.luggageforward.com
+
+378. [AUTO SUCCESS] Archives
+     https://www.archives.com
+
+379. [AUTO SUCCESS] Schwank Grills (US)
+     https://schwankgrills.com/
+
+380. [AUTO SUCCESS] Gisada US
+     https://gisada.com/
+
+381. [AUTO SUCCESS] Alpinistas
+     https://www.thealpinistas.com
+
+382. [AUTO SUCCESS] Lifeboost Coffee
+     https://lifeboostcoffee.com
+
+383. [AUTO SUCCESS] Rage Fitness
+     https://www.ragefitness.com/
+
+384. [AUTO SUCCESS] Furcy Botanik
+     https://furcybotanik.com
+
+385. [AUTO SUCCESS] Everest
+     https://www.everest.com/
+
+386. [AUTO SUCCESS] Blue Lagoon Skincare
+     https://skincare.bluelagoon.com/
+
+387. [AUTO SUCCESS] Quark Software
+     https://www.quark.com/affiliate?utm_source=cj&utm_medium=website
+
+388. [AUTO SUCCESS] Reef Sandals
+     https://reef.com
+
+389. [AUTO SUCCESS] Braun
+     https://us.braun.com
+
+390. [AUTO SUCCESS] Ucciyo
+     https://ucciyo.com
+
+391. [AUTO SUCCESS] LightingWill
+     https://www.lightingwill.com
+
+392. [AUTO SUCCESS] Wolfbox
+     https://wolfbox.com
+
+393. [AUTO SUCCESS] easy-peasy
+     https://easypeasy.com
+
+394. [AUTO SUCCESS] Origin Mattress
+     https://originmattress.com/
+
+395. [AUTO SUCCESS] Doba
+     https://www.doba.com/
+
+396. [AUTO SUCCESS] Hello.cv
+     https://www.hello.cv/
+
+397. [AUTO SUCCESS] Maya Bath
+     https://www.mayabath.com/
+
+398. [AUTO SUCCESS] GPO USA
+     https://gpo-usa.com
+
+399. [AUTO SUCCESS] The Digitize Center (US)
+     https://thedigitizecenter.com/
+
+400. [AUTO SUCCESS] Gravity Stunts
+     https://gravitystunts.com
+
+401. [AUTO SUCCESS] StoreYourBoard
+     https://www.storeyourboard.com
+
+402. [AUTO SUCCESS] CUNFON
+     https://mall.cunfon.com
+
+403. [AUTO SUCCESS] Buena Cura
+     https://buenacura.co/
+
+404. [AUTO SUCCESS] Armed American Supply
+     https://armedamerican.supply/
+
+405. [AUTO SUCCESS] Eddie by Giddy
+     https://store.eddiebygiddy.com/
+
+406. [AUTO SUCCESS] La Joya Jewelry
+     https://www.lajoyajewelry.com
+
+407. [AUTO SUCCESS] Flamingo
+     https://www.shopflamingo.com
+
+408. [AUTO SUCCESS] Our Heritage Homes (US)
+     https://ourheritagehomes.com/
+
+409. [AUTO SUCCESS] I Heart Jewels
+     https://www.iheartjewels.com/
+
+410. [AUTO SUCCESS] B/alam
+     https://balam.co/
+
+411. [AUTO SUCCESS] Usercentrics
+     https://www.usercentrics.com
+
+412. [AUTO SUCCESS] General Assembly
+     https://generalassemb.ly/students
+
+413. [AUTO SUCCESS] NOGU
+     https://www.nogu.studio?utm_source=shareasale&utm_medium=affiliate&nb_platform=shareasale
+
+414. [AUTO SUCCESS] Lockin
+     https://lockin.com/
+
+415. [AUTO SUCCESS] Interactive Aquarium Cancun
+     https://www.interactiveaquariumcancun.com/swim-with-dolphins
+
+416. [AUTO SUCCESS] HotelBooker
+     https://www.hotelbooker.com/
+
+417. [AUTO SUCCESS] EcoReco Scooter
+     https://www.ecorecoscooter.com/
+
+418. [AUTO SUCCESS] Viscata
+     https://www.viscata.com/
+
+419. [AUTO SUCCESS] Lullaby Earth
+     https://www.lullabyearth.com/
+
+420. [AUTO SUCCESS] SwifDoo
+     https://www.swifdoo.com
+
+421. [AUTO SUCCESS] JiaroPack
+     https://jiaropack.com
+
+422. [AUTO SUCCESS] Bala Enzyme
+     https://balaenzyme.com/
+
+423. [AUTO SUCCESS] Movich Hotels
+     https://www.movichhotels.com/en/
+
+424. [AUTO SUCCESS] ProWritingAid
+     https://prowritingaid.com
+
+425. [AUTO SUCCESS] Sabo Skirt
+     https://us.saboskirt.com/
+
+426. [AUTO SUCCESS] Amana
+     https://www.amana.com/
+
+427. [AUTO SUCCESS] Garden In Minutes
+     https://GardenInMinutes.com
+
+428. [AUTO SUCCESS] embarkvet
+     https://embarkvet.com
+
+429. [AUTO SUCCESS] Ring Concierge
+     https://ringconcierge.com
+
+430. [AUTO SUCCESS] Olive & Crate
+     https://oliveandcrate.com
+
+431. [AUTO SUCCESS] Max and Lily
+     https://maxandlily.com
+
+432. [AUTO SUCCESS] Reima
+     https://us.reima.com/
+
+433. [AUTO SUCCESS] SET Active
+     https://www.setactive.co
+
+434. [AUTO SUCCESS] Monument Grills
+     https://monumentgrills.com/
+
+435. [AUTO SUCCESS] Fahlo
+     https://myfahlo.com
+
+436. [AUTO SUCCESS] Luosophy
+     https://luosophy.com
+
+437. [AUTO SUCCESS] Wheel Hero
+     https://www.wheelhero.com
+
+438. [AUTO SUCCESS] Huion
+     https://store.huion.com
+
+439. [AUTO SUCCESS] Osmology
+     https://osmology.com
+
+440. [AUTO SUCCESS] Flower Knows
+     https://flowerknows.co/?utm_source=sas&utm_medium=text&utm_campaign=0517
+
+441. [AUTO SUCCESS] Numi
+     https://wearnumi.com
+
+442. [AUTO SUCCESS] MELT Method
+     https://www.meltmethod.com
+
+443. [AUTO SUCCESS] Maxtrix Kids
+     https://www.MaxtrixKids.com
+
+444. [AUTO SUCCESS] Onlymaker
+     https://www.onlymaker.com
+
+445. [AUTO SUCCESS] Nature/s Body
+     https://naturesbody.com.au/
+
+446. [AUTO SUCCESS] L/AVANT Collective
+     https://lavantcollective.com/
+
+447. [AUTO SUCCESS] Medical Spanish
+     https://www.medicalspanish.com/
+
+448. [AUTO SUCCESS] Plant Paper
+     https://plantpaper.us
+
+449. [AUTO SUCCESS] NICECNC
+     https://www.nicecnc.com
+
+450. [AUTO SUCCESS] Aligner32
+     https://aligner32.com
+
+451. [AUTO SUCCESS] Rio Beverages
+     https://riobeverages.com
+
+452. [AUTO SUCCESS] ScentAir
+     https://scentair.com/
+
+453. [AUTO SUCCESS] Laird Superfood
+     https://lairdsuperfood.com/
+
+454. [AUTO SUCCESS] Sympli
+     https://sympli.com
+
+455. [AUTO SUCCESS] Kulfi Beauty
+     https://kulfibeauty.com
+
+456. [AUTO SUCCESS] Coolzy.com
+     https://www.coolzy.com
+
+457. [AUTO SUCCESS] DermRays
+     https://www.dermrays.com
+
+458. [AUTO SUCCESS] Untangled Coaching
+     https://untangled-coaching.com/
+
+459. [AUTO SUCCESS] Kentfaith
+     https://www.kentfaith.com
+
+460. [AUTO SUCCESS] Oh Beauty
+     https://ohbeauty.com
+
+461. [AUTO SUCCESS] Makeblock
+     https://www.makeblock.com
+
+462. [AUTO SUCCESS] Sparkle Wellness
+     https://www.lovesparkle.life
+
+463. [AUTO SUCCESS] Hermoza
+     https://thehermoza.com
+
+464. [AUTO SUCCESS] OBSBOT
+     https://www.obsbot.com
+
+465. [AUTO SUCCESS] Nature/s Generator
+     https://www.naturesgenerator.com
+
+466. [AUTO SUCCESS] Vesta Living, Corp.
+     https://vesta-sleep.com
+
+467. [AUTO SUCCESS] Aray
+     https://arayroller.com
+
+468. [AUTO SUCCESS] Félix Technologies (US)
+     https://www.felixpago.com/
+
+469. [AUTO SUCCESS] Pixellot You
+     http://www.pixellot.tv/
+
+470. [AUTO SUCCESS] Ming Wang Knits
+     https://mingwang.com/
+
+471. [AUTO SUCCESS] Kingston
+     https://www.kingstonbrass.com
+
+472. [AUTO SUCCESS] Nguyen Coffee Supply
+     https://www.nguyencoffeesupply.com
+
+473. [AUTO SUCCESS] Paragon Group USA
+     https://paragon-outdoor.com/
+
+474. [AUTO SUCCESS] Stylevana
+     https://www.stylevana.com/en_US
+
+475. [AUTO SUCCESS] DOKODEMO
+     https://dokodemo.world/en/
+
+476. [AUTO SUCCESS] Boundary Supply
+     https://boundarysupply.com
+
+477. [AUTO SUCCESS] JOI
+     https://www.addjoi.com
+
+478. [AUTO SUCCESS] Smart Playrooms
+     https://www.smartplayrooms.com/
+
+479. [AUTO SUCCESS] Q30 Innovations
+     https://q30.com/
+
+480. [AUTO SUCCESS] Superfeast
+     https://superfeast.com
+
+481. [AUTO SUCCESS] Livro
+     https://shoplivro.com/
+
+482. [AUTO SUCCESS] Swimwear Anywhere
+     https://www.beach2ocean.com/
+
+483. [AUTO SUCCESS] Bernardo 1946
+     https://bernardo1946.com/
+
+484. [AUTO SUCCESS] Rovsun
+     https://www.rovsun.com
+
+485. [AUTO SUCCESS] Rapid Radios
+     https://rapidradios.com
+
+486. [AUTO SUCCESS] Casasola
+     https://casasola.com/
+
+487. [AUTO SUCCESS] Apple Forms
+     https://appleforms.com/
+
+488. [AUTO SUCCESS] Brush On Block
+     https://brushonblock.com/
+
+489. [AUTO SUCCESS] ober health
+     https://www.oberhealth.com
+
+490. [AUTO SUCCESS] Simplicity Vacuums
+     https://www.simplicityvac.com/
+
+491. [AUTO SUCCESS] Arenti
+     https://www.arenti.com
+
+492. [AUTO SUCCESS] Display Market
+     https://www.displaysmarket.com/
+
+493. [AUTO SUCCESS] Brooklyn Brew Shop
+     https://farmsteady.com
+
+494. [AUTO SUCCESS] Mission
+     https://mission.com
+
+495. [AUTO SUCCESS] Duncan Toys Company
+     https://duncantoys.com
+
+496. [AUTO SUCCESS] SODI
+     https://sodigear.com
+
+497. [AUTO SUCCESS] Mrs Wordsmith
+     https://mrswordsmith.com
+
+498. [AUTO SUCCESS] Dr. Tom Cowan
+     https://drtomcowan.com/
+
+499. [AUTO SUCCESS] Jonissi
+     https://jonissi.com
+
+500. [AUTO SUCCESS] Guibert
+     https://guibert.fr/fr
+
+501. [AUTO SUCCESS] Will Leather Goods
+     https://www.willleathergoods.com
+
+502. [AUTO SUCCESS] Nerdy Frames
+     https://nerdyframes.com
+
+503. [AUTO SUCCESS] Milkadamia
+     https://shopmilkadamia.com
+
+504. [AUTO SUCCESS] Kylea Health
+     https://kyleahealth.com
+
+505. [AUTO SUCCESS] AmpAura Energy
+     https://www.ampaura.tech/products/purea-portable-power-station
+
+506. [AUTO SUCCESS] Short & Suite
+     https://www.shortandsuite.com
+
+507. [AUTO SUCCESS] COOLCUT
+     https://coolcut.tv/
+
+508. [AUTO SUCCESS] MAX TANG TECHNOLOGY LIMITED
+     https://store.maxtangpc.com
+
+509. [AUTO SUCCESS] HZY TRADING LIMITED
+     https://www.chictry.com/
+
+510. [AUTO SUCCESS] Paris Rhone
+     https://www.parisrhone.com/
+
+511. [AUTO SUCCESS] Foshan City QKE clothing Co., LTD
+     https://www.sthcute.com
+
+512. [AUTO SUCCESS] Hobby Zone
+     https://www.hobbyzone.com
+
+513. [AUTO SUCCESS] NAISIGOO
+     https://www.naisigoo.com
+
+514. [AUTO SUCCESS] Huanuo
+     https://www.huanuo.com/
+
+515. [AUTO SUCCESS] Yesper Power
+     https://www.yesperpower.com/
+
+516. [AUTO SUCCESS] Run United
+     https://rununited.com/
+
+517. [AUTO SUCCESS] MukkPet Bike
+     https://www.mukkpetbike.com/
+
+518. [AUTO SUCCESS] ReAthlete
+     https://reathlete.com
+
+519. [AUTO SUCCESS] Akaso
+     https://shopakaso.com/
+
+520. [AUTO SUCCESS] Dream Tea NYC
+     https://www.dreamteanyc.com
+
+521. [AUTO SUCCESS] Aoocci
+     https://aoocci.com/
+
+522. [AUTO SUCCESS] The Good Chocolate
+     https://www.thegoodchocolate.com
+
+523. [AUTO SUCCESS] MeMoi Fashion
+     https://memoi.com/
+
+524. [AUTO SUCCESS] Taglia Pasta
+     https://www.tagliapasta.com
+
+525. [AUTO SUCCESS] NOM Maternity
+     https://NOMMaternity.com
+
+526. [AUTO SUCCESS] EKR auto
+     https://ekrcover.com
+
+527. [AUTO SUCCESS] Drop Connect
+     https://dropconnect.com
+
+528. [AUTO SUCCESS] Stormdesire
+     https://www.stormdesire.com
+
+529. [AUTO SUCCESS] Purpose Pet Food LLC
+     https://purposepetfood.com/
+
+530. [AUTO SUCCESS] PRI
+     https://www.shoppri.com
+
+531. [AUTO SUCCESS] Local Bag Company
+     https://localbagcompany.com/
+
+532. [AUTO SUCCESS] AEMBR
+     https://aembr.co
+
+533. [AUTO SUCCESS] GRACE KARIN
+     https://gracekarinonline.com/
+
+534. [AUTO SUCCESS] Scribble
+     https://scribble.art
+
+535. [AUTO SUCCESS] Blues Hog
+     https://www.blueshog.com
+
+536. [AUTO SUCCESS] UAB Memelio Atelje
+     https://wrinklesshop.com
+
+537. [AUTO SUCCESS] Babs Boutique NYC
+     https://babsboutiquenyc.com/
+
+538. [AUTO SUCCESS] SCOPRO Smart Coaching Products
+     https://www.scoprosoccer.com
+
+539. [AUTO SUCCESS] Rob Keller MD
+     https://www.robkellermd.com
+
+540. [AUTO SUCCESS] Lunyee
+     https://www.lunyeecnc.com/
+
+541. [AUTO SUCCESS] Guangzhou Anshenger Jewelry Co., Ltd.
+     https://www.imolovejewelry.com/
+
+542. [AUTO SUCCESS] Charmo
+     https://mycharmo.com
+
+543. [AUTO SUCCESS] Excavating Adventures
+     https://excavatingadventures.com
+
+544. [AUTO SUCCESS] Tacticalxmen.com
+     https://www.tacticalxmen.com
+
+545. [AUTO SUCCESS] TOSOT Direct
+     https://tosotdirect.com/
+
+546. [AUTO SUCCESS] ClothDiaper.com
+     https://www.clothdiaper.com
+
+547. [AUTO SUCCESS] Carlinkit
+     https://carlinkitcarplay.com
+
+548. [AUTO SUCCESS] Carved Solutions
+     https://carvedsolutions.com/
+
+549. [AUTO SUCCESS] Karma Nuts
+     https://www.karmanuts.com
+
+550. [AUTO SUCCESS] FireAvert
+     https://Www.fireavert.com
+
+551. [AUTO SUCCESS] Activist Skincare
+     https://activistskincare.com
+
+552. [AUTO SUCCESS] About Vintage
+     https://aboutvintage.com/
+
+553. [AUTO SUCCESS] GREEN
+     https://drinkgreendaily.com
+
+554. [AUTO SUCCESS] LBE Design
+     https://www.lbedesign.com/
+
+555. [AUTO SUCCESS] ASPENX
+     https://www.aspencollection.com/
+
+556. [AUTO SUCCESS] Hong Kong Hele Electronics Co., Ltd.
+     https://qcy.com
+
+557. [AUTO SUCCESS] Healthy Extracts
+     https://whitneyjohns.com/products/hormone-support
+
+558. [AUTO SUCCESS] Royce and Rocket
+     https://Royceandrocket.com
+
+559. [AUTO SUCCESS] Classic Fella
+     https://www.classicfella.com
+
+560. [AUTO SUCCESS] All About Suit
+     https://www.allaboutsuit.com
+
+561. [AUTO SUCCESS] Retechtronics
+     https://www.Retechtronics.com
+
+562. [AUTO SUCCESS] Dear Perli
+     https://dearperli.com/
+
+563. [AUTO SUCCESS] WAIT botanicamente Corp
+     https://waitbotanicamente.shop
+
+564. [AUTO SUCCESS] West Bend
+     https://westbend.com/
+
+565. [AUTO SUCCESS] HoliFrog
+     https://holifrog.com/
+
+566. [AUTO SUCCESS] BONHEUR JEWELRY
+     https://www.bonheurjewelry.com
+
+567. [AUTO SUCCESS] TRANYA
+     https://shop.tranya.com
+
+568. [AUTO SUCCESS] FemmePharma
+     https://www.femmepharma.com
+
+569. [AUTO SUCCESS] Studio Girl Shoes LLC
+     https://www.tanyaheathus.com
+
+570. [AUTO SUCCESS] EpiLynx
+     https://www.epilynx.com
+
+571. [AUTO SUCCESS] Hoolie
+     https://hooliegolf.com
+
+572. [AUTO SUCCESS] Beauty Market Online
+     https://beautymarketonline.com
+
+573. [FLAGGED] Prime Layers
+     https://primelayers.com/products/100-cotton-face-masks
+
+574. [AUTO SUCCESS] iDeaPLAY
+     https://www.ideausa.com
+
+575. [AUTO SUCCESS] 1212
+     https://shop1212.com
+
+576. [AUTO SUCCESS] Leaf of Life Wellness
+     https://leafoflifewellness.com
+
+577. [AUTO SUCCESS] Kim/C Market
+     https://www.kimcmarket.com
+
+578. [AUTO SUCCESS] DOGTV
+     https://www.dogtv.com
+
+579. [AUTO SUCCESS] Kyria Lingerie
+     https://kyrialingerie.com/
+
+580. [AUTO SUCCESS] Kiramoon
+     https://www.kiramoon.com
+
+581. [AUTO SUCCESS] Simple Wishes
+     https://www.simplewishes.com
+
+582. [AUTO SUCCESS] BodyFlow Hydration
+     https://bodyflowhydration.com
+
+583. [AUTO SUCCESS] Belly Sleep
+     https://bellysleep.com
+
+584. [AUTO SUCCESS] Georgie & Lou
+     https://www.georgieandlou.com
+
+585. [AUTO SUCCESS] Brainiac
+     https://www.brainiacfoods.com
+
+586. [AUTO SUCCESS] Flyers Cocktail Co
+     https://drinkflyers.com
+
+587. [AUTO SUCCESS] Lariat Marketing Hub
+     https://www.marketinghub.com
+
+588. [AUTO SUCCESS] Jeff Wan
+     https://www.jeffwan.com
+
+589. [AUTO SUCCESS] Lamomo Neon
+     https://www.lamomoneon.com/
+
+590. [AUTO SUCCESS] Egghead Nutrition
+     https://egghead-nutrition.myshopify.com
+
+591. [AUTO SUCCESS] Soulout
+     https://soulouter.com
+
+592. [AUTO SUCCESS] Website Speedy by MakkPress Technologies
+     https://websitespeedy.com
+
+593. [AUTO SUCCESS] GA-DE Cosmetics
+     https://www.gadecosmetics.com/?a=shareasale
+
+594. [AUTO SUCCESS] GOLDMoral
+     https://www.goldmoral.com
+
+595. [AUTO SUCCESS] MUNBYN
+     https://www.munbyn.com/
+
+596. [AUTO SUCCESS] Rosy Soil
+     https://rosysoil.com
+
+597. [AUTO SUCCESS] The Perfect Haircare
+     https://theperfecthaircare.com/
+
+598. [AUTO SUCCESS] Drip Gear Zone
+     https://dripgearzone.com
+
+599. [AUTO SUCCESS] Worm Nerd
+     https://www.wormnerd.com
+
+600. [AUTO SUCCESS] Thread Wallets
+     https://www.threadwallets.com/?gclid=Cj0KCQiA4uCcBhDdARIsAH5jyUlF8SKks22d43b1OqPUYclJBHvowKU6BBnF1Ibax_hkNTLxHEFdDUIaAgnBEALw_wcB
+
+601. [FLAGGED] Topdon Technology Co., Ltd
+     https://eu.topdon.com
+
+602. [AUTO SUCCESS] Once Again Nut Butter
+     https://www.onceagainnutbutter.com
+
+603. [AUTO SUCCESS] Chiyo
+     https://wearechiyo.com
+
+604. [FLAGGED] KYX World
+     https://www.kyx.world
+
+605. [AUTO SUCCESS] mens-weddingbands
+     https://mens-weddingbands.com
+
+606. [AUTO SUCCESS] My Diet Doc
+     https://mydietdoc.com
+
+607. [AUTO SUCCESS] Lux Unfiltered
+     https://www.luxunfiltered.com
+
+608. [AUTO SUCCESS] AlloyWorks Store
+     https://www.alloyworksplus.com/
+
+609. [AUTO SUCCESS] BLACKTIE
+     https://blacktie.com
+
+610. [AUTO SUCCESS] Lilin International Group Limited
+     https://liectrouxrobotics.com/
+
+611. [AUTO SUCCESS] My Personal Recruiter
+     https://mypersonalrecruiter.com/
+
+612. [AUTO SUCCESS] Totality Skincare
+     https://totality-skincare.com/
+
+613. [AUTO SUCCESS] CONNEQT Health
+     https://conneqthealth.com
+
+614. [AUTO SUCCESS] Divoom
+     https://divoom.com
+
+615. [AUTO SUCCESS] FastinSupplement.com
+     https://www.fastinsupplement.com
+
+616. [AUTO SUCCESS] Enable Accessible Haircare Products
+     https://enable.shop
+
+617. [AUTO SUCCESS] Floleaf Naturals LLC
+     https://stemox.com
+
+618. [AUTO SUCCESS] Humble Brands
+     https://humblebrands.com
+
+619. [AUTO SUCCESS] AL DUCA D/AOSTA
+     https://www.alducadaosta.com/us
+
+620. [AUTO SUCCESS] Two Face
+     https://www.us.twofaceaesthetics.com/
+
+621. [AUTO SUCCESS] COCOLAB
+     https://cocolab.com/
+
+622. [AUTO SUCCESS] EROMMY
+     https://erommy.com
+
+623. [AUTO SUCCESS] JoyTutus
+     https://www.joytutus.com
+
+624. [AUTO SUCCESS] OAKYWOOD
+     https://www.oakywood.shop
+
+625. [AUTO SUCCESS] Bestoutdor
+     https://www.bestoutdor.com
+
+626. [AUTO SUCCESS] Unwilted
+     https://unwilted.com
+
+627. [AUTO SUCCESS] SunGoldPower
+     https://sungoldpower.com
+
+================================================================================
+End of Report
