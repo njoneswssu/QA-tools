@@ -75,14 +75,26 @@
       display: flex;
       gap: 12px;
       align-items: center;
+      flex-wrap: wrap;
     }
     
     .controls input {
       flex: 1;
+      min-width: 200px;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 14px;
+    }
+    
+    .controls select {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      background: white;
+      cursor: pointer;
+      min-width: 150px;
     }
     
     .controls button {
@@ -106,6 +118,61 @@
     
     .controls button.danger:hover {
       background: #d32f2f;
+    }
+    
+    .stat-card {
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .stat-card:hover {
+      border-color: #2196F3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card.active {
+      border-color: #2196F3;
+      background: #f0f7ff;
+    }
+    
+    .download-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 8px;
+      font-size: 11px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.8;
+      z-index: 10;
+    }
+    
+    .download-btn:hover {
+      opacity: 1;
+      background: #45a049;
+    }
+    
+    .stat-value {
+      transition: all 0.2s;
+    }
+    
+    .stat-card.active .stat-value {
+      color: #1976D2;
+    }
+    
+    .stat-label {
+      transition: all 0.2s;
+    }
+    
+    .stat-card.active .stat-label {
+      color: #1976D2;
+      font-weight: 600;
     }
     
     .logs-table {
@@ -298,6 +365,27 @@
       text-decoration: underline;
     }
     
+    .modal-actions {
+      padding: 12px 0;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .download-btn-modal {
+      padding: 10px 16px;
+      font-size: 14px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .download-btn-modal:hover {
+      background: #45a049;
+    }
+    
     tr {
       cursor: pointer;
     }
@@ -314,15 +402,18 @@
   </div>
   
   <div class="stats" id="stats">
-    <div class="stat-card">
+    <div class="stat-card" data-filter-type="total" id="totalRequestsCard">
+      <button class="download-btn" data-download-type="total" title="Download all logs">⬇ Download</button>
       <div class="stat-value" id="totalRequests">0</div>
       <div class="stat-label">Total Requests</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" data-filter-type="wildlink" id="wildlinkCountCard">
+      <button class="download-btn" data-download-type="wildlink" title="Download wild.link logs">⬇ Download</button>
       <div class="stat-value" id="wildlinkCount">0</div>
       <div class="stat-label">wild.link</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" data-filter-type="wildlinkme" id="wildlinkMeCountCard">
+      <button class="download-btn" data-download-type="wildlinkme" title="Download wildlink.me logs">⬇ Download</button>
       <div class="stat-value" id="wildlinkMeCount">0</div>
       <div class="stat-label">wildlink.me</div>
     </div>
@@ -330,8 +421,18 @@
   
   <div class="controls">
     <input type="text" id="searchInput" placeholder="Search URLs, parameters, or domains...">
-    <button id="filterBtn">Filter</button>
-    <button id="clearFilterBtn">Clear</button>
+    <select id="methodFilter">
+      <option value="">All Methods</option>
+    </select>
+    <select id="statusFilter">
+      <option value="">All Status Codes</option>
+    </select>
+    <select id="paramsFilter">
+      <option value="">All Requests</option>
+      <option value="with-params">With Parameters</option>
+      <option value="no-params">No Parameters</option>
+    </select>
+    <button id="clearFilterBtn">Clear Filters</button>
     <button id="clearAllBtn" class="danger">Clear All Logs</button>
     <button id="refreshBtn">Refresh</button>
   </div>

@@ -2,6 +2,13 @@
 
 let allLogs = [];
 let filteredLogs = [];
+let activeFilters = {
+  search: '',
+  method: '',
+  status: '',
+  params: '',
+  domain: ''
+};
 
 // Load logs from storage
 async function loadLogs() {
@@ -9,16 +16,6 @@ async function loadLogs() {
     const response = await chrome.runtime.sendMessage({ action: 'getLogs' });
     if (response && response.success) {
       allLogs = response.logs || [];
-      // Preserve current filter if search is active
-      const searchInput = document.getElementById('searchInput');
-      const currentSearch = searchInput ? searchInput.value : '';
-      if (currentSearch) {
-        // Reapply filter with new data
-        filterLogs();
-      } else {
-        // No filter, show all logs
-        filteredLogs = [...allLogs];
-      }
       return allLogs;
     }
   } catch (error) {
@@ -27,7 +24,7 @@ async function loadLogs() {
   return [];
 }
 
-// Update stats
+// Update stats and populate filter dropdowns
 function updateStats() {
   const total = allLogs.length;
   const wildlinkCount = allLogs.filter(log => log.hostname.includes('wild.link')).length;
@@ -36,6 +33,48 @@ function updateStats() {
   document.getElementById('totalRequests').textContent = total;
   document.getElementById('wildlinkCount').textContent = wildlinkCount;
   document.getElementById('wildlinkMeCount').textContent = wildlinkMeCount;
+  
+  // Populate method filter
+  const methodFilter = document.getElementById('methodFilter');
+  const methods = [...new Set(allLogs.map(log => log.method).filter(Boolean))].sort();
+  const currentMethod = methodFilter.value;
+  methodFilter.innerHTML = '<option value="">All Methods</option>';
+  methods.forEach(method => {
+    const option = document.createElement('option');
+    option.value = method;
+    option.textContent = method;
+    methodFilter.appendChild(option);
+  });
+  if (currentMethod) {
+    methodFilter.value = currentMethod;
+  }
+  
+  // Populate status filter
+  const statusFilter = document.getElementById('statusFilter');
+  const statuses = [...new Set(allLogs.map(log => {
+    return log.statusCode ? String(log.statusCode) : 'Pending';
+  }))].sort((a, b) => {
+    if (a === 'Pending') return 1;
+    if (b === 'Pending') return -1;
+    const aNum = parseInt(a);
+    const bNum = parseInt(b);
+    if (isNaN(aNum)) return 1;
+    if (isNaN(bNum)) return -1;
+    return aNum - bNum;
+  });
+  const currentStatus = statusFilter ? statusFilter.value : '';
+  if (statusFilter) {
+    statusFilter.innerHTML = '<option value="">All Status Codes</option>';
+    statuses.forEach(status => {
+      const option = document.createElement('option');
+      option.value = status;
+      option.textContent = status;
+      statusFilter.appendChild(option);
+    });
+    if (currentStatus) {
+      statusFilter.value = currentStatus;
+    }
+  }
 }
 
 // Display logs in table
@@ -81,10 +120,16 @@ function displayLogs(logs) {
   });
 }
 
+// Store current log for download
+let currentModalLog = null;
+
 // Show log details in modal
 function showLogDetails(log) {
   const modal = document.getElementById('detailModal');
   const modalBody = document.getElementById('modalBody');
+  
+  // Store log for download
+  currentModalLog = log;
   
   const formatValue = (value) => {
     if (typeof value === 'object') {
@@ -94,6 +139,9 @@ function showLogDetails(log) {
   };
   
   modalBody.innerHTML = `
+    <div class="modal-actions">
+      <button class="download-btn-modal" id="downloadModalBtn" title="Download this log entry">⬇ Download This Log</button>
+    </div>
     <div class="detail-item">
       <div class="detail-label">Timestamp</div>
       <div class="detail-value">${new Date(log.timestamp).toLocaleString()}</div>
@@ -156,6 +204,14 @@ function showLogDetails(log) {
     </div>
   `;
   
+  // Add event listener for modal download button
+  const downloadModalBtn = document.getElementById('downloadModalBtn');
+  if (downloadModalBtn) {
+    downloadModalBtn.addEventListener('click', () => {
+      downloadSingleLog(log);
+    });
+  }
+  
   modal.style.display = 'block';
 }
 
@@ -165,30 +221,197 @@ function closeModal() {
   modal.style.display = 'none';
 }
 
+// Handle ESC key to close modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('detailModal');
+    if (modal && modal.style.display === 'block') {
+      closeModal();
+    }
+  }
+});
+
 // Filter logs
 function filterLogs() {
   const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const methodFilter = document.getElementById('methodFilter').value;
+  const statusFilter = document.getElementById('statusFilter').value;
+  const paramsFilter = document.getElementById('paramsFilter').value;
   
-  if (!searchTerm) {
-    filteredLogs = [...allLogs];
-  } else {
-    filteredLogs = allLogs.filter(log => {
-      return log.url.toLowerCase().includes(searchTerm) ||
+  activeFilters.search = searchTerm;
+  activeFilters.method = methodFilter;
+  activeFilters.status = statusFilter;
+  activeFilters.params = paramsFilter;
+  
+  filteredLogs = allLogs.filter(log => {
+    // Domain filter (from stat card clicks) - apply first
+    if (activeFilters.domain) {
+      if (activeFilters.domain === 'wildlink') {
+        // Filter for wild.link domain
+        if (!log.hostname || !log.hostname.includes('wild.link')) {
+          return false;
+        }
+      } else if (activeFilters.domain === 'wildlinkme') {
+        // Filter for wildlink.me domain
+        if (!log.hostname || !log.hostname.includes('wildlink.me')) {
+          return false;
+        }
+      } else if (activeFilters.domain === 'total') {
+        // Show all - no domain filter
+      }
+    }
+    
+    // Search filter
+    if (searchTerm) {
+      const matchesSearch = log.url.toLowerCase().includes(searchTerm) ||
              JSON.stringify(log.queryParams || {}).toLowerCase().includes(searchTerm) ||
              JSON.stringify(log.importantParams || {}).toLowerCase().includes(searchTerm) ||
              (log.pageUrl && log.pageUrl.toLowerCase().includes(searchTerm)) ||
-             log.hostname.toLowerCase().includes(searchTerm);
-    });
-  }
+             (log.hostname && log.hostname.toLowerCase().includes(searchTerm));
+      if (!matchesSearch) return false;
+    }
+    
+    // Method filter
+    if (methodFilter && log.method !== methodFilter) {
+      return false;
+    }
+    
+    // Status filter
+    if (statusFilter) {
+      // Handle both numeric status codes and "Pending"
+      const logStatus = log.statusCode ? String(log.statusCode) : 'Pending';
+      // Compare as strings
+      if (String(logStatus) !== String(statusFilter)) {
+        return false;
+      }
+    }
+    
+    // Parameters filter
+    if (paramsFilter === 'with-params') {
+      const hasParams = (log.queryParams && Object.keys(log.queryParams).length > 0) ||
+                       (log.importantParams && Object.keys(log.importantParams).length > 0);
+      if (!hasParams) return false;
+    } else if (paramsFilter === 'no-params') {
+      const hasParams = (log.queryParams && Object.keys(log.queryParams).length > 0) ||
+                       (log.importantParams && Object.keys(log.importantParams).length > 0);
+      if (hasParams) return false;
+    }
+    
+    return true;
+  });
   
   displayLogs(filteredLogs);
+  updateFilterDisplay();
+}
+
+// Update visual display of active filters
+function updateFilterDisplay() {
+  // Update stat card active states
+  const totalCard = document.getElementById('totalRequestsCard');
+  const wildlinkCard = document.getElementById('wildlinkCountCard');
+  const wildlinkMeCard = document.getElementById('wildlinkMeCountCard');
+  
+  // Remove active class from all cards
+  [totalCard, wildlinkCard, wildlinkMeCard].forEach(card => {
+    if (card) card.classList.remove('active');
+  });
+  
+  // Add active class to current filter card
+  if (activeFilters.domain === 'total' && totalCard) {
+    totalCard.classList.add('active');
+  } else if (activeFilters.domain === 'wildlink' && wildlinkCard) {
+    wildlinkCard.classList.add('active');
+  } else if (activeFilters.domain === 'wildlinkme' && wildlinkMeCard) {
+    wildlinkMeCard.classList.add('active');
+  }
 }
 
 // Clear filter
 function clearFilter() {
   document.getElementById('searchInput').value = '';
+  document.getElementById('methodFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('paramsFilter').value = '';
+  activeFilters = {
+    search: '',
+    method: '',
+    status: '',
+    params: '',
+    domain: ''
+  };
+  
   filteredLogs = [...allLogs];
   displayLogs(filteredLogs);
+  updateFilterDisplay();
+}
+
+// Toggle filter by clicking stat card
+function toggleFilter(domain) {
+  // If already active, clear it
+  if (activeFilters.domain === domain) {
+    activeFilters.domain = '';
+  } else {
+    // Set new active domain filter
+    activeFilters.domain = domain;
+  }
+  
+  // Apply all filters
+  filterLogs();
+}
+
+// Download a single log entry
+function downloadSingleLog(log) {
+  if (!log) {
+    alert('No log to download');
+    return;
+  }
+  
+  const dataStr = JSON.stringify(log, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  const timestamp = new Date(log.timestamp).toISOString().replace(/[:.]/g, '-');
+  link.download = `wildlink-log-${timestamp}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// Download stats
+function downloadStats(type) {
+  let logsToDownload = [];
+  
+  switch(type) {
+    case 'total':
+      logsToDownload = allLogs;
+      break;
+    case 'wildlink':
+      logsToDownload = allLogs.filter(log => log.hostname && log.hostname.includes('wild.link'));
+      break;
+    case 'wildlinkme':
+      logsToDownload = allLogs.filter(log => log.hostname && log.hostname.includes('wildlink.me'));
+      break;
+    default:
+      logsToDownload = allLogs;
+  }
+  
+  if (logsToDownload.length === 0) {
+    alert('No logs to download');
+    return;
+  }
+  
+  const dataStr = JSON.stringify(logsToDownload, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `wildlink-logs-${type}-${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 // Clear all logs
@@ -213,16 +436,8 @@ async function clearAllLogs() {
 // Refresh logs
 async function refreshLogs() {
   await loadLogs();
-  // Keep current filter when refreshing - don't clear search
-  const currentSearch = document.getElementById('searchInput').value;
-  if (currentSearch) {
-    // Reapply filter if there's a search term
-    filterLogs();
-  } else {
-    // No filter, show all logs
-    filteredLogs = [...allLogs];
-    displayLogs(filteredLogs);
-  }
+  // Reapply all active filters
+  filterLogs();
   updateStats();
 }
 
@@ -260,6 +475,23 @@ async function init() {
       }
     });
   }
+  
+  // Filter dropdowns
+  const methodFilter = document.getElementById('methodFilter');
+  const statusFilter = document.getElementById('statusFilter');
+  const paramsFilter = document.getElementById('paramsFilter');
+  
+  if (methodFilter) {
+    methodFilter.addEventListener('change', filterLogs);
+  }
+  
+  if (statusFilter) {
+    statusFilter.addEventListener('change', filterLogs);
+  }
+  
+  if (paramsFilter) {
+    paramsFilter.addEventListener('change', filterLogs);
+  }
 }
 
 // Make functions global for onclick handlers
@@ -268,6 +500,8 @@ window.clearFilter = clearFilter;
 window.clearAllLogs = clearAllLogs;
 window.refreshLogs = refreshLogs;
 window.closeModal = closeModal;
+window.toggleFilter = toggleFilter;
+window.downloadStats = downloadStats;
 
 // Modal close handlers and button event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -292,6 +526,33 @@ document.addEventListener('DOMContentLoaded', () => {
   if (refreshBtn) {
     refreshBtn.addEventListener('click', refreshLogs);
   }
+  
+  // Stat card click handlers for filtering
+  const statCards = document.querySelectorAll('.stat-card');
+  statCards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Don't trigger filter if clicking the download button
+      if (e.target.classList.contains('download-btn')) {
+        return;
+      }
+      const filterType = card.getAttribute('data-filter-type');
+      if (filterType) {
+        toggleFilter(filterType);
+      }
+    });
+  });
+  
+  // Download button event listeners for stat cards
+  // Use event delegation since buttons are in the DOM
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('download-btn') && !e.target.classList.contains('download-btn-modal')) {
+      e.stopPropagation(); // Prevent triggering stat card click
+      const type = e.target.getAttribute('data-download-type');
+      if (type) {
+        downloadStats(type);
+      }
+    }
+  });
   
   // Modal close handlers
   const closeBtn = document.getElementById('closeModal');
