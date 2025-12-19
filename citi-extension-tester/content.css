@@ -1,0 +1,31 @@
+/* Content script styles for Citi Extension Tester */
+
+/* Testing indicator styles */
+#citi-tester-indicator {
+  position: fixed !important;
+  top: 10px !important;
+  right: 10px !important;
+  background: #007bff !important;
+  color: white !important;
+  padding: 10px 15px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  z-index: 999999 !important;
+  box-shadow: 0 4px 12px rgba(0,123,255,0.4) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  pointer-events: none !important;
+  animation: citiTesterPulse 2s infinite !important;
+}
+
+@keyframes citiTesterPulse {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.05); 
+  }
+}
+

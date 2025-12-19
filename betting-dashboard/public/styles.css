@@ -1,0 +1,1100 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+header {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+header h1 {
+    font-size: 32px;
+    color: #667eea;
+    font-weight: 700;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-select {
+    padding: 10px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-select:hover {
+    border-color: #667eea;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.player-search {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    position: relative;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s ease;
+}
+
+.suggestion-item:hover {
+    background: #f8f9fa;
+}
+
+.suggestion-type {
+    font-size: 18px;
+}
+
+.suggestion-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.game-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 16px;
+}
+
+.player-count {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.btn-toggle-players {
+    padding: 8px 16px;
+    border: 2px solid #667eea;
+    border-radius: 6px;
+    background: white;
+    color: #667eea;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-toggle-players:hover {
+    background: #667eea;
+    color: white;
+}
+
+.search-input {
+    padding: 10px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    width: 200px;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-secondary {
+    background: #f8f9fa;
+    color: #333;
+    border: 2px solid #e0e0e0;
+}
+
+.refresh-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sport-selection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.sport-selection label:first-child {
+    font-weight: 600;
+    color: #333;
+    margin-right: 4px;
+}
+
+.sport-checkboxes {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.sport-checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sport-checkboxes input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.btn-secondary:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.stats {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.stats span {
+    color: #667eea;
+    font-weight: 700;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    display: none;
+}
+
+.loading.active {
+    display: block;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.games-container {
+    display: grid;
+    gap: 24px;
+}
+
+.game-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-card.collapsed .game-content {
+    display: none !important;
+}
+
+.game-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.game-teams {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.game-teams .vs {
+    color: #999;
+    font-weight: 400;
+}
+
+.game-date {
+    color: #666;
+    font-size: 14px;
+}
+
+.game-time {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.players-section {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.player-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 0;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.player-card:hover {
+    background: #f0f0f0;
+    transform: translateX(4px);
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.player-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.player-name {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.player-name:hover {
+    color: #667eea;
+    text-decoration: underline;
+    transform: translateX(2px);
+}
+
+.game-card {
+    transition: all 0.3s ease;
+}
+
+.game-card.collapsed .game-content {
+    display: none;
+}
+
+.game-header.clickable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.game-header-main {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.game-header-main:hover {
+    background: #f8f9fa;
+}
+
+.btn-toggle-players {
+    padding: 8px 16px;
+    border: 2px solid #667eea;
+    border-radius: 6px;
+    background: white;
+    color: #667eea;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-toggle-players:hover {
+    background: #667eea;
+    color: white;
+}
+
+.game-detail-card {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.game-header-large {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 32px;
+}
+
+.game-header-large h2 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    color: #333;
+}
+
+.betting-section {
+    margin-bottom: 32px;
+}
+
+.betting-section h3 {
+    margin-bottom: 16px;
+    color: #333;
+    font-size: 20px;
+}
+
+.betting-lines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+.betting-line-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+}
+
+.sportsbook-name {
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 12px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.line-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.line-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: white;
+    border-radius: 4px;
+}
+
+.team-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.line-value {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 16px;
+}
+
+.line-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.odds {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.over-odds {
+    color: #10b981;
+    background: #d1fae5;
+}
+
+.under-odds {
+    color: #ef4444;
+    background: #fee2e2;
+}
+
+.player-props-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.player-prop-group {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+}
+
+.player-prop-name {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    color: #333;
+    font-weight: 600;
+}
+
+.props-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.prop-card {
+    background: white;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.prop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.prop-stat {
+    font-weight: 600;
+    color: #333;
+}
+
+.prop-sportsbook {
+    font-size: 12px;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.prop-line {
+    font-size: 16px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 4px;
+}
+
+.prop-odds {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.collapse-icon {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.game-card.collapsed .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+.player-details {
+    padding: 20px;
+}
+
+.player-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.stat-card .stat-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 4px 0;
+}
+
+.chart-container {
+    height: 300px;
+    margin: 24px 0;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.recent-games-section {
+    margin-top: 24px;
+}
+
+.recent-games-section h3 {
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.games-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.game-result {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #667eea;
+}
+
+.game-date {
+    font-weight: 600;
+    color: #666;
+    min-width: 80px;
+}
+
+.game-opponent {
+    font-weight: 500;
+    color: #333;
+    flex: 1;
+}
+
+.game-stats {
+    display: flex;
+    gap: 12px;
+}
+
+.game-stats span {
+    padding: 4px 8px;
+    background: white;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.upcoming-projections {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 2px solid #e0e0e0;
+}
+
+.upcoming-projections h3 {
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.projection-item {
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #667eea;
+}
+
+.projection-game {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.projection-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.projection-reasoning {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.player-team {
+    font-size: 12px;
+    color: #666;
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+}
+
+.season-stats-preview {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.stat-badge {
+    font-size: 12px;
+    padding: 4px 8px;
+    background: #e7f3ff;
+    color: #0066cc;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.stats-grid {
+    display: block;
+    margin-top: 8px;
+}
+
+/* Compact projections override the grid */
+.stats-grid .projections-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.stat-item {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.projections-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.projection-compact-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    font-size: 13px;
+}
+
+.projection-stat {
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.projection-value {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 14px;
+}
+
+.confidence-badge-small {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.confidence-badge-small.confidence-high {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.confidence-badge-small.confidence-medium {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.confidence-badge-small.confidence-low {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.projection {
+    color: #667eea;
+}
+
+.line {
+    color: #764ba2;
+}
+
+.odds {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.over-odds {
+    color: #10b981;
+}
+
+.under-odds {
+    color: #ef4444;
+}
+
+.reasoning {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #856404;
+    font-style: italic;
+}
+
+.confidence-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.confidence-high {
+    background: #d4edda;
+    color: #155724;
+}
+
+.confidence-medium {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.confidence-low {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.sportsbooks {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.sportsbook-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.fanduel {
+    background: #1493ff;
+    color: white;
+}
+
+.betmgm {
+    background: #ffd700;
+    color: #000;
+}
+
+.draftkings {
+    background: #53d337;
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    color: #666;
+}
+
+.empty-state h2 {
+    margin-bottom: 12px;
+    color: #333;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #333;
+}
+
+#modalPlayerName {
+    margin-bottom: 24px;
+    color: #667eea;
+    font-size: 28px;
+}
+
+.recent-games-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+.recent-games-table th,
+.recent-games-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.recent-games-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.recent-games-table tr:hover {
+    background: #f8f9fa;
+}
+
+.player-info {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.player-info span {
+    font-size: 14px;
+    color: #666;
+}
+
+.player-info strong {
+    color: #333;
+    margin-right: 8px;
+}
+
+.season-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .game-teams {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .players-section {
+        grid-template-columns: 1fr;
+    }
+}
+

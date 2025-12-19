@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Frog Icons</title>
+</head>
+<body>
+  <h1>Frog Icon Generator</h1>
+  <p>Right-click each image below and "Save image as..." to save as PNG</p>
+  
+  <div>
+    <h2>16x16</h2>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <br>
+    <a id="download16" download="icon16.png">Download icon16.png</a>
+  </div>
+  
+  <div>
+    <h2>32x32</h2>
+    <canvas id="canvas32" width="32" height="32"></canvas>
+    <br>
+    <a id="download32" download="icon32.png">Download icon32.png</a>
+  </div>
+  
+  <div>
+    <h2>48x48</h2>
+    <canvas id="canvas48" width="48" height="48"></canvas>
+    <br>
+    <a id="download48" download="icon48.png">Download icon48.png</a>
+  </div>
+  
+  <div>
+    <h2>128x128</h2>
+    <canvas id="canvas128" width="128" height="128"></canvas>
+    <br>
+    <a id="download128" download="icon128.png">Download icon128.png</a>
+  </div>
+
+  <script>
+    function drawFrog(ctx, size) {
+      const scale = size / 128;
+      ctx.clearRect(0, 0, size, size);
+      
+      // Body (main circle)
+      ctx.fillStyle = '#4CAF50';
+      ctx.beginPath();
+      ctx.arc(size/2, size * 0.625, size * 0.25, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Left eye
+      ctx.fillStyle = '#2E7D32';
+      ctx.beginPath();
+      ctx.ellipse(size * 0.375, size * 0.5, size * 0.09375, size * 0.125, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Right eye
+      ctx.beginPath();
+      ctx.ellipse(size * 0.625, size * 0.5, size * 0.09375, size * 0.125, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Eye pupils
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(size * 0.375, size * 0.46875, size * 0.03125, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(size * 0.625, size * 0.46875, size * 0.03125, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Mouth
+      ctx.fillStyle = '#1B5E20';
+      ctx.beginPath();
+      ctx.ellipse(size/2, size * 0.59375, size * 0.0625, size * 0.03125, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Left leg
+      ctx.fillStyle = '#4CAF50';
+      ctx.beginPath();
+      ctx.ellipse(size * 0.3125, size * 0.375, size * 0.0625, size * 0.09375, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Right leg
+      ctx.beginPath();
+      ctx.ellipse(size * 0.6875, size * 0.375, size * 0.0625, size * 0.09375, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    function setupCanvas(id, size) {
+      const canvas = document.getElementById(id);
+      const ctx = canvas.getContext('2d');
+      drawFrog(ctx, size);
+      
+      const link = document.getElementById('download' + size);
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+      });
+    }
+    
+    setupCanvas('canvas16', 16);
+    setupCanvas('canvas32', 32);
+    setupCanvas('canvas48', 48);
+    setupCanvas('canvas128', 128);
+  </script>
+</body>
+</html>
+

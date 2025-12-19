@@ -1038,7 +1038,7 @@ function showCroutonAutocomplete(searchTerm) {
         await sendMessageToExtension('searchMerchant', { targetIndex: match.index });
         
         console.log(`🔄 Sent searchMerchant action to background script for: ${match.name}`);
-        showCroutonFeedback(`Navigating to ${match.name}...`);
+        // Removed crouton feedback notification
       }, 100);
     });
     
@@ -1156,7 +1156,7 @@ function selectCroutonAutocompleteItem(merchantName, merchantIndex) {
   // Navigate to the merchant
   console.log(`🔄 Sending searchMerchant action with targetIndex: ${merchantIndex}`);
   sendMessageToExtension('searchMerchant', { targetIndex: merchantIndex });
-  showCroutonFeedback(`Found: ${merchantName}`);
+  // Removed crouton feedback notification
 }
 
 function handleCroutonAutocompleteKeydown(e) {
@@ -1227,7 +1227,7 @@ function handleCroutonAutocompleteKeydown(e) {
             await sendMessageToExtension('searchMerchant', { targetIndex: merchantIndex });
             
             console.log(`🔄 Sent searchMerchant action to background script for: ${merchantName}`);
-            showCroutonFeedback(`Navigating to ${merchantName}...`);
+            // Removed crouton feedback notification
           }, 100);
         }
       }
@@ -1644,7 +1644,7 @@ function setupCroutonEventListeners() {
           await sendMessageToExtension('searchMerchant', { targetIndex: match.index });
           
           console.log(`🔄 Sent searchMerchant action to background script for: ${match.merchant.name}`);
-          showCroutonFeedback(`Navigating to ${match.merchant.name}...`);
+          // Removed crouton feedback notification
         }, 100);
       });
       
@@ -1691,7 +1691,7 @@ function setupCroutonEventListeners() {
     // Navigate to the merchant
     console.log(`🔄 Sending searchMerchant action with targetIndex: ${merchantIndex}`);
     sendMessageToExtension('searchMerchant', { targetIndex: merchantIndex });
-    showCroutonFeedback(`Found: ${merchantName}`);
+    // Removed crouton feedback notification
   }
   
   window.handleCroutonAutocompleteKeydown = function(e) {
@@ -1770,7 +1770,7 @@ function setupCroutonEventListeners() {
             await sendMessageToExtension('searchMerchant', { targetIndex: merchantIndex });
             
             console.log(`🔄 Sent searchMerchant action to background script for: ${merchantName}`);
-            showCroutonFeedback(`Navigating to ${merchantName}...`);
+            // Removed crouton feedback notification
           }, 100);
         }
         break;
@@ -1804,7 +1804,7 @@ function setupCroutonEventListeners() {
       // Ensure we have merchant data for search
       if (!croutonData?.testingMerchants || croutonData.testingMerchants.length === 0) {
         console.error('❌ No testingMerchants data available for search');
-        showCroutonFeedback('No merchants available for search');
+        // Removed crouton feedback notification
         return;
       }
       
@@ -1832,7 +1832,7 @@ function setupCroutonEventListeners() {
         await sendMessageToExtension('searchMerchant', { targetIndex: merchantIndex });
         
         console.log(`🔄 Sent searchMerchant action to background script for: ${foundMerchant.name}`);
-        showCroutonFeedback(`Navigating to ${foundMerchant.name}...`);
+        // Removed crouton feedback notification
         
         // Set search override flag to prevent external updates during local update
         searchOverride = true;
@@ -1867,9 +1867,9 @@ function setupCroutonEventListeners() {
         
         // Check if this looks like a domain search
         if (searchTerm.includes('.')) {
-          showCroutonFeedback(`No merchant found for domain: ${searchTerm}`);
+          // Removed crouton feedback notification
         } else {
-          showCroutonFeedback(`No merchant found: ${searchTerm}`);
+          // Removed crouton feedback notification
         }
         
         searchInput.style.borderColor = '#f44336';
@@ -2031,7 +2031,7 @@ function setupCroutonEventListeners() {
         copySuccessfulBtn.style.color = 'white';
         copySuccessfulBtn.classList.remove('crouton-btn-loading');
         
-        showCroutonFeedback('Copied successful merchants to clipboard', 'success');
+        // Removed crouton feedback notification
         
         // Reset after delay
         setTimeout(() => {
@@ -2049,7 +2049,7 @@ function setupCroutonEventListeners() {
         copySuccessfulBtn.style.color = 'white';
         copySuccessfulBtn.classList.remove('crouton-btn-loading');
         
-        showCroutonFeedback('Failed to copy successful merchants', 'error');
+        // Removed crouton feedback notification
         
         // Reset after delay
         setTimeout(() => {
@@ -2090,7 +2090,7 @@ function setupCroutonEventListeners() {
         copyFlaggedBtn.style.color = 'white';
         copyFlaggedBtn.classList.remove('crouton-btn-loading');
         
-        showCroutonFeedback('Copied flagged merchants to clipboard', 'success');
+        // Removed crouton feedback notification
         
         // Reset after delay
         setTimeout(() => {
@@ -2108,7 +2108,7 @@ function setupCroutonEventListeners() {
         copyFlaggedBtn.style.color = 'white';
         copyFlaggedBtn.classList.remove('crouton-btn-loading');
         
-        showCroutonFeedback('Failed to copy flagged merchants', 'error');
+        // Removed crouton feedback notification
         
         // Reset after delay
         setTimeout(() => {
@@ -3285,7 +3285,7 @@ async function sendMessageToExtension(action, extraData = {}) {
   
   // Test extension context first
   if (!testExtensionContext()) {
-    showCroutonFeedback('Extension needs reload');
+    // Removed crouton feedback notification
     return;
   }
   
@@ -3299,7 +3299,7 @@ async function sendMessageToExtension(action, extraData = {}) {
     // Check if chrome extension context is valid
     if (!chrome || !chrome.storage || !chrome.runtime) {
       console.error('❌ Extension context invalidated - cleaning up crouton');
-      showCroutonFeedback('Extension disconnected');
+      // Removed crouton feedback notification
       cleanupCrouton();
       return;
     }
@@ -3307,7 +3307,7 @@ async function sendMessageToExtension(action, extraData = {}) {
     // Additional check for runtime connection
     if (chrome.runtime.lastError) {
       console.error('❌ Chrome runtime error:', chrome.runtime.lastError);
-      showCroutonFeedback('Extension error - reload needed');
+      // Removed crouton feedback notification - Extension error - reload needed
       return;
     }
     
@@ -3344,7 +3344,7 @@ async function sendMessageToExtension(action, extraData = {}) {
               chrome.runtime.lastError.message.includes('message port closed') ||
               chrome.runtime.lastError.message.includes('receiving end does not exist')) {
             console.error('🔧 Extension context invalidated - cleaning up crouton');
-            showCroutonFeedback('Extension disconnected');
+            // Removed crouton feedback notification
             cleanupCrouton();
           }
         } else {
@@ -3360,7 +3360,7 @@ async function sendMessageToExtension(action, extraData = {}) {
           msgError.message.includes('message port closed') ||
           msgError.message.includes('receiving end does not exist')) {
         console.error('🔧 Extension context invalidated - cleaning up crouton');
-        showCroutonFeedback('Extension disconnected');
+        // Removed crouton feedback notification
         cleanupCrouton();
       }
     }
@@ -3373,9 +3373,9 @@ async function sendMessageToExtension(action, extraData = {}) {
     
     // Show user-friendly error
     if (error.message.includes('Extension context invalidated')) {
-      showCroutonFeedback('Please reload page');
+      // Removed crouton feedback notification
     } else {
-      showCroutonFeedback('Error - check console');
+      // Removed crouton feedback notification
     }
   }
 }
@@ -3980,7 +3980,7 @@ function showCroutonFeedback(message, type = 'info') {
     // Use appropriate feedback type based on action
     let feedbackType = 'info';
     
-    showCroutonFeedback(actionMap[message], feedbackType);
+    // Removed crouton feedback notification
   }
 }
 

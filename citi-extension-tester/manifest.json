@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Wildlink Traffic Monitor",
+  "name": "Citi Extension Tester",
   "version": "1.0.0",
-  "description": "Monitor and capture Wildlink network traffic directly in your browser",
+  "description": "Test Citi extension popup for exclusions, earning rates, and activation issues",
   
   "permissions": [
-    "webRequest",
     "storage",
+    "activeTab",
+    "scripting",
     "tabs",
-    "management"
+    "downloads"
   ],
   
   "host_permissions": [
@@ -20,9 +21,19 @@
     "service_worker": "background.js"
   },
   
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Wildlink Traffic Monitor",
+    "default_title": "Citi Extension Tester",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
@@ -40,7 +51,7 @@
   
   "web_accessible_resources": [
     {
-      "resources": ["dashboard.html"],
+      "resources": ["popup.html"],
       "matches": ["<all_urls>"]
     }
   ]

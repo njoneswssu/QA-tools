@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citi Extension Tester</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔍 Citi Extension Tester</h1>
+    </header>
+    
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-value" id="totalTested">0</div>
+        <div class="stat-label">Total Tested</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-value" id="totalSuccess">0</div>
+        <div class="stat-label">Successful</div>
+      </div>
+      <div class="stat-card error">
+        <div class="stat-value" id="totalFlagged">0</div>
+        <div class="stat-label">Flagged</div>
+      </div>
+    </div>
+    
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <div class="control-row">
+        <button id="startTesting" class="btn btn-primary">Start Testing</button>
+        <button id="enableClickToTest" class="btn btn-success">Enable Click-to-Test</button>
+      </div>
+      <div class="control-row">
+        <button id="pauseTesting" class="btn btn-secondary" disabled>Pause</button>
+        <button id="restartTesting" class="btn btn-secondary" disabled>Restart</button>
+        <button id="clearTesting" class="btn btn-danger">Clear Testing</button>
+      </div>
+      <div class="control-row">
+        <button id="clearResults" class="btn btn-warning">Clear Results</button>
+        <button id="exportCSV" class="btn btn-success">Export CSV</button>
+      </div>
+    </div>
+    
+    <!-- Instructions Section -->
+    <div class="instructions-section">
+      <p><strong>How to test:</strong></p>
+      <ol>
+        <li>Navigate to a merchant website</li>
+        <li>Wait for the Citi extension popup to appear</li>
+        <li>Click on the popup to test it, or click "Start Testing" below</li>
+      </ol>
+    </div>
+    
+    <!-- Search Section -->
+    <div class="search-section">
+      <input type="text" id="searchInput" placeholder="Search results..." class="search-input">
+    </div>
+    
+    <!-- Results Section -->
+    <div class="results-section">
+      <h2>Test Results</h2>
+      <div id="resultsList" class="results-list">
+        <div class="empty-state">No test results yet. Start testing to see results.</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Merchant Detail Modal -->
+  <div id="merchantModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Merchant Details</h2>
+        <span class="close-modal" id="closeModal">&times;</span>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Details will be inserted here -->
+      </div>
+      <div class="modal-footer">
+        <button id="flagMerchant" class="btn btn-danger">Flag Result</button>
+        <button id="passMerchant" class="btn btn-success">Pass Result</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
+

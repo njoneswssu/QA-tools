@@ -19,6 +19,14 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Tabs Navigation -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="testing">🧪 Testing</button>
+                <button class="tab-btn" data-tab="stats">📊 Stats</button>
+            </div>
+
+            <!-- Testing Tab -->
+            <div class="tab-content active" id="testingTab">
             <!-- Merchant Input Section -->
             <section class="input-section">
                 <h2>📝 Enter Merchants to Test</h2>
@@ -51,7 +59,10 @@
             <section class="results-section" id="resultsSection" style="display: none;">
                 <div class="results-header">
                     <h3>🔍 Validation Results</h3>
-                    <button id="downloadTableBtn" class="btn btn-download">📄 Download Table</button>
+                    <div class="results-header-actions">
+                        <button id="injectCroutonBtn" class="btn btn-secondary" title="Inject crouton into current webpage">🏪 Inject Crouton</button>
+                        <button id="downloadTableBtn" class="btn btn-download">📄 Download Table</button>
+                    </div>
                 </div>
                 
                 <div class="results-grid">
@@ -119,7 +130,37 @@
                     </button>
                 </div>
             </section>
+            </div>
 
+            <!-- Stats Tab -->
+            <div class="tab-content" id="statsTab" style="display: none;">
+                <section class="stats-section">
+                    <h2>📊 Testing Statistics</h2>
+                    <div class="stats-summary">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statsTotalFlagged">0</div>
+                            <div class="stat-label">Flagged</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-value" id="statsTotalSuccessful">0</div>
+                            <div class="stat-label">Successful</div>
+                        </div>
+                    </div>
+                    <div class="stats-filters">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="flagged">🚩 Flagged</button>
+                        <button class="filter-btn" data-filter="successful">✅ Successful</button>
+                        <div class="stats-search-container">
+                            <input type="text" id="statsSearchInput" placeholder="Search merchants..." class="stats-search-input">
+                            <button id="statsSearchBtn" class="btn btn-search-small">🔍</button>
+                        </div>
+                        <button id="clearAllStatsBtn" class="filter-btn btn-danger btn-small">🗑️ Clear</button>
+                    </div>
+                    <div class="stats-list" id="statsList">
+                        <div class="empty-state">No merchants have been flagged or marked as successful yet.</div>
+                    </div>
+                </section>
+            </div>
 
         </main>
 

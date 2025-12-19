@@ -1,0 +1,7 @@
+node_modules/
+database/betting_data.db
+database/betting_data.db-journal
+*.log
+.DS_Store
+.env
+

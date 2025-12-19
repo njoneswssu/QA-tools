@@ -10,37 +10,65 @@ const wildlinkDomains = [
   'storage.googleapis.com'
 ];
 
+// Cache of extension IDs to names for display
+const extensionInfoCache = new Map();
+
 // Check if URL matches Wildlink domains
 function isWildlinkUrl(url) {
   try {
     const urlObj = new URL(url);
     const hostname = urlObj.hostname.toLowerCase();
+    const pathname = urlObj.pathname.toLowerCase();
     
     // Check for storage.googleapis.com - only include if it's Wildlink-related
     if (hostname.includes('storage.googleapis.com')) {
       // Exclude Google Drive requests
-      if (url.includes('/drive.google.com') || 
-          url.includes('/drive/') ||
-          url.includes('drive') ||
-          url.includes('googleusercontent.com')) {
+      if (pathname.includes('/drive.google.com') || 
+          pathname.includes('/drive/') ||
+          pathname.includes('/drive') ||
+          hostname.includes('googleusercontent.com')) {
         return false;
       }
-      // Only include if it contains wildlink in the path
-      const path = urlObj.pathname.toLowerCase();
-      if (!path.includes('wildlink') && !path.includes('wl-')) {
+      // Exclude image requests (wl-image paths are just image files)
+      if (pathname.includes('/wl-image/') || 
+          pathname.startsWith('/wl-image') ||
+          pathname.includes('/images/')) {
         return false;
+      }
+      // Only include if it contains wildlink in the path (but not wl-image)
+      if (pathname.includes('wildlink') || 
+          (pathname.includes('wl-') && !pathname.includes('wl-image'))) {
+        return true;
+      }
+      return false;
+    }
+    
+    // Check other Wildlink domains - use exact match or subdomain match
+    for (const domain of wildlinkDomains) {
+      if (domain === 'storage.googleapis.com') {
+        continue; // Already handled above
+      }
+      
+      // Exact match
+      if (hostname === domain) {
+        return true;
+      }
+      
+      // Subdomain match (e.g., www.wildlink.me matches wildlink.me)
+      // Check if hostname ends with .domain or contains .domain/
+      if (hostname.endsWith('.' + domain)) {
+        return true;
+      }
+      
+      // Contains match (fallback for partial matches)
+      if (hostname.includes(domain)) {
+        return true;
       }
     }
     
-    // Check other Wildlink domains
-    return wildlinkDomains.some(domain => {
-      if (domain === 'storage.googleapis.com') {
-        // Already handled above
-        return false;
-      }
-      return hostname.includes(domain);
-    });
+    return false;
   } catch (error) {
+    console.error('Error parsing URL:', url, error);
     return false;
   }
 }
@@ -69,6 +97,48 @@ function parseImportantParams(url) {
   }
 }
 
+// Extract extension ID from initiator URL
+function getExtensionIdFromInitiator(initiator) {
+  if (!initiator) return null;
+  
+  try {
+    // initiator can be a string like "chrome-extension://abc123..." or null
+    if (typeof initiator === 'string' && initiator.startsWith('chrome-extension://')) {
+      const urlObj = new URL(initiator);
+      return urlObj.hostname; // The extension ID is the hostname
+    }
+  } catch (error) {
+    // Invalid URL format
+  }
+  
+  return null;
+}
+
+// Get extension name from ID (with caching)
+async function getExtensionName(extensionId) {
+  if (!extensionId) return null;
+  
+  // Check cache first
+  if (extensionInfoCache.has(extensionId)) {
+    return extensionInfoCache.get(extensionId);
+  }
+  
+  try {
+    // Try to get extension info using management API
+    // Note: This requires management permission, but we'll handle gracefully if not available
+    const extension = await chrome.management.get(extensionId);
+    if (extension && extension.name) {
+      extensionInfoCache.set(extensionId, extension.name);
+      return extension.name;
+    }
+  } catch (error) {
+    // Extension might not be accessible or management API not available
+    // Fall back to just using the ID
+  }
+  
+  return null;
+}
+
 // Create log entry
 function createLogEntry(requestDetails, responseHeaders = null, statusCode = null) {
   const timestamp = new Date().toISOString();
@@ -79,7 +149,11 @@ function createLogEntry(requestDetails, responseHeaders = null, statusCode = nul
     const urlObj = new URL(url);
     const { queryParams, importantParams } = parseImportantParams(url);
     
-    return {
+    // Extract extension info from initiator
+    const initiator = requestDetails.initiator;
+    const extensionId = getExtensionIdFromInitiator(initiator);
+    
+    const logEntry = {
       id: requestId,
       timestamp: timestamp,
       type: 'request',
@@ -99,10 +173,42 @@ function createLogEntry(requestDetails, responseHeaders = null, statusCode = nul
       completed: statusCode !== null,
       completedTimestamp: statusCode ? timestamp : null,
       tabId: requestDetails.tabId,
-      tabUrl: requestDetails.tabUrl || ''
+      tabUrl: requestDetails.tabUrl || '',
+      initiator: initiator || null,
+      extensionId: extensionId || null,
+      extensionName: null // Will be populated asynchronously
     };
+    
+    // Populate extension name asynchronously if extension ID found
+    if (extensionId) {
+      getExtensionName(extensionId).then(name => {
+        if (name) {
+          logEntry.extensionName = name;
+          // Update the log entry in storage
+          updateLogEntryExtensionName(requestId, name);
+        }
+      }).catch(() => {
+        // Ignore errors
+      });
+    }
+    
+    return logEntry;
   } catch (error) {
     return null;
+  }
+}
+
+// Update log entry with extension name
+async function updateLogEntryExtensionName(logId, extensionName) {
+  try {
+    const logs = await loadLogs();
+    const logIndex = logs.findIndex(log => log.id === logId);
+    if (logIndex !== -1) {
+      logs[logIndex].extensionName = extensionName;
+      await saveLogs(logs);
+    }
+  } catch (error) {
+    // Ignore errors
   }
 }
 
@@ -169,17 +275,26 @@ async function addLogEntry(logEntry) {
 chrome.webRequest.onBeforeRequest.addListener(
   async (details) => {
     if (isWildlinkUrl(details.url)) {
-      console.log('🎯 WILDLINK REQUEST:', details.method, details.url);
+      const extensionId = getExtensionIdFromInitiator(details.initiator);
+      const extensionName = extensionId ? await getExtensionName(extensionId) : null;
+      
+      if (extensionId) {
+        console.log(`🎯 WILDLINK REQUEST from extension ${extensionName || extensionId}:`, details.method, details.url);
+      } else {
+        console.log('🎯 WILDLINK REQUEST CAPTURED:', details.method, details.url);
+      }
       
       // Get tab info
       let tabUrl = '';
       let tabTitle = '';
       try {
-        const tab = await chrome.tabs.get(details.tabId);
-        tabUrl = tab.url || '';
-        tabTitle = tab.title || '';
+        if (details.tabId >= 0) {
+          const tab = await chrome.tabs.get(details.tabId);
+          tabUrl = tab.url || '';
+          tabTitle = tab.title || '';
+        }
       } catch (error) {
-        // Tab might not exist
+        // Tab might not exist (e.g., service worker requests)
       }
       
       const logEntry = createLogEntry({
@@ -190,7 +305,13 @@ chrome.webRequest.onBeforeRequest.addListener(
       if (logEntry) {
         logEntry.pageUrl = tabUrl;
         logEntry.pageTitle = tabTitle;
+        if (extensionName) {
+          logEntry.extensionName = extensionName;
+        }
         await addLogEntry(logEntry);
+        console.log('✅ Log entry added:', logEntry.id);
+      } else {
+        console.error('❌ Failed to create log entry for:', details.url);
       }
     }
   },
@@ -202,17 +323,26 @@ chrome.webRequest.onBeforeRequest.addListener(
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
     if (isWildlinkUrl(details.url)) {
-      console.log('✅ WILDLINK RESPONSE:', details.statusCode, details.url);
+      const extensionId = getExtensionIdFromInitiator(details.initiator);
+      const extensionName = extensionId ? await getExtensionName(extensionId) : null;
+      
+      if (extensionId) {
+        console.log(`✅ WILDLINK RESPONSE from extension ${extensionName || extensionId}:`, details.statusCode, details.url);
+      } else {
+        console.log('✅ WILDLINK RESPONSE CAPTURED:', details.statusCode, details.url);
+      }
       
       // Get tab info
       let tabUrl = '';
       let tabTitle = '';
       try {
-        const tab = await chrome.tabs.get(details.tabId);
-        tabUrl = tab.url || '';
-        tabTitle = tab.title || '';
+        if (details.tabId >= 0) {
+          const tab = await chrome.tabs.get(details.tabId);
+          tabUrl = tab.url || '';
+          tabTitle = tab.title || '';
+        }
       } catch (error) {
-        // Tab might not exist
+        // Tab might not exist (e.g., service worker requests)
       }
       
       const logEntry = createLogEntry(
@@ -224,7 +354,13 @@ chrome.webRequest.onCompleted.addListener(
       if (logEntry) {
         logEntry.pageUrl = tabUrl;
         logEntry.pageTitle = tabTitle;
+        if (extensionName) {
+          logEntry.extensionName = extensionName;
+        }
         await addLogEntry(logEntry);
+        console.log('✅ Response log entry added:', logEntry.id);
+      } else {
+        console.error('❌ Failed to create response log entry for:', details.url);
       }
     }
   },

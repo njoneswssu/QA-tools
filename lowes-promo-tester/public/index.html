@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lowe's Promotional Testing Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Lowe's Promotional Testing Dashboard</h1>
+            <div class="header-controls">
+                <div class="stats" id="stats">
+                    <span id="totalTests">0</span> Tests | 
+                    <span id="totalProducts">0</span> Products | 
+                    <span id="avgPromo">0</span>% Avg Promo
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <div class="product-selector">
+                    <label for="productDropdown">Select Products to Test:</label>
+                    <div class="dropdown-container">
+                        <button class="dropdown-toggle" id="productDropdownBtn">
+                            <span id="selectedCount">0 products selected</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-menu" id="productDropdown">
+                            <div class="dropdown-header">
+                                <input type="text" id="productSearch" placeholder="Search products..." class="search-input">
+                                <label class="check-all-label">
+                                    <input type="checkbox" id="checkAllProducts"> Check All
+                                </label>
+                            </div>
+                            <div class="dropdown-content" id="productList">
+                                <!-- Products will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="startTestBtn" class="btn btn-primary" disabled>
+                    🚀 Start Testing
+                </button>
+                <button id="testAllBtn" class="btn btn-primary" disabled>
+                    🎯 Test All Selected
+                </button>
+                <button id="stopTestBtn" class="btn btn-danger" style="display: none;">
+                    🛑 Stop Testing
+                </button>
+                <button id="refreshResultsBtn" class="btn btn-secondary">
+                    🔄 Refresh Results
+                </button>
+                <button id="clearResultsBtn" class="btn btn-danger">
+                    🗑️ Clear Results
+                </button>
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Preparing products...</p>
+            </div>
+
+            <div class="products-to-test" id="productsToTest" style="display: none;">
+                <h2>Products Ready for Testing</h2>
+                <p class="instruction-text">Click on any product link below to start automated testing. The browser will open, test the product, and close automatically.</p>
+                <div class="product-links-list" id="productLinksList">
+                    <!-- Product links will be inserted here -->
+                </div>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <div class="results-header">
+                    <h2>Test Results</h2>
+                    <div class="date-filter-container">
+                        <label for="dateFilter">Filter by Date:</label>
+                        <input type="date" id="dateFilter" class="date-filter-input">
+                        <button id="clearDateFilter" class="btn btn-secondary" style="display: none;">Clear Filter</button>
+                    </div>
+                </div>
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Test results will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot Modal -->
+    <div class="modal" id="screenshotModal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2 id="modalTitle">Screenshot</h2>
+            <div class="zoom-controls">
+                <button id="zoomIn" class="zoom-btn">🔍+</button>
+                <button id="zoomOut" class="zoom-btn">🔍-</button>
+                <button id="zoomReset" class="zoom-btn">Reset</button>
+                <span id="zoomLevel">100%</span>
+            </div>
+            <div class="screenshot-container">
+                <img id="modalImage" src="" alt="Screenshot">
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

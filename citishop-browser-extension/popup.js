@@ -166,6 +166,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   searchMerchantBtn = document.getElementById('searchMerchantBtn');
   searchAutocomplete = document.getElementById('searchAutocomplete');
   
+  // Initialize tabs and stats
+  setupTabs();
+  setupCroutonInjection();
+  setupStats();
+  
   console.log('🔍 DOMContentLoaded element check:');
   console.log('🔍 merchantSearchInput:', merchantSearchInput);
   console.log('🔍 searchMerchantBtn:', searchMerchantBtn);
@@ -377,6 +382,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   await restoreExtensionState();
   
+  // Load stats data (merchantStatuses, merchantTestDates, merchantNotes) from storage
+  const statsState = await chrome.storage.local.get(['extensionState']);
+  if (statsState.extensionState) {
+    if (statsState.extensionState.merchantStatuses) {
+      merchantStatuses = statsState.extensionState.merchantStatuses;
+      console.log('📊 Loaded merchantStatuses:', Object.keys(merchantStatuses).length, 'entries');
+    }
+    // merchantTestDates and merchantNotes will be loaded when refreshStats() is called
+  }
+  
   // Restore filter state
   await restoreFilterState();
   
@@ -399,7 +414,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (result.extensionState && result.extensionState.merchantStatuses) {
             // Update local merchantStatuses with fresh data from storage
             const oldStatuses = { ...merchantStatuses };
-            merchantStatuses = { ...result.extensionState.merchantStatuses };
+            merchantStatuses = { ...(result.extensionState.merchantStatuses || {}) };
             console.log('🔄 Updated merchantStatuses from storage:', merchantStatuses);
             console.log('🔄 Previous merchantStatuses:', oldStatuses);
             console.log('🔄 Current filter during update:', currentValidationFilter);
@@ -420,7 +435,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Fallback to regular refresh
         chrome.storage.local.get(['extensionState'], (result) => {
           if (result.extensionState && result.extensionState.merchantStatuses) {
-            merchantStatuses = { ...result.extensionState.merchantStatuses };
+            merchantStatuses = { ...(result.extensionState.merchantStatuses || {}) };
             refreshValidationResults();
             updateValidationStatusCounts();
           }
@@ -2792,27 +2807,37 @@ function setupValidationResultsClickHandlers() {
         if (action === 'flag') {
           // Check if already flagged
           if (merchantStatuses[merchantKey] === 'flagged') {
-            showToast(`${merchantName} is already flagged`, 'warning');
+            // Removed toast notification
             return;
           }
           
           // Flag the merchant
           merchantStatuses[merchantKey] = 'flagged';
-          showToast(`${merchantName} flagged`, 'warning');
+          // Removed toast notification
           console.log(`🚩 Flagged ${merchantName} from validation list`);
           
         } else if (action === 'success') {
           // Check if already successful
           if (merchantStatuses[merchantKey] === 'successful') {
-            showToast(`${merchantName} is already marked as successful`, 'info');
+            // Removed toast notification
             return;
           }
           
           // Mark as successful
           merchantStatuses[merchantKey] = 'successful';
-          showToast(`${merchantName} marked as successful`, 'success');
+          // Removed toast notification
           console.log(`✅ Marked ${merchantName} as successful from validation list`);
         }
+        
+        // Store test date
+        const state = await chrome.storage.local.get(['extensionState']);
+        const currentExtensionState = state.extensionState || {};
+        if (!currentExtensionState.merchantTestDates) {
+          currentExtensionState.merchantTestDates = {};
+        }
+        currentExtensionState.merchantTestDates[merchantKey] = new Date().toISOString();
+        currentExtensionState.merchantStatuses = merchantStatuses; // Update statuses too
+        await chrome.storage.local.set({ extensionState: currentExtensionState });
         
         // Save state and update displays
         saveExtensionState();
@@ -2821,6 +2846,12 @@ function setupValidationResultsClickHandlers() {
         
         // Update crouton if it's showing this merchant
         updateFloatingCrouton();
+        
+        // Refresh stats if stats tab is active
+        const statsTab = document.getElementById('statsTab');
+        if (statsTab && statsTab.style.display !== 'none') {
+          refreshStats();
+        }
         
       } catch (error) {
         console.error('❌ Error performing merchant action:', error);
@@ -3556,7 +3587,7 @@ async function testCurrentMerchant() {
   }
 }
 
-function flagCurrentMerchant() {
+async function flagCurrentMerchant() {
   console.log('🚩 flagCurrentMerchant called - STACK TRACE:');
   console.trace();
   
@@ -3565,19 +3596,35 @@ function flagCurrentMerchant() {
   
   // Check if already flagged - if so, show already flagged status
   if (merchantStatuses[merchantKey] === 'flagged') {
-    showToast('This merchant is already flagged', 'warning');
+    // Removed toast notification
     return;
   }
   
   // Flag the merchant without prompt
   console.log(`🚩 MARKING MERCHANT AS FLAGGED: ${currentMerchant.name}`);
   merchantStatuses[merchantKey] = 'flagged';
-  showToast(`${currentMerchant.name} flagged`, 'warning');
+  // Removed toast notification
+  
+  // Store test date
+  const state = await chrome.storage.local.get(['extensionState']);
+  const extensionState = state.extensionState || {};
+  if (!extensionState.merchantTestDates) {
+    extensionState.merchantTestDates = {};
+  }
+  extensionState.merchantTestDates[merchantKey] = new Date().toISOString();
+  extensionState.merchantStatuses = merchantStatuses; // Update statuses too
+  await chrome.storage.local.set({ extensionState });
   
   // Save state first to ensure background script gets latest data
   saveExtensionState();
   
   updateFloatingCrouton();
+  
+  // Refresh stats if stats tab is active
+  const statsTab = document.getElementById('statsTab');
+  if (statsTab && statsTab.style.display !== 'none') {
+    refreshStats();
+  }
   // updateStatsDisplay call removed (stats section eliminated)
   refreshValidationResults(); // Update validation results colors
   updateValidationStatusCounts(); // Update validation status counts
@@ -3589,7 +3636,7 @@ function flagCurrentMerchant() {
   }, 50);
 }
 
-function markCurrentMerchantSuccessful() {
+async function markCurrentMerchantSuccessful() {
   console.log('✅ markCurrentMerchantSuccessful called - STACK TRACE:');
   console.trace();
   
@@ -3604,7 +3651,17 @@ function markCurrentMerchantSuccessful() {
   // Mark the merchant as successful
   console.log(`✅ MARKING MERCHANT AS SUCCESSFUL: ${currentMerchant.name}`);
   merchantStatuses[merchantKey] = 'successful';
-  showToast(`${currentMerchant.name} marked as successful`, 'success');
+  // Removed toast notification
+  
+  // Store test date
+  const state = await chrome.storage.local.get(['extensionState']);
+  const extensionState = state.extensionState || {};
+  if (!extensionState.merchantTestDates) {
+    extensionState.merchantTestDates = {};
+  }
+  extensionState.merchantTestDates[merchantKey] = new Date().toISOString();
+  extensionState.merchantStatuses = merchantStatuses; // Update statuses too
+  await chrome.storage.local.set({ extensionState });
   
   // Save state first to ensure background script gets latest data
   saveExtensionState();
@@ -3613,6 +3670,12 @@ function markCurrentMerchantSuccessful() {
   // updateStatsDisplay call removed (stats section eliminated)
   refreshValidationResults(); // Update validation results colors
   updateValidationStatusCounts(); // Update validation status counts
+  
+  // Refresh stats if stats tab is active
+  const statsTab = document.getElementById('statsTab');
+  if (statsTab && statsTab.style.display !== 'none') {
+    refreshStats();
+  }
   
   // Also trigger immediate refresh for any open popup
   console.log('🔄 Triggering immediate validation refresh for popup after success');
@@ -3977,6 +4040,10 @@ function startNewTest() {
 
 // Save current extension state
 async function saveExtensionState() {
+  // Get existing stats data to preserve it
+  const existingState = await chrome.storage.local.get(['extensionState']);
+  const existingExtensionState = existingState.extensionState || {};
+  
   const state = {
     currentValidation: currentValidation,
     merchantInput: merchantInput.value,
@@ -3984,6 +4051,9 @@ async function saveExtensionState() {
     currentMerchantIndex: currentMerchantIndex,
     testingMerchants: testingMerchants,
     merchantStatuses: merchantStatuses,
+    // Preserve stats data (test dates and notes)
+    merchantTestDates: existingExtensionState.merchantTestDates || {},
+    merchantNotes: existingExtensionState.merchantNotes || {},
     testExecutionActive: false, // test execution section removed
     resultsVisible: resultsSection.style.display !== 'none',
     codeVisible: codeSection.style.display !== 'none',
@@ -3993,6 +4063,31 @@ async function saveExtensionState() {
   };
   
   await chrome.storage.local.set({ extensionState: state });
+  
+  // Update auto-inject crouton data if it exists
+  try {
+    const autoInjectState = await chrome.storage.local.get(['autoInjectCrouton']);
+    const autoInject = autoInjectState.autoInjectCrouton || {};
+    
+    // Update croutonData for all enabled auto-inject entries
+    for (const hostname in autoInject) {
+      if (autoInject[hostname].enabled && autoInject[hostname].croutonData) {
+        const storedData = autoInject[hostname].croutonData;
+        const merchantKey = storedData.currentMerchant?.name?.toLowerCase();
+        
+        if (merchantKey && state.merchantStatuses) {
+          // Update merchant status in stored crouton data
+          autoInject[hostname].croutonData.merchantStatus = state.merchantStatuses[merchantKey] || 'pending';
+          autoInject[hostname].croutonData.testingMerchants = state.testingMerchants || storedData.testingMerchants;
+          autoInject[hostname].croutonData.totalMerchants = (state.testingMerchants || storedData.testingMerchants || []).length;
+        }
+      }
+    }
+    
+    await chrome.storage.local.set({ autoInjectCrouton: autoInject });
+  } catch (error) {
+    console.error('Error updating auto-inject crouton data:', error);
+  }
 }
 
 // Restore extension state
@@ -4019,7 +4114,12 @@ async function restoreExtensionState() {
     if (state.merchantStatuses) {
       merchantStatuses = state.merchantStatuses;
       console.log('🔄 Restored merchant statuses:', Object.keys(merchantStatuses).length, 'entries');
+    } else {
+      merchantStatuses = {};
     }
+    
+    // Stats data (merchantTestDates and merchantNotes) are preserved in storage
+    // and will be loaded when refreshStats() is called
     
     // Restore validation results (after merchant statuses are loaded)
     if (state.currentValidation) {
@@ -4585,21 +4685,33 @@ async function checkExtensionReload() {
     
     // If runtime ID changed or doesn't exist, extension was reloaded
     if (!storedRuntimeId || storedRuntimeId !== currentRuntimeId) {
-      console.log('🔄 Extension was reloaded - resetting testing state');
+      console.log('🔄 Extension was reloaded - preserving stats data');
       
-      // Reset testing state
+      // Preserve stats data (merchantStatuses, merchantTestDates, merchantNotes)
+      const preservedStats = {
+        merchantStatuses: result.extensionState?.merchantStatuses || {},
+        merchantTestDates: result.extensionState?.merchantTestDates || {},
+        merchantNotes: result.extensionState?.merchantNotes || {}
+      };
+      
+      // Restore merchantStatuses to local variable
+      merchantStatuses = preservedStats.merchantStatuses;
+      
+      // Reset testing state (but keep stats)
       testingControlsActive = false;
       testingMerchants = [];
-      merchantStatuses = {};
       currentMerchantIndex = 0;
       
-      // Clear testing-related storage but keep validation results
+      // Clear testing-related storage but keep validation results and stats
       const stateToKeep = {
         currentValidation: result.extensionState?.currentValidation,
         merchantInput: result.extensionState?.merchantInput,
         merchantDatabase: result.extensionState?.merchantDatabase,
         resultsVisible: result.extensionState?.resultsVisible,
         codeVisible: result.extensionState?.codeVisible,
+        merchantStatuses: preservedStats.merchantStatuses,
+        merchantTestDates: preservedStats.merchantTestDates,
+        merchantNotes: preservedStats.merchantNotes,
         lastSavedAt: Date.now()
       };
       
@@ -4608,9 +4720,15 @@ async function checkExtensionReload() {
         extensionRuntimeId: currentRuntimeId
       });
       
-      console.log('✅ Testing state reset, validation results preserved');
+      console.log('✅ Testing state reset, validation results and stats preserved');
     } else {
       console.log('✅ Extension runtime unchanged - preserving state');
+      // Restore merchantStatuses from storage
+      if (result.extensionState?.merchantStatuses) {
+        merchantStatuses = result.extensionState.merchantStatuses;
+      } else {
+        merchantStatuses = {};
+      }
     }
     
     // Always update the runtime ID for next check
@@ -4624,7 +4742,7 @@ async function checkExtensionReload() {
 // Check if extension was just updated and reset UI accordingly
 async function checkForExtensionUpdate() {
   try {
-    const result = await chrome.storage.local.get(['extensionVersion', 'lastUpdateTime']);
+    const result = await chrome.storage.local.get(['extensionVersion', 'lastUpdateTime', 'extensionState']);
     const currentVersion = chrome.runtime.getManifest().version;
     const storedVersion = result.extensionVersion;
     const lastUpdate = result.lastUpdateTime || 0;
@@ -4635,6 +4753,13 @@ async function checkForExtensionUpdate() {
       console.log('🔄 Extension update detected - resetting UI to clean state');
       console.log('🔄 Previous version:', storedVersion, 'Current version:', currentVersion);
       console.log('🔄 Time since last update:', (now - lastUpdate) / 1000, 'seconds');
+      
+      // Preserve stats data before clearing
+      const statsToPreserve = {
+        merchantStatuses: result.extensionState?.merchantStatuses || {},
+        merchantTestDates: result.extensionState?.merchantTestDates || {},
+        merchantNotes: result.extensionState?.merchantNotes || {}
+      };
       
       // Clear all UI state
       currentValidation = null;
@@ -4656,9 +4781,19 @@ async function checkForExtensionUpdate() {
       currentValidationFilter = null;
       updateFilterButtonStates();
       
-      // Clear UI state but preserve merchant database
+      // Clear UI state but preserve merchant database and stats
       await chrome.storage.local.remove(['validationFilter', 'lastValidationResults']);
-      // Note: Not removing extensionState to preserve merchant database
+      
+      // Restore stats to extensionState
+      const currentState = await chrome.storage.local.get(['extensionState']);
+      const currentExtensionState = currentState.extensionState || {};
+      currentExtensionState.merchantStatuses = statsToPreserve.merchantStatuses;
+      currentExtensionState.merchantTestDates = statsToPreserve.merchantTestDates;
+      currentExtensionState.merchantNotes = statsToPreserve.merchantNotes;
+      await chrome.storage.local.set({ extensionState: currentExtensionState });
+      
+      // Restore merchantStatuses to local variable
+      merchantStatuses = statsToPreserve.merchantStatuses;
       
       // Update version and timestamp
       await chrome.storage.local.set({ 
@@ -4666,7 +4801,7 @@ async function checkForExtensionUpdate() {
         lastUpdateTime: now
       });
       
-      console.log('✅ Extension UI reset after update - database will be reloaded fresh from citiList.txt');
+      console.log('✅ Extension UI reset after update - database will be reloaded fresh from citiList.txt, stats preserved');
     }
     
   } catch (error) {
@@ -4895,14 +5030,24 @@ async function checkPendingCroutonActions() {
               
               // Check if already flagged
               if (merchantStatuses[merchantKey] === 'flagged') {
-                showToast(`${result.pendingCroutonAction.merchantName} is already flagged`, 'warning');
+                // Removed toast notification
                 return;
               }
               
               // Mark the specific merchant as flagged
               merchantStatuses[merchantKey] = 'flagged';
-              showToast(`${result.pendingCroutonAction.merchantName} flagged`, 'warning');
+              // Removed toast notification
               console.log(`🚩 Flagged ${result.pendingCroutonAction.merchantName} via crouton`);
+              
+              // Store test date
+              const flagState = await chrome.storage.local.get(['extensionState']);
+              const flagExtensionState = flagState.extensionState || {};
+              if (!flagExtensionState.merchantTestDates) {
+                flagExtensionState.merchantTestDates = {};
+              }
+              flagExtensionState.merchantTestDates[merchantKey] = new Date().toISOString();
+              flagExtensionState.merchantStatuses = merchantStatuses; // Update statuses too
+              await chrome.storage.local.set({ extensionState: flagExtensionState });
               
               // Save state and wait for completion
               await saveExtensionState();
@@ -4912,6 +5057,12 @@ async function checkPendingCroutonActions() {
               setTimeout(() => {
                 forceValidationRefresh('crouton flag action - specific merchant');
               }, 50);
+              
+              // Refresh stats if stats tab is active
+              const statsTab = document.getElementById('statsTab');
+              if (statsTab && statsTab.style.display !== 'none') {
+                refreshStats();
+              }
             } else {
               // Fallback to current merchant
               flagCurrentMerchant();
@@ -4930,8 +5081,18 @@ async function checkPendingCroutonActions() {
               
               // Mark the specific merchant as successful
               merchantStatuses[merchantKey] = 'successful';
-              showToast(`${result.pendingCroutonAction.merchantName} marked as successful`, 'success');
+              // Removed toast notification
               console.log(`✅ Marked ${result.pendingCroutonAction.merchantName} as successful via crouton`);
+              
+              // Store test date
+              const successState = await chrome.storage.local.get(['extensionState']);
+              const successExtensionState = successState.extensionState || {};
+              if (!successExtensionState.merchantTestDates) {
+                successExtensionState.merchantTestDates = {};
+              }
+              successExtensionState.merchantTestDates[merchantKey] = new Date().toISOString();
+              successExtensionState.merchantStatuses = merchantStatuses; // Update statuses too
+              await chrome.storage.local.set({ extensionState: successExtensionState });
               
               // Save state and wait for completion
               await saveExtensionState();
@@ -4941,6 +5102,12 @@ async function checkPendingCroutonActions() {
               setTimeout(() => {
                 forceValidationRefresh('crouton success action - specific merchant');
               }, 50);
+              
+              // Refresh stats if stats tab is active
+              const statsTab = document.getElementById('statsTab');
+              if (statsTab && statsTab.style.display !== 'none') {
+                refreshStats();
+              }
             } else {
               // Fallback to current merchant
               markCurrentMerchantSuccessful();
@@ -4964,7 +5131,7 @@ async function checkPendingCroutonActions() {
             console.log('Unknown crouton action:', action);
         }
         
-        showToast(`Crouton action: ${action}`, 'info');
+        // Removed crouton action toast notification
       } else {
         console.log(`⏰ Crouton action too old (${Date.now() - timestamp}ms > 30000ms), ignoring`);
       }
@@ -5275,13 +5442,17 @@ async function pinExtensionToTab() {
           border-radius: 10px !important;
           box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3) !important;
           overflow: hidden !important;
-          resize: none !important;
+          resize: both !important;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
           isolation: isolate !important;
           min-width: 300px !important;
           min-height: 400px !important;
           max-width: 90vw !important;
           max-height: 90vh !important;
+          transform: none !important;
+          left: auto !important;
+          bottom: auto !important;
+          margin: 0 !important;
         }
         
         #citishop-persistent-overlay iframe {
@@ -5839,5 +6010,402 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDetachedWindowUI();
   }, 100);
 });
+
+// Tab switching functionality
+function setupTabs() {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.dataset.tab;
+      
+      // Remove active class from all tabs and contents
+      tabButtons.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => {
+        c.classList.remove('active');
+        c.style.display = 'none';
+      });
+      
+      // Add active class to clicked tab and corresponding content
+      btn.classList.add('active');
+      const targetContent = document.getElementById(`${targetTab}Tab`);
+      if (targetContent) {
+        targetContent.classList.add('active');
+        targetContent.style.display = 'block';
+      }
+      
+      // Refresh stats when switching to stats tab
+      if (targetTab === 'stats') {
+        refreshStats();
+      }
+    });
+  });
+}
+
+// Setup crouton injection button
+function setupCroutonInjection() {
+  const injectCroutonBtn = document.getElementById('injectCroutonBtn');
+  if (injectCroutonBtn) {
+    injectCroutonBtn.addEventListener('click', async () => {
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        
+        if (!tab || !tab.url || (!tab.url.startsWith('http://') && !tab.url.startsWith('https://'))) {
+          showToast('Please navigate to a valid webpage first', 'error');
+          return;
+        }
+        
+        // Inject the floating crouton script
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['floating-crouton.js']
+          });
+          
+          // Get current testing state
+          const state = await chrome.storage.local.get(['extensionState']);
+          const extensionState = state.extensionState || {};
+          const testingMerchants = extensionState.testingMerchants || [];
+          const currentMerchantIndex = extensionState.currentMerchantIndex || 0;
+          const merchantStatuses = extensionState.merchantStatuses || {};
+          
+          if (testingMerchants.length === 0) {
+            showToast('No merchants available. Please validate merchants first.', 'warning');
+            return;
+          }
+          
+          const currentMerchant = testingMerchants[currentMerchantIndex];
+          if (!currentMerchant) {
+            showToast('No current merchant selected', 'warning');
+            return;
+          }
+          
+          // Send message to show crouton
+          const croutonData = {
+            currentMerchant: currentMerchant,
+            currentIndex: currentMerchantIndex,
+            totalMerchants: testingMerchants.length,
+            testingMerchants: testingMerchants,
+            status: `Ready to test ${currentMerchant.name}`,
+            merchantStatus: merchantStatuses[currentMerchant.name.toLowerCase()] || 'pending'
+          };
+          
+          await chrome.tabs.sendMessage(tab.id, {
+            action: 'showFloatingCrouton',
+            data: croutonData
+          });
+          
+          // Store that crouton should be auto-injected for this URL
+          const url = new URL(tab.url);
+          const hostname = url.hostname.replace(/^www\./, '');
+          const autoInjectState = await chrome.storage.local.get(['autoInjectCrouton']);
+          const autoInject = autoInjectState.autoInjectCrouton || {};
+          autoInject[hostname] = {
+            enabled: true,
+            lastInjected: Date.now(),
+            croutonData: croutonData
+          };
+          await chrome.storage.local.set({ autoInjectCrouton: autoInject });
+          console.log(`✅ Stored auto-inject flag for ${hostname}`);
+          
+          showToast('Crouton injected successfully!', 'success');
+        } catch (error) {
+          console.error('Error injecting crouton:', error);
+          showToast('Failed to inject crouton: ' + error.message, 'error');
+        }
+      } catch (error) {
+        console.error('Error in crouton injection:', error);
+        showToast('Error: ' + error.message, 'error');
+      }
+    });
+  }
+}
+
+// Setup stats functionality
+function setupStats() {
+  const filterButtons = document.querySelectorAll('.filter-btn[data-filter]');
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      refreshStats(btn.dataset.filter);
+    });
+  });
+  
+  // Setup search functionality
+  const statsSearchInput = document.getElementById('statsSearchInput');
+  const statsSearchBtn = document.getElementById('statsSearchBtn');
+  
+  if (statsSearchInput) {
+    statsSearchInput.addEventListener('input', () => {
+      const activeFilter = document.querySelector('.filter-btn[data-filter].active');
+      const filter = activeFilter ? activeFilter.dataset.filter : 'all';
+      refreshStats(filter);
+    });
+    
+    statsSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const activeFilter = document.querySelector('.filter-btn[data-filter].active');
+        const filter = activeFilter ? activeFilter.dataset.filter : 'all';
+        refreshStats(filter);
+      }
+    });
+  }
+  
+  if (statsSearchBtn) {
+    statsSearchBtn.addEventListener('click', () => {
+      const activeFilter = document.querySelector('.filter-btn[data-filter].active');
+      const filter = activeFilter ? activeFilter.dataset.filter : 'all';
+      refreshStats(filter);
+    });
+  }
+  
+  // Setup clear all stats button
+  const clearAllStatsBtn = document.getElementById('clearAllStatsBtn');
+  if (clearAllStatsBtn) {
+    clearAllStatsBtn.addEventListener('click', async () => {
+      if (confirm('Are you sure you want to clear all stats?\n\nThis will remove:\n• All flagged/successful statuses\n• All test dates\n• All notes\n\nThis cannot be undone.')) {
+        try {
+          const state = await chrome.storage.local.get(['extensionState']);
+          const extensionState = state.extensionState || {};
+          
+          // Clear only stats-related data
+          extensionState.merchantStatuses = {};
+          extensionState.merchantTestDates = {};
+          extensionState.merchantNotes = {};
+          
+          // Update local variables
+          merchantStatuses = {};
+          
+          // Save to storage
+          await chrome.storage.local.set({ extensionState });
+          
+          // Clear search input
+          if (statsSearchInput) {
+            statsSearchInput.value = '';
+          }
+          
+          // Refresh stats display
+          refreshStats();
+          
+          showToast('All stats cleared!', 'success');
+          console.log('✅ All stats cleared');
+        } catch (error) {
+          console.error('❌ Error clearing stats:', error);
+          showToast('Failed to clear stats: ' + error.message, 'error');
+        }
+      }
+    });
+  }
+}
+
+// Refresh stats display
+async function refreshStats(filter = 'all') {
+  try {
+    const state = await chrome.storage.local.get(['extensionState']);
+    const extensionState = state.extensionState || {};
+    let merchantStatuses = extensionState.merchantStatuses || {};
+    const testingMerchants = extensionState.testingMerchants || [];
+    let merchantNotes = extensionState.merchantNotes || {}; // Store notes separately
+    let merchantTestDates = extensionState.merchantTestDates || {}; // Store test dates
+    
+    // Preserve current textarea values before recreating HTML
+    const statsList = document.getElementById('statsList');
+    if (!statsList) return;
+    
+    const currentNotes = {};
+    statsList.querySelectorAll('.merchant-note-input').forEach(textarea => {
+      const merchantKey = textarea.dataset.merchantKey;
+      if (merchantKey) {
+        currentNotes[merchantKey] = textarea.value;
+      }
+    });
+    
+    // Merge current notes with saved notes (current takes precedence if user is typing)
+    Object.keys(currentNotes).forEach(key => {
+      if (currentNotes[key].trim() !== '') {
+        merchantNotes[key] = currentNotes[key];
+      }
+    });
+    
+    // Count flagged and successful, and ensure dates exist for merchants with status
+    let flaggedCount = 0;
+    let successfulCount = 0;
+    const flaggedMerchants = [];
+    const successfulMerchants = [];
+    let datesUpdated = false;
+    
+    testingMerchants.forEach(merchant => {
+      const merchantKey = merchant.name.toLowerCase();
+      const status = merchantStatuses[merchantKey];
+      
+      // If merchant has a status but no date, add a date now (for merchants marked before date tracking)
+      if (status && !merchantTestDates[merchantKey]) {
+        merchantTestDates[merchantKey] = new Date().toISOString();
+        datesUpdated = true;
+      }
+      
+      if (status === 'flagged') {
+        flaggedCount++;
+        flaggedMerchants.push(merchant);
+      } else if (status === 'successful') {
+        successfulCount++;
+        successfulMerchants.push(merchant);
+      }
+    });
+    
+    // Save updated dates if any were added
+    if (datesUpdated) {
+      extensionState.merchantTestDates = merchantTestDates;
+      await chrome.storage.local.set({ extensionState });
+    }
+    
+    // Update summary
+    const statsTotalFlagged = document.getElementById('statsTotalFlagged');
+    const statsTotalSuccessful = document.getElementById('statsTotalSuccessful');
+    if (statsTotalFlagged) statsTotalFlagged.textContent = flaggedCount;
+    if (statsTotalSuccessful) statsTotalSuccessful.textContent = successfulCount;
+    
+    // Filter merchants based on selected filter
+    let merchantsToShow = [];
+    if (filter === 'flagged') {
+      merchantsToShow = flaggedMerchants;
+    } else if (filter === 'successful') {
+      merchantsToShow = successfulMerchants;
+    } else {
+      merchantsToShow = [...flaggedMerchants, ...successfulMerchants];
+    }
+    
+    if (merchantsToShow.length === 0) {
+      statsList.innerHTML = '<div class="empty-state">No merchants match the selected filter.</div>';
+      return;
+    }
+    
+    // Format date helper
+    const formatDate = (dateString) => {
+      if (!dateString) {
+        return 'Date not recorded';
+      }
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          return 'Date not recorded';
+        }
+        return date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch (e) {
+        return 'Date not recorded';
+      }
+    };
+    
+    // Get search filter if any
+    const statsSearchInput = document.getElementById('statsSearchInput');
+    const searchTerm = statsSearchInput ? statsSearchInput.value.toLowerCase().trim() : '';
+    
+    // Filter by search term if provided
+    let filteredMerchants = merchantsToShow;
+    if (searchTerm) {
+      filteredMerchants = merchantsToShow.filter(merchant => {
+        const merchantName = merchant.name.toLowerCase();
+        const merchantUrl = (merchant.url || '').toLowerCase();
+        return merchantName.includes(searchTerm) || merchantUrl.includes(searchTerm);
+      });
+    }
+    
+    if (filteredMerchants.length === 0) {
+      statsList.innerHTML = '<div class="empty-state">No merchants match the search criteria.</div>';
+      return;
+    }
+    
+    statsList.innerHTML = filteredMerchants.map(merchant => {
+      const merchantKey = merchant.name.toLowerCase();
+      const status = merchantStatuses[merchantKey];
+      const note = merchantNotes[merchantKey] || '';
+      const testDate = merchantTestDates[merchantKey];
+      const statusClass = status === 'flagged' ? 'flagged' : 'successful';
+      
+      return `
+        <div class="stat-merchant-card ${statusClass}">
+          <div class="stat-merchant-header">
+            <div class="stat-merchant-name">${escapeHtml(merchant.name)}</div>
+            <div class="stat-merchant-status ${statusClass}">${status === 'flagged' ? '🚩 Flagged' : '✅ Successful'}</div>
+          </div>
+          <div class="stat-merchant-url">${escapeHtml(merchant.url || 'N/A')}</div>
+          <div class="stat-merchant-date">Tested: ${formatDate(testDate)}</div>
+          <div class="stat-merchant-notes">
+            <label>Notes:</label>
+            <textarea 
+              class="merchant-note-input" 
+              data-merchant-key="${merchantKey}"
+              placeholder="Enter notes about this merchant..."
+            >${escapeHtml(note)}</textarea>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    // Add event listeners for note inputs with debounced saving
+    statsList.querySelectorAll('.merchant-note-input').forEach(textarea => {
+      let saveTimeout = null;
+      
+      const saveNote = async () => {
+        const merchantKey = textarea.dataset.merchantKey;
+        const note = textarea.value.trim();
+        
+        // Save note to storage
+        const currentState = await chrome.storage.local.get(['extensionState']);
+        const currentExtensionState = currentState.extensionState || {};
+        if (!currentExtensionState.merchantNotes) {
+          currentExtensionState.merchantNotes = {};
+        }
+        
+        if (note) {
+          currentExtensionState.merchantNotes[merchantKey] = note;
+        } else {
+          delete currentExtensionState.merchantNotes[merchantKey];
+        }
+        
+        await chrome.storage.local.set({ extensionState: currentExtensionState });
+        console.log(`Saved note for ${merchantKey}:`, note);
+      };
+      
+      // Save on blur (when user clicks away)
+      textarea.addEventListener('blur', saveNote);
+      
+      // Save on input with debounce (saves 1 second after user stops typing)
+      textarea.addEventListener('input', () => {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(saveNote, 1000);
+      });
+      
+      // Save immediately when user presses Enter (but allow newline with Shift+Enter)
+      textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          clearTimeout(saveTimeout);
+          saveNote();
+          textarea.blur(); // Remove focus after saving
+        }
+      });
+    });
+    
+  } catch (error) {
+    console.error('Error refreshing stats:', error);
+  }
+}
+
+// Utility function for HTML escaping
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
 
 console.log('CitiShop Browser Extension popup loaded successfully!');

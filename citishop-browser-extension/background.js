@@ -157,13 +157,21 @@ function normalizeMerchantName(name) {
 // Handle extension updates
 async function handleExtensionUpdate() {
   try {
-    console.log('🔄 Extension updated - resetting all data to clean state');
+    console.log('🔄 Extension updated - preserving stats data');
+    
+    // Preserve stats data (merchantStatuses, merchantTestDates, merchantNotes)
+    const existingState = await chrome.storage.local.get(['extensionState']);
+    const preservedStats = {
+      merchantStatuses: existingState.extensionState?.merchantStatuses || {},
+      merchantTestDates: existingState.extensionState?.merchantTestDates || {},
+      merchantNotes: existingState.extensionState?.merchantNotes || {}
+    };
     
     // Clear all stored data for a fresh start
     await chrome.storage.local.clear();
-    console.log('🧹 Cleared all stored data');
+    console.log('🧹 Cleared all stored data (except stats)');
     
-    // Reinitialize with default settings
+    // Reinitialize with default settings and restore stats
     await chrome.storage.local.set({
       sessionStats: {
         totalValidated: 0,
@@ -183,13 +191,17 @@ async function handleExtensionUpdate() {
         croutonPosition: 'middle-left'
       },
       merchantDatabase: [], // Will be populated by popup.js
-      merchantStatuses: {}, // Will be populated as merchants are tested
+      extensionState: {
+        merchantStatuses: preservedStats.merchantStatuses,
+        merchantTestDates: preservedStats.merchantTestDates,
+        merchantNotes: preservedStats.merchantNotes
+      },
       validationFilter: null, // Reset filter state
       croutonCollapsed: false, // Reset crouton state
       lastValidationResults: null // Reset validation results
     });
     
-    console.log('✅ Extension reset to clean state after update');
+    console.log('✅ Extension reset to clean state after update (stats preserved)');
     
   } catch (error) {
     console.error('❌ Failed to reset extension after update:', error);
@@ -816,6 +828,73 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     console.log('🔄 Tab completed loading, checking for testing...');
     
     try {
+      // First check if crouton should be auto-injected for this URL
+      const url = new URL(tab.url);
+      const hostname = url.hostname.replace(/^www\./, '');
+      const autoInjectState = await chrome.storage.local.get(['autoInjectCrouton']);
+      const autoInject = autoInjectState.autoInjectCrouton || {};
+      
+      if (autoInject[hostname] && autoInject[hostname].enabled) {
+        console.log(`🔄 Auto-inject crouton enabled for ${hostname}`);
+        
+        // Wait a moment for page to be ready
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        try {
+          // Inject the floating crouton script
+          await chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            files: ['floating-crouton.js']
+          });
+          
+          // Wait for script to initialize
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Always get fresh data from extension state to ensure latest merchant statuses
+          const result = await chrome.storage.local.get(['extensionState']);
+          const state = result.extensionState;
+          
+          let croutonData = null;
+          
+          if (state && state.testingMerchants && state.testingMerchants.length > 0) {
+            // Use stored croutonData as base, but update with fresh state
+            const storedData = autoInject[hostname].croutonData;
+            const currentMerchantIndex = state.currentMerchantIndex || (storedData?.currentIndex || 0);
+            const currentMerchant = state.testingMerchants[currentMerchantIndex] || storedData?.currentMerchant;
+            
+            if (currentMerchant) {
+              const merchantKey = currentMerchant.name.toLowerCase();
+              croutonData = {
+                currentMerchant: currentMerchant,
+                currentIndex: currentMerchantIndex,
+                totalMerchants: state.testingMerchants.length,
+                testingMerchants: state.testingMerchants,
+                status: `Ready to test ${currentMerchant.name}`,
+                merchantStatus: (state.merchantStatuses || {})[merchantKey] || 'pending'
+              };
+              
+              // Update stored croutonData with fresh data
+              autoInject[hostname].croutonData = croutonData;
+              await chrome.storage.local.set({ autoInjectCrouton: autoInject });
+            }
+          } else if (autoInject[hostname].croutonData) {
+            // Fallback to stored data if no extension state
+            croutonData = autoInject[hostname].croutonData;
+          }
+          
+          if (croutonData) {
+            // Send message to show crouton
+            await chrome.tabs.sendMessage(tabId, {
+              action: 'showFloatingCrouton',
+              data: croutonData
+            });
+            console.log(`✅ Auto-injected crouton on ${hostname} after page refresh`);
+          }
+        } catch (error) {
+          console.error('Error auto-injecting crouton:', error);
+        }
+      }
+      
       // Check if testing is active
       const result = await chrome.storage.local.get(['extensionState']);
       const state = result.extensionState;

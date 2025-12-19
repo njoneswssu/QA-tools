@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Betting Model Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 AI Betting Model Dashboard</h1>
+            <div class="header-controls">
+                <div class="filters">
+                    <select id="sportFilter" class="filter-select">
+                        <option value="NBA" selected>NBA</option>
+                        <option value="NFL">NFL</option>
+                        <option value="NCAAM">NCAA Men's Basketball</option>
+                        <option value="NCAAF">NCAA Football</option>
+                        <option value="">All Sports</option>
+                    </select>
+                    <div class="player-search">
+                        <input type="text" id="playerSearchInput" placeholder="Search player..." class="search-input">
+                        <button id="playerSearchBtn" class="btn btn-secondary">🔍 Search</button>
+                    </div>
+                </div>
+                <div class="refresh-section">
+                    <div class="sport-selection">
+                        <label>Scrape Sports:</label>
+                        <div class="sport-checkboxes">
+                            <label><input type="checkbox" value="NBA" checked> NBA</label>
+                            <label><input type="checkbox" value="NFL"> NFL</label>
+                            <label><input type="checkbox" value="NCAAM"> NCAAM</label>
+                            <label><input type="checkbox" value="NCAAF"> NCAAF</label>
+                        </div>
+                    </div>
+                    <button id="refreshBtn" class="btn btn-primary">🔄 Refresh Data</button>
+                </div>
+                <div class="stats" id="stats">
+                    <span id="gameCount">0</span> Games | 
+                    <span id="lineCount">0</span> Lines | 
+                    <span id="projectionCount">0</span> Projections
+                </div>
+            </div>
+        </header>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading data...</p>
+        </div>
+
+        <div class="games-container" id="gamesContainer">
+            <!-- Games will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Player Modal -->
+    <div class="modal" id="playerModal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2 id="modalPlayerName">Player Name</h2>
+            <div id="modalContent">
+                <!-- Player details will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

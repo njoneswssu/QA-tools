@@ -82,7 +82,7 @@ function displayLogs(logs) {
   const tbody = document.getElementById('logsTableBody');
   
   if (!logs || logs.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No logs found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No logs found</td></tr>';
     return;
   }
   
@@ -99,6 +99,11 @@ function displayLogs(logs) {
     const pageUrl = log.pageUrl || log.tabUrl || 'N/A';
     const shortPageUrl = pageUrl.length > 40 ? pageUrl.substring(0, 40) + '...' : pageUrl;
     
+    // Extension info
+    const extensionDisplay = log.extensionName 
+      ? `${log.extensionName}`
+      : (log.extensionId ? `Extension (${log.extensionId.substring(0, 8)}...)` : 'Browser');
+    
     return `
       <tr data-log-index="${index}" title="Click to view details">
         <td>${time}</td>
@@ -106,6 +111,7 @@ function displayLogs(logs) {
         <td><span class="status ${statusClass}">${statusText}</span></td>
         <td class="url"><a href="${log.url}" target="_blank" title="${log.url}" onclick="event.stopPropagation()">${log.url}</a></td>
         <td title="${params}">${params.substring(0, 50)}${params.length > 50 ? '...' : ''}</td>
+        <td title="${log.extensionId || 'N/A'}">${extensionDisplay}</td>
         <td title="${pageUrl}">${shortPageUrl}</td>
       </tr>
     `;
@@ -197,6 +203,18 @@ function showLogDetails(log) {
     <div class="detail-item">
       <div class="detail-label">Source Page Title</div>
       <div class="detail-value">${log.pageTitle || 'N/A'}</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Initiator</div>
+      <div class="detail-value">${log.initiator || 'N/A'}</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Extension ID</div>
+      <div class="detail-value">${log.extensionId || 'N/A (Browser-initiated)'}</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Extension Name</div>
+      <div class="detail-value">${log.extensionName || 'N/A (Browser-initiated)'}</div>
     </div>
     <div class="detail-item">
       <div class="detail-label">Completed</div>
