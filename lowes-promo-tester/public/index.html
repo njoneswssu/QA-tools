@@ -64,20 +64,33 @@
             </div>
 
             <div class="products-to-test" id="productsToTest" style="display: none;">
-                <h2>Products Ready for Testing</h2>
-                <p class="instruction-text">Click on any product link below to start automated testing. The browser will open, test the product, and close automatically.</p>
-                <div class="product-links-list" id="productLinksList">
-                    <!-- Product links will be inserted here -->
+                <div class="products-to-test-header">
+                    <h2>Products Ready for Testing</h2>
+                    <button id="collapseProductsBtn" class="collapse-btn" title="Collapse/Expand">
+                        <span id="collapseProductsIcon">▼</span>
+                    </button>
+                </div>
+                <div class="products-to-test-content" id="productsToTestContent">
+                    <p class="instruction-text">Click on any product link below to start automated testing. The browser will open, test the product, and close automatically.</p>
+                    <div class="product-links-list" id="productLinksList">
+                        <!-- Product links will be inserted here -->
+                    </div>
                 </div>
             </div>
 
             <div class="results-container" id="resultsContainer">
                 <div class="results-header">
                     <h2>Test Results</h2>
-                    <div class="date-filter-container">
-                        <label for="dateFilter">Filter by Date:</label>
-                        <input type="date" id="dateFilter" class="date-filter-input">
-                        <button id="clearDateFilter" class="btn btn-secondary" style="display: none;">Clear Filter</button>
+                    <div class="results-filters">
+                        <div class="search-container">
+                            <input type="text" id="resultsSearch" class="search-input" placeholder="Search results...">
+                            <button id="clearSearchBtn" class="btn btn-secondary" style="display: none;">Clear</button>
+                        </div>
+                        <div class="date-filter-container">
+                            <label for="dateFilter">Filter by Date:</label>
+                            <input type="date" id="dateFilter" class="date-filter-input">
+                            <button id="clearDateFilter" class="btn btn-secondary" style="display: none;">Clear Filter</button>
+                        </div>
                     </div>
                 </div>
                 <div class="results-grid" id="resultsGrid">

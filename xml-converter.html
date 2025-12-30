@@ -272,6 +272,27 @@
             font-size: 1.1rem;
         }
 
+        .wsco-section {
+            margin-top: 30px;
+        }
+
+        .wsco-container {
+            width: 100%;
+            height: 70vh;
+            min-height: 600px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: #f8f9fa;
+        }
+
+        .wsco-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         @media (max-width: 768px) {
             .converter-section {
                 grid-template-columns: 1fr;
@@ -308,10 +329,11 @@
                 <div class="mode-buttons">
                     <button class="mode-btn" id="orderModeBtn">Order Numbers</button>
                     <button class="mode-btn active" id="xmlModeBtn">XML Input</button>
+                    <button class="mode-btn" id="wscoModeBtn">WSCO Search</button>
                 </div>
             </div>
             
-            <div class="converter-section">
+            <div class="converter-section" id="converterSection">
                 <div class="input-section">
                     <div class="section-title" id="inputTitle">Input XML</div>
                     <textarea id="inputArea" placeholder="Paste your XML code here..."></textarea>
@@ -331,7 +353,14 @@
                 </div>
             </div>
             
-            <div class="button-container">
+            <div class="wsco-section" id="wscoSection" style="display: none;">
+                <div class="section-title">WSCO Search</div>
+                <div class="wsco-container">
+                    <iframe id="wscoIframe" src="http://transfer.levsuite.com/search_wsco.php" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="button-container" id="buttonContainer">
                 <button class="btn btn-convert" id="convertBtn">
                     🔄 Convert to ORDER STATUS UPDATE ACCEPT
                 </button>
@@ -347,6 +376,7 @@
                 <ul>
                     <li><strong>Order Numbers Mode:</strong> Paste order numbers (one per line) to generate complete XML</li>
                     <li><strong>XML Input Mode:</strong> Paste existing XML to convert between formats</li>
+                    <li><strong>WSCO Search Mode:</strong> Search for WSCO numbers using the embedded search tool</li>
                     <li><strong>Blue Button:</strong> Converts to ORDER STATUS UPDATE ACCEPT format</li>
                     <li><strong>Red Button:</strong> Converts to ORDER INPUT SHIPMENT format</li>
                     <li>Automatically handles &lt;ShipmentDate&gt; and tracking info</li>
@@ -363,13 +393,17 @@
         const inputTitle = document.getElementById('inputTitle');
         const orderModeBtn = document.getElementById('orderModeBtn');
         const xmlModeBtn = document.getElementById('xmlModeBtn');
+        const wscoModeBtn = document.getElementById('wscoModeBtn');
         const convertBtn = document.getElementById('convertBtn');
         const reverseConvertBtn = document.getElementById('reverseConvertBtn');
         const copyBtn = document.getElementById('copyBtn');
         const downloadBtn = document.getElementById('downloadBtn');
         const statusMessage = document.getElementById('statusMessage');
+        const converterSection = document.getElementById('converterSection');
+        const wscoSection = document.getElementById('wscoSection');
+        const buttonContainer = document.getElementById('buttonContainer');
 
-        let currentMode = 'xml'; // 'order' or 'xml' - default to XML mode
+        let currentMode = 'xml'; // 'order', 'xml', or 'wsco' - default to XML mode
 
         function showStatus(message, isError = false) {
             statusMessage.textContent = message;
@@ -443,16 +477,30 @@
         function switchMode(mode) {
             currentMode = mode;
             
+            // Reset all buttons
+            orderModeBtn.classList.remove('active');
+            xmlModeBtn.classList.remove('active');
+            wscoModeBtn.classList.remove('active');
+            
             if (mode === 'order') {
                 orderModeBtn.classList.add('active');
-                xmlModeBtn.classList.remove('active');
                 inputTitle.textContent = 'Input Order Numbers';
                 inputArea.placeholder = 'Paste order numbers here (one per line)...\nExample:\n02438130\n02438109\n02440750';
+                converterSection.style.display = 'grid';
+                wscoSection.style.display = 'none';
+                buttonContainer.style.display = 'flex';
+            } else if (mode === 'wsco') {
+                wscoModeBtn.classList.add('active');
+                converterSection.style.display = 'none';
+                wscoSection.style.display = 'block';
+                buttonContainer.style.display = 'none';
             } else {
                 xmlModeBtn.classList.add('active');
-                orderModeBtn.classList.remove('active');
                 inputTitle.textContent = 'Input XML';
                 inputArea.placeholder = 'Paste your XML code here...';
+                converterSection.style.display = 'grid';
+                wscoSection.style.display = 'none';
+                buttonContainer.style.display = 'flex';
             }
             
             inputArea.value = '';
@@ -613,12 +661,25 @@
                 return;
             }
 
-            const blob = new Blob([outputArea.value], { type: 'application/xml' });
+            // Generate timestamp for filename
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+            
+            // Wrap XML with ComergentData tags
+            const wrappedXML = `<ComergentData>\n${outputArea.value}\n</ComergentData>`;
+
+            const blob = new Blob([wrappedXML], { type: 'application/xml' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             
             a.href = url;
-            a.download = 'converted_order_status.xml';
+            a.download = `converted_order_status_${timestamp}.xml`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -728,6 +789,7 @@
         // Event listeners
         orderModeBtn.addEventListener('click', () => switchMode('order'));
         xmlModeBtn.addEventListener('click', () => switchMode('xml'));
+        wscoModeBtn.addEventListener('click', () => switchMode('wsco'));
         convertBtn.addEventListener('click', convertXML);
         reverseConvertBtn.addEventListener('click', reverseConvertXML);
         copyBtn.addEventListener('click', copyToClipboard);

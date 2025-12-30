@@ -19,6 +19,11 @@ const resultsGrid = document.getElementById('resultsGrid');
 const selectedCount = document.getElementById('selectedCount');
 const dateFilter = document.getElementById('dateFilter');
 const clearDateFilter = document.getElementById('clearDateFilter');
+const collapseProductsBtn = document.getElementById('collapseProductsBtn');
+const collapseProductsIcon = document.getElementById('collapseProductsIcon');
+const productsToTestContent = document.getElementById('productsToTestContent');
+const resultsSearch = document.getElementById('resultsSearch');
+const clearSearchBtn = document.getElementById('clearSearchBtn');
 const stats = {
     totalTests: document.getElementById('totalTests'),
     totalProducts: document.getElementById('totalProducts'),
@@ -30,6 +35,9 @@ const screenshotModal = document.getElementById('screenshotModal');
 const closeModal = document.getElementById('closeModal');
 const modalImage = document.getElementById('modalImage');
 const modalTitle = document.getElementById('modalTitle');
+
+// Test results data
+let allTestResults = []; // Store all results for filtering
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -106,6 +114,45 @@ function setupEventListeners() {
         clearDateFilter.style.display = 'none';
         loadTestResults();
     });
+    
+    // Collapse products section
+    if (collapseProductsBtn && productsToTestContent) {
+        let isCollapsed = false;
+        collapseProductsBtn.addEventListener('click', () => {
+            isCollapsed = !isCollapsed;
+            productsToTestContent.style.display = isCollapsed ? 'none' : 'block';
+            collapseProductsIcon.textContent = isCollapsed ? '▶' : '▼';
+            collapseProductsBtn.title = isCollapsed ? 'Expand' : 'Collapse';
+        });
+    }
+    
+    // Search results
+    if (resultsSearch) {
+        resultsSearch.addEventListener('input', (e) => {
+            if (e.target.value.trim()) {
+                if (clearSearchBtn) clearSearchBtn.style.display = 'inline-block';
+                filterResults();
+            } else {
+                if (clearSearchBtn) clearSearchBtn.style.display = 'none';
+                filterResults();
+            }
+        });
+        
+        resultsSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterResults();
+            }
+        });
+    }
+    
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+            if (resultsSearch) resultsSearch.value = '';
+            clearSearchBtn.style.display = 'none';
+            filterResults();
+        });
+    }
 
     // Close modal
     closeModal.addEventListener('click', () => {
@@ -457,8 +504,10 @@ async function loadTestResults() {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        testResults = await response.json();
-        renderTestResults();
+        const fetchedResults = await response.json();
+        testResults = fetchedResults;
+        allTestResults = [...fetchedResults]; // Keep a copy of all results for filtering
+        filterResults(); // Apply search filter if active
     } catch (error) {
         console.error('Error loading test results:', error);
         // Only show error if we don't have any results yet (to avoid spam)
@@ -468,13 +517,45 @@ async function loadTestResults() {
     }
 }
 
+// Filter and render test results
+function filterResults() {
+    if (!allTestResults || allTestResults.length === 0) {
+        renderTestResults([]);
+        return;
+    }
+    
+    let filtered = [...allTestResults];
+    
+    // Apply search filter
+    if (resultsSearch && resultsSearch.value.trim()) {
+        const searchTerm = resultsSearch.value.toLowerCase().trim();
+        filtered = filtered.filter(result => {
+            const productName = (result.product_name || '').toLowerCase();
+            const model = (result.model || '').toLowerCase();
+            const color = (result.color || '').toLowerCase();
+            const testDate = formatDate(result.test_date).toLowerCase();
+            
+            return productName.includes(searchTerm) ||
+                   model.includes(searchTerm) ||
+                   color.includes(searchTerm) ||
+                   testDate.includes(searchTerm);
+        });
+    }
+    
+    testResults = filtered;
+    renderTestResults(testResults);
+}
+
 // Render test results
-function renderTestResults() {
-    if (testResults.length === 0) {
+function renderTestResults(resultsToRender = null) {
+    const results = resultsToRender !== null ? resultsToRender : testResults;
+    if (results.length === 0) {
         // Check if a date filter is active
         const hasDateFilter = dateFilter && dateFilter.value;
         let message = 'No test results yet';
         let subMessage = 'Select products and click "Start Testing" to begin';
+        
+        const hasSearchFilter = resultsSearch && resultsSearch.value.trim();
         
         if (hasDateFilter) {
             // Format the date for display
@@ -486,13 +567,17 @@ function renderTestResults() {
             });
             message = 'No test results found';
             subMessage = `No test results found for ${formattedDate}. Try selecting a different date or clear the filter.`;
+        } else if (hasSearchFilter) {
+            message = 'No test results found';
+            subMessage = `No results match "${resultsSearch.value}". Try a different search term.`;
         }
         
         resultsGrid.innerHTML = `
             <div class="empty-state" style="grid-column: 1 / -1;">
                 <h3>${message}</h3>
                 <p>${subMessage}</p>
-                ${hasDateFilter ? `<button class="btn btn-secondary" onclick="clearDateFilter.click()" style="margin-top: 15px;">Clear Date Filter</button>` : ''}
+                ${hasDateFilter ? `<button class="btn btn-secondary" onclick="clearDateFilter.click()" style="margin-top: 15px; margin-right: 10px;">Clear Date Filter</button>` : ''}
+                ${hasSearchFilter ? `<button class="btn btn-secondary" onclick="clearSearchBtn.click()" style="margin-top: 15px;">Clear Search</button>` : ''}
             </div>
         `;
         return;
