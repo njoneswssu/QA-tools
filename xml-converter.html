@@ -1240,8 +1240,15 @@
                 // Store raw XML for editing
                 currentWSCOXmlRaw = xmlString;
                 
+                // Debug: log what we're trying to parse
+                console.log('Attempting to parse XML:', xmlString.substring(0, 200));
+                
                 const rootNode = parseXMLToTree(xmlString);
                 const treeHtml = renderXMLNode(rootNode);
+                
+                if (!treeHtml || treeHtml.trim() === '') {
+                    throw new Error('Empty tree generated from XML');
+                }
                 
                 xmlTreeContainer.innerHTML = `<div class="xml-tree">${treeHtml}</div>`;
                 // Always show convert button
@@ -1253,8 +1260,9 @@
                     xmlTreeOverlay.style.display = 'flex';
                 }
             } catch (error) {
+                console.error('Error displaying XML tree:', error);
                 // Show raw XML with convert button
-                xmlTreeContainer.innerHTML = `<div class="xml-placeholder"><pre style="text-align: left; white-space: pre-wrap; word-wrap: break-word; color: #333;">${escapeHtml(xmlString)}</pre></div>`;
+                xmlTreeContainer.innerHTML = `<div class="xml-placeholder"><p style="color: #dc3545;">Error: ${escapeHtml(error.message)}</p><pre style="text-align: left; white-space: pre-wrap; word-wrap: break-word; color: #333; max-height: 400px; overflow-y: auto;">${escapeHtml(xmlString)}</pre></div>`;
                 // Always show convert button
                 if (convertToTreeBtn) {
                     convertToTreeBtn.style.display = 'block';
@@ -1269,8 +1277,32 @@
         }
 
         function convertRawXMLToTree() {
+            // Try to get XML from the viewer if currentWSCOXmlRaw is not set
             if (!currentWSCOXmlRaw) {
-                showStatus('No XML to convert', true);
+                // Try to extract from the displayed content
+                const preElement = xmlTreeContainer.querySelector('pre');
+                if (preElement) {
+                    currentWSCOXmlRaw = preElement.textContent || preElement.innerText || '';
+                }
+                
+                // If still no XML, try to get from iframe
+                if (!currentWSCOXmlRaw && wscoIframe) {
+                    try {
+                        const iframeDoc = wscoIframe.contentDocument || wscoIframe.contentWindow.document;
+                        if (iframeDoc && iframeDoc.body) {
+                            const bodyText = iframeDoc.body.textContent || iframeDoc.body.innerText || '';
+                            if (bodyText.trim()) {
+                                currentWSCOXmlRaw = bodyText.trim();
+                            }
+                        }
+                    } catch (e) {
+                        // CORS error
+                    }
+                }
+            }
+            
+            if (!currentWSCOXmlRaw || !currentWSCOXmlRaw.trim()) {
+                showStatus('No XML to convert. Please search for a WSCO number first.', true);
                 return;
             }
             
@@ -1398,41 +1430,55 @@
                 try {
                     // Check if documentElement is XML (not HTML)
                     const docElement = iframeDoc.documentElement;
-                    if (docElement && (docElement.tagName === 'ComergentData' || docElement.tagName === 'Comergent' || 
-                        docElement.nodeName.toLowerCase() === 'comergentdata' || docElement.nodeName.toLowerCase() === 'comergent')) {
-                        // This is an XML document - serialize it
-                        const serializer = new XMLSerializer();
-                        xmlContent = serializer.serializeToString(iframeDoc);
-                        // Remove the XML declaration if present for cleaner display
-                        xmlContent = xmlContent.replace(/<\?xml[^>]*\?>\s*/i, '');
+                    if (docElement && docElement.nodeType === Node.ELEMENT_NODE) {
+                        // Check if it's an XML document (not HTML)
+                        if (docElement.tagName !== 'HTML' && docElement.tagName !== 'html') {
+                            // This is likely an XML document - serialize it
+                            const serializer = new XMLSerializer();
+                            xmlContent = serializer.serializeToString(iframeDoc);
+                            // Remove the XML declaration if present for cleaner display
+                            xmlContent = xmlContent.replace(/<\?xml[^>]*\?>\s*/i, '');
+                        }
                     }
                 } catch (e) {
                     // Not an XML document, continue with other methods
                 }
                 
-                // If Method 1 didn't work, try getting from body text
+                // If Method 1 didn't work, try getting from body HTML (preserves structure)
                 if (!xmlContent) {
-                    const bodyText = iframeDoc.body ? (iframeDoc.body.textContent || iframeDoc.body.innerText || '') : '';
                     const bodyHtml = iframeDoc.body ? (iframeDoc.body.innerHTML || '') : '';
+                    const bodyText = iframeDoc.body ? (iframeDoc.body.textContent || iframeDoc.body.innerText || '') : '';
                     
-                    // Check if this is a browser XML view (starts with <?xml or <ComergentData>)
-                    if (bodyText.trim().startsWith('<?xml') || bodyText.trim().startsWith('<ComergentData>') || bodyText.trim().startsWith('<Comergent>')) {
-                        // Extract the full XML document
-                        const xmlStart = bodyText.indexOf('<');
-                        // Find the end - look for </ComergentData> or </Comergent>
-                        let xmlEnd = bodyText.lastIndexOf('</ComergentData>');
-                        if (xmlEnd === -1) {
-                            xmlEnd = bodyText.lastIndexOf('</Comergent>');
-                        }
-                        if (xmlEnd > xmlStart) {
-                            // Include the closing tag
-                            const closingTag = bodyText.lastIndexOf('</ComergentData>') > -1 ? '</ComergentData>' : '</Comergent>';
-                            xmlContent = bodyText.substring(xmlStart, xmlEnd + closingTag.length);
-                        } else {
-                            // Fallback: get everything from first < to last >
-                            const lastBracket = bodyText.lastIndexOf('>');
-                            if (lastBracket > xmlStart) {
-                                xmlContent = bodyText.substring(xmlStart, lastBracket + 1);
+                    // Check if body HTML contains XML structure (not just text)
+                    if (bodyHtml && bodyHtml.includes('<') && bodyHtml.includes('</')) {
+                        // Try to extract XML from HTML - look for XML patterns
+                        const xmlMatch = bodyHtml.match(/<[?]?xml[\s\S]*?<\/ComergentData>/i) || 
+                                       bodyHtml.match(/<ComergentData[\s\S]*?<\/ComergentData>/i) ||
+                                       bodyHtml.match(/<[?]?xml[\s\S]*?<\/Comergent>/i) ||
+                                       bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i);
+                        if (xmlMatch) {
+                            xmlContent = xmlMatch[0];
+                            // Decode HTML entities if needed
+                            if (xmlContent.includes('&lt;') || xmlContent.includes('&gt;')) {
+                                const tempDiv = document.createElement('div');
+                                tempDiv.innerHTML = xmlContent;
+                                xmlContent = tempDiv.textContent || tempDiv.innerText || xmlContent;
+                            }
+                        } else if (bodyText.trim().startsWith('<?xml') || bodyText.trim().startsWith('<ComergentData>') || bodyText.trim().startsWith('<Comergent>')) {
+                            // Fallback: extract from text if HTML extraction didn't work
+                            const xmlStart = bodyText.indexOf('<');
+                            let xmlEnd = bodyText.lastIndexOf('</ComergentData>');
+                            if (xmlEnd === -1) {
+                                xmlEnd = bodyText.lastIndexOf('</Comergent>');
+                            }
+                            if (xmlEnd > xmlStart) {
+                                const closingTag = bodyText.lastIndexOf('</ComergentData>') > -1 ? '</ComergentData>' : '</Comergent>';
+                                xmlContent = bodyText.substring(xmlStart, xmlEnd + closingTag.length);
+                            } else {
+                                const lastBracket = bodyText.lastIndexOf('>');
+                                if (lastBracket > xmlStart) {
+                                    xmlContent = bodyText.substring(xmlStart, lastBracket + 1);
+                                }
                             }
                         }
                     }
@@ -1514,9 +1560,30 @@
                     displayXMLTree(xmlContent);
                 } else {
                     // No XML found, but check if there's raw text that looks like XML
+                    // When browser displays XML, textContent might just be text values
+                    // Try to reconstruct XML from the DOM structure
+                    try {
+                        const docElement = iframeDoc.documentElement;
+                        if (docElement && docElement.nodeType === Node.ELEMENT_NODE && docElement.tagName !== 'HTML') {
+                            // This might be XML - try to serialize it
+                            const serializer = new XMLSerializer();
+                            const serialized = serializer.serializeToString(iframeDoc);
+                            if (serialized && serialized.includes('<') && serialized.includes('>')) {
+                                xmlContent = serialized.replace(/<\?xml[^>]*\?>\s*/i, '');
+                                if (xmlContent.trim()) {
+                                    displayXMLTree(xmlContent);
+                                    return;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // Not XML document
+                    }
+                    
+                    // Last resort: show raw text with convert button
                     const bodyText = iframeDoc.body ? (iframeDoc.body.textContent || iframeDoc.body.innerText || '') : '';
-                    if (bodyText && bodyText.trim().length > 0 && bodyText.includes('<') && bodyText.includes('>')) {
-                        // Store as raw and show convert button
+                    if (bodyText && bodyText.trim().length > 0) {
+                        // Store as raw - even if it doesn't look like XML, user might want to convert it
                         currentWSCOXmlRaw = bodyText.trim();
                         xmlTreeContainer.innerHTML = `<div class="xml-placeholder"><pre style="text-align: left; white-space: pre-wrap; word-wrap: break-word; color: #333; max-height: 500px; overflow-y: auto;">${escapeHtml(bodyText.trim())}</pre></div>`;
                         if (convertToTreeBtn) {
