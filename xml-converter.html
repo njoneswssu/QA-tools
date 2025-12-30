@@ -286,12 +286,62 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             background: #f8f9fa;
             position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wsco-navigation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: white;
+            border-bottom: 2px solid #e1e5e9;
+            flex-shrink: 0;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            background: white;
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #f8f9fa;
+            border-color: #4facfe;
+            color: #4facfe;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .wsco-url-display {
+            flex: 1;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #666;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .wsco-container iframe {
+            flex: 1;
             width: 100%;
-            height: 100%;
             border: none;
+            min-height: 0;
         }
 
         .xml-tree-overlay {
@@ -457,6 +507,18 @@
             <div class="wsco-section" id="wscoSection" style="display: none;">
                 <div class="section-title">WSCO Search</div>
                 <div class="wsco-container">
+                    <div class="wsco-navigation">
+                        <button class="nav-btn" id="wscoBackBtn" title="Back">
+                            ← Back
+                        </button>
+                        <button class="nav-btn" id="wscoForwardBtn" title="Forward">
+                            Forward →
+                        </button>
+                        <button class="nav-btn" id="wscoRefreshBtn" title="Refresh">
+                            ↻ Refresh
+                        </button>
+                        <div class="wsco-url-display" id="wscoUrlDisplay">http://transfer.levsuite.com/search_wsco.php</div>
+                    </div>
                     <iframe id="wscoIframe" src="http://transfer.levsuite.com/search_wsco.php" frameborder="0" allowfullscreen></iframe>
                     <div class="xml-tree-overlay" id="xmlTreeOverlay" style="display: none;">
                         <div class="xml-viewer-header">
@@ -516,6 +578,10 @@
         const xmlTreeOverlay = document.getElementById('xmlTreeOverlay');
         const closeXmlTreeBtn = document.getElementById('closeXmlTreeBtn');
         const wscoIframe = document.getElementById('wscoIframe');
+        const wscoBackBtn = document.getElementById('wscoBackBtn');
+        const wscoForwardBtn = document.getElementById('wscoForwardBtn');
+        const wscoRefreshBtn = document.getElementById('wscoRefreshBtn');
+        const wscoUrlDisplay = document.getElementById('wscoUrlDisplay');
 
         let currentMode = 'xml'; // 'order', 'xml', or 'wsco' - default to XML mode
 
@@ -598,6 +664,7 @@
             
             if (mode === 'order') {
                 stopIframeMonitoring();
+                stopNavMonitoring();
                 closeXMLTree();
                 orderModeBtn.classList.add('active');
                 inputTitle.textContent = 'Input Order Numbers';
@@ -610,8 +677,10 @@
                 converterSection.style.display = 'none';
                 wscoSection.style.display = 'block';
                 buttonContainer.style.display = 'none';
+                startNavMonitoring();
             } else {
                 stopIframeMonitoring();
+                stopNavMonitoring();
                 closeXMLTree();
                 xmlModeBtn.classList.add('active');
                 inputTitle.textContent = 'Input XML';
@@ -910,14 +979,61 @@
                 // Clean up the XML string - remove any HTML wrapper
                 let cleanXML = xmlString.trim();
                 
-                // Extract XML from HTML if needed
-                const xmlMatch = cleanXML.match(/<[?]?xml[\s\S]*?>/i) || cleanXML.match(/<Comergent[\s\S]*?<\/Comergent>/i);
-                if (xmlMatch) {
-                    const startIdx = cleanXML.indexOf(xmlMatch[0]);
-                    const endTag = cleanXML.lastIndexOf('</Comergent>');
-                    if (endTag > startIdx) {
-                        cleanXML = cleanXML.substring(startIdx, endTag + '</Comergent>'.length);
+                // Decode HTML entities
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cleanXML;
+                cleanXML = tempDiv.textContent || tempDiv.innerText || cleanXML;
+                
+                // Remove HTML tags that might wrap the XML
+                cleanXML = cleanXML.replace(/<html[^>]*>[\s\S]*?<body[^>]*>/i, '');
+                cleanXML = cleanXML.replace(/<\/body>[\s\S]*?<\/html>/i, '');
+                cleanXML = cleanXML.replace(/<pre[^>]*>/gi, '');
+                cleanXML = cleanXML.replace(/<\/pre>/gi, '');
+                cleanXML = cleanXML.replace(/<code[^>]*>/gi, '');
+                cleanXML = cleanXML.replace(/<\/code>/gi, '');
+                
+                // Extract XML portion - look for Comergent tag or XML declaration
+                let xmlStart = -1;
+                let xmlEnd = -1;
+                
+                // Try to find XML declaration or Comergent tag
+                const xmlDeclMatch = cleanXML.match(/<[?]xml[\s\S]*?>/i);
+                const comergentMatch = cleanXML.match(/<Comergent[\s>]/i);
+                
+                if (xmlDeclMatch) {
+                    xmlStart = cleanXML.indexOf(xmlDeclMatch[0]);
+                } else if (comergentMatch) {
+                    xmlStart = cleanXML.indexOf(comergentMatch[0]);
+                } else if (cleanXML.trim().startsWith('<')) {
+                    xmlStart = 0;
+                }
+                
+                if (xmlStart >= 0) {
+                    // Find the closing Comergent tag
+                    const closingTag = cleanXML.lastIndexOf('</Comergent>');
+                    if (closingTag > xmlStart) {
+                        xmlEnd = closingTag + '</Comergent>'.length;
+                        cleanXML = cleanXML.substring(xmlStart, xmlEnd);
+                    } else {
+                        // If no closing tag, try to find last > character
+                        const lastBracket = cleanXML.lastIndexOf('>');
+                        if (lastBracket > xmlStart) {
+                            cleanXML = cleanXML.substring(xmlStart, lastBracket + 1);
+                        } else {
+                            cleanXML = cleanXML.substring(xmlStart);
+                        }
                     }
+                }
+                
+                // Final cleanup - remove any remaining non-XML content
+                cleanXML = cleanXML.trim();
+                
+                // Remove any script or style tags
+                cleanXML = cleanXML.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+                cleanXML = cleanXML.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+                
+                if (!cleanXML || !cleanXML.startsWith('<')) {
+                    throw new Error('No valid XML found in the content');
                 }
                 
                 const parser = new DOMParser();
@@ -926,7 +1042,8 @@
                 // Check for parsing errors
                 const parserError = xmlDoc.querySelector('parsererror');
                 if (parserError) {
-                    throw new Error('Invalid XML: ' + parserError.textContent);
+                    const errorText = parserError.textContent || 'Unknown parsing error';
+                    throw new Error('Invalid XML: ' + errorText);
                 }
                 
                 return xmlDoc.documentElement;
@@ -1056,43 +1173,143 @@
                 // Try multiple methods to find XML content
                 let xmlContent = '';
                 
-                // Method 1: Look for pre/code tags with XML
-                const preElements = iframeDoc.querySelectorAll('pre, code');
+                // Method 1: Look for pre/code tags with XML (most common)
+                const preElements = iframeDoc.querySelectorAll('pre, code, textarea');
                 for (let elem of preElements) {
                     const text = elem.textContent || elem.innerText || '';
-                    if (text.trim().startsWith('<') && (text.includes('</') || text.includes('<?xml'))) {
+                    if (text.trim().startsWith('<') && (text.includes('</') || text.includes('<?xml') || text.includes('<Comergent'))) {
                         xmlContent = text.trim();
                         break;
                     }
                 }
                 
-                // Method 2: Check body text for XML
+                // Method 2: Check for XML in any div or body
                 if (!xmlContent) {
-                    const bodyText = iframeDoc.body.innerText || iframeDoc.body.textContent || '';
-                    if (bodyText.trim().startsWith('<') && (bodyText.includes('</Comergent') || bodyText.includes('<?xml'))) {
-                        // Extract XML portion
-                        const xmlStart = bodyText.indexOf('<');
-                        const xmlEnd = bodyText.lastIndexOf('>') + 1;
-                        if (xmlEnd > xmlStart) {
-                            xmlContent = bodyText.substring(xmlStart, xmlEnd);
+                    const allElements = iframeDoc.querySelectorAll('div, body');
+                    for (let elem of allElements) {
+                        const text = elem.textContent || elem.innerText || '';
+                        if (text.trim().startsWith('<') && (text.includes('</Comergent') || text.includes('<?xml') || text.includes('<Comergent'))) {
+                            // Extract just the XML portion
+                            const xmlStart = text.indexOf('<');
+                            const closingTag = text.lastIndexOf('</Comergent>');
+                            if (closingTag > xmlStart) {
+                                xmlContent = text.substring(xmlStart, closingTag + '</Comergent>'.length);
+                            } else {
+                                const lastBracket = text.lastIndexOf('>');
+                                if (lastBracket > xmlStart) {
+                                    xmlContent = text.substring(xmlStart, lastBracket + 1);
+                                }
+                            }
+                            if (xmlContent) break;
                         }
                     }
                 }
                 
-                // Method 3: Check innerHTML for XML
+                // Method 3: Check innerHTML for XML (for HTML-encoded XML)
                 if (!xmlContent) {
                     const bodyHtml = iframeDoc.body.innerHTML || '';
-                    const xmlMatch = bodyHtml.match(/<[?]?xml[\s\S]*?<\/Comergent>/i) || bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i);
+                    // Look for XML that might be HTML-encoded
+                    const xmlMatch = bodyHtml.match(/<[?]?xml[\s\S]*?<\/Comergent>/i) || 
+                                   bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i) ||
+                                   bodyHtml.match(/&lt;[?]?xml[\s\S]*?&lt;\/Comergent&gt;/i) ||
+                                   bodyHtml.match(/&lt;Comergent[\s\S]*?&lt;\/Comergent&gt;/i);
                     if (xmlMatch) {
                         xmlContent = xmlMatch[0];
+                        // Decode HTML entities if needed
+                        if (xmlContent.includes('&lt;')) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = xmlContent;
+                            xmlContent = tempDiv.textContent || tempDiv.innerText || xmlContent;
+                        }
                     }
                 }
                 
-                if (xmlContent) {
+                // Method 4: Check body text directly
+                if (!xmlContent) {
+                    const bodyText = iframeDoc.body.innerText || iframeDoc.body.textContent || '';
+                    if (bodyText.trim().startsWith('<') && (bodyText.includes('</Comergent') || bodyText.includes('<?xml') || bodyText.includes('<Comergent'))) {
+                        const xmlStart = bodyText.indexOf('<');
+                        const closingTag = bodyText.lastIndexOf('</Comergent>');
+                        if (closingTag > xmlStart) {
+                            xmlContent = bodyText.substring(xmlStart, closingTag + '</Comergent>'.length);
+                        } else {
+                            const lastBracket = bodyText.lastIndexOf('>');
+                            if (lastBracket > xmlStart) {
+                                xmlContent = bodyText.substring(xmlStart, lastBracket + 1);
+                            }
+                        }
+                    }
+                }
+                
+                if (xmlContent && xmlContent.trim()) {
                     displayXMLTree(xmlContent);
                 }
             } catch (error) {
                 // CORS or other error - silently fail, user can still use the iframe
+            }
+        }
+
+        // Navigation functions for iframe
+        function navigateWSCOBack() {
+            try {
+                if (wscoIframe && wscoIframe.contentWindow) {
+                    wscoIframe.contentWindow.history.back();
+                    updateWSCOUrl();
+                }
+            } catch (error) {
+                showStatus('Cannot navigate: ' + error.message, true);
+            }
+        }
+
+        function navigateWSCOForward() {
+            try {
+                if (wscoIframe && wscoIframe.contentWindow) {
+                    wscoIframe.contentWindow.history.forward();
+                    updateWSCOUrl();
+                }
+            } catch (error) {
+                showStatus('Cannot navigate: ' + error.message, true);
+            }
+        }
+
+        function refreshWSCO() {
+            try {
+                if (wscoIframe && wscoIframe.contentWindow) {
+                    wscoIframe.contentWindow.location.reload();
+                    updateWSCOUrl();
+                }
+            } catch (error) {
+                showStatus('Cannot refresh: ' + error.message, true);
+            }
+        }
+
+        function updateWSCOUrl() {
+            try {
+                if (wscoIframe && wscoIframe.contentWindow && wscoUrlDisplay) {
+                    const url = wscoIframe.contentWindow.location.href;
+                    wscoUrlDisplay.textContent = url;
+                }
+            } catch (error) {
+                // CORS - can't access URL, keep default
+            }
+        }
+
+        function updateWSCONavButtons() {
+            try {
+                if (wscoIframe && wscoIframe.contentWindow) {
+                    const win = wscoIframe.contentWindow;
+                    if (wscoBackBtn) {
+                        wscoBackBtn.disabled = !win.history || win.history.length <= 1;
+                    }
+                    if (wscoForwardBtn) {
+                        // Can't reliably check forward history, so enable it
+                        wscoForwardBtn.disabled = false;
+                    }
+                }
+            } catch (error) {
+                // CORS - disable buttons
+                if (wscoBackBtn) wscoBackBtn.disabled = true;
+                if (wscoForwardBtn) wscoForwardBtn.disabled = true;
             }
         }
 
@@ -1119,11 +1336,46 @@
         wscoModeBtn.addEventListener('click', () => {
             switchMode('wsco');
             // Start monitoring after a short delay to let iframe load
-            setTimeout(startIframeMonitoring, 1000);
+            setTimeout(() => {
+                startIframeMonitoring();
+                updateWSCONavButtons();
+                updateWSCOUrl();
+            }, 1000);
         });
         if (closeXmlTreeBtn) {
             closeXmlTreeBtn.addEventListener('click', closeXMLTree);
         }
+        if (wscoBackBtn) {
+            wscoBackBtn.addEventListener('click', navigateWSCOBack);
+        }
+        if (wscoForwardBtn) {
+            wscoForwardBtn.addEventListener('click', navigateWSCOForward);
+        }
+        if (wscoRefreshBtn) {
+            wscoRefreshBtn.addEventListener('click', refreshWSCO);
+        }
+        
+        // Update navigation buttons periodically when in WSCO mode
+        function startNavMonitoring() {
+            if (navCheckInterval) {
+                clearInterval(navCheckInterval);
+            }
+            navCheckInterval = setInterval(() => {
+                if (currentMode === 'wsco') {
+                    updateWSCONavButtons();
+                    updateWSCOUrl();
+                }
+            }, 1000);
+        }
+        
+        function stopNavMonitoring() {
+            if (navCheckInterval) {
+                clearInterval(navCheckInterval);
+                navCheckInterval = null;
+            }
+        }
+        
+        let navCheckInterval = null;
         convertBtn.addEventListener('click', convertXML);
         reverseConvertBtn.addEventListener('click', reverseConvertXML);
         copyBtn.addEventListener('click', copyToClipboard);
