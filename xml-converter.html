@@ -298,6 +298,7 @@
             background: white;
             border-bottom: 2px solid #e1e5e9;
             flex-shrink: 0;
+            flex-wrap: wrap;
         }
 
         .nav-btn {
@@ -421,21 +422,17 @@
         }
 
         .xml-convert-to-tree-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
+            padding: 10px 18px;
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
             transition: all 0.3s ease;
-            z-index: 100;
-            display: block;
+            white-space: nowrap;
         }
 
         .xml-convert-to-tree-btn:hover {
@@ -587,6 +584,9 @@
                             ↻ Refresh
                         </button>
                         <div class="wsco-url-display" id="wscoUrlDisplay">http://transfer.levsuite.com/search_wsco.php</div>
+                        <button class="xml-convert-to-tree-btn" id="convertToTreeBtn">
+                            🌳 Convert to Document Tree
+                        </button>
                     </div>
                     <iframe id="wscoIframe" src="http://transfer.levsuite.com/search_wsco.php" frameborder="0" allowfullscreen></iframe>
                     <div class="xml-tree-overlay" id="xmlTreeOverlay" style="display: none;">
@@ -601,11 +601,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="xml-tree-container" id="xmlTreeContainer">
-                            <button class="xml-convert-to-tree-btn" id="convertToTreeBtn">
-                                🌳 Convert to Document Tree
-                            </button>
-                        </div>
+                        <div class="xml-tree-container" id="xmlTreeContainer"></div>
                         <div class="xml-edit-container" id="xmlEditContainer" style="display: none;">
                             <textarea id="xmlEditArea" class="xml-edit-textarea"></textarea>
                             <div class="xml-edit-buttons">
