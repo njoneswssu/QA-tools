@@ -285,6 +285,7 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             background: #f8f9fa;
+            position: relative;
         }
 
         .wsco-container iframe {
@@ -292,6 +293,106 @@
             height: 100%;
             border: none;
         }
+
+        .xml-tree-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .xml-viewer-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .xml-tree-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .xml-placeholder {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px 20px;
+        }
+
+        .xml-placeholder p {
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+
+        .xml-placeholder .xml-hint {
+            font-size: 0.9rem;
+            color: #868e96;
+            font-style: italic;
+        }
+
+        .xml-tree {
+            color: #333;
+        }
+
+        .xml-element {
+            margin: 4px 0;
+            white-space: nowrap;
+        }
+
+        .xml-tag {
+            color: #0066cc;
+            font-weight: 600;
+        }
+
+        .xml-attribute {
+            color: #cc0066;
+        }
+
+        .xml-value {
+            color: #008800;
+        }
+
+        .xml-toggle {
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            width: 16px;
+            margin-right: 4px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .xml-toggle:hover {
+            color: #4facfe;
+        }
+
+        .xml-children {
+            margin-left: 20px;
+        }
+
+        .xml-collapsed .xml-children {
+            display: none;
+        }
+
+        .xml-expand-icon::before {
+            content: '▼';
+        }
+
+        .xml-collapse-icon::before {
+            content: '▶';
+        }
+
 
         @media (max-width: 768px) {
             .converter-section {
@@ -357,6 +458,15 @@
                 <div class="section-title">WSCO Search</div>
                 <div class="wsco-container">
                     <iframe id="wscoIframe" src="http://transfer.levsuite.com/search_wsco.php" frameborder="0" allowfullscreen></iframe>
+                    <div class="xml-tree-overlay" id="xmlTreeOverlay" style="display: none;">
+                        <div class="xml-viewer-header">
+                            <span>XML Document Tree</span>
+                            <button class="btn btn-convert" id="closeXmlTreeBtn" style="padding: 8px 16px; font-size: 0.9rem; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);">
+                                ✕ Close Tree View
+                            </button>
+                        </div>
+                        <div class="xml-tree-container" id="xmlTreeContainer"></div>
+                    </div>
                 </div>
             </div>
             
@@ -402,6 +512,10 @@
         const converterSection = document.getElementById('converterSection');
         const wscoSection = document.getElementById('wscoSection');
         const buttonContainer = document.getElementById('buttonContainer');
+        const xmlTreeContainer = document.getElementById('xmlTreeContainer');
+        const xmlTreeOverlay = document.getElementById('xmlTreeOverlay');
+        const closeXmlTreeBtn = document.getElementById('closeXmlTreeBtn');
+        const wscoIframe = document.getElementById('wscoIframe');
 
         let currentMode = 'xml'; // 'order', 'xml', or 'wsco' - default to XML mode
 
@@ -483,6 +597,8 @@
             wscoModeBtn.classList.remove('active');
             
             if (mode === 'order') {
+                stopIframeMonitoring();
+                closeXMLTree();
                 orderModeBtn.classList.add('active');
                 inputTitle.textContent = 'Input Order Numbers';
                 inputArea.placeholder = 'Paste order numbers here (one per line)...\nExample:\n02438130\n02438109\n02440750';
@@ -495,6 +611,8 @@
                 wscoSection.style.display = 'block';
                 buttonContainer.style.display = 'none';
             } else {
+                stopIframeMonitoring();
+                closeXMLTree();
                 xmlModeBtn.classList.add('active');
                 inputTitle.textContent = 'Input XML';
                 inputArea.placeholder = 'Paste your XML code here...';
@@ -786,10 +904,226 @@
             }
         }
 
+        // XML Tree Viewer Functions
+        function parseXMLToTree(xmlString) {
+            try {
+                // Clean up the XML string - remove any HTML wrapper
+                let cleanXML = xmlString.trim();
+                
+                // Extract XML from HTML if needed
+                const xmlMatch = cleanXML.match(/<[?]?xml[\s\S]*?>/i) || cleanXML.match(/<Comergent[\s\S]*?<\/Comergent>/i);
+                if (xmlMatch) {
+                    const startIdx = cleanXML.indexOf(xmlMatch[0]);
+                    const endTag = cleanXML.lastIndexOf('</Comergent>');
+                    if (endTag > startIdx) {
+                        cleanXML = cleanXML.substring(startIdx, endTag + '</Comergent>'.length);
+                    }
+                }
+                
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(cleanXML, 'text/xml');
+                
+                // Check for parsing errors
+                const parserError = xmlDoc.querySelector('parsererror');
+                if (parserError) {
+                    throw new Error('Invalid XML: ' + parserError.textContent);
+                }
+                
+                return xmlDoc.documentElement;
+            } catch (error) {
+                throw new Error('Failed to parse XML: ' + error.message);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function renderXMLNode(node, level = 0, nodeIdPrefix = '') {
+            if (!node) return '';
+            
+            let html = '';
+            const nodeId = nodeIdPrefix + '-' + level + '-' + Math.random().toString(36).substr(2, 5);
+            
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const tagName = node.tagName;
+                
+                // Check if element has children (element nodes or meaningful text)
+                const childElements = Array.from(node.childNodes).filter(n => n.nodeType === Node.ELEMENT_NODE);
+                const textNodes = Array.from(node.childNodes).filter(n => n.nodeType === Node.TEXT_NODE);
+                const textContent = textNodes.map(n => n.textContent.trim()).join(' ').trim();
+                const hasChildren = childElements.length > 0;
+                const hasText = textContent && !hasChildren;
+                
+                // Build attributes string
+                let attrs = '';
+                if (node.attributes && node.attributes.length > 0) {
+                    attrs = ' ' + Array.from(node.attributes)
+                        .map(attr => `<span class="xml-attribute">${attr.name}="${escapeHtml(attr.value)}"</span>`)
+                        .join(' ');
+                }
+                
+                html += `<div class="xml-element" style="padding-left: ${level * 20}px;">`;
+                
+                if (hasChildren || hasText) {
+                    html += `<span class="xml-toggle xml-expand-icon" onclick="toggleXMLNode('${nodeId}')"></span>`;
+                    html += `<span class="xml-tag">&lt;${tagName}${attrs}&gt;</span>`;
+                    
+                    if (hasText) {
+                        html += `<span class="xml-value">${escapeHtml(textContent)}</span>`;
+                    }
+                    
+                    html += `<div class="xml-children" id="${nodeId}">`;
+                    
+                    // Process child nodes
+                    Array.from(node.childNodes).forEach((child, idx) => {
+                        if (child.nodeType === Node.ELEMENT_NODE) {
+                            html += renderXMLNode(child, level + 1, nodeId + '-' + idx);
+                        } else if (child.nodeType === Node.TEXT_NODE && child.textContent.trim() && !hasText) {
+                            html += `<div style="padding-left: ${(level + 1) * 20}px;"><span class="xml-value">${escapeHtml(child.textContent.trim())}</span></div>`;
+                        }
+                    });
+                    
+                    html += `</div>`;
+                    html += `<span class="xml-tag">&lt;/${tagName}&gt;</span>`;
+                } else {
+                    // Self-closing or empty element
+                    html += `<span class="xml-tag">&lt;${tagName}${attrs} /&gt;</span>`;
+                }
+                
+                html += `</div>`;
+            }
+            
+            return html;
+        }
+
+        function displayXMLTree(xmlString) {
+            try {
+                const rootNode = parseXMLToTree(xmlString);
+                const treeHtml = renderXMLNode(rootNode);
+                
+                xmlTreeContainer.innerHTML = `<div class="xml-tree">${treeHtml}</div>`;
+                // Show the overlay
+                if (xmlTreeOverlay) {
+                    xmlTreeOverlay.style.display = 'flex';
+                }
+            } catch (error) {
+                xmlTreeContainer.innerHTML = `<div class="xml-placeholder"><p style="color: #dc3545;">Error parsing XML: ${escapeHtml(error.message)}</p></div>`;
+                // Still show overlay even on error
+                if (xmlTreeOverlay) {
+                    xmlTreeOverlay.style.display = 'flex';
+                }
+            }
+        }
+
+        function closeXMLTree() {
+            if (xmlTreeOverlay) {
+                xmlTreeOverlay.style.display = 'none';
+            }
+        }
+
+        function toggleXMLNode(nodeId) {
+            const node = document.getElementById(nodeId);
+            if (!node) return;
+            
+            const parent = node.parentElement;
+            const toggle = parent.querySelector('.xml-toggle');
+            
+            if (node.style.display === 'none') {
+                node.style.display = 'block';
+                toggle.classList.remove('xml-collapse-icon');
+                toggle.classList.add('xml-expand-icon');
+            } else {
+                node.style.display = 'none';
+                toggle.classList.remove('xml-expand-icon');
+                toggle.classList.add('xml-collapse-icon');
+            }
+        }
+
+        // Make toggleXMLNode available globally
+        window.toggleXMLNode = toggleXMLNode;
+
+        // Monitor iframe for XML content
+        function checkIframeForXML() {
+            if (currentMode !== 'wsco' || !wscoIframe) return;
+            
+            try {
+                const iframeDoc = wscoIframe.contentDocument || wscoIframe.contentWindow.document;
+                if (!iframeDoc) return;
+                
+                // Try multiple methods to find XML content
+                let xmlContent = '';
+                
+                // Method 1: Look for pre/code tags with XML
+                const preElements = iframeDoc.querySelectorAll('pre, code');
+                for (let elem of preElements) {
+                    const text = elem.textContent || elem.innerText || '';
+                    if (text.trim().startsWith('<') && (text.includes('</') || text.includes('<?xml'))) {
+                        xmlContent = text.trim();
+                        break;
+                    }
+                }
+                
+                // Method 2: Check body text for XML
+                if (!xmlContent) {
+                    const bodyText = iframeDoc.body.innerText || iframeDoc.body.textContent || '';
+                    if (bodyText.trim().startsWith('<') && (bodyText.includes('</Comergent') || bodyText.includes('<?xml'))) {
+                        // Extract XML portion
+                        const xmlStart = bodyText.indexOf('<');
+                        const xmlEnd = bodyText.lastIndexOf('>') + 1;
+                        if (xmlEnd > xmlStart) {
+                            xmlContent = bodyText.substring(xmlStart, xmlEnd);
+                        }
+                    }
+                }
+                
+                // Method 3: Check innerHTML for XML
+                if (!xmlContent) {
+                    const bodyHtml = iframeDoc.body.innerHTML || '';
+                    const xmlMatch = bodyHtml.match(/<[?]?xml[\s\S]*?<\/Comergent>/i) || bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i);
+                    if (xmlMatch) {
+                        xmlContent = xmlMatch[0];
+                    }
+                }
+                
+                if (xmlContent) {
+                    displayXMLTree(xmlContent);
+                }
+            } catch (error) {
+                // CORS or other error - silently fail, user can still use the iframe
+            }
+        }
+
+        // Poll iframe for changes (since we can't reliably detect when it updates)
+        let iframeCheckInterval = null;
+        
+        function startIframeMonitoring() {
+            if (iframeCheckInterval) {
+                clearInterval(iframeCheckInterval);
+            }
+            iframeCheckInterval = setInterval(checkIframeForXML, 2000); // Check every 2 seconds
+        }
+
+        function stopIframeMonitoring() {
+            if (iframeCheckInterval) {
+                clearInterval(iframeCheckInterval);
+                iframeCheckInterval = null;
+            }
+        }
+
         // Event listeners
         orderModeBtn.addEventListener('click', () => switchMode('order'));
         xmlModeBtn.addEventListener('click', () => switchMode('xml'));
-        wscoModeBtn.addEventListener('click', () => switchMode('wsco'));
+        wscoModeBtn.addEventListener('click', () => {
+            switchMode('wsco');
+            // Start monitoring after a short delay to let iframe load
+            setTimeout(startIframeMonitoring, 1000);
+        });
+        if (closeXmlTreeBtn) {
+            closeXmlTreeBtn.addEventListener('click', closeXMLTree);
+        }
         convertBtn.addEventListener('click', convertXML);
         reverseConvertBtn.addEventListener('click', reverseConvertXML);
         copyBtn.addEventListener('click', copyToClipboard);
