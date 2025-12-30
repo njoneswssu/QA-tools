@@ -1047,10 +1047,12 @@
                 // Clean up the XML string - remove any HTML wrapper
                 let cleanXML = xmlString.trim();
                 
-                // Decode HTML entities
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = cleanXML;
-                cleanXML = tempDiv.textContent || tempDiv.innerText || cleanXML;
+                // Decode HTML entities first
+                if (cleanXML.includes('&lt;') || cleanXML.includes('&gt;') || cleanXML.includes('&amp;')) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = cleanXML;
+                    cleanXML = tempDiv.textContent || tempDiv.innerText || cleanXML;
+                }
                 
                 // Remove HTML tags that might wrap the XML
                 cleanXML = cleanXML.replace(/<html[^>]*>[\s\S]*?<body[^>]*>/i, '');
@@ -1060,16 +1062,18 @@
                 cleanXML = cleanXML.replace(/<code[^>]*>/gi, '');
                 cleanXML = cleanXML.replace(/<\/code>/gi, '');
                 
-                // Extract XML portion - look for Comergent tag or XML declaration
+                // Extract XML portion - look for ComergentData or Comergent tag or XML declaration
                 let xmlStart = -1;
-                let xmlEnd = -1;
                 
-                // Try to find XML declaration or Comergent tag
+                // Try to find XML declaration, ComergentData, or Comergent tag
                 const xmlDeclMatch = cleanXML.match(/<[?]xml[\s\S]*?>/i);
+                const comergentDataMatch = cleanXML.match(/<ComergentData[\s>]/i);
                 const comergentMatch = cleanXML.match(/<Comergent[\s>]/i);
                 
                 if (xmlDeclMatch) {
                     xmlStart = cleanXML.indexOf(xmlDeclMatch[0]);
+                } else if (comergentDataMatch) {
+                    xmlStart = cleanXML.indexOf(comergentDataMatch[0]);
                 } else if (comergentMatch) {
                     xmlStart = cleanXML.indexOf(comergentMatch[0]);
                 } else if (cleanXML.trim().startsWith('<')) {
@@ -1077,11 +1081,21 @@
                 }
                 
                 if (xmlStart >= 0) {
-                    // Find the closing Comergent tag
-                    const closingTag = cleanXML.lastIndexOf('</Comergent>');
+                    // Find the appropriate closing tag
+                    let closingTag = -1;
+                    let closingTagText = '';
+                    
+                    // Check for ComergentData first, then Comergent
+                    if (cleanXML.includes('</ComergentData>')) {
+                        closingTag = cleanXML.lastIndexOf('</ComergentData>');
+                        closingTagText = '</ComergentData>';
+                    } else if (cleanXML.includes('</Comergent>')) {
+                        closingTag = cleanXML.lastIndexOf('</Comergent>');
+                        closingTagText = '</Comergent>';
+                    }
+                    
                     if (closingTag > xmlStart) {
-                        xmlEnd = closingTag + '</Comergent>'.length;
-                        cleanXML = cleanXML.substring(xmlStart, xmlEnd);
+                        cleanXML = cleanXML.substring(xmlStart, closingTag + closingTagText.length);
                     } else {
                         // If no closing tag, try to find last > character
                         const lastBracket = cleanXML.lastIndexOf('>');
@@ -1114,6 +1128,7 @@
                     throw new Error('Invalid XML: ' + errorText);
                 }
                 
+                // Return the root element (ComergentData if present, otherwise Comergent)
                 return xmlDoc.documentElement;
             } catch (error) {
                 throw new Error('Failed to parse XML: ' + error.message);
@@ -1330,46 +1345,73 @@
                 // Try multiple methods to find XML content
                 let xmlContent = '';
                 
-                // Method 1: Look for pre/code tags with XML (most common)
-                const preElements = iframeDoc.querySelectorAll('pre, code, textarea');
-                for (let elem of preElements) {
-                    const text = elem.textContent || elem.innerText || '';
-                    if (text.trim().startsWith('<') && (text.includes('</') || text.includes('<?xml') || text.includes('<Comergent'))) {
-                        xmlContent = text.trim();
-                        break;
+                // Method 1: Check if the page itself is XML (browser XML view)
+                // When browser displays XML directly, the document itself is XML
+                // Try to serialize the XML document directly
+                try {
+                    // Check if documentElement is XML (not HTML)
+                    const docElement = iframeDoc.documentElement;
+                    if (docElement && (docElement.tagName === 'ComergentData' || docElement.tagName === 'Comergent' || 
+                        docElement.nodeName.toLowerCase() === 'comergentdata' || docElement.nodeName.toLowerCase() === 'comergent')) {
+                        // This is an XML document - serialize it
+                        const serializer = new XMLSerializer();
+                        xmlContent = serializer.serializeToString(iframeDoc);
+                        // Remove the XML declaration if present for cleaner display
+                        xmlContent = xmlContent.replace(/<\?xml[^>]*\?>\s*/i, '');
+                    }
+                } catch (e) {
+                    // Not an XML document, continue with other methods
+                }
+                
+                // If Method 1 didn't work, try getting from body text
+                if (!xmlContent) {
+                    const bodyText = iframeDoc.body ? (iframeDoc.body.textContent || iframeDoc.body.innerText || '') : '';
+                    const bodyHtml = iframeDoc.body ? (iframeDoc.body.innerHTML || '') : '';
+                    
+                    // Check if this is a browser XML view (starts with <?xml or <ComergentData>)
+                    if (bodyText.trim().startsWith('<?xml') || bodyText.trim().startsWith('<ComergentData>') || bodyText.trim().startsWith('<Comergent>')) {
+                        // Extract the full XML document
+                        const xmlStart = bodyText.indexOf('<');
+                        // Find the end - look for </ComergentData> or </Comergent>
+                        let xmlEnd = bodyText.lastIndexOf('</ComergentData>');
+                        if (xmlEnd === -1) {
+                            xmlEnd = bodyText.lastIndexOf('</Comergent>');
+                        }
+                        if (xmlEnd > xmlStart) {
+                            // Include the closing tag
+                            const closingTag = bodyText.lastIndexOf('</ComergentData>') > -1 ? '</ComergentData>' : '</Comergent>';
+                            xmlContent = bodyText.substring(xmlStart, xmlEnd + closingTag.length);
+                        } else {
+                            // Fallback: get everything from first < to last >
+                            const lastBracket = bodyText.lastIndexOf('>');
+                            if (lastBracket > xmlStart) {
+                                xmlContent = bodyText.substring(xmlStart, lastBracket + 1);
+                            }
+                        }
                     }
                 }
                 
-                // Method 2: Check for XML in any div or body
+                // Method 2: Look for pre/code tags with XML (most common in HTML pages)
                 if (!xmlContent) {
-                    const allElements = iframeDoc.querySelectorAll('div, body');
-                    for (let elem of allElements) {
+                    const preElements = iframeDoc.querySelectorAll('pre, code, textarea');
+                    for (let elem of preElements) {
                         const text = elem.textContent || elem.innerText || '';
-                        if (text.trim().startsWith('<') && (text.includes('</Comergent') || text.includes('<?xml') || text.includes('<Comergent'))) {
-                            // Extract just the XML portion
-                            const xmlStart = text.indexOf('<');
-                            const closingTag = text.lastIndexOf('</Comergent>');
-                            if (closingTag > xmlStart) {
-                                xmlContent = text.substring(xmlStart, closingTag + '</Comergent>'.length);
-                            } else {
-                                const lastBracket = text.lastIndexOf('>');
-                                if (lastBracket > xmlStart) {
-                                    xmlContent = text.substring(xmlStart, lastBracket + 1);
-                                }
-                            }
-                            if (xmlContent) break;
+                        if (text.trim().startsWith('<') && (text.includes('</') || text.includes('<?xml') || text.includes('<Comergent'))) {
+                            xmlContent = text.trim();
+                            break;
                         }
                     }
                 }
                 
                 // Method 3: Check innerHTML for XML (for HTML-encoded XML)
-                if (!xmlContent) {
-                    const bodyHtml = iframeDoc.body.innerHTML || '';
-                    // Look for XML that might be HTML-encoded
-                    const xmlMatch = bodyHtml.match(/<[?]?xml[\s\S]*?<\/Comergent>/i) || 
+                if (!xmlContent && bodyHtml) {
+                    // Look for XML that might be HTML-encoded or in HTML structure
+                    const xmlMatch = bodyHtml.match(/<[?]?xml[\s\S]*?<\/ComergentData>/i) || 
+                                   bodyHtml.match(/<ComergentData[\s\S]*?<\/ComergentData>/i) ||
+                                   bodyHtml.match(/<[?]?xml[\s\S]*?<\/Comergent>/i) ||
                                    bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i) ||
-                                   bodyHtml.match(/&lt;[?]?xml[\s\S]*?&lt;\/Comergent&gt;/i) ||
-                                   bodyHtml.match(/&lt;Comergent[\s\S]*?&lt;\/Comergent&gt;/i);
+                                   bodyHtml.match(/&lt;[?]?xml[\s\S]*?&lt;\/ComergentData&gt;/i) ||
+                                   bodyHtml.match(/&lt;ComergentData[\s\S]*?&lt;\/ComergentData&gt;/i);
                     if (xmlMatch) {
                         xmlContent = xmlMatch[0];
                         // Decode HTML entities if needed
@@ -1381,47 +1423,51 @@
                     }
                 }
                 
-                // Method 4: Check body text directly
+                // Method 4: Check for XML in any div or body
                 if (!xmlContent) {
-                    const bodyText = iframeDoc.body.innerText || iframeDoc.body.textContent || '';
-                    if (bodyText.trim().startsWith('<') && (bodyText.includes('</Comergent') || bodyText.includes('<?xml') || bodyText.includes('<Comergent'))) {
-                        const xmlStart = bodyText.indexOf('<');
-                        const closingTag = bodyText.lastIndexOf('</Comergent>');
-                        if (closingTag > xmlStart) {
-                            xmlContent = bodyText.substring(xmlStart, closingTag + '</Comergent>'.length);
-                        } else {
-                            const lastBracket = bodyText.lastIndexOf('>');
-                            if (lastBracket > xmlStart) {
-                                xmlContent = bodyText.substring(xmlStart, lastBracket + 1);
-                            }
-                        }
-                    }
-                }
-                
-                // Method 5: Try to get XML from any element that contains XML-like content
-                if (!xmlContent) {
-                    const allTextElements = iframeDoc.querySelectorAll('*');
-                    for (let elem of allTextElements) {
+                    const allElements = iframeDoc.querySelectorAll('div, body');
+                    for (let elem of allElements) {
                         const text = elem.textContent || elem.innerText || '';
-                        if (text.trim().startsWith('<') && text.includes('</') && (text.includes('Comergent') || text.includes('xml'))) {
-                            // Try to extract just the XML portion
+                        if (text.trim().startsWith('<') && (text.includes('</Comergent') || text.includes('</ComergentData') || text.includes('<?xml') || text.includes('<Comergent'))) {
+                            // Extract just the XML portion
                             const xmlStart = text.indexOf('<');
-                            const closingTag = text.lastIndexOf('</Comergent>');
-                            if (closingTag > xmlStart) {
-                                xmlContent = text.substring(xmlStart, closingTag + '</Comergent>'.length);
-                                break;
+                            let closingTag = text.lastIndexOf('</ComergentData>');
+                            if (closingTag === -1) {
+                                closingTag = text.lastIndexOf('</Comergent>');
                             }
+                            if (closingTag > xmlStart) {
+                                const closingTagText = text.lastIndexOf('</ComergentData>') > -1 ? '</ComergentData>' : '</Comergent>';
+                                xmlContent = text.substring(xmlStart, closingTag + closingTagText.length);
+                            } else {
+                                const lastBracket = text.lastIndexOf('>');
+                                if (lastBracket > xmlStart) {
+                                    xmlContent = text.substring(xmlStart, lastBracket + 1);
+                                }
+                            }
+                            if (xmlContent) break;
                         }
                     }
                 }
                 
                 if (xmlContent && xmlContent.trim()) {
-                    // Clean and display
+                    // Clean and display - ensure we have valid XML
                     xmlContent = xmlContent.trim();
+                    
+                    // If we have ComergentData wrapper, use it; otherwise wrap if needed
+                    if (!xmlContent.includes('<ComergentData>') && xmlContent.includes('<Comergent>')) {
+                        // Check if we should wrap it
+                        const comergentCount = (xmlContent.match(/<Comergent>/g) || []).length;
+                        if (comergentCount > 1) {
+                            // Multiple Comergent blocks - wrap in ComergentData
+                            xmlContent = '<ComergentData>\n' + xmlContent + '\n</ComergentData>';
+                        }
+                    }
+                    
                     displayXMLTree(xmlContent);
                 }
             } catch (error) {
                 // CORS or other error - silently fail, user can still use the iframe
+                console.error('Error checking iframe for XML:', error);
             }
         }
 
