@@ -417,6 +417,30 @@
             font-family: 'Courier New', monospace;
             font-size: 13px;
             line-height: 1.6;
+            position: relative;
+        }
+
+        .xml-convert-to-tree-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: block;
+        }
+
+        .xml-convert-to-tree-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
         }
 
         .xml-placeholder {
@@ -577,7 +601,11 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="xml-tree-container" id="xmlTreeContainer"></div>
+                        <div class="xml-tree-container" id="xmlTreeContainer">
+                            <button class="xml-convert-to-tree-btn" id="convertToTreeBtn">
+                                🌳 Convert to Document Tree
+                            </button>
+                        </div>
                         <div class="xml-edit-container" id="xmlEditContainer" style="display: none;">
                             <textarea id="xmlEditArea" class="xml-edit-textarea"></textarea>
                             <div class="xml-edit-buttons">
@@ -643,6 +671,7 @@
         const xmlEditArea = document.getElementById('xmlEditArea');
         const saveXmlBtn = document.getElementById('saveXmlBtn');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const convertToTreeBtn = document.getElementById('convertToTreeBtn');
         const wscoIframe = document.getElementById('wscoIframe');
         const wscoBackBtn = document.getElementById('wscoBackBtn');
         const wscoForwardBtn = document.getElementById('wscoForwardBtn');
@@ -1220,18 +1249,41 @@
                 const treeHtml = renderXMLNode(rootNode);
                 
                 xmlTreeContainer.innerHTML = `<div class="xml-tree">${treeHtml}</div>`;
+                // Always show convert button
+                if (convertToTreeBtn) {
+                    convertToTreeBtn.style.display = 'block';
+                }
                 // Show the overlay
                 if (xmlTreeOverlay) {
                     xmlTreeOverlay.style.display = 'flex';
                 }
             } catch (error) {
-                xmlTreeContainer.innerHTML = `<div class="xml-placeholder"><p style="color: #dc3545;">Error parsing XML: ${escapeHtml(error.message)}</p><p>You can still edit the raw XML using the Edit button.</p></div>`;
+                // Show raw XML with convert button
+                xmlTreeContainer.innerHTML = `<div class="xml-placeholder"><pre style="text-align: left; white-space: pre-wrap; word-wrap: break-word; color: #333;">${escapeHtml(xmlString)}</pre></div>`;
+                // Always show convert button
+                if (convertToTreeBtn) {
+                    convertToTreeBtn.style.display = 'block';
+                }
                 // Still show overlay even on error
                 if (xmlTreeOverlay) {
                     xmlTreeOverlay.style.display = 'flex';
                 }
                 // Store the raw XML even if parsing failed
                 currentWSCOXmlRaw = xmlString;
+            }
+        }
+
+        function convertRawXMLToTree() {
+            if (!currentWSCOXmlRaw) {
+                showStatus('No XML to convert', true);
+                return;
+            }
+            
+            try {
+                displayXMLTree(currentWSCOXmlRaw);
+                showStatus('XML converted to document tree');
+            } catch (error) {
+                showStatus('Error converting XML: ' + error.message, true);
             }
         }
 
@@ -1463,7 +1515,22 @@
                         }
                     }
                     
+                    // Try to display as tree, will show convert button if it fails
                     displayXMLTree(xmlContent);
+                } else {
+                    // No XML found, but check if there's raw text that looks like XML
+                    const bodyText = iframeDoc.body ? (iframeDoc.body.textContent || iframeDoc.body.innerText || '') : '';
+                    if (bodyText && bodyText.trim().length > 0 && bodyText.includes('<') && bodyText.includes('>')) {
+                        // Store as raw and show convert button
+                        currentWSCOXmlRaw = bodyText.trim();
+                        xmlTreeContainer.innerHTML = `<div class="xml-placeholder"><pre style="text-align: left; white-space: pre-wrap; word-wrap: break-word; color: #333; max-height: 500px; overflow-y: auto;">${escapeHtml(bodyText.trim())}</pre></div>`;
+                        if (convertToTreeBtn) {
+                            convertToTreeBtn.style.display = 'block';
+                        }
+                        if (xmlTreeOverlay) {
+                            xmlTreeOverlay.style.display = 'flex';
+                        }
+                    }
                 }
             } catch (error) {
                 // CORS or other error - silently fail, user can still use the iframe
@@ -1575,6 +1642,9 @@
         }
         if (cancelEditBtn) {
             cancelEditBtn.addEventListener('click', hideEditMode);
+        }
+        if (convertToTreeBtn) {
+            convertToTreeBtn.addEventListener('click', convertRawXMLToTree);
         }
         if (wscoBackBtn) {
             wscoBackBtn.addEventListener('click', navigateWSCOBack);
