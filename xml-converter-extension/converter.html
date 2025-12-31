@@ -9,14 +9,14 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
+            }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-        }
+            }
 
         .container {
             max-width: 1200px;
@@ -25,34 +25,34 @@
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-        }
+            }
 
         .header {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
             padding: 30px;
             text-align: center;
-        }
+            }
 
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
             font-weight: 300;
-        }
+            }
 
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
-        }
+            }
 
         .content {
             padding: 40px;
-        }
+            }
 
         .input-mode-selector {
             margin-bottom: 30px;
             text-align: center;
-        }
+            }
 
         .mode-buttons {
             display: inline-flex;
@@ -60,7 +60,7 @@
             border-radius: 10px;
             padding: 5px;
             gap: 5px;
-        }
+            }
 
         .mode-btn {
             padding: 12px 24px;
@@ -72,18 +72,18 @@
             transition: all 0.3s ease;
             background: transparent;
             color: #6c757d;
-        }
+            }
 
         .mode-btn.active {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-        }
+            }
 
         .mode-btn:hover:not(.active) {
             background: #e9ecef;
             color: #495057;
-        }
+            }
 
         .converter-section {
             display: grid;
@@ -91,13 +91,13 @@
             gap: 30px;
             margin-bottom: 30px;
             align-items: start;
-        }
+            }
 
         .input-section, .output-section {
             display: flex;
             flex-direction: column;
             height: 100%;
-        }
+            }
 
         .section-title {
             font-size: 1.3rem;
@@ -107,7 +107,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-        }
+            }
 
         .section-title::before {
             content: '';
@@ -115,7 +115,7 @@
             height: 20px;
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             border-radius: 2px;
-        }
+            }
 
         textarea {
             width: 100%;
@@ -133,32 +133,32 @@
             overflow-y: auto;
             cursor: text;
             pointer-events: auto;
-        }
+            }
 
         textarea:focus {
             outline: none;
             border-color: #4facfe;
             box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
-        }
+            }
 
         #outputArea {
             background-color: #f8f9fa;
             color: #333;
             cursor: text;
             pointer-events: auto;
-        }
+            }
         
         #inputArea {
             cursor: text;
             pointer-events: auto;
-        }
+            }
 
         .button-container {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin: 30px 0;
-        }
+            }
 
         .btn {
             padding: 15px 30px;
@@ -173,46 +173,46 @@
             gap: 8px;
             text-decoration: none;
             color: white;
-        }
+            }
 
         .btn-convert {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+            }
 
         .btn-convert:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
+            }
 
         .btn-copy {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
+            }
 
         .btn-copy:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
-        }
+            }
 
         .btn-download {
             background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
+            }
 
         .btn-download:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(250, 112, 154, 0.3);
-        }
+            }
 
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-        }
+            }
 
         .output-buttons {
             display: flex;
             gap: 15px;
             margin-top: 15px;
-        }
+            }
 
         .status-message {
             text-align: center;
@@ -221,37 +221,37 @@
             margin: 15px 0;
             font-weight: 500;
             display: none;
-        }
+            }
 
         .status-success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
-        }
+            }
 
         .status-error {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
-        }
+            }
 
         .conversion-rules {
             background: #f8f9fa;
             border-radius: 10px;
             padding: 25px;
             margin-top: 30px;
-        }
+            }
 
         .conversion-rules h3 {
             color: #333;
             margin-bottom: 15px;
             font-size: 1.2rem;
-        }
+            }
 
         .conversion-rules ul {
             list-style: none;
             padding: 0;
-        }
+            }
 
         .conversion-rules li {
             padding: 8px 0;
@@ -259,22 +259,22 @@
             display: flex;
             align-items: center;
             gap: 10px;
-        }
+            }
 
         .conversion-rules li:last-child {
             border-bottom: none;
-        }
+            }
 
         .conversion-rules li::before {
             content: '✓';
             color: #28a745;
             font-weight: bold;
             font-size: 1.1rem;
-        }
+            }
 
         .wsco-section {
             margin-top: 30px;
-        }
+            }
 
         .chrome-browser-wrapper {
             width: 100%;
@@ -285,7 +285,7 @@
             align-items: flex-start;
             padding: 20px;
             background: #e8eaed;
-        }
+            }
 
         .chrome-window {
             width: 100%;
@@ -297,7 +297,7 @@
             flex-direction: column;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
+            }
 
         .chrome-tabs {
             display: flex;
@@ -306,7 +306,7 @@
             padding: 0 8px;
             height: 36px;
             align-items: flex-end;
-        }
+            }
 
         .chrome-tab {
             display: flex;
@@ -322,20 +322,20 @@
             min-width: 200px;
             max-width: 240px;
             height: 28px;
-        }
+            }
 
         .chrome-tab.active {
             background: #ffffff;
             border-bottom: 1px solid #ffffff;
             z-index: 1;
             margin-bottom: -1px;
-        }
+            }
 
         .chrome-tab-favicon {
             width: 16px;
             height: 16px;
             flex-shrink: 0;
-        }
+            }
 
         .chrome-tab-title {
             flex: 1;
@@ -344,11 +344,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
+            }
 
         .chrome-tab.active .chrome-tab-title {
             color: #202124;
-        }
+            }
 
         .chrome-tab-close {
             width: 16px;
@@ -362,15 +362,15 @@
             line-height: 1;
             opacity: 0;
             transition: opacity 0.2s;
-        }
+            }
 
         .chrome-tab:hover .chrome-tab-close {
             opacity: 1;
-        }
+            }
 
         .chrome-tab-close:hover {
             background: #dadce0;
-        }
+            }
 
         .chrome-toolbar {
             display: flex;
@@ -380,12 +380,12 @@
             background: #f8f9fa;
             border-bottom: 1px solid #dadce0;
             flex-shrink: 0;
-        }
+            }
 
         .chrome-nav-buttons {
             display: flex;
             gap: 4px;
-        }
+            }
 
         .chrome-nav-btn {
             width: 32px;
@@ -400,21 +400,21 @@
             align-items: center;
             justify-content: center;
             padding: 0;
-        }
+            }
 
         .chrome-nav-btn:hover:not(:disabled) {
             background: #e8eaed;
             color: #202124;
-        }
+            }
 
         .chrome-nav-btn:active:not(:disabled) {
             background: #dadce0;
-        }
+            }
 
         .chrome-nav-btn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
-        }
+            }
 
         .chrome-address-bar {
             flex: 1;
@@ -427,12 +427,12 @@
             border-radius: 20px;
             height: 36px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
+            }
 
         .chrome-address-bar-icon {
             font-size: 14px;
             flex-shrink: 0;
-        }
+            }
 
         .chrome-address-input {
             flex: 1;
@@ -442,7 +442,7 @@
             font-size: 0.875rem;
             color: #202124;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
+            }
 
         .chrome-reload-btn {
             width: 20px;
@@ -457,25 +457,25 @@
             justify-content: center;
             border-radius: 50%;
             flex-shrink: 0;
-        }
+            }
 
         .chrome-reload-btn:hover {
             background: #e8eaed;
-        }
+            }
 
         .chrome-content {
             flex: 1;
             overflow: hidden;
             background: #ffffff;
             position: relative;
-        }
+            }
 
         .chrome-content iframe {
             width: 100%;
             height: 100%;
             border: none;
             background: #ffffff;
-        }
+            }
 
         .wsco-url-display {
             flex: 1;
@@ -489,12 +489,12 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
+            }
 
 
         .chrome-convert-btn {
             margin-left: auto;
-        }
+            }
 
         .xml-tree-overlay {
             position: absolute;
@@ -506,11 +506,11 @@
             z-index: 10;
             display: flex;
             flex-direction: column;
-        }
+            }
 
         .chrome-overlay {
             border-radius: 0 0 8px 8px;
-        }
+            }
 
         .xml-viewer-header {
             padding: 15px 20px;
@@ -522,13 +522,13 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-        }
+            }
 
         .xml-viewer-controls {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-        }
+            }
 
         .xml-edit-container {
             flex: 1;
@@ -536,7 +536,7 @@
             flex-direction: column;
             padding: 20px;
             background: white;
-        }
+            }
 
         .xml-edit-textarea {
             flex: 1;
@@ -549,20 +549,20 @@
             font-size: 13px;
             line-height: 1.6;
             resize: vertical;
-        }
+            }
 
         .xml-edit-textarea:focus {
             outline: none;
             border-color: #4facfe;
             box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
-        }
+            }
 
         .xml-edit-buttons {
             display: flex;
             gap: 10px;
             margin-top: 15px;
             justify-content: flex-end;
-        }
+            }
 
         .xml-tree-container {
             flex: 1;
@@ -574,7 +574,7 @@
             font-size: 13px;
             line-height: 1.5;
             position: relative;
-        }
+            }
 
         .xml-convert-to-tree-btn {
             padding: 6px 16px;
@@ -588,39 +588,39 @@
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             transition: all 0.15s ease;
             white-space: nowrap;
-        }
+            }
 
         .xml-convert-to-tree-btn:hover {
             background: #1557b0;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-        }
+            }
 
         .xml-convert-to-tree-btn:active {
             background: #1348a0;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
+            }
 
         .xml-convert-to-tree-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
-        }
+            }
 
         .xml-placeholder {
             text-align: center;
             color: #6c757d;
             padding: 40px 20px;
-        }
+            }
 
         .xml-placeholder p {
             margin: 10px 0;
             font-size: 1rem;
-        }
+            }
 
         .xml-placeholder .xml-hint {
             font-size: 0.9rem;
             color: #868e96;
             font-style: italic;
-        }
+            }
 
         .xml-tree {
             color: #333;
@@ -628,7 +628,7 @@
             font-size: 13px;
             line-height: 1.5;
             padding: 20px;
-        }
+            }
 
         .xml-element {
             margin: 0;
@@ -636,7 +636,7 @@
             display: flex;
             align-items: flex-start;
             min-height: 20px;
-        }
+            }
 
         .xml-toggle {
             cursor: pointer;
@@ -648,7 +648,7 @@
             margin-top: 3px;
             flex-shrink: 0;
             position: relative;
-        }
+            }
 
         .xml-toggle::before {
             content: '';
@@ -661,46 +661,46 @@
             border-top: 3px solid transparent;
             border-bottom: 3px solid transparent;
             transition: transform 0.2s;
-        }
+            }
 
         .xml-toggle.expanded::before {
             transform: rotate(90deg);
-        }
+            }
 
         .xml-toggle:hover::before {
             border-left-color: #1a73e8;
-        }
+            }
 
         .xml-tag {
             color: #881391;
             font-weight: normal;
-        }
+            }
 
         .xml-attribute-name {
             color: #881391;
-        }
+            }
 
         .xml-attribute-value {
             color: #1a1aa6;
-        }
+            }
 
         .xml-value {
             color: #c41a16;
-        }
+            }
 
         .xml-children {
             margin-left: 16px;
             display: block;
-        }
+            }
 
         .xml-children.collapsed {
             display: none;
-        }
+            }
 
         .xml-text-node {
             color: #000000;
             margin-left: 16px;
-        }
+            }
 
 
         @media (max-width: 768px) {
@@ -724,7 +724,7 @@
                 height: 50vh;
                 min-height: 300px;
             }
-        }
+            }
     </style>
 </head>
 <body>
@@ -852,52 +852,62 @@
         </div>
     </div>
 
-    <script>
-        const inputArea = document.getElementById('inputArea');
-        const outputArea = document.getElementById('outputArea');
-        const inputTitle = document.getElementById('inputTitle');
-        const orderModeBtn = document.getElementById('orderModeBtn');
-        const xmlModeBtn = document.getElementById('xmlModeBtn');
-        const wscoModeBtn = document.getElementById('wscoModeBtn');
-        const convertBtn = document.getElementById('convertBtn');
-        const reverseConvertBtn = document.getElementById('reverseConvertBtn');
-        const copyBtn = document.getElementById('copyBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const statusMessage = document.getElementById('statusMessage');
-        const converterSection = document.getElementById('converterSection');
-        const wscoSection = document.getElementById('wscoSection');
-        const buttonContainer = document.getElementById('buttonContainer');
-        const xmlTreeContainer = document.getElementById('xmlTreeContainer');
-        const xmlTreeOverlay = document.getElementById('xmlTreeOverlay');
-        const closeXmlTreeBtn = document.getElementById('closeXmlTreeBtn');
-        const editXmlBtn = document.getElementById('editXmlBtn');
-        const xmlEditContainer = document.getElementById('xmlEditContainer');
-        const xmlEditArea = document.getElementById('xmlEditArea');
-        const saveXmlBtn = document.getElementById('saveXmlBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const wscoIframe = document.getElementById('wscoIframe');
-        const wscoBackBtn = document.getElementById('wscoBackBtn');
-        const wscoForwardBtn = document.getElementById('wscoForwardBtn');
-        const wscoRefreshBtn = document.getElementById('wscoRefreshBtn');
-        const chromeReloadBtn = document.getElementById('chromeReloadBtn');
-        const chromeAddressInput = document.getElementById('chromeAddressInput');
-        const chromeTabTitle = document.getElementById('chromeTabTitle');
-        
-        let currentWSCOXmlRaw = ''; // Store raw XML for editing
-
-        let currentMode = 'xml'; // 'order', 'xml', or 'wsco' - default to XML mode
-
-        function showStatus(message, isError = false) {
-            statusMessage.textContent = message;
-            statusMessage.className = `status-message ${isError ? 'status-error' : 'status-success'}`;
-            statusMessage.style.display = 'block';
+    <script src="converter.js"></script>
+</body>
+</html>
+            const outputArea = document.getElementById('outputArea');
+            const inputTitle = document.getElementById('inputTitle');
+            const orderModeBtn = document.getElementById('orderModeBtn');
+            const xmlModeBtn = document.getElementById('xmlModeBtn');
+            const wscoModeBtn = document.getElementById('wscoModeBtn');
+            const convertBtn = document.getElementById('convertBtn');
+            const reverseConvertBtn = document.getElementById('reverseConvertBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const statusMessage = document.getElementById('statusMessage');
+            const converterSection = document.getElementById('converterSection');
+            const wscoSection = document.getElementById('wscoSection');
+            const buttonContainer = document.getElementById('buttonContainer');
+            const xmlTreeContainer = document.getElementById('xmlTreeContainer');
+            const xmlTreeOverlay = document.getElementById('xmlTreeOverlay');
+            const closeXmlTreeBtn = document.getElementById('closeXmlTreeBtn');
+            const editXmlBtn = document.getElementById('editXmlBtn');
+            const xmlEditContainer = document.getElementById('xmlEditContainer');
+            const xmlEditArea = document.getElementById('xmlEditArea');
+            const saveXmlBtn = document.getElementById('saveXmlBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const wscoIframe = document.getElementById('wscoIframe');
+            const wscoBackBtn = document.getElementById('wscoBackBtn');
+            const wscoForwardBtn = document.getElementById('wscoForwardBtn');
+            const wscoRefreshBtn = document.getElementById('wscoRefreshBtn');
+            const chromeReloadBtn = document.getElementById('chromeReloadBtn');
+            const chromeAddressInput = document.getElementById('chromeAddressInput');
+            const chromeTabTitle = document.getElementById('chromeTabTitle');
             
-            setTimeout(() => {
-                statusMessage.style.display = 'none';
-            }, 3000);
-        }
+            // Check if all required elements exist
+            if (!inputArea || !outputArea || !orderModeBtn || !xmlModeBtn || !wscoModeBtn) {
+                console.error('Required DOM elements not found');
+                return;
+            }
+            
+            let currentWSCOXmlRaw = ''; // Store raw XML for editing
 
-        function generateCurrentDate() {
+            let currentMode = 'xml'; // 'order', 'xml', or 'wsco' - default to XML mode
+
+            function showStatus(message, isError = false) {
+                if (!statusMessage) return;
+                statusMessage.textContent = message;
+                statusMessage.className = `status-message ${isError ? 'status-error' : 'status-success'}`;
+                statusMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    if (statusMessage) {
+                        statusMessage.style.display = 'none';
+                    }
+                }, 3000);
+            }
+
+            function generateCurrentDate() {
             const now = new Date();
             
             // Generate a random number of days between 1 and 10 days ago
@@ -912,9 +922,9 @@
             const day = String(shipmentDate.getDate()).padStart(2, '0');
             
             return `${year}-${month}-${day} 0:0:0.0`;
-        }
+            }
 
-        function generateXMLTemplate(orderNumber, isShipment = false) {
+            function generateXMLTemplate(orderNumber, isShipment = false) {
             const orderInput = isShipment ? 'ORDER INPUT SHIPMENT' : 'ORDER INPUT ORDER STATUS UPDATE ACCEPT';
             const shipmentDateTag = isShipment ? `\n                    <ShipmentDate>${generateCurrentDate()}</ShipmentDate>` : '';
             const trackingInfo = isShipment ? `
@@ -954,61 +964,61 @@
             </OrderShipmentUpdateLineItemList>${trackingInfo}
         </OrderStatusUpdate>
     </Comergent>`;
-        }
-
-        function switchMode(mode) {
-            currentMode = mode;
-            
-            // Reset all buttons
-            orderModeBtn.classList.remove('active');
-            xmlModeBtn.classList.remove('active');
-            wscoModeBtn.classList.remove('active');
-            
-            if (mode === 'order') {
-                stopIframeMonitoring();
-                stopNavMonitoring();
-                closeXMLTree();
-                orderModeBtn.classList.add('active');
-                inputTitle.textContent = 'Input Order Numbers';
-                inputArea.placeholder = 'Paste order numbers here (one per line)...\nExample:\n02438130\n02438109\n02440750';
-                converterSection.style.display = 'grid';
-                wscoSection.style.display = 'none';
-                buttonContainer.style.display = 'flex';
-            } else if (mode === 'wsco') {
-                wscoModeBtn.classList.add('active');
-                converterSection.style.display = 'none';
-                wscoSection.style.display = 'block';
-                buttonContainer.style.display = 'none';
-                startNavMonitoring();
-            } else {
-                stopIframeMonitoring();
-                stopNavMonitoring();
-                closeXMLTree();
-                xmlModeBtn.classList.add('active');
-                inputTitle.textContent = 'Input XML';
-                inputArea.placeholder = 'Paste your XML code here...';
-                converterSection.style.display = 'grid';
-                wscoSection.style.display = 'none';
-                buttonContainer.style.display = 'flex';
-            }
-            
-            inputArea.value = '';
-            outputArea.value = '';
-            copyBtn.disabled = true;
-            downloadBtn.disabled = true;
-        }
-
-        function convertXML() {
-            const inputText = inputArea.value.trim();
-            
-            if (!inputText) {
-                const inputType = currentMode === 'order' ? 'order numbers' : 'XML content';
-                showStatus(`Please paste some ${inputType} to convert.`, true);
-                return;
             }
 
-            try {
-                let finalOutput = '';
+            function switchMode(mode) {
+                currentMode = mode;
+                
+                // Reset all buttons
+                orderModeBtn.classList.remove('active');
+                xmlModeBtn.classList.remove('active');
+                wscoModeBtn.classList.remove('active');
+                
+                if (mode === 'order') {
+                    stopIframeMonitoring();
+                    stopNavMonitoring();
+                    closeXMLTree();
+                    orderModeBtn.classList.add('active');
+                    inputTitle.textContent = 'Input Order Numbers';
+                    inputArea.placeholder = 'Paste order numbers here (one per line)...\nExample:\n02438130\n02438109\n02440750';
+                    converterSection.style.display = 'grid';
+                    wscoSection.style.display = 'none';
+                    buttonContainer.style.display = 'flex';
+                } else if (mode === 'wsco') {
+                    wscoModeBtn.classList.add('active');
+                    converterSection.style.display = 'none';
+                    wscoSection.style.display = 'block';
+                    buttonContainer.style.display = 'none';
+                    startNavMonitoring();
+                } else {
+                    stopIframeMonitoring();
+                    stopNavMonitoring();
+                    closeXMLTree();
+                    xmlModeBtn.classList.add('active');
+                    inputTitle.textContent = 'Input XML';
+                    inputArea.placeholder = 'Paste your XML code here...';
+                    converterSection.style.display = 'grid';
+                    wscoSection.style.display = 'none';
+                    buttonContainer.style.display = 'flex';
+                }
+                
+                inputArea.value = '';
+                outputArea.value = '';
+                copyBtn.disabled = true;
+                downloadBtn.disabled = true;
+            }
+
+            function convertXML() {
+                const inputText = inputArea.value.trim();
+                
+                if (!inputText) {
+                    const inputType = currentMode === 'order' ? 'order numbers' : 'XML content';
+                    showStatus(`Please paste some ${inputType} to convert.`, true);
+                    return;
+                }
+
+                try {
+                    let finalOutput = '';
 
                 if (currentMode === 'order') {
                     // Order number mode - generate XML from order numbers
@@ -1120,9 +1130,9 @@
             } catch (error) {
                 showStatus('Error converting: ' + error.message, true);
             }
-        }
+            }
 
-        function copyToClipboard() {
+            function copyToClipboard() {
             if (!outputArea.value) {
                 showStatus('No converted XML to copy.', true);
                 return;
@@ -1142,9 +1152,9 @@
                     showStatus('Failed to copy to clipboard.', true);
                 });
             }
-        }
+            }
 
-        function downloadXML() {
+            function downloadXML() {
             if (!outputArea.value) {
                 showStatus('No converted XML to download.', true);
                 return;
@@ -1175,9 +1185,9 @@
             URL.revokeObjectURL(url);
             
             showStatus('Successfully downloaded XML file!');
-        }
+            }
 
-        function reverseConvertXML() {
+            function reverseConvertXML() {
             const inputText = inputArea.value.trim();
             
             if (!inputText) {
@@ -1273,10 +1283,10 @@
             } catch (error) {
                 showStatus('Error converting: ' + error.message, true);
             }
-        }
+            }
 
         // XML Tree Viewer Functions
-        function parseXMLToTree(xmlString) {
+            function parseXMLToTree(xmlString) {
             try {
                 // Clean up the XML string - remove any HTML wrapper
                 let cleanXML = xmlString.trim();
@@ -1393,15 +1403,15 @@
             } catch (error) {
                 throw new Error('Failed to parse XML: ' + error.message);
             }
-        }
+            }
 
-        function escapeHtml(text) {
+            function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
-        }
+            }
 
-        function renderXMLNode(node, level = 0, nodeIdPrefix = '') {
+            function renderXMLNode(node, level = 0, nodeIdPrefix = '') {
             if (!node) return '';
             
             let html = '';
@@ -1467,9 +1477,9 @@
             }
             
             return html;
-        }
+            }
 
-        function displayXMLTree(xmlString) {
+            function displayXMLTree(xmlString) {
             try {
                 // Store raw XML for editing
                 currentWSCOXmlRaw = xmlString;
@@ -1500,10 +1510,10 @@
                 // Store the raw XML even if parsing failed
                 currentWSCOXmlRaw = xmlString;
             }
-        }
+            }
 
 
-        function showEditMode() {
+            function showEditMode() {
             if (xmlTreeContainer) xmlTreeContainer.style.display = 'none';
             if (xmlEditContainer) {
                 xmlEditContainer.style.display = 'flex';
@@ -1512,14 +1522,14 @@
                     xmlEditArea.value = formatXML(currentWSCOXmlRaw);
                 }
             }
-        }
+            }
 
-        function hideEditMode() {
+            function hideEditMode() {
             if (xmlTreeContainer) xmlTreeContainer.style.display = 'block';
             if (xmlEditContainer) xmlEditContainer.style.display = 'none';
-        }
+            }
 
-        function formatXML(xml) {
+            function formatXML(xml) {
             // Better XML formatter
             try {
                 const parser = new DOMParser();
@@ -1554,9 +1564,9 @@
                 // If formatting fails, return original
                 return xml;
             }
-        }
+            }
 
-        function saveEditedXML() {
+            function saveEditedXML() {
             if (!xmlEditArea || !xmlEditArea.value) {
                 showStatus('No XML to save', true);
                 return;
@@ -1573,15 +1583,15 @@
             } catch (error) {
                 showStatus('Error saving XML: ' + error.message, true);
             }
-        }
+            }
 
-        function closeXMLTree() {
+            function closeXMLTree() {
             if (xmlTreeOverlay) {
                 xmlTreeOverlay.style.display = 'none';
             }
-        }
+            }
 
-        function toggleXMLNode(nodeId) {
+            function toggleXMLNode(nodeId) {
             const node = document.getElementById(nodeId);
             if (!node) return;
             
@@ -1598,13 +1608,13 @@
                 node.classList.add('collapsed');
                 toggle.classList.remove('expanded');
             }
-        }
+            }
 
         // Make toggleXMLNode available globally
         window.toggleXMLNode = toggleXMLNode;
 
         // Monitor iframe for XML content
-        function checkIframeForXML() {
+            function checkIframeForXML() {
             if (currentMode !== 'wsco' || !wscoIframe) return;
             
             try {
@@ -1825,10 +1835,10 @@
                 // CORS or other error - silently fail, user can still use the iframe
                 console.error('Error checking iframe for XML:', error);
             }
-        }
+            }
 
         // Navigation functions for iframe
-        function navigateWSCOBack() {
+            function navigateWSCOBack() {
             try {
                 if (wscoIframe && wscoIframe.contentWindow) {
                     wscoIframe.contentWindow.history.back();
@@ -1837,9 +1847,9 @@
             } catch (error) {
                 showStatus('Cannot navigate: ' + error.message, true);
             }
-        }
+            }
 
-        function navigateWSCOForward() {
+            function navigateWSCOForward() {
             try {
                 if (wscoIframe && wscoIframe.contentWindow) {
                     wscoIframe.contentWindow.history.forward();
@@ -1848,9 +1858,9 @@
             } catch (error) {
                 showStatus('Cannot navigate: ' + error.message, true);
             }
-        }
+            }
 
-        function refreshWSCO() {
+            function refreshWSCO() {
             try {
                 if (wscoIframe) {
                     // Reload the iframe
@@ -1864,9 +1874,9 @@
             } catch (error) {
                 showStatus('Cannot refresh: ' + error.message, true);
             }
-        }
+            }
 
-        function updateWSCOUrl() {
+            function updateWSCOUrl() {
             try {
                 if (wscoIframe && wscoIframe.contentWindow) {
                     const url = wscoIframe.contentWindow.location.href;
@@ -1887,9 +1897,9 @@
             } catch (error) {
                 // CORS - can't access URL, keep default
             }
-        }
+            }
 
-        function updateWSCONavButtons() {
+            function updateWSCONavButtons() {
             // Enable buttons by default - let them try to navigate
             // CORS will prevent actual navigation if needed, but buttons should be enabled
             if (wscoBackBtn) {
@@ -1898,121 +1908,173 @@
             if (wscoForwardBtn) {
                 wscoForwardBtn.disabled = false;
             }
-        }
+            }
 
         // Poll iframe for changes (since we can't reliably detect when it updates)
-        let iframeCheckInterval = null;
+            let iframeCheckInterval = null;
         
-        function startIframeMonitoring() {
+            function startIframeMonitoring() {
             if (iframeCheckInterval) {
                 clearInterval(iframeCheckInterval);
             }
             iframeCheckInterval = setInterval(checkIframeForXML, 2000); // Check every 2 seconds
-        }
+            }
 
-        function stopIframeMonitoring() {
+            function stopIframeMonitoring() {
             if (iframeCheckInterval) {
                 clearInterval(iframeCheckInterval);
                 iframeCheckInterval = null;
             }
-        }
+            }
 
-        // Event listeners
-        orderModeBtn.addEventListener('click', () => switchMode('order'));
-        xmlModeBtn.addEventListener('click', () => switchMode('xml'));
-        wscoModeBtn.addEventListener('click', () => {
-            switchMode('wsco');
-            // Start monitoring after a short delay to let iframe load
-            setTimeout(() => {
-                startIframeMonitoring();
-                updateWSCONavButtons();
-                updateWSCOUrl();
-            }, 1000);
-        });
-        if (closeXmlTreeBtn) {
-            closeXmlTreeBtn.addEventListener('click', closeXMLTree);
-        }
-        if (editXmlBtn) {
-            editXmlBtn.addEventListener('click', showEditMode);
-        }
-        if (saveXmlBtn) {
-            saveXmlBtn.addEventListener('click', saveEditedXML);
-        }
-        if (cancelEditBtn) {
-            cancelEditBtn.addEventListener('click', hideEditMode);
-        }
-        // Handle address bar navigation
-        if (chromeAddressInput) {
-            chromeAddressInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
+            // Event listeners
+            console.log('Setting up event listeners...');
+            console.log('orderModeBtn:', orderModeBtn);
+            console.log('xmlModeBtn:', xmlModeBtn);
+            console.log('wscoModeBtn:', wscoModeBtn);
+            
+            if (orderModeBtn) {
+                orderModeBtn.addEventListener('click', (e) => {
+                    console.log('Order mode button clicked');
                     e.preventDefault();
-                    const url = chromeAddressInput.value.trim();
-                    if (url && wscoIframe) {
-                        // Add http:// if no protocol specified
-                        let fullUrl = url;
-                        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                            fullUrl = 'http://' + url;
+                    e.stopPropagation();
+                    switchMode('order');
+                });
+                console.log('Order mode listener attached');
+            } else {
+                console.error('orderModeBtn not found!');
+            }
+            
+            if (xmlModeBtn) {
+                xmlModeBtn.addEventListener('click', (e) => {
+                    console.log('XML mode button clicked');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    switchMode('xml');
+                });
+                console.log('XML mode listener attached');
+            } else {
+                console.error('xmlModeBtn not found!');
+            }
+            
+            if (wscoModeBtn) {
+                wscoModeBtn.addEventListener('click', (e) => {
+                    console.log('WSCO mode button clicked');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    switchMode('wsco');
+                    // Start monitoring after a short delay to let iframe load
+                    setTimeout(() => {
+                        startIframeMonitoring();
+                        updateWSCONavButtons();
+                        updateWSCOUrl();
+                    }, 1000);
+                });
+                console.log('WSCO mode listener attached');
+            } else {
+                console.error('wscoModeBtn not found!');
+            }
+            if (closeXmlTreeBtn) {
+                closeXmlTreeBtn.addEventListener('click', closeXMLTree);
+            }
+            if (editXmlBtn) {
+                editXmlBtn.addEventListener('click', showEditMode);
+            }
+            if (saveXmlBtn) {
+                saveXmlBtn.addEventListener('click', saveEditedXML);
+            }
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', hideEditMode);
+            }
+            // Handle address bar navigation
+            if (chromeAddressInput) {
+                chromeAddressInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const url = chromeAddressInput.value.trim();
+                        if (url && wscoIframe) {
+                            // Add http:// if no protocol specified
+                            let fullUrl = url;
+                            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                                fullUrl = 'http://' + url;
+                            }
+                            wscoIframe.src = fullUrl;
+                            chromeAddressInput.value = fullUrl;
                         }
-                        wscoIframe.src = fullUrl;
-                        chromeAddressInput.value = fullUrl;
                     }
+                });
+            }
+            if (wscoBackBtn) {
+                wscoBackBtn.addEventListener('click', navigateWSCOBack);
+            }
+            if (wscoForwardBtn) {
+                wscoForwardBtn.addEventListener('click', navigateWSCOForward);
+            }
+            if (wscoRefreshBtn) {
+                wscoRefreshBtn.addEventListener('click', refreshWSCO);
+            }
+            if (chromeReloadBtn) {
+                chromeReloadBtn.addEventListener('click', refreshWSCO);
+            }
+            
+            // Update navigation buttons periodically when in WSCO mode
+            function startNavMonitoring() {
+                if (navCheckInterval) {
+                    clearInterval(navCheckInterval);
                 }
-            });
-        }
-        if (wscoBackBtn) {
-            wscoBackBtn.addEventListener('click', navigateWSCOBack);
-        }
-        if (wscoForwardBtn) {
-            wscoForwardBtn.addEventListener('click', navigateWSCOForward);
-        }
-        if (wscoRefreshBtn) {
-            wscoRefreshBtn.addEventListener('click', refreshWSCO);
-        }
-        if (chromeReloadBtn) {
-            chromeReloadBtn.addEventListener('click', refreshWSCO);
-        }
-        
-        // Update navigation buttons periodically when in WSCO mode
-        function startNavMonitoring() {
-            if (navCheckInterval) {
-                clearInterval(navCheckInterval);
+                navCheckInterval = setInterval(() => {
+                    if (currentMode === 'wsco') {
+                        updateWSCONavButtons();
+                        updateWSCOUrl();
+                    }
+                }, 1000);
             }
-            navCheckInterval = setInterval(() => {
-                if (currentMode === 'wsco') {
-                    updateWSCONavButtons();
-                    updateWSCOUrl();
+            
+            function stopNavMonitoring() {
+                if (navCheckInterval) {
+                    clearInterval(navCheckInterval);
+                    navCheckInterval = null;
                 }
-            }, 1000);
-        }
-        
-        function stopNavMonitoring() {
-            if (navCheckInterval) {
-                clearInterval(navCheckInterval);
-                navCheckInterval = null;
             }
-        }
-        
-        let navCheckInterval = null;
-        convertBtn.addEventListener('click', convertXML);
-        reverseConvertBtn.addEventListener('click', reverseConvertXML);
-        copyBtn.addEventListener('click', copyToClipboard);
-        downloadBtn.addEventListener('click', downloadXML);
-
-        // Allow Enter key to convert (Ctrl+Enter or Cmd+Enter)
-        inputArea.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                convertXML();
+            
+            let navCheckInterval = null;
+            
+            if (convertBtn) {
+                convertBtn.addEventListener('click', convertXML);
             }
-        });
+            if (reverseConvertBtn) {
+                reverseConvertBtn.addEventListener('click', reverseConvertXML);
+            }
+            if (copyBtn) {
+                copyBtn.addEventListener('click', copyToClipboard);
+            }
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', downloadXML);
+            }
 
-        // Auto-resize textareas based on content
-        function autoResize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = Math.max(500, textarea.scrollHeight) + 'px';
-        }
+            // Allow Enter key to convert (Ctrl+Enter or Cmd+Enter)
+            if (inputArea) {
+                inputArea.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        convertXML();
+                    }
+                });
+            }
 
-        inputArea.addEventListener('input', () => autoResize(inputArea));
-        outputArea.addEventListener('input', () => autoResize(outputArea));
+            // Auto-resize textareas based on content
+            function autoResize(textarea) {
+                if (!textarea) return;
+                textarea.style.height = 'auto';
+                textarea.style.height = Math.max(500, textarea.scrollHeight) + 'px';
+            }
+
+            if (inputArea) {
+                inputArea.addEventListener('input', () => autoResize(inputArea));
+            }
+            if (outputArea) {
+                outputArea.addEventListener('input', () => autoResize(outputArea));
+            }
+            }
     </script>
 </body>
 </html>
