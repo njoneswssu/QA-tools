@@ -568,10 +568,10 @@
             overflow-y: auto;
             overflow-x: auto;
             padding: 20px;
-            background: #f8f9fa;
-            font-family: 'Courier New', monospace;
+            background: #ffffff;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 13px;
-            line-height: 1.6;
+            line-height: 1.5;
             position: relative;
         }
 
@@ -623,54 +623,82 @@
 
         .xml-tree {
             color: #333;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 20px;
         }
 
         .xml-element {
-            margin: 4px 0;
+            margin: 0;
             white-space: nowrap;
-        }
-
-        .xml-tag {
-            color: #0066cc;
-            font-weight: 600;
-        }
-
-        .xml-attribute {
-            color: #cc0066;
-        }
-
-        .xml-value {
-            color: #008800;
+            display: flex;
+            align-items: flex-start;
+            min-height: 20px;
         }
 
         .xml-toggle {
             cursor: pointer;
             user-select: none;
             display: inline-block;
-            width: 16px;
+            width: 12px;
+            height: 12px;
             margin-right: 4px;
-            color: #666;
-            font-weight: bold;
+            margin-top: 3px;
+            flex-shrink: 0;
+            position: relative;
         }
 
-        .xml-toggle:hover {
-            color: #4facfe;
+        .xml-toggle::before {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            width: 0;
+            height: 0;
+            border-left: 4px solid #666;
+            border-top: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .xml-toggle.expanded::before {
+            transform: rotate(90deg);
+        }
+
+        .xml-toggle:hover::before {
+            border-left-color: #1a73e8;
+        }
+
+        .xml-tag {
+            color: #881391;
+            font-weight: normal;
+        }
+
+        .xml-attribute-name {
+            color: #881391;
+        }
+
+        .xml-attribute-value {
+            color: #1a1aa6;
+        }
+
+        .xml-value {
+            color: #c41a16;
         }
 
         .xml-children {
-            margin-left: 20px;
+            margin-left: 16px;
+            display: block;
         }
 
-        .xml-collapsed .xml-children {
+        .xml-children.collapsed {
             display: none;
         }
 
-        .xml-expand-icon::before {
-            content: '▼';
-        }
-
-        .xml-collapse-icon::before {
-            content: '▶';
+        .xml-text-node {
+            color: #000000;
+            margin-left: 16px;
         }
 
 
@@ -1360,31 +1388,33 @@
                 const childElements = childNodes.filter(n => n.nodeType === Node.ELEMENT_NODE);
                 const textNodes = childNodes.filter(n => n.nodeType === Node.TEXT_NODE);
                 
-                // Get text content - preserve whitespace for mixed content
+                // Get text content
                 const textContent = textNodes.map(n => n.textContent).join('');
                 const hasChildren = childElements.length > 0;
                 const hasText = textContent.trim().length > 0;
-                const isMixedContent = hasChildren && hasText;
+                const isEmpty = !hasChildren && !hasText;
                 
-                // Build attributes string
+                // Build attributes string - Chrome style
                 let attrs = '';
                 if (node.attributes && node.attributes.length > 0) {
                     attrs = ' ' + Array.from(node.attributes)
-                        .map(attr => `<span class="xml-attribute">${attr.name}="${escapeHtml(attr.value)}"</span>`)
+                        .map(attr => `<span class="xml-attribute-name">${escapeHtml(attr.name)}</span>="<span class="xml-attribute-value">${escapeHtml(attr.value)}</span>"`)
                         .join(' ');
                 }
                 
-                html += `<div class="xml-element" style="padding-left: ${level * 20}px;">`;
+                const indent = level * 16;
+                html += `<div class="xml-element" style="padding-left: ${indent}px;">`;
                 
-                if (hasChildren || hasText) {
-                    html += `<span class="xml-toggle xml-expand-icon" onclick="toggleXMLNode('${nodeId}')"></span>`;
+                if (isEmpty) {
+                    // Self-closing or empty element
+                    html += `<span class="xml-tag">&lt;${tagName}${attrs} /&gt;</span>`;
+                } else {
+                    // Element with content
+                    html += `<span class="xml-toggle expanded" onclick="toggleXMLNode('${nodeId}')"></span>`;
                     html += `<span class="xml-tag">&lt;${tagName}${attrs}&gt;</span>`;
                     
-                    // Show text content if it's the only content (not mixed)
+                    // Show text content if it's the only content
                     if (hasText && !hasChildren) {
-                        html += `<span class="xml-value">${escapeHtml(textContent.trim())}</span>`;
-                    } else if (hasText && !isMixedContent) {
-                        // Text only, no element children
                         html += `<span class="xml-value">${escapeHtml(textContent.trim())}</span>`;
                     }
                     
@@ -1396,18 +1426,14 @@
                             html += renderXMLNode(child, level + 1, nodeId + '-' + idx);
                         } else if (child.nodeType === Node.TEXT_NODE) {
                             const text = child.textContent;
-                            if (text.trim() || (hasChildren && text)) {
-                                // Show text nodes, especially in mixed content
-                                html += `<div style="padding-left: ${(level + 1) * 20}px;"><span class="xml-value">${escapeHtml(text)}</span></div>`;
+                            if (text.trim()) {
+                                html += `<div class="xml-text-node" style="padding-left: ${(level + 1) * 16}px;"><span class="xml-value">${escapeHtml(text.trim())}</span></div>`;
                             }
                         }
                     });
                     
                     html += `</div>`;
                     html += `<span class="xml-tag">&lt;/${tagName}&gt;</span>`;
-                } else {
-                    // Self-closing or empty element
-                    html += `<span class="xml-tag">&lt;${tagName}${attrs} /&gt;</span>`;
                 }
                 
                 html += `</div>`;
@@ -1532,17 +1558,18 @@
             const node = document.getElementById(nodeId);
             if (!node) return;
             
-            const parent = node.parentElement;
-            const toggle = parent.querySelector('.xml-toggle');
+            const xmlElement = node.closest('.xml-element');
+            if (!xmlElement) return;
             
-            if (node.style.display === 'none') {
-                node.style.display = 'block';
-                toggle.classList.remove('xml-collapse-icon');
-                toggle.classList.add('xml-expand-icon');
+            const toggle = xmlElement.querySelector('.xml-toggle');
+            if (!toggle) return;
+            
+            if (node.classList.contains('collapsed')) {
+                node.classList.remove('collapsed');
+                toggle.classList.add('expanded');
             } else {
-                node.style.display = 'none';
-                toggle.classList.remove('xml-expand-icon');
-                toggle.classList.add('xml-collapse-icon');
+                node.classList.add('collapsed');
+                toggle.classList.remove('expanded');
             }
         }
 
@@ -1568,12 +1595,20 @@
                     const docElement = iframeDoc.documentElement;
                     if (docElement && docElement.nodeType === Node.ELEMENT_NODE) {
                         // Check if it's an XML document (not HTML)
-                        if (docElement.tagName !== 'HTML' && docElement.tagName !== 'html') {
-                            // This is likely an XML document - serialize it
+                        if (docElement.tagName !== 'HTML' && docElement.tagName !== 'html' && 
+                            (docElement.tagName === 'ComergentData' || docElement.tagName === 'Comergent' ||
+                             docElement.nodeName.toLowerCase() === 'comergentdata' || docElement.nodeName.toLowerCase() === 'comergent')) {
+                            // This is an XML document - serialize it
                             const serializer = new XMLSerializer();
                             xmlContent = serializer.serializeToString(iframeDoc);
                             // Remove the XML declaration if present for cleaner display
                             xmlContent = xmlContent.replace(/<\?xml[^>]*\?>\s*/i, '');
+                            
+                            // If we got XML, display it immediately
+                            if (xmlContent && xmlContent.trim()) {
+                                displayXMLTree(xmlContent);
+                                return;
+                            }
                         }
                     }
                 } catch (e) {
@@ -1692,7 +1727,7 @@
                         }
                     }
                     
-                    // Try to display as tree, will show convert button if it fails
+                    // Always try to display as tree
                     displayXMLTree(xmlContent);
                 } else {
                     // No XML found, but check if there's raw text that looks like XML
@@ -1758,9 +1793,14 @@
 
         function refreshWSCO() {
             try {
-                if (wscoIframe && wscoIframe.contentWindow) {
-                    wscoIframe.contentWindow.location.reload();
-                    updateWSCOUrl();
+                if (wscoIframe) {
+                    // Reload the iframe
+                    const currentSrc = wscoIframe.src;
+                    wscoIframe.src = '';
+                    setTimeout(() => {
+                        wscoIframe.src = currentSrc;
+                        updateWSCOUrl();
+                    }, 10);
                 }
             } catch (error) {
                 showStatus('Cannot refresh: ' + error.message, true);
@@ -1791,21 +1831,13 @@
         }
 
         function updateWSCONavButtons() {
-            try {
-                if (wscoIframe && wscoIframe.contentWindow) {
-                    const win = wscoIframe.contentWindow;
-                    if (wscoBackBtn) {
-                        wscoBackBtn.disabled = !win.history || win.history.length <= 1;
-                    }
-                    if (wscoForwardBtn) {
-                        // Can't reliably check forward history, so enable it
-                        wscoForwardBtn.disabled = false;
-                    }
-                }
-            } catch (error) {
-                // CORS - disable buttons
-                if (wscoBackBtn) wscoBackBtn.disabled = true;
-                if (wscoForwardBtn) wscoForwardBtn.disabled = true;
+            // Enable buttons by default - let them try to navigate
+            // CORS will prevent actual navigation if needed, but buttons should be enabled
+            if (wscoBackBtn) {
+                wscoBackBtn.disabled = false;
+            }
+            if (wscoForwardBtn) {
+                wscoForwardBtn.disabled = false;
             }
         }
 
