@@ -484,12 +484,6 @@
             white-space: nowrap;
         }
 
-        .chrome-content iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #ffffff;
-        }
 
         .chrome-convert-btn {
             margin-left: auto;
@@ -792,7 +786,12 @@
                             </div>
                         </div>
                         <div class="chrome-content">
-                            <iframe id="wscoIframe" src="http://transfer.levsuite.com/search_wsco.php" frameborder="0" allowfullscreen></iframe>
+                            <div id="wscoContentArea" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #ffffff;">
+                                <div id="wscoLoading" style="text-align: center; color: #5f6368;">
+                                    <div style="font-size: 1.2rem; margin-bottom: 10px;">Loading...</div>
+                                    <div style="font-size: 0.9rem;">Fetching XML from server</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -874,7 +873,8 @@
         const xmlEditArea = document.getElementById('xmlEditArea');
         const saveXmlBtn = document.getElementById('saveXmlBtn');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const wscoIframe = document.getElementById('wscoIframe');
+        const wscoContentArea = document.getElementById('wscoContentArea');
+        const wscoLoading = document.getElementById('wscoLoading');
         const wscoBackBtn = document.getElementById('wscoBackBtn');
         const wscoForwardBtn = document.getElementById('wscoForwardBtn');
         const wscoRefreshBtn = document.getElementById('wscoRefreshBtn');
@@ -883,6 +883,8 @@
         const chromeTabTitle = document.getElementById('chromeTabTitle');
         
         let currentWSCOXmlRaw = ''; // Store raw XML for editing
+        let currentWSCOUrl = 'http://transfer.levsuite.com/search_wsco.php';
+        const PROXY_SERVER_URL = 'http://localhost:3001'; // Proxy server URL
 
         let currentMode = 'xml'; // 'order', 'xml', or 'wsco' - default to XML mode
 
@@ -979,6 +981,10 @@
                 wscoSection.style.display = 'block';
                 buttonContainer.style.display = 'none';
                 startNavMonitoring();
+                // Fetch XML when switching to WSCO mode
+                setTimeout(() => {
+                    fetchXMLFromUrl(currentWSCOUrl);
+                }, 100);
             } else {
                 stopIframeMonitoring();
                 stopNavMonitoring();
@@ -1473,6 +1479,11 @@
                 // Store raw XML for editing
                 currentWSCOXmlRaw = xmlString;
                 
+                // Hide loading area
+                if (wscoLoading) {
+                    wscoLoading.style.display = 'none';
+                }
+                
                 // Debug: log what we're trying to parse
                 console.log('Attempting to parse XML:', xmlString.substring(0, 200));
                 
@@ -1490,6 +1501,10 @@
                 }
             } catch (error) {
                 console.error('Error displaying XML tree:', error);
+                // Hide loading area
+                if (wscoLoading) {
+                    wscoLoading.style.display = 'none';
+                }
                 // Show raw XML
                 xmlTreeContainer.innerHTML = `<div class="xml-placeholder"><p style="color: #dc3545;">Error: ${escapeHtml(error.message)}</p><pre style="text-align: left; white-space: pre-wrap; word-wrap: break-word; color: #333; max-height: 400px; overflow-y: auto;">${escapeHtml(xmlString)}</pre></div>`;
                 // Still show overlay even on error
@@ -1602,78 +1617,53 @@
         // Make toggleXMLNode available globally
         window.toggleXMLNode = toggleXMLNode;
 
-        // Monitor iframe for XML content
-        function checkIframeForXML() {
-            if (currentMode !== 'wsco' || !wscoIframe) return;
+        // Fetch XML from URL using proxy server
+        async function fetchXMLFromUrl(url) {
+            if (currentMode !== 'wsco') return;
             
             try {
-                const iframeDoc = wscoIframe.contentDocument || wscoIframe.contentWindow.document;
-                if (!iframeDoc) return;
-                
-                // Try multiple methods to find XML content
-                let xmlContent = '';
-                
-                // Method 1: Check if the page itself is XML (browser XML view)
-                // When browser displays XML directly, the document itself is XML
-                // Try to serialize the XML document directly
-                try {
-                    // Check if documentElement is XML (not HTML)
-                    const docElement = iframeDoc.documentElement;
-                    if (docElement && docElement.nodeType === Node.ELEMENT_NODE) {
-                        // Check if it's an XML document (not HTML)
-                        // Chrome displays XML directly, so check for any XML root element
-                        if (docElement.tagName !== 'HTML' && docElement.tagName !== 'html') {
-                            // This might be an XML document - try to serialize it
-                            const serializer = new XMLSerializer();
-                            let serialized = serializer.serializeToString(iframeDoc);
-                            
-                            // Check if it looks like XML (has XML structure)
-                            if (serialized && serialized.includes('<') && serialized.includes('>') && 
-                                (serialized.includes('</') || serialized.trim().startsWith('<?xml'))) {
-                                // Keep XML declaration if present, otherwise remove it
-                                // We want to preserve the full XML structure
-                                if (!serialized.trim().startsWith('<?xml')) {
-                                    // Add XML declaration if missing
-                                    serialized = '<?xml version="1.0" encoding="UTF-8"?>\n' + serialized;
-                                }
-                                
-                                xmlContent = serialized;
-                                
-                                // If we got XML, display it immediately as tree
-                                if (xmlContent && xmlContent.trim()) {
-                                    displayXMLTree(xmlContent);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                } catch (e) {
-                    // Not an XML document or CORS error, continue with other methods
+                // Show loading state
+                if (wscoLoading) {
+                    wscoLoading.style.display = 'block';
+                    wscoLoading.innerHTML = '<div style="font-size: 1.2rem; margin-bottom: 10px;">Loading...</div><div style="font-size: 0.9rem;">Fetching XML from server</div>';
                 }
                 
-                // If Method 1 didn't work, try getting from body HTML (preserves structure)
-                if (!xmlContent) {
-                    const bodyHtml = iframeDoc.body ? (iframeDoc.body.innerHTML || '') : '';
-                    const bodyText = iframeDoc.body ? (iframeDoc.body.textContent || iframeDoc.body.innerText || '') : '';
-                    
-                    // Check if body HTML contains XML structure (not just text)
-                    if (bodyHtml && bodyHtml.includes('<') && bodyHtml.includes('</')) {
-                        // Try to extract XML from HTML - prioritize XML declaration pattern
-                        const xmlMatch = bodyHtml.match(/<[?]xml[\s\S]*?<\/ComergentData>/i) || 
-                                       bodyHtml.match(/<ComergentData[\s\S]*?<\/ComergentData>/i) ||
-                                       bodyHtml.match(/<[?]xml[\s\S]*?<\/Comergent>/i) ||
-                                       bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i);
-                        if (xmlMatch) {
-                            xmlContent = xmlMatch[0];
-                            // Decode HTML entities if needed
-                            if (xmlContent.includes('&lt;') || xmlContent.includes('&gt;')) {
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = xmlContent;
-                                xmlContent = tempDiv.textContent || tempDiv.innerText || xmlContent;
-                            }
-                        } else if (bodyText.trim().startsWith('<?xml') || bodyText.trim().startsWith('<ComergentData>') || bodyText.trim().startsWith('<Comergent>')) {
-                            // Fallback: extract from text if HTML extraction didn't work
-                            // Prioritize XML declaration
+                // Fetch through proxy server
+                const proxyUrl = `${PROXY_SERVER_URL}/?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const xmlContent = await response.text();
+                
+                // Hide loading state
+                if (wscoLoading) {
+                    wscoLoading.style.display = 'none';
+                }
+                
+                if (xmlContent && xmlContent.trim()) {
+                    // Check if it's XML
+                    const trimmedContent = xmlContent.trim();
+                    if (trimmedContent.startsWith('<?xml') || trimmedContent.startsWith('<')) {
+                        // Display as XML tree
+                        displayXMLTree(trimmedContent);
+                    } else {
+                        // Not XML - might be HTML page, try to extract XML from it
+                        const parser = new DOMParser();
+                        const htmlDoc = parser.parseFromString(xmlContent, 'text/html');
+                        
+                        // Try to find XML in the HTML
+                        const bodyText = htmlDoc.body ? htmlDoc.body.textContent || htmlDoc.body.innerText || '' : '';
+                        const bodyHtml = htmlDoc.body ? htmlDoc.body.innerHTML || '' : '';
+                        
+                        // Look for XML in the content
+                        let extractedXml = '';
+                        
+                        // Check for XML declaration or XML tags
+                        if (bodyText.trim().startsWith('<?xml') || bodyText.includes('<Comergent')) {
+                            // Extract XML portion
                             let xmlStart = bodyText.indexOf('<?xml');
                             if (xmlStart === -1) {
                                 xmlStart = bodyText.indexOf('<ComergentData>');
@@ -1686,205 +1676,98 @@
                             }
                             
                             if (xmlStart >= 0) {
-                                // Find the closing tag - prioritize ComergentData
                                 let xmlEnd = bodyText.lastIndexOf('</ComergentData>');
                                 if (xmlEnd === -1) {
                                     xmlEnd = bodyText.lastIndexOf('</Comergent>');
                                 }
                                 if (xmlEnd > xmlStart) {
                                     const closingTag = bodyText.lastIndexOf('</ComergentData>') > -1 ? '</ComergentData>' : '</Comergent>';
-                                    xmlContent = bodyText.substring(xmlStart, xmlEnd + closingTag.length);
+                                    extractedXml = bodyText.substring(xmlStart, xmlEnd + closingTag.length);
                                 } else {
                                     const lastBracket = bodyText.lastIndexOf('>');
                                     if (lastBracket > xmlStart) {
-                                        xmlContent = bodyText.substring(xmlStart, lastBracket + 1);
+                                        extractedXml = bodyText.substring(xmlStart, lastBracket + 1);
                                     }
                                 }
                             }
                         }
-                    }
-                }
-                
-                // Method 2: Look for pre/code tags with XML (most common in HTML pages)
-                if (!xmlContent) {
-                    const preElements = iframeDoc.querySelectorAll('pre, code, textarea');
-                    for (let elem of preElements) {
-                        const text = elem.textContent || elem.innerText || '';
-                        // Prioritize XML declaration
-                        if (text.trim().startsWith('<?xml') || 
-                            (text.trim().startsWith('<') && (text.includes('</') || text.includes('<Comergent')))) {
-                            xmlContent = text.trim();
-                            break;
-                        }
-                    }
-                }
-                
-                // Method 3: Check innerHTML for XML (for HTML-encoded XML)
-                if (!xmlContent && bodyHtml) {
-                    // Look for XML that might be HTML-encoded or in HTML structure
-                    // Prioritize patterns with XML declaration
-                    const xmlMatch = bodyHtml.match(/<[?]xml[\s\S]*?<\/ComergentData>/i) || 
-                                   bodyHtml.match(/<ComergentData[\s\S]*?<\/ComergentData>/i) ||
-                                   bodyHtml.match(/<[?]xml[\s\S]*?<\/Comergent>/i) ||
-                                   bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i) ||
-                                   bodyHtml.match(/&lt;[?]xml[\s\S]*?&lt;\/ComergentData&gt;/i) ||
-                                   bodyHtml.match(/&lt;ComergentData[\s\S]*?&lt;\/ComergentData&gt;/i);
-                    if (xmlMatch) {
-                        xmlContent = xmlMatch[0];
-                        // Decode HTML entities if needed
-                        if (xmlContent.includes('&lt;')) {
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = xmlContent;
-                            xmlContent = tempDiv.textContent || tempDiv.innerText || xmlContent;
-                        }
-                    }
-                }
-                
-                // Method 4: Check for XML in any div or body
-                if (!xmlContent) {
-                    const allElements = iframeDoc.querySelectorAll('div, body');
-                    for (let elem of allElements) {
-                        const text = elem.textContent || elem.innerText || '';
-                        // Prioritize XML declaration
-                        if (text.trim().startsWith('<?xml') || 
-                            (text.trim().startsWith('<') && (text.includes('</Comergent') || text.includes('</ComergentData') || text.includes('<Comergent')))) {
-                            // Extract just the XML portion - prioritize XML declaration
-                            let xmlStart = text.indexOf('<?xml');
-                            if (xmlStart === -1) {
-                                xmlStart = text.indexOf('<ComergentData>');
-                            }
-                            if (xmlStart === -1) {
-                                xmlStart = text.indexOf('<Comergent>');
-                            }
-                            if (xmlStart === -1) {
-                                xmlStart = text.indexOf('<');
-                            }
-                            
-                            if (xmlStart >= 0) {
-                                let closingTag = text.lastIndexOf('</ComergentData>');
-                                if (closingTag === -1) {
-                                    closingTag = text.lastIndexOf('</Comergent>');
-                                }
-                                if (closingTag > xmlStart) {
-                                    const closingTagText = text.lastIndexOf('</ComergentData>') > -1 ? '</ComergentData>' : '</Comergent>';
-                                    xmlContent = text.substring(xmlStart, closingTag + closingTagText.length);
-                                } else {
-                                    const lastBracket = text.lastIndexOf('>');
-                                    if (lastBracket > xmlStart) {
-                                        xmlContent = text.substring(xmlStart, lastBracket + 1);
-                                    }
+                        
+                        // Also check HTML for encoded XML
+                        if (!extractedXml && bodyHtml) {
+                            const xmlMatch = bodyHtml.match(/<[?]xml[\s\S]*?<\/ComergentData>/i) || 
+                                           bodyHtml.match(/<ComergentData[\s\S]*?<\/ComergentData>/i) ||
+                                           bodyHtml.match(/<[?]xml[\s\S]*?<\/Comergent>/i) ||
+                                           bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i);
+                            if (xmlMatch) {
+                                extractedXml = xmlMatch[0];
+                                // Decode HTML entities if needed
+                                if (extractedXml.includes('&lt;')) {
+                                    const tempDiv = document.createElement('div');
+                                    tempDiv.innerHTML = extractedXml;
+                                    extractedXml = tempDiv.textContent || tempDiv.innerText || extractedXml;
                                 }
                             }
-                            if (xmlContent) break;
+                        }
+                        
+                        if (extractedXml && extractedXml.trim()) {
+                            displayXMLTree(extractedXml.trim());
+                        } else {
+                            // No XML found - show message
+                            if (wscoLoading) {
+                                wscoLoading.style.display = 'block';
+                                wscoLoading.innerHTML = '<div style="font-size: 1rem; margin-bottom: 10px; color: #dc3545;">No XML found</div><div style="font-size: 0.9rem; color: #6c757d;">The page does not contain XML content</div>';
+                            }
                         }
                     }
-                }
-                
-                if (xmlContent && xmlContent.trim()) {
-                    // Clean and display - ensure we have valid XML
-                    xmlContent = xmlContent.trim();
-                    
-                    // If we have ComergentData wrapper, use it; otherwise wrap if needed
-                    if (!xmlContent.includes('<ComergentData>') && xmlContent.includes('<Comergent>')) {
-                        // Check if we should wrap it
-                        const comergentCount = (xmlContent.match(/<Comergent>/g) || []).length;
-                        if (comergentCount > 1) {
-                            // Multiple Comergent blocks - wrap in ComergentData
-                            xmlContent = '<ComergentData>\n' + xmlContent + '\n</ComergentData>';
-                        }
-                    }
-                    
-                    // Always try to display as Chrome-style tree
-                    displayXMLTree(xmlContent);
                 } else {
-                    // No XML found yet - try one more time to serialize the entire document
-                    // This handles cases where Chrome displays XML but we haven't detected it
-                    try {
-                        const docElement = iframeDoc.documentElement;
-                        if (docElement && docElement.nodeType === Node.ELEMENT_NODE && docElement.tagName !== 'HTML') {
-                            // Try to serialize the entire document
-                            const serializer = new XMLSerializer();
-                            const serialized = serializer.serializeToString(iframeDoc);
-                            
-                            // If it looks like XML (has proper XML structure)
-                            if (serialized && serialized.trim().startsWith('<') && 
-                                (serialized.includes('</') || serialized.includes('<?xml'))) {
-                                xmlContent = serialized.replace(/<\?xml[^>]*\?>\s*/i, '').trim();
-                                if (xmlContent) {
-                                    displayXMLTree(xmlContent);
-                                    return;
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        // Not XML document or CORS error
+                    if (wscoLoading) {
+                        wscoLoading.style.display = 'block';
+                        wscoLoading.innerHTML = '<div style="font-size: 1rem; margin-bottom: 10px; color: #dc3545;">Empty response</div><div style="font-size: 0.9rem; color: #6c757d;">No content received from server</div>';
                     }
                 }
             } catch (error) {
-                // CORS or other error - silently fail, user can still use the iframe
-                console.error('Error checking iframe for XML:', error);
+                console.error('Error fetching XML:', error);
+                if (wscoLoading) {
+                    wscoLoading.style.display = 'block';
+                    wscoLoading.innerHTML = `<div style="font-size: 1rem; margin-bottom: 10px; color: #dc3545;">Error loading XML</div><div style="font-size: 0.9rem; color: #6c757d;">${error.message}</div><div style="font-size: 0.8rem; color: #868e96; margin-top: 10px;">Make sure the proxy server is running on port 3001</div>`;
+                }
+                showStatus('Error fetching XML: ' + error.message, true);
             }
         }
 
-        // Navigation functions for iframe
+        // Navigation functions
         function navigateWSCOBack() {
-            try {
-                if (wscoIframe && wscoIframe.contentWindow) {
-                    wscoIframe.contentWindow.history.back();
-                    updateWSCOUrl();
-                }
-            } catch (error) {
-                showStatus('Cannot navigate: ' + error.message, true);
-            }
+            // History navigation not applicable with fetch-based approach
+            // Could implement history stack if needed
+            showStatus('Back navigation not available with server-side fetch', true);
         }
 
         function navigateWSCOForward() {
-            try {
-                if (wscoIframe && wscoIframe.contentWindow) {
-                    wscoIframe.contentWindow.history.forward();
-                    updateWSCOUrl();
-                }
-            } catch (error) {
-                showStatus('Cannot navigate: ' + error.message, true);
-            }
+            // History navigation not applicable with fetch-based approach
+            showStatus('Forward navigation not available with server-side fetch', true);
         }
 
         function refreshWSCO() {
-            try {
-                if (wscoIframe) {
-                    // Reload the iframe
-                    const currentSrc = wscoIframe.src;
-                    wscoIframe.src = '';
-                    setTimeout(() => {
-                        wscoIframe.src = currentSrc;
-                        updateWSCOUrl();
-                    }, 10);
-                }
-            } catch (error) {
-                showStatus('Cannot refresh: ' + error.message, true);
+            // Reload current URL
+            if (currentWSCOUrl) {
+                fetchXMLFromUrl(currentWSCOUrl);
             }
         }
 
         function updateWSCOUrl() {
-            try {
-                if (wscoIframe && wscoIframe.contentWindow) {
-                    const url = wscoIframe.contentWindow.location.href;
-                    if (chromeAddressInput) {
-                        chromeAddressInput.value = url;
-                    }
-                    // Update tab title
-                    if (chromeTabTitle) {
-                        try {
-                            const iframeDoc = wscoIframe.contentDocument || wscoIframe.contentWindow.document;
-                            const title = iframeDoc.title || 'WSCO Search';
-                            chromeTabTitle.textContent = title.length > 20 ? title.substring(0, 20) + '...' : title;
-                        } catch (e) {
-                            // CORS - can't access title
-                        }
-                    }
+            // Update address bar with current URL
+            if (chromeAddressInput && currentWSCOUrl) {
+                chromeAddressInput.value = currentWSCOUrl;
+            }
+            // Update tab title
+            if (chromeTabTitle) {
+                try {
+                    const urlObj = new URL(currentWSCOUrl);
+                    const title = urlObj.pathname.split('/').pop() || 'WSCO Search';
+                    chromeTabTitle.textContent = title.length > 20 ? title.substring(0, 20) + '...' : title;
+                } catch (e) {
+                    chromeTabTitle.textContent = 'WSCO Search';
                 }
-            } catch (error) {
-                // CORS - can't access URL, keep default
             }
         }
 
@@ -1899,21 +1782,13 @@
             }
         }
 
-        // Poll iframe for changes (since we can't reliably detect when it updates)
-        let iframeCheckInterval = null;
-        
+        // No longer need iframe monitoring - using fetch instead
         function startIframeMonitoring() {
-            if (iframeCheckInterval) {
-                clearInterval(iframeCheckInterval);
-            }
-            iframeCheckInterval = setInterval(checkIframeForXML, 2000); // Check every 2 seconds
+            // Not needed with fetch approach
         }
 
         function stopIframeMonitoring() {
-            if (iframeCheckInterval) {
-                clearInterval(iframeCheckInterval);
-                iframeCheckInterval = null;
-            }
+            // Not needed with fetch approach
         }
 
         // Event listeners
@@ -1921,12 +1796,12 @@
         xmlModeBtn.addEventListener('click', () => switchMode('xml'));
         wscoModeBtn.addEventListener('click', () => {
             switchMode('wsco');
-            // Start monitoring after a short delay to let iframe load
+            // Fetch XML from the default URL
             setTimeout(() => {
-                startIframeMonitoring();
+                fetchXMLFromUrl(currentWSCOUrl);
                 updateWSCONavButtons();
                 updateWSCOUrl();
-            }, 1000);
+            }, 100);
         });
         if (closeXmlTreeBtn) {
             closeXmlTreeBtn.addEventListener('click', closeXMLTree);
@@ -1946,14 +1821,16 @@
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const url = chromeAddressInput.value.trim();
-                    if (url && wscoIframe) {
+                    if (url) {
                         // Add http:// if no protocol specified
                         let fullUrl = url;
                         if (!url.startsWith('http://') && !url.startsWith('https://')) {
                             fullUrl = 'http://' + url;
                         }
-                        wscoIframe.src = fullUrl;
+                        currentWSCOUrl = fullUrl;
                         chromeAddressInput.value = fullUrl;
+                        fetchXMLFromUrl(fullUrl);
+                        updateWSCOUrl();
                     }
                 }
             });
