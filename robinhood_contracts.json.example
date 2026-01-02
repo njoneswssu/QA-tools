@@ -1,0 +1,12 @@
+[
+  {
+    "symbol": "CONTRACT-SYMBOL-1",
+    "name": "Example Contract 1",
+    "id": "optional-id-if-needed"
+  },
+  {
+    "symbol": "CONTRACT-SYMBOL-2",
+    "name": "Example Contract 2"
+  }
+]
+

@@ -1,0 +1,4 @@
+robin-stocks>=1.0.0
+plyer>=2.1.0
+requests>=2.31.0
+
