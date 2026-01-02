@@ -212,7 +212,7 @@ class SportsbookMonitor:
             print(f"Unexpected error fetching sportsbook odds: {e}")
             return []
     
-    def parse_spread_and_total(self, game: Dict, bookmaker_key: str) -> Tuple[Optional[float], Optional[float]]:
+    def parse_spread_and_total(self, game: Dict, bookmaker_key: str) -> Tuple[Optional[float], Optional[float], Optional[str]]:
         """
         Parse spread and total from game data for a specific bookmaker
         
@@ -221,10 +221,12 @@ class SportsbookMonitor:
             bookmaker_key: The bookmaker key (e.g., 'draftkings', 'fanduel')
             
         Returns:
-            Tuple of (spread, total) or (None, None) if not found
+            Tuple of (spread, total, favored_team) or (None, None, None) if not found
+            favored_team: The team name that is favored (negative spread)
         """
         spread = None
         total = None
+        favored_team = None
         
         try:
             # Navigate through the API response structure
@@ -238,8 +240,44 @@ class SportsbookMonitor:
                         if market.get('key') == 'spreads':
                             outcomes = market.get('outcomes', [])
                             if outcomes:
-                                # Spread is typically the first outcome's point value
-                                spread = float(outcomes[0].get('point', 0))
+                                # Get home team name from game data
+                                home_team = game.get('home_team', '')
+                                away_team = game.get('away_team', '')
+                                
+                                # Find the home team's spread value (consistent tracking)
+                                # This ensures we always track the same reference point
+                                for outcome in outcomes:
+                                    if outcome.get('name') == home_team:
+                                        spread = float(outcome.get('point', 0))
+                                        # If home team has negative spread, they're favored
+                                        # If home team has positive spread, away team is favored
+                                        if spread < 0:
+                                            favored_team = home_team
+                                        elif spread > 0:
+                                            favored_team = away_team
+                                        break
+                                
+                                # If home team not found in outcomes, find negative spread (favored team)
+                                if spread is None:
+                                    for outcome in outcomes:
+                                        point = float(outcome.get('point', 0))
+                                        if point < 0:
+                                            spread = point
+                                            favored_team = outcome.get('name', 'Unknown')
+                                            break
+                                
+                                # Fallback: use first outcome if still not found
+                                if spread is None and outcomes:
+                                    spread = float(outcomes[0].get('point', 0))
+                                    # Check if it's negative to determine favored team
+                                    if spread < 0:
+                                        favored_team = outcomes[0].get('name', 'Unknown')
+                                    elif spread > 0:
+                                        # If first outcome is positive, find the other team
+                                        for outcome in outcomes:
+                                            if outcome.get('name') != outcomes[0].get('name'):
+                                                favored_team = outcome.get('name', 'Unknown')
+                                                break
                         
                         # Get total
                         elif market.get('key') == 'totals':
@@ -252,7 +290,7 @@ class SportsbookMonitor:
         except Exception as e:
             print(f"Error parsing spread/total for {bookmaker_key}: {e}")
         
-        return spread, total
+        return spread, total, favored_team
     
     def get_all_bookmaker_odds(self, game: Dict) -> Dict[str, Dict]:
         """
@@ -262,16 +300,17 @@ class SportsbookMonitor:
             game: Game dictionary from API
             
         Returns:
-            Dictionary mapping bookmaker keys to their (spread, total) tuples
+            Dictionary mapping bookmaker keys to their odds data including favored team
         """
         bookmaker_odds = {}
         
         for bookmaker_key in self.bookmakers:
-            spread, total = self.parse_spread_and_total(game, bookmaker_key)
+            spread, total, favored_team = self.parse_spread_and_total(game, bookmaker_key)
             if spread is not None or total is not None:
                 bookmaker_odds[bookmaker_key] = {
                     'spread': spread,
-                    'total': total
+                    'total': total,
+                    'favored_team': favored_team
                 }
         
         return bookmaker_odds
@@ -313,6 +352,7 @@ class SportsbookMonitor:
                         'initial_total': odds.get('total'),
                         'current_spread': odds.get('spread'),
                         'current_total': odds.get('total'),
+                        'favored_team': odds.get('favored_team'),
                         'spread_movements': [],
                         'total_movements': []
                     }
@@ -339,6 +379,7 @@ class SportsbookMonitor:
                             'initial_total': odds.get('total'),
                             'current_spread': odds.get('spread'),
                             'current_total': odds.get('total'),
+                            'favored_team': odds.get('favored_team'),
                             'spread_movements': [],
                             'total_movements': [],
                             'last_seen': current_time
@@ -354,13 +395,20 @@ class SportsbookMonitor:
                     # Use the last saved values as the baseline (from previous run or last check)
                     old_spread = bookmaker_history.get('current_spread')
                     old_total = bookmaker_history.get('current_total')
+                    old_favored_team = bookmaker_history.get('favored_team')
                     new_spread = odds.get('spread')
                     new_total = odds.get('total')
+                    new_favored_team = odds.get('favored_team')
                     
                     # Check spread movement
                     if new_spread is not None and old_spread is not None:
                         spread_change = abs(new_spread - old_spread)
                         if spread_change >= SPREAD_MOVEMENT_THRESHOLD:
+                            # Determine movement direction towards teams
+                            movement_towards = self.determine_spread_movement_direction(
+                                game, old_spread, new_spread, old_favored_team, new_favored_team
+                            )
+                            
                             movement = {
                                 'timestamp': current_time,
                                 'readable_timestamp': readable_time,
@@ -370,7 +418,10 @@ class SportsbookMonitor:
                                 'new_spread': new_spread,
                                 'movement': new_spread - old_spread,
                                 'absolute_movement': spread_change,
-                                'direction': 'increased' if new_spread > old_spread else 'decreased'
+                                'direction': 'increased' if new_spread > old_spread else 'decreased',
+                                'movement_towards': movement_towards,
+                                'old_favored_team': old_favored_team,
+                                'new_favored_team': new_favored_team
                             }
                             bookmaker_history['spread_movements'].append(movement)
                             
@@ -381,12 +432,14 @@ class SportsbookMonitor:
                             movement_occurred = True
                             # Update current value after movement detected
                             bookmaker_history['current_spread'] = new_spread
+                            bookmaker_history['favored_team'] = new_favored_team
                         else:
                             # No significant movement, but still update current value for next comparison
                             bookmaker_history['current_spread'] = new_spread
                     elif new_spread is not None:
                         # First time seeing this spread value, update it
                         bookmaker_history['current_spread'] = new_spread
+                        bookmaker_history['favored_team'] = new_favored_team
                     
                     # Check total movement
                     if new_total is not None and old_total is not None:
@@ -426,6 +479,53 @@ class SportsbookMonitor:
                 # This ensures we remember the current lines for the next run
                 history['last_updated'] = current_time
                 self.save_history()
+    
+    def determine_spread_movement_direction(self, game: Dict, old_spread: float, new_spread: float, 
+                                           old_favored_team: Optional[str], new_favored_team: Optional[str]) -> str:
+        """
+        Determine which team the spread movement is favoring
+        
+        Args:
+            game: Game dictionary with home_team and away_team
+            old_spread: Previous spread value
+            new_spread: New spread value
+            old_favored_team: Previously favored team name
+            new_favored_team: Currently favored team name
+            
+        Returns:
+            String describing movement direction (e.g., "towards home team", "towards away team", "favorite getting more points")
+        """
+        home_team = game.get('home_team', 'Home Team')
+        away_team = game.get('away_team', 'Away Team')
+        
+        # If favored team changed, that's a significant shift
+        if old_favored_team and new_favored_team and old_favored_team != new_favored_team:
+            if new_favored_team == home_team:
+                return f"shifted to favor {home_team} (home team)"
+            elif new_favored_team == away_team:
+                return f"shifted to favor {away_team} (away team)"
+            else:
+                return f"shifted to favor {new_favored_team}"
+        
+        # Spread moved more negative (favorite getting more points)
+        if new_spread < old_spread:
+            if old_favored_team == home_team:
+                return f"towards {home_team} (home team getting more points)"
+            elif old_favored_team == away_team:
+                return f"towards {away_team} (away team getting more points)"
+            else:
+                return "favorite getting more points"
+        
+        # Spread moved more positive (favorite getting fewer points, underdog improving)
+        elif new_spread > old_spread:
+            if old_favored_team == home_team:
+                return f"towards {away_team} (away team improving, home team getting fewer points)"
+            elif old_favored_team == away_team:
+                return f"towards {home_team} (home team improving, away team getting fewer points)"
+            else:
+                return "underdog improving (favorite getting fewer points)"
+        
+        return "unknown direction"
     
     def load_original_lines(self) -> Dict:
         """Load original lines from file"""
@@ -583,6 +683,12 @@ class SportsbookMonitor:
             'direction': movement['direction']
         }
         
+        # Add spread-specific movement direction if available
+        if movement_type == 'spread' and 'movement_towards' in movement:
+            movement_entry['movement_towards'] = movement['movement_towards']
+            movement_entry['old_favored_team'] = movement.get('old_favored_team')
+            movement_entry['new_favored_team'] = movement.get('new_favored_team')
+        
         # Add to movements list
         movements_data['movements'].append(movement_entry)
         movements_data['last_updated'] = datetime.now().isoformat()
@@ -594,6 +700,8 @@ class SportsbookMonitor:
         print(f"✓ Documented {movement_type} movement ({bookmaker_name}): {away_team} @ {home_team}")
         print(f"  Previous: {movement_entry['previous_value']:.1f} → New: {movement_entry['new_value']:.1f}")
         print(f"  Change: {movement_entry['change']:+.1f} points ({movement_entry['direction']})")
+        if 'movement_towards' in movement_entry:
+            print(f"  Movement: {movement_entry['movement_towards']}")
         print(f"  Detected at: {movement_entry['detected_at_readable']}")
         print(f"  Saved to: {LINE_MOVEMENTS_FILE}")
     

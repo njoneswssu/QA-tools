@@ -1201,8 +1201,151 @@
           "documented_at_readable": "2026-01-02 11:07:57"
         }
       }
+    },
+    "d0ea0e32a8c7559d59da7f303f58e146": {
+      "game_id": "d0ea0e32a8c7559d59da7f303f58e146",
+      "home_team": "NC State Wolfpack",
+      "away_team": "Virginia Cavaliers",
+      "game_time": "2026-01-03T16:00:00Z",
+      "first_seen": "2026-01-02T13:20:05.241344",
+      "first_seen_readable": "2026-01-02 13:20:05",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": -3.5,
+          "original_total": 155.5,
+          "documented_at": "2026-01-02T13:20:05.241344",
+          "documented_at_readable": "2026-01-02 13:20:05"
+        }
+      }
+    },
+    "5b57ee11792a1bf04561c323d5169aea": {
+      "game_id": "5b57ee11792a1bf04561c323d5169aea",
+      "home_team": "Georgia Bulldogs",
+      "away_team": "Auburn Tigers",
+      "game_time": "2026-01-03T18:00:00Z",
+      "first_seen": "2026-01-02T13:20:05.241344",
+      "first_seen_readable": "2026-01-02 13:20:05",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": -4.5,
+          "original_total": 173.5,
+          "documented_at": "2026-01-02T13:20:05.241344",
+          "documented_at_readable": "2026-01-02 13:20:05"
+        }
+      }
+    },
+    "4397afdc53feebf2bc621d0481217fe2": {
+      "game_id": "4397afdc53feebf2bc621d0481217fe2",
+      "home_team": "Texas Tech Red Raiders",
+      "away_team": "Oklahoma St Cowboys",
+      "game_time": "2026-01-03T18:00:00Z",
+      "first_seen": "2026-01-02T13:20:05.241344",
+      "first_seen_readable": "2026-01-02 13:20:05",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": -10.5,
+          "original_total": 168.5,
+          "documented_at": "2026-01-02T13:20:05.241344",
+          "documented_at_readable": "2026-01-02 13:20:05"
+        }
+      }
+    },
+    "d32e4d2fac570ab648ec4098f0144c3a": {
+      "game_id": "d32e4d2fac570ab648ec4098f0144c3a",
+      "home_team": "Alabama Crimson Tide",
+      "away_team": "Kentucky Wildcats",
+      "game_time": "2026-01-03T18:00:33Z",
+      "first_seen": "2026-01-02T13:20:05.241344",
+      "first_seen_readable": "2026-01-02 13:20:05",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": -5.5,
+          "original_total": 171.5,
+          "documented_at": "2026-01-02T13:20:05.241344",
+          "documented_at_readable": "2026-01-02 13:20:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -5.5,
+          "original_total": 170.5,
+          "documented_at": "2026-01-02T13:20:05.241344",
+          "documented_at_readable": "2026-01-02 13:20:05"
+        }
+      }
+    },
+    "140c39058ac714549940dc533848524d": {
+      "game_id": "140c39058ac714549940dc533848524d",
+      "home_team": "Kansas St Wildcats",
+      "away_team": "BYU Cougars",
+      "game_time": "2026-01-03T18:30:00Z",
+      "first_seen": "2026-01-02T13:20:05.241344",
+      "first_seen_readable": "2026-01-02 13:20:05",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": -14.5,
+          "original_total": 171.5,
+          "documented_at": "2026-01-02T13:20:05.241344",
+          "documented_at_readable": "2026-01-02 13:20:05"
+        }
+      }
+    },
+    "769bf1a053765a395759287e008a8c47": {
+      "game_id": "769bf1a053765a395759287e008a8c47",
+      "home_team": "Arkansas Razorbacks",
+      "away_team": "Tennessee Volunteers",
+      "game_time": "2026-01-03T20:00:33Z",
+      "first_seen": "2026-01-02T13:20:05.241344",
+      "first_seen_readable": "2026-01-02 13:20:05",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -1.5,
+          "original_total": 152.5,
+          "documented_at": "2026-01-02T13:20:05.241344",
+          "documented_at_readable": "2026-01-02 13:20:05"
+        }
+      }
+    },
+    "828736363951dd253bf737a83eda5ec0": {
+      "game_id": "828736363951dd253bf737a83eda5ec0",
+      "home_team": "Cincinnati Bearcats",
+      "away_team": "Houston Cougars",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T13:23:46.420328",
+      "first_seen_readable": "2026-01-02 13:23:46",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 11.5,
+          "original_total": 131.5,
+          "documented_at": "2026-01-02T13:23:46.420328",
+          "documented_at_readable": "2026-01-02 13:23:46"
+        }
+      }
+    },
+    "32d4b4672ab70a7713d5d74abcc762e8": {
+      "game_id": "32d4b4672ab70a7713d5d74abcc762e8",
+      "home_team": "South Carolina Gamecocks",
+      "away_team": "Vanderbilt Commodores",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T13:23:46.420328",
+      "first_seen_readable": "2026-01-02 13:23:46",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 18.5,
+          "original_total": 155.5,
+          "documented_at": "2026-01-02T13:23:46.420328",
+          "documented_at_readable": "2026-01-02 13:23:46"
+        }
+      }
     }
   },
-  "last_updated": "2026-01-02T11:07:57.792220",
-  "total_games": 39
+  "last_updated": "2026-01-02T13:23:46.420328",
+  "total_games": 47
 }
