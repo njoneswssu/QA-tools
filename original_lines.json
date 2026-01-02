@@ -1216,6 +1216,20 @@
           "original_total": 155.5,
           "documented_at": "2026-01-02T13:20:05.241344",
           "documented_at_readable": "2026-01-02 13:20:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -3.5,
+          "original_total": 154.5,
+          "documented_at": "2026-01-02T13:52:00.325200",
+          "documented_at_readable": "2026-01-02 13:52:00"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": -3.5,
+          "original_total": 155.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
         }
       }
     },
@@ -1233,6 +1247,20 @@
           "original_total": 173.5,
           "documented_at": "2026-01-02T13:20:05.241344",
           "documented_at_readable": "2026-01-02 13:20:05"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": -4.5,
+          "original_total": 173.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -4.5,
+          "original_total": 173.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:08"
         }
       }
     },
@@ -1250,6 +1278,20 @@
           "original_total": 168.5,
           "documented_at": "2026-01-02T13:20:05.241344",
           "documented_at_readable": "2026-01-02 13:20:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -11.5,
+          "original_total": 167.5,
+          "documented_at": "2026-01-02T13:52:00.325200",
+          "documented_at_readable": "2026-01-02 13:52:00"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": -10.5,
+          "original_total": 168.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
         }
       }
     },
@@ -1274,6 +1316,13 @@
           "original_total": 170.5,
           "documented_at": "2026-01-02T13:20:05.241344",
           "documented_at_readable": "2026-01-02 13:20:05"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": -5.5,
+          "original_total": 171.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
         }
       }
     },
@@ -1291,6 +1340,20 @@
           "original_total": 171.5,
           "documented_at": "2026-01-02T13:20:05.241344",
           "documented_at_readable": "2026-01-02 13:20:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 8.5,
+          "original_total": 172.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 9.5,
+          "original_total": 171.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
         }
       }
     },
@@ -1308,6 +1371,20 @@
           "original_total": 152.5,
           "documented_at": "2026-01-02T13:20:05.241344",
           "documented_at_readable": "2026-01-02 13:20:05"
+        },
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": -1.5,
+          "original_total": 153.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": -1.5,
+          "original_total": 153.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
         }
       }
     },
@@ -1325,6 +1402,20 @@
           "original_total": 131.5,
           "documented_at": "2026-01-02T13:23:46.420328",
           "documented_at_readable": "2026-01-02 13:23:46"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 11.5,
+          "original_total": 131.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 7.5,
+          "original_total": 133.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:08"
         }
       }
     },
@@ -1342,10 +1433,633 @@
           "original_total": 155.5,
           "documented_at": "2026-01-02T13:23:46.420328",
           "documented_at_readable": "2026-01-02 13:23:46"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 18.5,
+          "original_total": 155.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 13.5,
+          "original_total": 156.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:08"
         }
       }
+    },
+    "7a957f884e56c59ac877ef9b4bfd77ad": {
+      "game_id": "7a957f884e56c59ac877ef9b4bfd77ad",
+      "home_team": "UCF Knights",
+      "away_team": "Kansas Jayhawks",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T13:37:17.025993",
+      "first_seen_readable": "2026-01-02 13:37:17",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 6.5,
+          "original_total": 151.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 6.5,
+          "original_total": 151.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 5.5,
+          "original_total": 153.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:08"
+        }
+      }
+    },
+    "0d25d88607ed811f36e3b6a08d2c1ae9": {
+      "game_id": "0d25d88607ed811f36e3b6a08d2c1ae9",
+      "home_team": "SMU Mustangs",
+      "away_team": "North Carolina Tar Heels",
+      "game_time": "2026-01-03T19:15:00Z",
+      "first_seen": "2026-01-02T13:37:17.025993",
+      "first_seen_readable": "2026-01-02 13:37:17",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 1.5,
+          "original_total": 151.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 1.5,
+          "original_total": 151.5,
+          "documented_at": "2026-01-02T14:23:03.769981",
+          "documented_at_readable": "2026-01-02 14:23:05"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 1.5,
+          "original_total": 153.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        }
+      }
+    },
+    "4cc1f616bfd6c49d1115b9208d5cd77d": {
+      "game_id": "4cc1f616bfd6c49d1115b9208d5cd77d",
+      "home_team": "Florida St Seminoles",
+      "away_team": "Duke Blue Devils",
+      "game_time": "2026-01-03T20:45:00Z",
+      "first_seen": "2026-01-02T13:37:17.025993",
+      "first_seen_readable": "2026-01-02 13:37:17",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 16.5,
+          "original_total": 161.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 14.5,
+          "original_total": 160.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 16.5,
+          "original_total": 161.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        }
+      }
+    },
+    "4b8a8dce0d5cd258db04705ba70a3fdd": {
+      "game_id": "4b8a8dce0d5cd258db04705ba70a3fdd",
+      "home_team": "Utah Utes",
+      "away_team": "Arizona Wildcats",
+      "game_time": "2026-01-03T21:00:00Z",
+      "first_seen": "2026-01-02T13:37:17.025993",
+      "first_seen_readable": "2026-01-02 13:37:17",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 18.5,
+          "original_total": 162.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 17.5,
+          "original_total": 161.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 18.5,
+          "original_total": 162.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        }
+      }
+    },
+    "3000ec8118f181f7add336c99630cb39": {
+      "game_id": "3000ec8118f181f7add336c99630cb39",
+      "home_team": "Iowa Hawkeyes",
+      "away_team": "UCLA Bruins",
+      "game_time": "2026-01-03T23:00:00Z",
+      "first_seen": "2026-01-02T13:37:17.025993",
+      "first_seen_readable": "2026-01-02 13:37:17",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": -4.5,
+          "original_total": 138.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -4.5,
+          "original_total": 136.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": -4.5,
+          "original_total": 137.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        }
+      }
+    },
+    "0e917a3f309143967db06afd5f148001": {
+      "game_id": "0e917a3f309143967db06afd5f148001",
+      "home_team": "Penn State Nittany Lions",
+      "away_team": "Illinois Fighting Illini",
+      "game_time": "2026-01-04T00:00:00Z",
+      "first_seen": "2026-01-02T13:37:17.025993",
+      "first_seen_readable": "2026-01-02 13:37:17",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 18.5,
+          "original_total": 156.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 17.5,
+          "original_total": 156.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 18.5,
+          "original_total": 156.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        }
+      }
+    },
+    "cd02016f4604d99d55519b2abf628ced": {
+      "game_id": "cd02016f4604d99d55519b2abf628ced",
+      "home_team": "Wisconsin Badgers",
+      "away_team": "Purdue Boilermakers",
+      "game_time": "2026-01-04T01:00:00Z",
+      "first_seen": "2026-01-02T13:37:17.025993",
+      "first_seen_readable": "2026-01-02 13:37:17",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 8.5,
+          "original_total": 152.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 7.5,
+          "original_total": 150.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 8.5,
+          "original_total": 152.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        }
+      }
+    },
+    "3ae2aa915b605eba6decf12174828e45": {
+      "game_id": "3ae2aa915b605eba6decf12174828e45",
+      "home_team": "Missouri Tigers",
+      "away_team": "Florida Gators",
+      "game_time": "2026-01-04T01:30:00Z",
+      "first_seen": "2026-01-02T13:37:17.025993",
+      "first_seen_readable": "2026-01-02 13:37:17",
+      "bookmakers": {
+        "draftkings": {
+          "bookmaker_name": "DraftKings",
+          "original_spread": 7.5,
+          "original_total": 157.5,
+          "documented_at": "2026-01-02T13:37:17.025993",
+          "documented_at_readable": "2026-01-02 13:37:17"
+        },
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 6.5,
+          "original_total": 158.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        },
+        "betmgm": {
+          "bookmaker_name": "BetMGM",
+          "original_spread": 7.5,
+          "original_total": 157.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        }
+      }
+    },
+    "827fb304193b823494d04fd717c1b953": {
+      "game_id": "827fb304193b823494d04fd717c1b953",
+      "home_team": "Pittsburgh Panthers",
+      "away_team": "Clemson Tigers",
+      "game_time": "2026-01-03T17:00:18Z",
+      "first_seen": "2026-01-02T16:23:03.947488",
+      "first_seen_readable": "2026-01-02 16:23:08",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 2.5,
+          "original_total": 134.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:08"
+        }
+      }
+    },
+    "3cdbee8a4bfd7f6d54389bd8ec9f4871": {
+      "game_id": "3cdbee8a4bfd7f6d54389bd8ec9f4871",
+      "home_team": "Butler Bulldogs",
+      "away_team": "Villanova Wildcats",
+      "game_time": "2026-01-03T17:00:38Z",
+      "first_seen": "2026-01-02T16:23:03.947488",
+      "first_seen_readable": "2026-01-02 16:23:08",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": 1.5,
+          "original_total": 147.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:08"
+        }
+      }
+    },
+    "6767a3b5aa113d2c3b970ca3fd6e75be": {
+      "game_id": "6767a3b5aa113d2c3b970ca3fd6e75be",
+      "home_team": "St. John's Red Storm",
+      "away_team": "Providence Friars",
+      "game_time": "2026-01-03T17:00:42Z",
+      "first_seen": "2026-01-02T16:23:03.947488",
+      "first_seen_readable": "2026-01-02 16:23:08",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -10.5,
+          "original_total": 168.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:08"
+        }
+      }
+    },
+    "1f436c9e86ce53068c8095e6337e82f3": {
+      "game_id": "1f436c9e86ce53068c8095e6337e82f3",
+      "home_team": "TCU Horned Frogs",
+      "away_team": "Baylor Bears",
+      "game_time": "2026-01-03T19:00:55Z",
+      "first_seen": "2026-01-02T16:23:03.947488",
+      "first_seen_readable": "2026-01-02 16:23:09",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -1.5,
+          "original_total": 155.5,
+          "documented_at": "2026-01-02T16:23:03.947488",
+          "documented_at_readable": "2026-01-02 16:23:09"
+        }
+      }
+    },
+    "b9d4c49ff5254d29e970cbb40bb6b2ea": {
+      "game_id": "b9d4c49ff5254d29e970cbb40bb6b2ea",
+      "home_team": "Indiana Hoosiers",
+      "away_team": "Miami Hurricanes",
+      "game_time": "2026-01-20T00:30:00Z",
+      "first_seen": "2026-01-02T16:23:10.386567",
+      "first_seen_readable": "2026-01-02 16:23:12",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -4.5,
+          "original_total": null,
+          "documented_at": "2026-01-02T16:23:10.386567",
+          "documented_at_readable": "2026-01-02 16:23:12"
+        }
+      }
+    },
+    "23a8a77339e637f439bd73791b4e22af": {
+      "game_id": "23a8a77339e637f439bd73791b4e22af",
+      "home_team": "Indiana Hoosiers",
+      "away_team": "Ole Miss Rebels",
+      "game_time": "2026-01-20T00:30:00Z",
+      "first_seen": "2026-01-02T16:23:10.386567",
+      "first_seen_readable": "2026-01-02 16:23:12",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -7.5,
+          "original_total": null,
+          "documented_at": "2026-01-02T16:23:10.386567",
+          "documented_at_readable": "2026-01-02 16:23:12"
+        }
+      }
+    },
+    "ecf29901db3fe15c0e5eae32f0390c51": {
+      "game_id": "ecf29901db3fe15c0e5eae32f0390c51",
+      "home_team": "Oregon Ducks",
+      "away_team": "Miami Hurricanes",
+      "game_time": "2026-01-20T00:30:00Z",
+      "first_seen": "2026-01-02T16:23:10.386567",
+      "first_seen_readable": "2026-01-02 16:23:12",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -2.5,
+          "original_total": null,
+          "documented_at": "2026-01-02T16:23:10.386567",
+          "documented_at_readable": "2026-01-02 16:23:12"
+        }
+      }
+    },
+    "6af6623a038f6add7f026fc913e24356": {
+      "game_id": "6af6623a038f6add7f026fc913e24356",
+      "home_team": "Oregon Ducks",
+      "away_team": "Ole Miss Rebels",
+      "game_time": "2026-01-20T00:30:00Z",
+      "first_seen": "2026-01-02T16:23:10.386567",
+      "first_seen_readable": "2026-01-02 16:23:12",
+      "bookmakers": {
+        "fanduel": {
+          "bookmaker_name": "FanDuel",
+          "original_spread": -3.5,
+          "original_total": null,
+          "documented_at": "2026-01-02T16:23:10.386567",
+          "documented_at_readable": "2026-01-02 16:23:12"
+        }
+      }
+    },
+    "dd6c65e86b5f8be4640dc9cda987ccb8": {
+      "game_id": "dd6c65e86b5f8be4640dc9cda987ccb8",
+      "home_team": "Campbell Fighting Camels",
+      "away_team": "Northeastern Huskies",
+      "game_time": "2026-01-03T17:00:00Z",
+      "first_seen": "2026-01-02T17:00:03.934649",
+      "first_seen_readable": "2026-01-02 17:00:09",
+      "bookmakers": {}
+    },
+    "cc5b0b1d0191f1146189c7426812f430": {
+      "game_id": "cc5b0b1d0191f1146189c7426812f430",
+      "home_team": "Duquesne Dukes",
+      "away_team": "VCU Rams",
+      "game_time": "2026-01-03T17:00:00Z",
+      "first_seen": "2026-01-02T17:00:03.934649",
+      "first_seen_readable": "2026-01-02 17:00:09",
+      "bookmakers": {}
+    },
+    "91e5fbdd188f13b36232e5615a38fdc9": {
+      "game_id": "91e5fbdd188f13b36232e5615a38fdc9",
+      "home_team": "Temple Owls",
+      "away_team": "UTSA Roadrunners",
+      "game_time": "2026-01-03T17:00:00Z",
+      "first_seen": "2026-01-02T17:00:03.934649",
+      "first_seen_readable": "2026-01-02 17:00:09",
+      "bookmakers": {}
+    },
+    "c339ca812acbb5016edfbd30cee871a2": {
+      "game_id": "c339ca812acbb5016edfbd30cee871a2",
+      "home_team": "Wake Forest Demon Deacons",
+      "away_team": "Virginia Tech Hokies",
+      "game_time": "2026-01-03T17:00:00Z",
+      "first_seen": "2026-01-02T17:00:03.934649",
+      "first_seen_readable": "2026-01-02 17:00:09",
+      "bookmakers": {}
+    },
+    "33dbcd63c2991243b3613cac9fef683e": {
+      "game_id": "33dbcd63c2991243b3613cac9fef683e",
+      "home_team": "VMI Keydets",
+      "away_team": "Chattanooga Mocs",
+      "game_time": "2026-01-03T18:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "4498832150c15bd66e484896ca901060": {
+      "game_id": "4498832150c15bd66e484896ca901060",
+      "home_team": "Coastal Carolina Chanticleers",
+      "away_team": "Georgia St Panthers",
+      "game_time": "2026-01-03T18:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "ecf3e99a550b756486a1ee2c70297952": {
+      "game_id": "ecf3e99a550b756486a1ee2c70297952",
+      "home_team": "Kent State Golden Flashes",
+      "away_team": "Northern Illinois Huskies",
+      "game_time": "2026-01-03T18:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "536a05f27bb64cdd3859c8382fc6f400": {
+      "game_id": "536a05f27bb64cdd3859c8382fc6f400",
+      "home_team": "Louisiana Ragin' Cajuns",
+      "away_team": "Southern Miss Golden Eagles",
+      "game_time": "2026-01-03T18:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "c5a0796902629901ad8cae5b45a40c3e": {
+      "game_id": "c5a0796902629901ad8cae5b45a40c3e",
+      "home_team": "The Citadel Bulldogs",
+      "away_team": "Wofford Terriers",
+      "game_time": "2026-01-03T18:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "f8ccc014a8fe4a5bb411af4e7a62f45e": {
+      "game_id": "f8ccc014a8fe4a5bb411af4e7a62f45e",
+      "home_team": "Buffalo Bulls",
+      "away_team": "Ball State Cardinals",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "4133d921878cdad1cb8b60553f1623af": {
+      "game_id": "4133d921878cdad1cb8b60553f1623af",
+      "home_team": "Georgia Tech Yellow Jackets",
+      "away_team": "Boston College Eagles",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "bebdc893b8941bd5c33ebd405a44692d": {
+      "game_id": "bebdc893b8941bd5c33ebd405a44692d",
+      "home_team": "Massachusetts Minutemen",
+      "away_team": "Bowling Green Falcons",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "32a3a2d807fdb3811b286ee1ef5c7b89": {
+      "game_id": "32a3a2d807fdb3811b286ee1ef5c7b89",
+      "home_team": "Loyola (Chi) Ramblers",
+      "away_team": "Dayton Flyers",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "090730b857397142f166072ef6668764": {
+      "game_id": "090730b857397142f166072ef6668764",
+      "home_team": "DePaul Blue Demons",
+      "away_team": "Xavier Musketeers",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "141377f072acc8b7fcb17b5ad5de91e3": {
+      "game_id": "141377f072acc8b7fcb17b5ad5de91e3",
+      "home_team": "Drexel Dragons",
+      "away_team": "Hofstra Pride",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "de16ccaa4744619a8fedfa1739e3155d": {
+      "game_id": "de16ccaa4744619a8fedfa1739e3155d",
+      "home_team": "Eastern Michigan Eagles",
+      "away_team": "Ohio Bobcats",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "88c1771810a67f31a15abff4e7c8d1be": {
+      "game_id": "88c1771810a67f31a15abff4e7c8d1be",
+      "home_team": "GW Revolutionaries",
+      "away_team": "La Salle Explorers",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "e6e6bc5f0ce2468376c91e1109b3615f": {
+      "game_id": "e6e6bc5f0ce2468376c91e1109b3615f",
+      "home_team": "North Dakota Fighting Hawks",
+      "away_team": "South Dakota St Jackrabbits",
+      "game_time": "2026-01-03T19:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "474e0b3ce7fcfc64e9948f0789eaba18": {
+      "game_id": "474e0b3ce7fcfc64e9948f0789eaba18",
+      "home_team": "Arkansas St Red Wolves",
+      "away_team": "James Madison Dukes",
+      "game_time": "2026-01-03T20:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "db482dc9a8450afc7e82cf5dce598cc8": {
+      "game_id": "db482dc9a8450afc7e82cf5dce598cc8",
+      "home_team": "Central Michigan Chippewas",
+      "away_team": "Toledo Rockets",
+      "game_time": "2026-01-03T20:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "d109bbd17d154a229236e288e7defce1": {
+      "game_id": "d109bbd17d154a229236e288e7defce1",
+      "home_team": "Rice Owls",
+      "away_team": "Memphis Tigers",
+      "game_time": "2026-01-03T20:00:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "ebbacdb2033d87704860622ba46cbdd8": {
+      "game_id": "ebbacdb2033d87704860622ba46cbdd8",
+      "home_team": "Miami (OH) RedHawks",
+      "away_team": "Akron Zips",
+      "game_time": "2026-01-03T20:30:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "8a8572eb213193ff68394dfdc20f349c": {
+      "game_id": "8a8572eb213193ff68394dfdc20f349c",
+      "home_team": "Old Dominion Monarchs",
+      "away_team": "Georgia Southern Eagles",
+      "game_time": "2026-01-03T20:30:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "a7b4479ff4ce2e8ba7b5dd1b94134449": {
+      "game_id": "a7b4479ff4ce2e8ba7b5dd1b94134449",
+      "home_team": "Oklahoma Sooners",
+      "away_team": "Ole Miss Rebels",
+      "game_time": "2026-01-03T20:30:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
+    },
+    "2a28878245ab91312ac446cfeb1462bd": {
+      "game_id": "2a28878245ab91312ac446cfeb1462bd",
+      "home_team": "UL Monroe Warhawks",
+      "away_team": "Texas State Bobcats",
+      "game_time": "2026-01-03T20:30:00Z",
+      "first_seen": "2026-01-02T17:30:18.720795",
+      "first_seen_readable": "2026-01-02 17:30:23",
+      "bookmakers": {}
     }
   },
-  "last_updated": "2026-01-02T13:23:46.420328",
-  "total_games": 47
+  "last_updated": "2026-01-02T17:30:18.720795",
+  "total_games": 88
 }

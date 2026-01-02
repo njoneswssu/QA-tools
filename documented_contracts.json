@@ -1,7 +1,7 @@
 {
   "robinhood_contracts": [],
-  "last_updated": "2026-01-02T13:23:46.411550",
-  "total_contracts": 73,
+  "last_updated": "2026-01-02T17:30:18.710577",
+  "total_contracts": 114,
   "draftkings_contracts": [
     {
       "id": "14bc31e6584046b79f90aa3d42877f07",
@@ -10569,6 +10569,1238 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "id": "7a957f884e56c59ac877ef9b4bfd77ad",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T13:37:16.952810",
+      "data": {
+        "id": "7a957f884e56c59ac877ef9b4bfd77ad",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "UCF Knights",
+        "away_team": "Kansas Jayhawks",
+        "bookmakers": [
+          {
+            "key": "draftkings",
+            "title": "DraftKings",
+            "last_update": "2026-01-02T18:37:06Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Kansas Jayhawks",
+                    "price": -110,
+                    "point": -6.5
+                  },
+                  {
+                    "name": "UCF Knights",
+                    "price": -110,
+                    "point": 6.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 151.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 151.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "0d25d88607ed811f36e3b6a08d2c1ae9",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T13:37:16.962028",
+      "data": {
+        "id": "0d25d88607ed811f36e3b6a08d2c1ae9",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:15:00Z",
+        "home_team": "SMU Mustangs",
+        "away_team": "North Carolina Tar Heels",
+        "bookmakers": [
+          {
+            "key": "draftkings",
+            "title": "DraftKings",
+            "last_update": "2026-01-02T18:37:06Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "North Carolina Tar Heels",
+                    "price": -105,
+                    "point": -1.5
+                  },
+                  {
+                    "name": "SMU Mustangs",
+                    "price": -115,
+                    "point": 1.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 151.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 151.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "4cc1f616bfd6c49d1115b9208d5cd77d",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T13:37:16.971555",
+      "data": {
+        "id": "4cc1f616bfd6c49d1115b9208d5cd77d",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T20:45:00Z",
+        "home_team": "Florida St Seminoles",
+        "away_team": "Duke Blue Devils",
+        "bookmakers": [
+          {
+            "key": "draftkings",
+            "title": "DraftKings",
+            "last_update": "2026-01-02T18:37:06Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Duke Blue Devils",
+                    "price": -110,
+                    "point": -16.5
+                  },
+                  {
+                    "name": "Florida St Seminoles",
+                    "price": -110,
+                    "point": 16.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 161.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 161.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "4b8a8dce0d5cd258db04705ba70a3fdd",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T13:37:16.981109",
+      "data": {
+        "id": "4b8a8dce0d5cd258db04705ba70a3fdd",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T21:00:00Z",
+        "home_team": "Utah Utes",
+        "away_team": "Arizona Wildcats",
+        "bookmakers": [
+          {
+            "key": "draftkings",
+            "title": "DraftKings",
+            "last_update": "2026-01-02T18:37:06Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Arizona Wildcats",
+                    "price": -110,
+                    "point": -18.5
+                  },
+                  {
+                    "name": "Utah Utes",
+                    "price": -110,
+                    "point": 18.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 162.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 162.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "3000ec8118f181f7add336c99630cb39",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T13:37:16.989934",
+      "data": {
+        "id": "3000ec8118f181f7add336c99630cb39",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T23:00:00Z",
+        "home_team": "Iowa Hawkeyes",
+        "away_team": "UCLA Bruins",
+        "bookmakers": [
+          {
+            "key": "draftkings",
+            "title": "DraftKings",
+            "last_update": "2026-01-02T18:37:06Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Iowa Hawkeyes",
+                    "price": -110,
+                    "point": -4.5
+                  },
+                  {
+                    "name": "UCLA Bruins",
+                    "price": -110,
+                    "point": 4.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 138.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 138.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "0e917a3f309143967db06afd5f148001",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T13:37:16.998591",
+      "data": {
+        "id": "0e917a3f309143967db06afd5f148001",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-04T00:00:00Z",
+        "home_team": "Penn State Nittany Lions",
+        "away_team": "Illinois Fighting Illini",
+        "bookmakers": [
+          {
+            "key": "draftkings",
+            "title": "DraftKings",
+            "last_update": "2026-01-02T18:37:06Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Illinois Fighting Illini",
+                    "price": -110,
+                    "point": -18.5
+                  },
+                  {
+                    "name": "Penn State Nittany Lions",
+                    "price": -110,
+                    "point": 18.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 156.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 156.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cd02016f4604d99d55519b2abf628ced",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T13:37:17.007612",
+      "data": {
+        "id": "cd02016f4604d99d55519b2abf628ced",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-04T01:00:00Z",
+        "home_team": "Wisconsin Badgers",
+        "away_team": "Purdue Boilermakers",
+        "bookmakers": [
+          {
+            "key": "draftkings",
+            "title": "DraftKings",
+            "last_update": "2026-01-02T18:37:06Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Purdue Boilermakers",
+                    "price": -110,
+                    "point": -8.5
+                  },
+                  {
+                    "name": "Wisconsin Badgers",
+                    "price": -110,
+                    "point": 8.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 152.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 152.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "3ae2aa915b605eba6decf12174828e45",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T13:37:17.016311",
+      "data": {
+        "id": "3ae2aa915b605eba6decf12174828e45",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-04T01:30:00Z",
+        "home_team": "Missouri Tigers",
+        "away_team": "Florida Gators",
+        "bookmakers": [
+          {
+            "key": "draftkings",
+            "title": "DraftKings",
+            "last_update": "2026-01-02T18:37:06Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Florida Gators",
+                    "price": -110,
+                    "point": -7.5
+                  },
+                  {
+                    "name": "Missouri Tigers",
+                    "price": -110,
+                    "point": 7.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T18:37:06Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 157.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 157.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "827fb304193b823494d04fd717c1b953",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T16:23:03.896104",
+      "data": {
+        "id": "827fb304193b823494d04fd717c1b953",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T17:00:18Z",
+        "home_team": "Pittsburgh Panthers",
+        "away_team": "Clemson Tigers",
+        "bookmakers": [
+          {
+            "key": "fanduel",
+            "title": "FanDuel",
+            "last_update": "2026-01-02T21:22:31Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T21:22:30Z",
+                "outcomes": [
+                  {
+                    "name": "Clemson Tigers",
+                    "price": -110,
+                    "point": -2.5
+                  },
+                  {
+                    "name": "Pittsburgh Panthers",
+                    "price": -110,
+                    "point": 2.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T21:22:30Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 134.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 134.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "3cdbee8a4bfd7f6d54389bd8ec9f4871",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T16:23:03.912866",
+      "data": {
+        "id": "3cdbee8a4bfd7f6d54389bd8ec9f4871",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T17:00:38Z",
+        "home_team": "Butler Bulldogs",
+        "away_team": "Villanova Wildcats",
+        "bookmakers": [
+          {
+            "key": "fanduel",
+            "title": "FanDuel",
+            "last_update": "2026-01-02T21:22:31Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T21:22:30Z",
+                "outcomes": [
+                  {
+                    "name": "Butler Bulldogs",
+                    "price": -115,
+                    "point": 1.5
+                  },
+                  {
+                    "name": "Villanova Wildcats",
+                    "price": -105,
+                    "point": -1.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T21:22:30Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 147.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 147.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "6767a3b5aa113d2c3b970ca3fd6e75be",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T16:23:03.921488",
+      "data": {
+        "id": "6767a3b5aa113d2c3b970ca3fd6e75be",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T17:00:42Z",
+        "home_team": "St. John's Red Storm",
+        "away_team": "Providence Friars",
+        "bookmakers": [
+          {
+            "key": "fanduel",
+            "title": "FanDuel",
+            "last_update": "2026-01-02T21:22:31Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T21:22:30Z",
+                "outcomes": [
+                  {
+                    "name": "Providence Friars",
+                    "price": -102,
+                    "point": 10.5
+                  },
+                  {
+                    "name": "St. John's Red Storm",
+                    "price": -120,
+                    "point": -10.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T21:22:30Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 168.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 168.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "1f436c9e86ce53068c8095e6337e82f3",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T16:23:03.935277",
+      "data": {
+        "id": "1f436c9e86ce53068c8095e6337e82f3",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:55Z",
+        "home_team": "TCU Horned Frogs",
+        "away_team": "Baylor Bears",
+        "bookmakers": [
+          {
+            "key": "fanduel",
+            "title": "FanDuel",
+            "last_update": "2026-01-02T21:22:31Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T21:22:30Z",
+                "outcomes": [
+                  {
+                    "name": "Baylor Bears",
+                    "price": -115,
+                    "point": 1.5
+                  },
+                  {
+                    "name": "TCU Horned Frogs",
+                    "price": -105,
+                    "point": -1.5
+                  }
+                ]
+              },
+              {
+                "key": "totals",
+                "last_update": "2026-01-02T21:22:30Z",
+                "outcomes": [
+                  {
+                    "name": "Over",
+                    "price": -110,
+                    "point": 155.5
+                  },
+                  {
+                    "name": "Under",
+                    "price": -110,
+                    "point": 155.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "b9d4c49ff5254d29e970cbb40bb6b2ea",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T16:23:10.345953",
+      "data": {
+        "id": "b9d4c49ff5254d29e970cbb40bb6b2ea",
+        "sport_key": "americanfootball_ncaaf",
+        "sport_title": "NCAAF",
+        "commence_time": "2026-01-20T00:30:00Z",
+        "home_team": "Indiana Hoosiers",
+        "away_team": "Miami Hurricanes",
+        "bookmakers": [
+          {
+            "key": "fanduel",
+            "title": "FanDuel",
+            "last_update": "2026-01-02T21:22:18Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T21:22:18Z",
+                "outcomes": [
+                  {
+                    "name": "Indiana Hoosiers",
+                    "price": -110,
+                    "point": -4.5
+                  },
+                  {
+                    "name": "Miami Hurricanes",
+                    "price": -110,
+                    "point": 4.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "23a8a77339e637f439bd73791b4e22af",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T16:23:10.355009",
+      "data": {
+        "id": "23a8a77339e637f439bd73791b4e22af",
+        "sport_key": "americanfootball_ncaaf",
+        "sport_title": "NCAAF",
+        "commence_time": "2026-01-20T00:30:00Z",
+        "home_team": "Indiana Hoosiers",
+        "away_team": "Ole Miss Rebels",
+        "bookmakers": [
+          {
+            "key": "fanduel",
+            "title": "FanDuel",
+            "last_update": "2026-01-02T21:22:18Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T21:22:18Z",
+                "outcomes": [
+                  {
+                    "name": "Indiana Hoosiers",
+                    "price": -105,
+                    "point": -7.5
+                  },
+                  {
+                    "name": "Ole Miss Rebels",
+                    "price": -115,
+                    "point": 7.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ecf29901db3fe15c0e5eae32f0390c51",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T16:23:10.364416",
+      "data": {
+        "id": "ecf29901db3fe15c0e5eae32f0390c51",
+        "sport_key": "americanfootball_ncaaf",
+        "sport_title": "NCAAF",
+        "commence_time": "2026-01-20T00:30:00Z",
+        "home_team": "Oregon Ducks",
+        "away_team": "Miami Hurricanes",
+        "bookmakers": [
+          {
+            "key": "fanduel",
+            "title": "FanDuel",
+            "last_update": "2026-01-02T21:22:18Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T21:22:18Z",
+                "outcomes": [
+                  {
+                    "name": "Miami Hurricanes",
+                    "price": -115,
+                    "point": 2.5
+                  },
+                  {
+                    "name": "Oregon Ducks",
+                    "price": -105,
+                    "point": -2.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "6af6623a038f6add7f026fc913e24356",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T16:23:10.374574",
+      "data": {
+        "id": "6af6623a038f6add7f026fc913e24356",
+        "sport_key": "americanfootball_ncaaf",
+        "sport_title": "NCAAF",
+        "commence_time": "2026-01-20T00:30:00Z",
+        "home_team": "Oregon Ducks",
+        "away_team": "Ole Miss Rebels",
+        "bookmakers": [
+          {
+            "key": "fanduel",
+            "title": "FanDuel",
+            "last_update": "2026-01-02T21:22:18Z",
+            "markets": [
+              {
+                "key": "spreads",
+                "last_update": "2026-01-02T21:22:18Z",
+                "outcomes": [
+                  {
+                    "name": "Ole Miss Rebels",
+                    "price": -105,
+                    "point": 3.5
+                  },
+                  {
+                    "name": "Oregon Ducks",
+                    "price": -115,
+                    "point": -3.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "dd6c65e86b5f8be4640dc9cda987ccb8",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:00:03.888116",
+      "data": {
+        "id": "dd6c65e86b5f8be4640dc9cda987ccb8",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T17:00:00Z",
+        "home_team": "Campbell Fighting Camels",
+        "away_team": "Northeastern Huskies",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "cc5b0b1d0191f1146189c7426812f430",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:00:03.898796",
+      "data": {
+        "id": "cc5b0b1d0191f1146189c7426812f430",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T17:00:00Z",
+        "home_team": "Duquesne Dukes",
+        "away_team": "VCU Rams",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "91e5fbdd188f13b36232e5615a38fdc9",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:00:03.909009",
+      "data": {
+        "id": "91e5fbdd188f13b36232e5615a38fdc9",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T17:00:00Z",
+        "home_team": "Temple Owls",
+        "away_team": "UTSA Roadrunners",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "c339ca812acbb5016edfbd30cee871a2",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:00:03.923386",
+      "data": {
+        "id": "c339ca812acbb5016edfbd30cee871a2",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T17:00:00Z",
+        "home_team": "Wake Forest Demon Deacons",
+        "away_team": "Virginia Tech Hokies",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "33dbcd63c2991243b3613cac9fef683e",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.419060",
+      "data": {
+        "id": "33dbcd63c2991243b3613cac9fef683e",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T18:00:00Z",
+        "home_team": "VMI Keydets",
+        "away_team": "Chattanooga Mocs",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "4498832150c15bd66e484896ca901060",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.438983",
+      "data": {
+        "id": "4498832150c15bd66e484896ca901060",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T18:00:00Z",
+        "home_team": "Coastal Carolina Chanticleers",
+        "away_team": "Georgia St Panthers",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "ecf3e99a550b756486a1ee2c70297952",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.455647",
+      "data": {
+        "id": "ecf3e99a550b756486a1ee2c70297952",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T18:00:00Z",
+        "home_team": "Kent State Golden Flashes",
+        "away_team": "Northern Illinois Huskies",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "536a05f27bb64cdd3859c8382fc6f400",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.469663",
+      "data": {
+        "id": "536a05f27bb64cdd3859c8382fc6f400",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T18:00:00Z",
+        "home_team": "Louisiana Ragin' Cajuns",
+        "away_team": "Southern Miss Golden Eagles",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "c5a0796902629901ad8cae5b45a40c3e",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.483731",
+      "data": {
+        "id": "c5a0796902629901ad8cae5b45a40c3e",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T18:00:00Z",
+        "home_team": "The Citadel Bulldogs",
+        "away_team": "Wofford Terriers",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "f8ccc014a8fe4a5bb411af4e7a62f45e",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.500440",
+      "data": {
+        "id": "f8ccc014a8fe4a5bb411af4e7a62f45e",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "Buffalo Bulls",
+        "away_team": "Ball State Cardinals",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "4133d921878cdad1cb8b60553f1623af",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.513650",
+      "data": {
+        "id": "4133d921878cdad1cb8b60553f1623af",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "Georgia Tech Yellow Jackets",
+        "away_team": "Boston College Eagles",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "bebdc893b8941bd5c33ebd405a44692d",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.530179",
+      "data": {
+        "id": "bebdc893b8941bd5c33ebd405a44692d",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "Massachusetts Minutemen",
+        "away_team": "Bowling Green Falcons",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "32a3a2d807fdb3811b286ee1ef5c7b89",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.567348",
+      "data": {
+        "id": "32a3a2d807fdb3811b286ee1ef5c7b89",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "Loyola (Chi) Ramblers",
+        "away_team": "Dayton Flyers",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "090730b857397142f166072ef6668764",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.600146",
+      "data": {
+        "id": "090730b857397142f166072ef6668764",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "DePaul Blue Demons",
+        "away_team": "Xavier Musketeers",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "141377f072acc8b7fcb17b5ad5de91e3",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.613299",
+      "data": {
+        "id": "141377f072acc8b7fcb17b5ad5de91e3",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "Drexel Dragons",
+        "away_team": "Hofstra Pride",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "de16ccaa4744619a8fedfa1739e3155d",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.625348",
+      "data": {
+        "id": "de16ccaa4744619a8fedfa1739e3155d",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "Eastern Michigan Eagles",
+        "away_team": "Ohio Bobcats",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "88c1771810a67f31a15abff4e7c8d1be",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.634086",
+      "data": {
+        "id": "88c1771810a67f31a15abff4e7c8d1be",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "GW Revolutionaries",
+        "away_team": "La Salle Explorers",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "e6e6bc5f0ce2468376c91e1109b3615f",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.642992",
+      "data": {
+        "id": "e6e6bc5f0ce2468376c91e1109b3615f",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T19:00:00Z",
+        "home_team": "North Dakota Fighting Hawks",
+        "away_team": "South Dakota St Jackrabbits",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "474e0b3ce7fcfc64e9948f0789eaba18",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.652109",
+      "data": {
+        "id": "474e0b3ce7fcfc64e9948f0789eaba18",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T20:00:00Z",
+        "home_team": "Arkansas St Red Wolves",
+        "away_team": "James Madison Dukes",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "db482dc9a8450afc7e82cf5dce598cc8",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.661344",
+      "data": {
+        "id": "db482dc9a8450afc7e82cf5dce598cc8",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T20:00:00Z",
+        "home_team": "Central Michigan Chippewas",
+        "away_team": "Toledo Rockets",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "d109bbd17d154a229236e288e7defce1",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.670563",
+      "data": {
+        "id": "d109bbd17d154a229236e288e7defce1",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T20:00:00Z",
+        "home_team": "Rice Owls",
+        "away_team": "Memphis Tigers",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "ebbacdb2033d87704860622ba46cbdd8",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.680727",
+      "data": {
+        "id": "ebbacdb2033d87704860622ba46cbdd8",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T20:30:00Z",
+        "home_team": "Miami (OH) RedHawks",
+        "away_team": "Akron Zips",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "8a8572eb213193ff68394dfdc20f349c",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.690330",
+      "data": {
+        "id": "8a8572eb213193ff68394dfdc20f349c",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T20:30:00Z",
+        "home_team": "Old Dominion Monarchs",
+        "away_team": "Georgia Southern Eagles",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "a7b4479ff4ce2e8ba7b5dd1b94134449",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.700104",
+      "data": {
+        "id": "a7b4479ff4ce2e8ba7b5dd1b94134449",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T20:30:00Z",
+        "home_team": "Oklahoma Sooners",
+        "away_team": "Ole Miss Rebels",
+        "bookmakers": []
+      }
+    },
+    {
+      "id": "2a28878245ab91312ac446cfeb1462bd",
+      "name": "Unknown",
+      "symbol": "N/A",
+      "source": "sportsbook",
+      "discovered_at": "2026-01-02T17:30:18.710567",
+      "data": {
+        "id": "2a28878245ab91312ac446cfeb1462bd",
+        "sport_key": "basketball_ncaab",
+        "sport_title": "NCAAB",
+        "commence_time": "2026-01-03T20:30:00Z",
+        "home_team": "UL Monroe Warhawks",
+        "away_team": "Texas State Bobcats",
+        "bookmakers": []
       }
     }
   ]

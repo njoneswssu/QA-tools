@@ -50,6 +50,9 @@ DRAFTKINGS_HISTORY_FILE = "draftkings_history.json"
 LINE_MOVEMENTS_FILE = "line_movements.json"
 ORIGINAL_LINES_FILE = "original_lines.json"
 
+# Discord webhook (optional)
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+
 
 class ContractDocumenter:
     """Documents all found contracts to a JSON file"""
@@ -118,6 +121,156 @@ class ContractDocumenter:
             print(f"Error saving documented contracts: {e}")
 
 
+class DiscordNotifier:
+    """Handles Discord webhook notifications"""
+    
+    def __init__(self, webhook_url: str = None):
+        """
+        Initialize Discord notifier
+        
+        Args:
+            webhook_url: Discord webhook URL (or set DISCORD_WEBHOOK_URL env var)
+        """
+        self.webhook_url = webhook_url or DISCORD_WEBHOOK_URL
+        self.enabled = bool(self.webhook_url and REQUESTS_AVAILABLE)
+    
+    def send_webhook(self, title: str, description: str, color: int = 0x00ff00, fields: List[Dict] = None):
+        """
+        Send a message to Discord webhook
+        
+        Args:
+            title: Message title
+            description: Message description
+            color: Embed color (hex as int, default: green)
+            fields: List of field dictionaries with 'name' and 'value' keys
+        """
+        if not self.enabled:
+            return
+        
+        try:
+            embed = {
+                'title': title,
+                'description': description,
+                'color': color,
+                'timestamp': datetime.now().isoformat(),
+                'fields': fields or []
+            }
+            
+            payload = {
+                'embeds': [embed]
+            }
+            
+            response = requests.post(self.webhook_url, json=payload, timeout=10)
+            response.raise_for_status()
+        except Exception as e:
+            print(f"Error sending Discord webhook: {e}")
+    
+    def send_grouped_spread_alert(self, game: Dict, movements: List[Dict]):
+        """Send grouped spread movement alert to Discord for multiple bookmakers with same movement"""
+        home_team = game.get('home_team', 'Unknown')
+        away_team = game.get('away_team', 'Unknown')
+        
+        # All movements should have the same values (grouped by same change)
+        first_movement = movements[0]
+        direction_emoji = "📈" if first_movement['movement'] > 0 else "📉"
+        
+        # Get bookmaker names
+        bookmaker_names = [m.get('bookmaker_name', m.get('bookmaker', 'Unknown')) for m in movements]
+        bookmakers_str = ', '.join(bookmaker_names)
+        
+        title = f"{direction_emoji} Spread Movement Alert ({len(movements)} bookmakers)"
+        description = f"**{away_team} @ {home_team}**"
+        
+        fields = [
+            {'name': 'Previous Spread', 'value': f"{first_movement['old_spread']:.1f}", 'inline': True},
+            {'name': 'New Spread', 'value': f"{first_movement['new_spread']:.1f}", 'inline': True},
+            {'name': 'Change', 'value': f"{first_movement['movement']:+.1f} points", 'inline': True},
+            {'name': 'Direction', 'value': first_movement.get('direction', 'unknown').title(), 'inline': True},
+            {'name': 'Bookmakers', 'value': bookmakers_str, 'inline': False},
+            {'name': 'Time', 'value': first_movement.get('readable_timestamp', 'N/A'), 'inline': True}
+        ]
+        
+        if 'movement_towards' in first_movement:
+            fields.append({
+                'name': 'Movement Direction',
+                'value': first_movement['movement_towards'],
+                'inline': False
+            })
+        
+        # Color: red for large movements, orange for medium, green for small
+        absolute_change = first_movement.get('absolute_movement', 0)
+        if absolute_change >= 5:
+            color = 0xff0000  # Red
+        elif absolute_change >= 3:
+            color = 0xffaa00  # Orange
+        else:
+            color = 0x00ff00  # Green
+        
+        self.send_webhook(title, description, color, fields)
+    
+    def send_spread_alert(self, game: Dict, movement: Dict):
+        """Send spread movement alert to Discord (single bookmaker)"""
+        self.send_grouped_spread_alert(game, [movement])
+    
+    def send_grouped_total_alert(self, game: Dict, movements: List[Dict]):
+        """Send grouped total movement alert to Discord for multiple bookmakers with same movement"""
+        home_team = game.get('home_team', 'Unknown')
+        away_team = game.get('away_team', 'Unknown')
+        
+        # All movements should have the same values (grouped by same change)
+        first_movement = movements[0]
+        direction_emoji = "📈" if first_movement['movement'] > 0 else "📉"
+        
+        # Get bookmaker names
+        bookmaker_names = [m.get('bookmaker_name', m.get('bookmaker', 'Unknown')) for m in movements]
+        bookmakers_str = ', '.join(bookmaker_names)
+        
+        title = f"{direction_emoji} Total Movement Alert ({len(movements)} bookmakers)"
+        description = f"**{away_team} @ {home_team}**"
+        
+        fields = [
+            {'name': 'Previous Total', 'value': f"{first_movement['old_total']:.1f}", 'inline': True},
+            {'name': 'New Total', 'value': f"{first_movement['new_total']:.1f}", 'inline': True},
+            {'name': 'Change', 'value': f"{first_movement['movement']:+.1f} points", 'inline': True},
+            {'name': 'Direction', 'value': first_movement.get('direction', 'unknown').title(), 'inline': True},
+            {'name': 'Bookmakers', 'value': bookmakers_str, 'inline': False},
+            {'name': 'Time', 'value': first_movement.get('readable_timestamp', 'N/A'), 'inline': True}
+        ]
+        
+        # Color based on movement size
+        absolute_change = first_movement.get('absolute_movement', 0)
+        if absolute_change >= 5:
+            color = 0xff0000  # Red
+        elif absolute_change >= 3:
+            color = 0xffaa00  # Orange
+        else:
+            color = 0x00ff00  # Green
+        
+        self.send_webhook(title, description, color, fields)
+    
+    def send_total_alert(self, game: Dict, movement: Dict):
+        """Send total movement alert to Discord (single bookmaker)"""
+        self.send_grouped_total_alert(game, [movement])
+    
+    def send_robinhood_alert(self, contract: Dict, price: float):
+        """Send Robinhood contract alert to Discord"""
+        contract_name = contract.get('name', contract.get('symbol', 'Unknown Contract'))
+        contract_symbol = contract.get('symbol', 'N/A')
+        price_percent = price * 100
+        
+        title = "🚨 Robinhood Prediction Market Alert"
+        description = f"**{contract_name}** ({contract_symbol})"
+        
+        fields = [
+            {'name': 'Price', 'value': f"{price_percent:.2f}%", 'inline': True},
+            {'name': 'Threshold', 'value': f"{PRICE_THRESHOLD*100}%", 'inline': True},
+            {'name': 'Symbol', 'value': contract_symbol, 'inline': True},
+            {'name': 'Time', 'value': datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'inline': True}
+        ]
+        
+        self.send_webhook(title, description, 0xff6b6b, fields)
+
+
 class SportsbookMonitor:
     """Monitors multiple sportsbooks (DraftKings, FanDuel, BetMGM, Bet365) for point totals and spreads"""
     
@@ -130,19 +283,21 @@ class SportsbookMonitor:
         'bet365': 'Bet365'
     }
     
-    def __init__(self, api_key: str = None, bookmakers: List[str] = None):
+    def __init__(self, api_key: str = None, bookmakers: List[str] = None, discord_webhook: str = None):
         """
         Initialize sportsbook monitor
         
         Args:
             api_key: The Odds API key (get free key from https://the-odds-api.com/)
             bookmakers: List of bookmakers to monitor (default: all supported)
+            discord_webhook: Discord webhook URL for notifications
         """
         self.api_key = api_key or os.getenv('ODDS_API_KEY')
         self.base_url = "https://api.the-odds-api.com/v4"
         self.bookmakers = bookmakers or self.BOOKMAKERS
         self.history = self.load_history()
         self.documenter = ContractDocumenter()
+        self.discord = DiscordNotifier(webhook_url=discord_webhook)
     
     def load_history(self) -> Dict:
         """Load historical odds data"""
@@ -206,10 +361,12 @@ class SportsbookMonitor:
             return data
             
         except requests.exceptions.RequestException as e:
-            print(f"Error fetching sportsbook odds: {e}")
+            print(f"⚠️  Network error fetching sportsbook odds for {sport}: {e}")
             return []
         except Exception as e:
-            print(f"Unexpected error fetching sportsbook odds: {e}")
+            print(f"⚠️  Unexpected error fetching sportsbook odds for {sport}: {e}")
+            import traceback
+            traceback.print_exc()
             return []
     
     def parse_spread_and_total(self, game: Dict, bookmaker_key: str) -> Tuple[Optional[float], Optional[float], Optional[str]]:
@@ -371,6 +528,10 @@ class SportsbookMonitor:
                 if 'bookmakers' not in history:
                     history['bookmakers'] = {}
                 
+                # Collect all movements first, then group and notify
+                spread_movements = []  # List of all spread movements
+                total_movements = []   # List of all total movements
+                
                 for bookmaker_key, odds in bookmaker_odds.items():
                     # Initialize bookmaker if first time seeing it
                     if bookmaker_key not in history['bookmakers']:
@@ -425,10 +586,11 @@ class SportsbookMonitor:
                             }
                             bookmaker_history['spread_movements'].append(movement)
                             
-                            # Document the movement in the contracts file
+                            # Document the movement in the contracts file (still individual)
                             self.document_movement(game, 'spread', movement, bookmaker_key)
                             
-                            self.send_spread_alert(game, movement)
+                            # Collect for grouping
+                            spread_movements.append(movement)
                             movement_occurred = True
                             # Update current value after movement detected
                             bookmaker_history['current_spread'] = new_spread
@@ -458,10 +620,11 @@ class SportsbookMonitor:
                             }
                             bookmaker_history['total_movements'].append(movement)
                             
-                            # Document the movement in the contracts file
+                            # Document the movement in the contracts file (still individual)
                             self.document_movement(game, 'total', movement, bookmaker_key)
                             
-                            self.send_total_alert(game, movement)
+                            # Collect for grouping
+                            total_movements.append(movement)
                             movement_occurred = True
                             # Update current value after movement detected
                             bookmaker_history['current_total'] = new_total
@@ -474,6 +637,57 @@ class SportsbookMonitor:
                     
                     # Update last_seen timestamp for this bookmaker
                     bookmaker_history['last_seen'] = current_time
+                
+                # Group and send notifications for spread movements
+                if spread_movements:
+                    # Group by same old_spread, new_spread, and movement amount
+                    spread_groups = {}
+                    for movement in spread_movements:
+                        # Create a key based on the movement values
+                        group_key = (
+                            movement['old_spread'],
+                            movement['new_spread'],
+                            movement['movement'],
+                            movement.get('movement_towards', '')
+                        )
+                        if group_key not in spread_groups:
+                            spread_groups[group_key] = []
+                        spread_groups[group_key].append(movement)
+                    
+                    # Send grouped notifications
+                    for group_movements in spread_groups.values():
+                        if len(group_movements) > 1:
+                            # Multiple bookmakers with same movement - send grouped notification
+                            self.send_grouped_spread_alert_console(game, group_movements)
+                            self.discord.send_grouped_spread_alert(game, group_movements)
+                        else:
+                            # Single bookmaker - send individual notification
+                            self.send_spread_alert(game, group_movements[0])
+                
+                # Group and send notifications for total movements
+                if total_movements:
+                    # Group by same old_total, new_total, and movement amount
+                    total_groups = {}
+                    for movement in total_movements:
+                        # Create a key based on the movement values
+                        group_key = (
+                            movement['old_total'],
+                            movement['new_total'],
+                            movement['movement']
+                        )
+                        if group_key not in total_groups:
+                            total_groups[group_key] = []
+                        total_groups[group_key].append(movement)
+                    
+                    # Send grouped notifications
+                    for group_movements in total_groups.values():
+                        if len(group_movements) > 1:
+                            # Multiple bookmakers with same movement - send grouped notification
+                            self.send_grouped_total_alert_console(game, group_movements)
+                            self.discord.send_grouped_total_alert(game, group_movements)
+                        else:
+                            # Single bookmaker - send individual notification
+                            self.send_total_alert(game, group_movements[0])
                 
                 # Always update last_updated and save history (even if no movement)
                 # This ensures we remember the current lines for the next run
@@ -705,25 +919,68 @@ class SportsbookMonitor:
         print(f"  Detected at: {movement_entry['detected_at_readable']}")
         print(f"  Saved to: {LINE_MOVEMENTS_FILE}")
     
+    def send_grouped_spread_alert_console(self, game: Dict, movements: List[Dict]):
+        """Send grouped spread alert to console"""
+        home_team = game.get('home_team', 'Unknown')
+        away_team = game.get('away_team', 'Unknown')
+        first_movement = movements[0]
+        direction = "↑" if first_movement['movement'] > 0 else "↓"
+        
+        bookmaker_names = [m.get('bookmaker_name', m.get('bookmaker', 'Unknown')) for m in movements]
+        bookmakers_str = ', '.join(bookmaker_names)
+        
+        timestamp = first_movement.get('readable_timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print(f"\n{'='*60}")
+        print(f"📊 SPREAD ALERT - {len(movements)} BOOKMAKERS [{timestamp}]")
+        print(f"Game: {away_team} @ {home_team}")
+        print(f"Bookmakers: {bookmakers_str}")
+        print(f"Previous Spread: {first_movement['old_spread']:.1f}")
+        print(f"New Spread: {first_movement['new_spread']:.1f}")
+        print(f"Change: {first_movement['movement']:+.1f} points ({first_movement.get('direction', 'unknown')})")
+        if 'movement_towards' in first_movement:
+            print(f"Movement: {first_movement['movement_towards']}")
+        print(f"Movement detected at: {timestamp}")
+        print(f"{'='*60}\n")
+        
+        # Log each movement individually
+        for movement in movements:
+            self.log_alert('spread', game, movement)
+    
+    def send_grouped_total_alert_console(self, game: Dict, movements: List[Dict]):
+        """Send grouped total alert to console"""
+        home_team = game.get('home_team', 'Unknown')
+        away_team = game.get('away_team', 'Unknown')
+        first_movement = movements[0]
+        direction = "↑" if first_movement['movement'] > 0 else "↓"
+        
+        bookmaker_names = [m.get('bookmaker_name', m.get('bookmaker', 'Unknown')) for m in movements]
+        bookmakers_str = ', '.join(bookmaker_names)
+        
+        timestamp = first_movement.get('readable_timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print(f"\n{'='*60}")
+        print(f"📊 TOTAL ALERT - {len(movements)} BOOKMAKERS [{timestamp}]")
+        print(f"Game: {away_team} @ {home_team}")
+        print(f"Bookmakers: {bookmakers_str}")
+        print(f"Previous Total: {first_movement['old_total']:.1f}")
+        print(f"New Total: {first_movement['new_total']:.1f}")
+        print(f"Change: {first_movement['movement']:+.1f} points ({first_movement.get('direction', 'unknown')})")
+        print(f"Movement detected at: {timestamp}")
+        print(f"{'='*60}\n")
+        
+        # Log each movement individually
+        for movement in movements:
+            self.log_alert('total', game, movement)
+    
     def send_spread_alert(self, game: Dict, movement: Dict):
-        """Send alert for spread movement"""
+        """Send alert for spread movement (single bookmaker)"""
+        self.send_grouped_spread_alert_console(game, [movement])
+        
         home_team = game.get('home_team', 'Unknown')
         away_team = game.get('away_team', 'Unknown')
         bookmaker_name = movement.get('bookmaker_name', movement.get('bookmaker', 'Unknown'))
         direction = "↑" if movement['movement'] > 0 else "↓"
         
         message = f"{bookmaker_name}: {away_team} @ {home_team}\nSpread moved {direction} {abs(movement['movement']):.1f} points\n{movement['old_spread']:.1f} → {movement['new_spread']:.1f}"
-        
-        timestamp = movement.get('readable_timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        print(f"\n{'='*60}")
-        print(f"📊 {bookmaker_name.upper()} SPREAD ALERT [{timestamp}]")
-        print(f"Game: {away_team} @ {home_team}")
-        print(f"Bookmaker: {bookmaker_name}")
-        print(f"Previous Spread: {movement['old_spread']:.1f}")
-        print(f"New Spread: {movement['new_spread']:.1f}")
-        print(f"Change: {movement['movement']:+.1f} points ({movement.get('direction', 'unknown')})")
-        print(f"Movement detected at: {movement.get('readable_timestamp', timestamp)}")
-        print(f"{'='*60}\n")
         
         if NOTIFICATIONS_AVAILABLE:
             try:
@@ -735,27 +992,19 @@ class SportsbookMonitor:
             except:
                 pass
         
-        self.log_alert('spread', game, movement)
+        # Send Discord webhook notification
+        self.discord.send_spread_alert(game, movement)
     
     def send_total_alert(self, game: Dict, movement: Dict):
-        """Send alert for total movement"""
+        """Send alert for total movement (single bookmaker)"""
+        self.send_grouped_total_alert_console(game, [movement])
+        
         home_team = game.get('home_team', 'Unknown')
         away_team = game.get('away_team', 'Unknown')
         bookmaker_name = movement.get('bookmaker_name', movement.get('bookmaker', 'Unknown'))
         direction = "↑" if movement['movement'] > 0 else "↓"
         
         message = f"{bookmaker_name}: {away_team} @ {home_team}\nTotal moved {direction} {abs(movement['movement']):.1f} points\n{movement['old_total']:.1f} → {movement['new_total']:.1f}"
-        
-        timestamp = movement.get('readable_timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        print(f"\n{'='*60}")
-        print(f"📊 {bookmaker_name.upper()} TOTAL ALERT [{timestamp}]")
-        print(f"Game: {away_team} @ {home_team}")
-        print(f"Bookmaker: {bookmaker_name}")
-        print(f"Previous Total: {movement['old_total']:.1f}")
-        print(f"New Total: {movement['new_total']:.1f}")
-        print(f"Change: {movement['movement']:+.1f} points ({movement.get('direction', 'unknown')})")
-        print(f"Movement detected at: {movement.get('readable_timestamp', timestamp)}")
-        print(f"{'='*60}\n")
         
         if NOTIFICATIONS_AVAILABLE:
             try:
@@ -767,7 +1016,8 @@ class SportsbookMonitor:
             except:
                 pass
         
-        self.log_alert('total', game, movement)
+        # Send Discord webhook notification
+        self.discord.send_total_alert(game, movement)
     
     def log_alert(self, alert_type: str, game: Dict, movement: Dict):
         """Log alert to file"""
@@ -823,23 +1073,36 @@ class SportsbookMonitor:
         
         try:
             while True:
-                for sport in sports:
-                    sport_display = sport_names.get(sport, sport)
-                    print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking {sport_display}...")
-                    games = self.get_sportsbook_odds(sport)
+                try:
+                    for sport in sports:
+                        sport_display = sport_names.get(sport, sport)
+                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking {sport_display}...")
+                        games = self.get_sportsbook_odds(sport)
+                        
+                        if games:
+                            print(f"Found {len(games)} games")
+                            self.check_movements(games)
+                        else:
+                            print(f"No games found for {sport_display}")
+                        
+                        time.sleep(1)  # Small delay between sports
                     
-                    if games:
-                        print(f"Found {len(games)} games")
-                        self.check_movements(games)
+                    print(f"[{datetime.now().strftime('%H:%M:%S')}] Cycle complete. Next check in {CHECK_INTERVAL/60:.1f} minutes...\n")
+                    time.sleep(CHECK_INTERVAL)
                     
-                    time.sleep(1)  # Small delay between sports
-                
-                time.sleep(CHECK_INTERVAL)
+                except KeyboardInterrupt:
+                    raise  # Re-raise to exit outer loop
+                except Exception as e:
+                    print(f"\n⚠️  Error during sportsbook check: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    print(f"Continuing monitoring in {CHECK_INTERVAL/60:.1f} minutes...\n")
+                    time.sleep(CHECK_INTERVAL)  # Wait before retrying
                 
         except KeyboardInterrupt:
             print("\n\nSportsbook monitoring stopped.")
         except Exception as e:
-            print(f"\nError in sportsbook monitoring: {e}")
+            print(f"\nFatal error in sportsbook monitoring: {e}")
             import traceback
             traceback.print_exc()
 
@@ -847,13 +1110,14 @@ class SportsbookMonitor:
 class EnhancedPredictionMarketMonitor:
     """Enhanced Robinhood monitor with contract documentation"""
     
-    def __init__(self, username: str = None, password: str = None, mfa_code: str = None):
+    def __init__(self, username: str = None, password: str = None, mfa_code: str = None, discord_webhook: str = None):
         self.username = username or os.getenv('ROBINHOOD_USERNAME')
         self.password = password or os.getenv('ROBINHOOD_PASSWORD')
         self.mfa_code = mfa_code or os.getenv('ROBINHOOD_MFA')
         self.authenticated = False
         self.contracts_cache = []
         self.documenter = ContractDocumenter()
+        self.discord = DiscordNotifier(webhook_url=discord_webhook)
     
     def login(self) -> bool:
         """Authenticate with Robinhood"""
@@ -968,6 +1232,9 @@ class EnhancedPredictionMarketMonitor:
                 )
             except:
                 pass
+        
+        # Send Discord webhook notification
+        self.discord.send_robinhood_alert(contract, price)
     
     def monitor_contracts(self):
         """Main monitoring loop"""
@@ -982,33 +1249,44 @@ class EnhancedPredictionMarketMonitor:
         
         try:
             while True:
-                if not self.contracts_cache:
-                    print(f"[{datetime.now().strftime('%H:%M:%S')}] Fetching contracts...")
-                    self.contracts_cache = self.get_prediction_market_contracts()
-                    print(f"Monitoring {len(self.contracts_cache)} contracts")
-                
-                for contract in self.contracts_cache:
-                    price = self.get_contract_price(contract)
-                    if price is None:
-                        continue
+                try:
+                    if not self.contracts_cache:
+                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Fetching contracts...")
+                        self.contracts_cache = self.get_prediction_market_contracts()
+                        print(f"Monitoring {len(self.contracts_cache)} contracts")
                     
-                    contract_id = contract.get('symbol') or contract.get('id', 'unknown')
+                    for contract in self.contracts_cache:
+                        price = self.get_contract_price(contract)
+                        if price is None:
+                            continue
+                        
+                        contract_id = contract.get('symbol') or contract.get('id', 'unknown')
+                        
+                        if price >= PRICE_THRESHOLD:
+                            if contract_id not in ALERTED_CONTRACTS:
+                                self.send_notification(contract, price)
+                                ALERTED_CONTRACTS.add(contract_id)
+                        else:
+                            ALERTED_CONTRACTS.discard(contract_id)
+                        
+                        time.sleep(0.5)
                     
-                    if price >= PRICE_THRESHOLD:
-                        if contract_id not in ALERTED_CONTRACTS:
-                            self.send_notification(contract, price)
-                            ALERTED_CONTRACTS.add(contract_id)
-                    else:
-                        ALERTED_CONTRACTS.discard(contract_id)
+                    print(f"[{datetime.now().strftime('%H:%M:%S')}] Next check in {CHECK_INTERVAL/60:.1f} minutes...\n")
+                    time.sleep(CHECK_INTERVAL)
                     
-                    time.sleep(0.5)
-                
-                time.sleep(CHECK_INTERVAL)
+                except KeyboardInterrupt:
+                    raise  # Re-raise to exit outer loop
+                except Exception as e:
+                    print(f"\n⚠️  Error during Robinhood check: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    print(f"Continuing monitoring in {CHECK_INTERVAL/60:.1f} minutes...\n")
+                    time.sleep(CHECK_INTERVAL)  # Wait before retrying
                 
         except KeyboardInterrupt:
             print("\n\nRobinhood monitoring stopped.")
         except Exception as e:
-            print(f"\nError in monitoring: {e}")
+            print(f"\nFatal error in Robinhood monitoring: {e}")
             import traceback
             traceback.print_exc()
 
@@ -1037,6 +1315,8 @@ def main():
     parser.add_argument('--bookmakers', nargs='+', 
                        choices=['draftkings', 'fanduel', 'betmgm', 'bet365'],
                        help='Specific bookmakers to monitor (default: all)')
+    parser.add_argument('--discord-webhook', '-dw', 
+                       help='Discord webhook URL for notifications')
     
     args = parser.parse_args()
     
@@ -1054,7 +1334,8 @@ def main():
         rh_monitor = EnhancedPredictionMarketMonitor(
             username=args.robinhood_username,
             password=args.robinhood_password,
-            mfa_code=args.robinhood_mfa
+            mfa_code=args.robinhood_mfa,
+            discord_webhook=args.discord_webhook
         )
         
         if rh_monitor.login():
@@ -1066,7 +1347,11 @@ def main():
     
     # Start Sportsbook monitoring
     if not args.robinhood_only:
-        sb_monitor = SportsbookMonitor(api_key=args.odds_api_key, bookmakers=args.bookmakers)
+        sb_monitor = SportsbookMonitor(
+            api_key=args.odds_api_key, 
+            bookmakers=args.bookmakers,
+            discord_webhook=args.discord_webhook
+        )
         if args.sportsbook_only:
             sb_monitor.monitor()
         else:
