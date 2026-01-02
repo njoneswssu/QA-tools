@@ -767,7 +767,7 @@ function toggleXMLNode(nodeId) {
 // Make toggleXMLNode available globally
 window.toggleXMLNode = toggleXMLNode;
 
-// Monitor iframe for XML content
+// Monitor iframe for XML content - specifically listening for <ComergentData>
 function checkIframeForXML() {
     if (currentMode !== 'wsco' || !wscoIframe) return;
     
@@ -775,8 +775,9 @@ function checkIframeForXML() {
         const iframeDoc = wscoIframe.contentDocument || wscoIframe.contentWindow.document;
         if (!iframeDoc) return;
         
-        // Try multiple methods to find XML content
+        // Try multiple methods to find XML content - PRIORITIZE ComergentData
         let xmlContent = '';
+        let foundComergentData = false;
         
         // Method 1: Check if the page itself is XML (browser XML view)
         // When browser displays XML directly, the document itself is XML
@@ -785,12 +786,36 @@ function checkIframeForXML() {
             // Check if documentElement is XML (not HTML)
             const docElement = iframeDoc.documentElement;
             if (docElement && docElement.nodeType === Node.ELEMENT_NODE) {
+                // PRIORITY: Check if root element is ComergentData
+                if (docElement.tagName === 'ComergentData' || docElement.tagName === 'comergentdata') {
+                    foundComergentData = true;
+                    const serializer = new XMLSerializer();
+                    let serialized = serializer.serializeToString(iframeDoc);
+                    
+                    if (!serialized.trim().startsWith('<?xml')) {
+                        serialized = '<?xml version="1.0" encoding="UTF-8"?>\n' + serialized;
+                    }
+                    
+                    xmlContent = serialized;
+                    if (xmlContent && xmlContent.trim()) {
+                        console.log('Found ComergentData as root element!');
+                        displayXMLTree(xmlContent);
+                        return;
+                    }
+                }
+                
                 // Check if it's an XML document (not HTML)
                 // Chrome displays XML directly, so check for any XML root element
                 if (docElement.tagName !== 'HTML' && docElement.tagName !== 'html') {
                     // This might be an XML document - try to serialize it
                     const serializer = new XMLSerializer();
                     let serialized = serializer.serializeToString(iframeDoc);
+                    
+                    // Check if it contains ComergentData
+                    if (serialized && serialized.includes('<ComergentData>')) {
+                        foundComergentData = true;
+                        console.log('Found ComergentData in XML document!');
+                    }
                     
                     // Check if it looks like XML (has XML structure)
                     if (serialized && serialized.includes('<') && serialized.includes('>') && 
@@ -814,31 +839,74 @@ function checkIframeForXML() {
             }
         } catch (e) {
             // Not an XML document or CORS error, continue with other methods
+            console.log('Method 1 failed:', e.message);
         }
         
         // If Method 1 didn't work, try getting from body HTML (preserves structure)
+        // PRIORITY: Look for ComergentData first
         if (!xmlContent) {
             const bodyHtml = iframeDoc.body ? (iframeDoc.body.innerHTML || '') : '';
             const bodyText = iframeDoc.body ? (iframeDoc.body.textContent || iframeDoc.body.innerText || '') : '';
             
+            // PRIORITY CHECK: Look specifically for ComergentData tags
+            if (bodyText.includes('<ComergentData>') || bodyHtml.includes('<ComergentData>') || bodyHtml.includes('&lt;ComergentData&gt;')) {
+                foundComergentData = true;
+                console.log('Detected ComergentData tag in iframe content!');
+            }
+            
             // Check if body HTML contains XML structure (not just text)
             if (bodyHtml && bodyHtml.includes('<') && bodyHtml.includes('</')) {
-                // Try to extract XML from HTML - prioritize XML declaration pattern
-                const xmlMatch = bodyHtml.match(/<[?]xml[\s\S]*?<\/ComergentData>/i) || 
-                               bodyHtml.match(/<ComergentData[\s\S]*?<\/ComergentData>/i) ||
-                               bodyHtml.match(/<[?]xml[\s\S]*?<\/Comergent>/i) ||
-                               bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i);
-                if (xmlMatch) {
-                    xmlContent = xmlMatch[0];
+                // PRIORITY: Try to extract ComergentData first
+                const comergentDataMatch = bodyHtml.match(/<[?]xml[\s\S]*?<\/ComergentData>/i) || 
+                                         bodyHtml.match(/<ComergentData[\s\S]*?<\/ComergentData>/i) ||
+                                         bodyHtml.match(/&lt;[?]xml[\s\S]*?&lt;\/ComergentData&gt;/i) ||
+                                         bodyHtml.match(/&lt;ComergentData[\s\S]*?&lt;\/ComergentData&gt;/i);
+                
+                if (comergentDataMatch) {
+                    foundComergentData = true;
+                    console.log('Found ComergentData match in HTML!');
+                    xmlContent = comergentDataMatch[0];
                     // Decode HTML entities if needed
                     if (xmlContent.includes('&lt;') || xmlContent.includes('&gt;')) {
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = xmlContent;
                         xmlContent = tempDiv.textContent || tempDiv.innerText || xmlContent;
                     }
+                } else {
+                    // Fallback to other XML patterns
+                    const xmlMatch = bodyHtml.match(/<[?]xml[\s\S]*?<\/Comergent>/i) ||
+                                   bodyHtml.match(/<Comergent[\s\S]*?<\/Comergent>/i);
+                    if (xmlMatch) {
+                        xmlContent = xmlMatch[0];
+                        // Decode HTML entities if needed
+                        if (xmlContent.includes('&lt;') || xmlContent.includes('&gt;')) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = xmlContent;
+                            xmlContent = tempDiv.textContent || tempDiv.innerText || xmlContent;
+                        }
+                    }
+                }
+            }
+            
+            // Also check text content - PRIORITIZE ComergentData
+            if (!xmlContent && bodyText) {
+                if (bodyText.includes('<ComergentData>')) {
+                    foundComergentData = true;
+                    console.log('Found ComergentData in text content!');
+                    // Extract ComergentData specifically
+                    let xmlStart = bodyText.indexOf('<ComergentData>');
+                    if (xmlStart === -1) {
+                        xmlStart = bodyText.indexOf('<?xml');
+                    }
+                    if (xmlStart >= 0) {
+                        let xmlEnd = bodyText.lastIndexOf('</ComergentData>');
+                        if (xmlEnd > xmlStart) {
+                            xmlContent = bodyText.substring(xmlStart, xmlEnd + '</ComergentData>'.length);
+                        }
+                    }
                 } else if (bodyText.trim().startsWith('<?xml') || bodyText.trim().startsWith('<ComergentData>') || bodyText.trim().startsWith('<Comergent>')) {
                     // Fallback: extract from text if HTML extraction didn't work
-                    // Prioritize XML declaration
+                    // Prioritize XML declaration and ComergentData
                     let xmlStart = bodyText.indexOf('<?xml');
                     if (xmlStart === -1) {
                         xmlStart = bodyText.indexOf('<ComergentData>');
@@ -871,12 +939,18 @@ function checkIframeForXML() {
         }
         
         // Method 2: Look for pre/code tags with XML (most common in HTML pages)
+        // PRIORITY: Check for ComergentData first
         if (!xmlContent) {
             const preElements = iframeDoc.querySelectorAll('pre, code, textarea');
             for (let elem of preElements) {
                 const text = elem.textContent || elem.innerText || '';
-                // Prioritize XML declaration
-                if (text.trim().startsWith('<?xml') || 
+                // PRIORITY: Check for ComergentData first
+                if (text.includes('<ComergentData>')) {
+                    foundComergentData = true;
+                    console.log('Found ComergentData in pre/code element!');
+                    xmlContent = text.trim();
+                    break;
+                } else if (text.trim().startsWith('<?xml') || 
                     (text.trim().startsWith('<') && (text.includes('</') || text.includes('<Comergent')))) {
                     xmlContent = text.trim();
                     break;
@@ -949,6 +1023,11 @@ function checkIframeForXML() {
             // Clean and display - ensure we have valid XML
             xmlContent = xmlContent.trim();
             
+            // Check if this is the same XML we already displayed (avoid duplicate displays)
+            if (xmlContent === lastDetectedXML) {
+                return; // Already displayed this XML
+            }
+            
             // If we have ComergentData wrapper, use it; otherwise wrap if needed
             if (!xmlContent.includes('<ComergentData>') && xmlContent.includes('<Comergent>')) {
                 // Check if we should wrap it
@@ -957,6 +1036,12 @@ function checkIframeForXML() {
                     // Multiple Comergent blocks - wrap in ComergentData
                     xmlContent = '<ComergentData>\n' + xmlContent + '\n</ComergentData>';
                 }
+            }
+            
+            // Log if we found ComergentData
+            if (foundComergentData || xmlContent.includes('<ComergentData>')) {
+                console.log('✓ ComergentData detected and displaying!');
+                lastDetectedXML = xmlContent; // Store to avoid duplicates
             }
             
             // Always try to display as Chrome-style tree
@@ -1064,14 +1149,72 @@ function updateWSCONavButtons() {
     }
 }
 
-// Poll iframe for changes (since we can't reliably detect when it updates)
+// Poll iframe for changes and use MutationObserver to listen for ComergentData
 let iframeCheckInterval = null;
+let iframeMutationObserver = null;
+let lastDetectedXML = ''; // Track last detected XML to avoid duplicate displays
 
 function startIframeMonitoring() {
     if (iframeCheckInterval) {
         clearInterval(iframeCheckInterval);
     }
-    iframeCheckInterval = setInterval(checkIframeForXML, 2000); // Check every 2 seconds
+    // More frequent polling when actively looking for ComergentData
+    iframeCheckInterval = setInterval(checkIframeForXML, 500); // Check every 500ms for faster detection
+    
+    // Also try to set up MutationObserver for real-time detection
+    try {
+        const iframeDoc = wscoIframe.contentDocument || wscoIframe.contentWindow.document;
+        if (iframeDoc && iframeDoc.body) {
+            // Stop existing observer if any
+            if (iframeMutationObserver) {
+                iframeMutationObserver.disconnect();
+            }
+            
+            // Create MutationObserver to watch for DOM changes
+            iframeMutationObserver = new MutationObserver((mutations) => {
+                // Check if any mutation might have added ComergentData
+                let shouldCheck = false;
+                mutations.forEach((mutation) => {
+                    if (mutation.addedNodes.length > 0) {
+                        mutation.addedNodes.forEach((node) => {
+                            if (node.nodeType === Node.TEXT_NODE) {
+                                if (node.textContent && node.textContent.includes('<ComergentData>')) {
+                                    shouldCheck = true;
+                                }
+                            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                                if (node.textContent && node.textContent.includes('<ComergentData>')) {
+                                    shouldCheck = true;
+                                }
+                            }
+                        });
+                    }
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        shouldCheck = true;
+                    }
+                });
+                
+                if (shouldCheck) {
+                    console.log('DOM mutation detected, checking for ComergentData...');
+                    // Debounce the check slightly
+                    setTimeout(() => {
+                        checkIframeForXML();
+                    }, 100);
+                }
+            });
+            
+            // Start observing
+            iframeMutationObserver.observe(iframeDoc.body, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+            
+            console.log('MutationObserver set up to watch for ComergentData');
+        }
+    } catch (e) {
+        console.log('Could not set up MutationObserver (CORS restriction):', e.message);
+        // Fall back to polling only
+    }
 }
 
 function stopIframeMonitoring() {
@@ -1079,6 +1222,11 @@ function stopIframeMonitoring() {
         clearInterval(iframeCheckInterval);
         iframeCheckInterval = null;
     }
+    if (iframeMutationObserver) {
+        iframeMutationObserver.disconnect();
+        iframeMutationObserver = null;
+    }
+    lastDetectedXML = '';
 }
 
 // Event listeners
