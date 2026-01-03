@@ -405,6 +405,16 @@ class NBAPlayerPropsMonitor:
                     # Show a few oddIDs to understand structure
                     odd_ids = list(first_event.get('odds', {}).keys())[:5]
                     print(f"   Sample oddIDs: {odd_ids}")
+                # Debug: Show teams structure
+                if 'teams' in first_event:
+                    teams = first_event.get('teams', [])
+                    print(f"   Teams structure: {teams}")
+                    if isinstance(teams, list) and len(teams) > 0:
+                        print(f"   First team keys: {list(teams[0].keys()) if isinstance(teams[0], dict) else 'Not a dict'}")
+                if 'awayTeam' in first_event:
+                    print(f"   AwayTeam keys: {list(first_event.get('awayTeam', {}).keys())}")
+                if 'homeTeam' in first_event:
+                    print(f"   HomeTeam keys: {list(first_event.get('homeTeam', {}).keys())}")
             
             props = []
             
@@ -419,13 +429,62 @@ class NBAPlayerPropsMonitor:
                 
                 # Get teams - structure may vary, try multiple paths
                 teams = event.get('teams', [])
+                away_team = 'Away'
+                home_team = 'Home'
+                
                 if isinstance(teams, list) and len(teams) >= 2:
-                    away_team = teams[0].get('name', teams[0].get('teamName', 'Away'))
-                    home_team = teams[1].get('name', teams[1].get('teamName', 'Home'))
+                    # Try various field names for team names
+                    away_team = (
+                        teams[0].get('name') or
+                        teams[0].get('teamName') or
+                        teams[0].get('team') or
+                        teams[0].get('shortName') or
+                        teams[0].get('displayName') or
+                        teams[0].get('abbreviation') or
+                        str(teams[0].get('id', 'Away'))
+                    )
+                    home_team = (
+                        teams[1].get('name') or
+                        teams[1].get('teamName') or
+                        teams[1].get('team') or
+                        teams[1].get('shortName') or
+                        teams[1].get('displayName') or
+                        teams[1].get('abbreviation') or
+                        str(teams[1].get('id', 'Home'))
+                    )
                 else:
-                    # Try alternative structure
-                    away_team = event.get('awayTeam', {}).get('name', 'Away')
-                    home_team = event.get('homeTeam', {}).get('name', 'Home')
+                    # Try alternative structure with awayTeam/homeTeam objects
+                    away_team_obj = event.get('awayTeam', {})
+                    home_team_obj = event.get('homeTeam', {})
+                    
+                    if away_team_obj:
+                        away_team = (
+                            away_team_obj.get('name') or
+                            away_team_obj.get('teamName') or
+                            away_team_obj.get('team') or
+                            away_team_obj.get('shortName') or
+                            away_team_obj.get('displayName') or
+                            away_team_obj.get('abbreviation') or
+                            str(away_team_obj.get('id', 'Away'))
+                        )
+                    if home_team_obj:
+                        home_team = (
+                            home_team_obj.get('name') or
+                            home_team_obj.get('teamName') or
+                            home_team_obj.get('team') or
+                            home_team_obj.get('shortName') or
+                            home_team_obj.get('displayName') or
+                            home_team_obj.get('abbreviation') or
+                            str(home_team_obj.get('id', 'Home'))
+                        )
+                
+                # If still default values, try to get from event info or other fields
+                if away_team == 'Away' or home_team == 'Home':
+                    # Try info field which might contain team names
+                    info = event.get('info', {})
+                    if info:
+                        away_team = info.get('awayTeam') or info.get('away') or away_team
+                        home_team = info.get('homeTeam') or info.get('home') or home_team
                 
                 game_matchup = f"{away_team} @ {home_team}"
                 
@@ -442,6 +501,9 @@ class NBAPlayerPropsMonitor:
                 # For player points: points-PLAYER_NAME-game-ou-over (or under)
                 points_odds_found = 0
                 player_points_odds_found = 0
+                other_stats_found = {}  # Track other stat types for debugging
+                filtered_stats = set()  # Track what we're filtering out
+                processed_odd_ids = []  # Track oddIDs we're processing (for debugging)
                 
                 for odd_id, odd_data in odds.items():
                     if not isinstance(odd_data, dict):
@@ -452,22 +514,67 @@ class NBAPlayerPropsMonitor:
                     if len(odd_parts) < 5:
                         continue
                     
-                    stat_id = odd_parts[0]  # Should be "points"
+                    stat_id = odd_parts[0].lower().strip()  # Should be "points" (normalized)
                     stat_entity_id = odd_parts[1]  # Player name (e.g., "LEBRON_JAMES") or "home"/"away"
                     period_id = odd_parts[2]  # Usually "game"
-                    bet_type_id = odd_parts[3]  # Should be "ou" for over/under
+                    bet_type_id = odd_parts[3].lower().strip()  # Should be "ou" for over/under (normalized)
                     side_id = odd_parts[4]  # "over" or "under"
                     
-                    # Count points odds for debugging
-                    if stat_id.lower() == 'points' and bet_type_id.lower() == 'ou':
-                        points_odds_found += 1
-                        # Check if it's a player prop (not team-level)
-                        if stat_entity_id.upper() not in ['HOME', 'AWAY', 'ALL']:
-                            player_points_odds_found += 1
+                    # Debug: Log first few oddIDs to see the actual format (only for player props)
+                    if stat_entity_id.upper() not in ['HOME', 'AWAY', 'ALL'] and len(processed_odd_ids) < 20:
+                        processed_odd_ids.append({
+                            'odd_id': odd_id,
+                            'stat_id': stat_id,
+                            'stat_entity_id': stat_entity_id,
+                            'bet_type_id': bet_type_id
+                        })
                     
-                    # Only process point props (over/under)
-                    if stat_id.lower() != 'points' or bet_type_id.lower() != 'ou':
+                    # Track stat types for debugging (only for player props, not team-level)
+                    if stat_entity_id.upper() not in ['HOME', 'AWAY', 'ALL'] and bet_type_id == 'ou':
+                        if stat_id not in other_stats_found:
+                            other_stats_found[stat_id] = 0
+                        other_stats_found[stat_id] += 1
+                    
+                    # STRICT FILTER: Only process point props (over/under)
+                    # Must be exactly "points" (not "player_points", "points_rebounds", "rebounds", "assists", etc.)
+                    # Explicitly exclude known non-point stat types
+                    excluded_stats = {'rebounds', 'assists', 'rebound', 'assist', 'steals', 'steal', 
+                                     'blocks', 'block', 'threes', 'three', 'threepointers', 'threepointer',
+                                     'turnovers', 'turnover', 'fouls', 'foul', 'minutes', 'minute',
+                                     'pts', 'pts+reb', 'pts+ast', 'reb+ast', 'pts+reb+ast'}
+                    
+                    if stat_id in excluded_stats:
+                        filtered_stats.add(stat_id)
                         continue
+                    
+                    if stat_id != 'points':
+                        filtered_stats.add(stat_id)
+                        continue
+                    
+                    if bet_type_id != 'ou':
+                        continue
+                    
+                    # ADDITIONAL FILTER: Check if statEntityID contains stat type indicator
+                    # The API might encode stat type in statEntityID (e.g., "PLAYER_NAME_1" = points, "_2" = rebounds, "_3" = assists)
+                    # Based on the history file, all point props have "1 Nba" in the player name
+                    # So we should filter out anything that has numbers 2-10 (which would be rebounds, assists, etc.)
+                    stat_entity_lower = stat_entity_id.lower()
+                    import re
+                    
+                    # Check if statEntityID contains a number 2-10 that might indicate a different stat type
+                    # Pattern: ends with "_2", "_3", etc., or " 2 ", " 3 ", etc., or "2 nba", "3 nba", etc.
+                    # We want to keep "1" (points) but filter out "2", "3", etc. (rebounds, assists)
+                    non_points_pattern = re.search(r'[_\s]([2-9]|10)(\s*nba|\s*$|_)', stat_entity_lower)
+                    if non_points_pattern:
+                        # This appears to be rebounds, assists, or another stat type (not points)
+                        filtered_stats.add(f"{stat_id}_entity_has_non1_number")
+                        continue
+                    
+                    # Count points odds for debugging
+                    points_odds_found += 1
+                    # Check if it's a player prop (not team-level)
+                    if stat_entity_id.upper() not in ['HOME', 'AWAY', 'ALL']:
+                        player_points_odds_found += 1
                     
                     # Skip team-level props (statEntityID would be "home" or "away")
                     if stat_entity_id.upper() in ['HOME', 'AWAY', 'ALL']:
@@ -590,9 +697,19 @@ class NBAPlayerPropsMonitor:
                         print(f"   Debug: Bookmaker IDs found: {list(by_bookmaker.keys())[:5]}")
                 
                 # Debug output for first event
-                if event == events[0] and points_odds_found > 0:
-                    print(f"   First event: Found {points_odds_found} point odds, {player_points_odds_found} player point odds")
-                    print(f"   Props extracted from first event: {len([p for p in props if p['game_id'] == str(event_id)])}")
+                if event == events[0]:
+                    if processed_odd_ids:
+                        print(f"   Sample oddIDs processed (first 10):")
+                        for sample in processed_odd_ids[:10]:
+                            print(f"     {sample['odd_id']} -> stat_id='{sample['stat_id']}', entity='{sample['stat_entity_id']}', bet_type='{sample['bet_type_id']}'")
+                    if points_odds_found > 0:
+                        print(f"   First event: Found {points_odds_found} point odds, {player_points_odds_found} player point odds")
+                        print(f"   Props extracted from first event: {len([p for p in props if p['game_id'] == str(event_id)])}")
+                    # Show other stat types found (for debugging)
+                    if other_stats_found:
+                        print(f"   Other stat types found (filtered out): {dict(other_stats_found)}")
+                    if filtered_stats:
+                        print(f"   Stat types filtered (not 'points'): {sorted(filtered_stats)}")
             
             if props:
                 print(f"✓ Successfully fetched {len(props)} player props from SportsGameOdds API")
@@ -857,18 +974,27 @@ class NBAPlayerPropsMonitor:
             if prop_id in self.history:
                 history = self.history[prop_id]
                 primary_line = history.get('current_line')
+                # If primary_line is too low (< 8.0), it might be rebounds/assists, recalculate
+                if primary_line and primary_line < 8.0:
+                    # Recalculate using highest line
+                    if lines_dict:
+                        filtered_for_primary = {k: v for k, v in lines_dict.items() if k >= 8.0}
+                        if filtered_for_primary:
+                            primary_line = max(filtered_for_primary.keys())
+                        else:
+                            primary_line = max(lines_dict.keys())  # Fallback to highest even if < 8.0
             else:
-                # First time seeing this player prop - use the line with most bookmakers
-                best_line = None
-                best_line_data = None
-                max_bookmakers = 0
+                # First time seeing this player prop - use the highest line value (points is typically highest)
+                # Filter out low lines that are likely rebounds/assists (< 8.0)
+                filtered_lines = {k: v for k, v in lines_dict.items() if k >= 8.0}
                 
-                for line_value, line_data in lines_dict.items():
-                    num_bookmakers = len(line_data['bookmakers'])
-                    if num_bookmakers > max_bookmakers:
-                        max_bookmakers = num_bookmakers
-                        best_line = line_value
-                        best_line_data = line_data
+                # If no lines pass the filter, use all lines (might be a low-scoring player)
+                if not filtered_lines:
+                    filtered_lines = lines_dict
+                
+                # Use the highest line value (points is usually the highest stat line)
+                best_line = max(filtered_lines.keys())
+                best_line_data = filtered_lines[best_line]
                 
                 if best_line is None:
                     continue
@@ -892,24 +1018,43 @@ class NBAPlayerPropsMonitor:
                 }
                 history = self.history[prop_id]
             
-            # Update lines dictionary with all current lines and their bookmakers (consolidated)
-            history['lines'] = {}
+            # FILTER: Only keep point lines (filter out rebounds/assists)
+            # Points lines for NBA players are typically 10+ (with some exceptions for role players)
+            # Rebounds/assists are typically 3-10
+            # Strategy: Keep only the highest line value (points is usually the highest stat line)
+            # OR filter out lines that are too low (< 8.0) to be points
+            filtered_lines_dict = {}
             for line_value, line_data in lines_dict.items():
+                # Filter out lines that are too low to be points (likely rebounds/assists)
+                # Most NBA players score 8+ points, so lines below 8 are likely not points
+                if line_value >= 8.0:
+                    filtered_lines_dict[line_value] = line_data
+            
+            # If no lines pass the filter, use the highest line anyway (might be a low-scoring player)
+            if not filtered_lines_dict:
+                # Fallback: use the highest line value
+                if lines_dict:
+                    highest_line = max(lines_dict.keys())
+                    filtered_lines_dict[highest_line] = lines_dict[highest_line]
+            
+            # Update lines dictionary with only filtered (point) lines
+            history['lines'] = {}
+            for line_value, line_data in filtered_lines_dict.items():
                 history['lines'][str(line_value)] = {
                     'line': line_value,
                     'bookmakers': line_data['bookmakers']
                 }
             
             # Determine which line to use for movement comparison
-            # Use the most common line (line with most bookmakers) as the primary line
+            # Use the highest line value (points is typically the highest stat line)
             best_line = primary_line
             best_line_bookmakers = []
-            max_bookmakers = 0
+            max_line_value = 0
             
-            for line_value, line_data in lines_dict.items():
-                num_bookmakers = len(line_data['bookmakers'])
-                if num_bookmakers > max_bookmakers:
-                    max_bookmakers = num_bookmakers
+            for line_value, line_data in filtered_lines_dict.items():
+                # Use the highest line value as the primary line (points is usually highest)
+                if line_value > max_line_value:
+                    max_line_value = line_value
                     best_line = line_value
                     best_line_bookmakers = line_data['bookmakers']
             

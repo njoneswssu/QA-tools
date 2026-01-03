@@ -2115,7 +2115,7 @@
           "documented_at_readable": "2026-01-03 10:08:33",
           "current_spread": -3.5,
           "favored_team": "Toronto Raptors",
-          "current_total": 236.5
+          "current_total": 237.5
         },
         "fanduel": {
           "bookmaker_name": "FanDuel",
@@ -2155,7 +2155,7 @@
           "documented_at_readable": "2026-01-03 10:08:33",
           "current_spread": -3.5,
           "favored_team": "New York Knicks",
-          "current_total": 232.5
+          "current_total": 233.5
         },
         "fanduel": {
           "bookmaker_name": "FanDuel",
@@ -2275,7 +2275,7 @@
           "documented_at_readable": "2026-01-03 10:08:33",
           "current_spread": 8.5,
           "favored_team": "Houston Rockets",
-          "current_total": 225.5
+          "current_total": 226.5
         },
         "fanduel": {
           "bookmaker_name": "FanDuel",
@@ -2315,7 +2315,7 @@
           "documented_at_readable": "2026-01-03 10:08:33",
           "current_spread": -12.5,
           "favored_team": "Golden State Warriors",
-          "current_total": 242.5
+          "current_total": 243.5
         },
         "fanduel": {
           "bookmaker_name": "FanDuel",
@@ -2380,7 +2380,7 @@
       }
     }
   },
-  "last_updated": "2026-01-03T10:53:40.072787",
+  "last_updated": "2026-01-03T11:53:42.403220",
   "total_games": 96,
   "player_props": {},
   "total_props": 0
