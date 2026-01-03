@@ -10,7 +10,8 @@ app = Flask(__name__)
 
 class StockTracker:
     def __init__(self):
-        self.watchlist_file = "watchlist.json"
+        _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.watchlist_file = os.path.join(_base_dir, "watchlist.json")
         self.watchlist = self.load_watchlist()
     
     def load_watchlist(self):

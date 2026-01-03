@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
 Comprehensive Betting Market Monitor
-- Monitors Robinhood prediction market contracts
 - Monitors multiple sportsbooks (DraftKings, FanDuel, BetMGM, Bet365) point totals and spreads
-- Documents all found contracts
+- Documents all found games
 - Alerts on significant movements
 """
 
@@ -13,14 +12,6 @@ import os
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
 import sys
-
-# Robinhood imports
-try:
-    import robin_stocks.robinhood as rh
-    ROBINHOOD_AVAILABLE = True
-except ImportError:
-    ROBINHOOD_AVAILABLE = False
-    print("Warning: robin_stocks not available. Robinhood monitoring disabled.")
 
 # HTTP requests for Sportsbook API
 try:
@@ -39,86 +30,19 @@ except ImportError:
 
 # Configuration
 CHECK_INTERVAL = 1800  # Check every 30 minutes (1800 seconds) for football and NBA
-PRICE_THRESHOLD = 0.80  # 80% threshold for Robinhood
 SPREAD_MOVEMENT_THRESHOLD = 2.0  # Minimum 2 point movement for sportsbooks
 TOTAL_MOVEMENT_THRESHOLD = 2.0  # Minimum 2 point movement for totals
 
-# Tracking
+# Tracking (files stored in monitor-data directory)
 ALERTED_CONTRACTS = set()
-DOCUMENTED_CONTRACTS_FILE = "documented_contracts.json"
-DRAFTKINGS_HISTORY_FILE = "draftkings_history.json"
-LINE_MOVEMENTS_FILE = "line_movements.json"
-ORIGINAL_LINES_FILE = "original_lines.json"
+_base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_data_dir = os.path.join(_base_dir, "monitor-data")
+os.makedirs(_data_dir, exist_ok=True)  # Ensure directory exists
+LINE_MOVEMENTS_FILE = os.path.join(_data_dir, "line_movements.json")
+ORIGINAL_LINES_FILE = os.path.join(_data_dir, "original_lines.json")
 
 # Discord webhook (optional)
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-
-
-class ContractDocumenter:
-    """Documents all found contracts to a JSON file"""
-    
-    def __init__(self, filename: str = DOCUMENTED_CONTRACTS_FILE):
-        self.filename = filename
-        self.contracts = self.load_documented_contracts()
-    
-    def load_documented_contracts(self) -> Dict:
-        """Load previously documented contracts"""
-        if os.path.exists(self.filename):
-            try:
-                with open(self.filename, 'r') as f:
-                    return json.load(f)
-            except Exception as e:
-                print(f"Error loading documented contracts: {e}")
-        return {
-            'robinhood_contracts': [],
-            'sportsbook_contracts': [],
-            'last_updated': None,
-            'total_contracts': 0
-        }
-    
-    def document_contract(self, contract: Dict, source: str = 'robinhood'):
-        """
-        Document a contract when found
-        
-        Args:
-            contract: Contract dictionary
-            source: Source of the contract ('robinhood' or 'sportsbook')
-        """
-        contract_id = contract.get('symbol') or contract.get('id') or contract.get('event_id', 'unknown')
-        
-        # Check if already documented
-        key = f'{source}_contracts'
-        existing_ids = [c.get('id') for c in self.contracts.get(key, [])]
-        
-        if contract_id not in existing_ids:
-            contract_entry = {
-                'id': contract_id,
-                'name': contract.get('name', contract.get('title', 'Unknown')),
-                'symbol': contract.get('symbol', 'N/A'),
-                'source': source,
-                'discovered_at': datetime.now().isoformat(),
-                'data': contract  # Store full contract data
-            }
-            
-            if key not in self.contracts:
-                self.contracts[key] = []
-            
-            self.contracts[key].append(contract_entry)
-            self.contracts['last_updated'] = datetime.now().isoformat()
-            self.contracts['total_contracts'] = len(self.contracts.get('robinhood_contracts', [])) + \
-                                                 len(self.contracts.get('sportsbook_contracts', []))
-            
-            self.save()
-            print(f"✓ Documented new {source} contract: {contract_entry['name']}")
-        # If contract already exists, don't update anything - no need to save
-    
-    def save(self):
-        """Save documented contracts to file"""
-        try:
-            with open(self.filename, 'w') as f:
-                json.dump(self.contracts, f, indent=2)
-        except Exception as e:
-            print(f"Error saving documented contracts: {e}")
 
 
 class DiscordNotifier:
@@ -251,24 +175,6 @@ class DiscordNotifier:
     def send_total_alert(self, game: Dict, movement: Dict):
         """Send total movement alert to Discord (single bookmaker)"""
         self.send_grouped_total_alert(game, [movement])
-    
-    def send_robinhood_alert(self, contract: Dict, price: float):
-        """Send Robinhood contract alert to Discord"""
-        contract_name = contract.get('name', contract.get('symbol', 'Unknown Contract'))
-        contract_symbol = contract.get('symbol', 'N/A')
-        price_percent = price * 100
-        
-        title = "🚨 Robinhood Prediction Market Alert"
-        description = f"**{contract_name}** ({contract_symbol})"
-        
-        fields = [
-            {'name': 'Price', 'value': f"{price_percent:.2f}%", 'inline': True},
-            {'name': 'Threshold', 'value': f"{PRICE_THRESHOLD*100}%", 'inline': True},
-            {'name': 'Symbol', 'value': contract_symbol, 'inline': True},
-            {'name': 'Time', 'value': datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'inline': True}
-        ]
-        
-        self.send_webhook(title, description, 0xff6b6b, fields)
 
 
 class SportsbookMonitor:
@@ -295,27 +201,7 @@ class SportsbookMonitor:
         self.api_key = api_key or os.getenv('ODDS_API_KEY')
         self.base_url = "https://api.the-odds-api.com/v4"
         self.bookmakers = bookmakers or self.BOOKMAKERS
-        self.history = self.load_history()
-        self.documenter = ContractDocumenter()
         self.discord = DiscordNotifier(webhook_url=discord_webhook)
-    
-    def load_history(self) -> Dict:
-        """Load historical odds data"""
-        if os.path.exists(DRAFTKINGS_HISTORY_FILE):
-            try:
-                with open(DRAFTKINGS_HISTORY_FILE, 'r') as f:
-                    return json.load(f)
-            except Exception as e:
-                print(f"Error loading sportsbook history: {e}")
-        return {}
-    
-    def save_history(self):
-        """Save historical odds data"""
-        try:
-            with open(DRAFTKINGS_HISTORY_FILE, 'w') as f:
-                json.dump(self.history, f, indent=2)
-        except Exception as e:
-            print(f"Error saving sportsbook history: {e}")
     
     def get_sportsbook_odds(self, sport: str = 'basketball_nba') -> List[Dict]:
         """
@@ -353,10 +239,6 @@ class SportsbookMonitor:
             response.raise_for_status()
             
             data = response.json()
-            
-            # Only document new games (document_contract checks if already exists)
-            for game in data:
-                self.documenter.document_contract(game, source='sportsbook')
             
             return data
             
@@ -483,160 +365,152 @@ class SportsbookMonitor:
         current_time = datetime.now().isoformat()
         readable_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
+        games_documented = 0
+        games_already_existing = 0
+        games_no_odds = 0
+        
         for game in current_games:
             game_id = game.get('id', 'unknown')
             home_team = game.get('home_team', 'Unknown')
             away_team = game.get('away_team', 'Unknown')
             commence_time = game.get('commence_time', '')
+            sport_display = game.get('sport_display', 'Unknown')
             
             # Get odds from all bookmakers for this game
             bookmaker_odds = self.get_all_bookmaker_odds(game)
             
-            if game_id not in self.history:
-                # First time seeing this game, store initial values for all bookmakers
-                self.history[game_id] = {
-                    'home_team': home_team,
-                    'away_team': away_team,
-                    'bookmakers': {},
-                    'first_seen': current_time,
-                    'last_updated': current_time
-                }
-                
-                # Initialize each bookmaker's data
-                for bookmaker_key, odds in bookmaker_odds.items():
-                    self.history[game_id]['bookmakers'][bookmaker_key] = {
-                        'initial_spread': odds.get('spread'),
-                        'initial_total': odds.get('total'),
-                        'current_spread': odds.get('spread'),
-                        'current_total': odds.get('total'),
-                        'favored_team': odds.get('favored_team'),
-                        'spread_movements': [],
-                        'total_movements': []
-                    }
-                
-                # Document original lines in separate file
+            if not bookmaker_odds:
+                games_no_odds += 1
+                continue
+            
+            # Load original lines data (single source of truth)
+            original_lines_data = self.load_original_lines()
+            games = original_lines_data.get('games', {})
+            game_entry = games.get(game_id)
+            
+            if game_entry is None:
+                # First time seeing this game - document it
                 self.document_original_lines(game, bookmaker_odds, current_time)
-                
-                # Save initial state
-                self.save_history()
+                games_documented += 1
+                # Reload to get the updated data
+                original_lines_data = self.load_original_lines()
+                game_entry = original_lines_data['games'][game_id]
             else:
-                # Check for movements in each bookmaker
-                history = self.history[game_id]
-                movement_occurred = False
-                
-                # Initialize bookmaker data if not exists
-                if 'bookmakers' not in history:
-                    history['bookmakers'] = {}
-                
-                # Collect all movements first, then group and notify
-                spread_movements = []  # List of all spread movements
-                total_movements = []   # List of all total movements
-                
+                games_already_existing += 1
+                # Check if we need to add new bookmakers
+                updated = False
                 for bookmaker_key, odds in bookmaker_odds.items():
-                    # Initialize bookmaker if first time seeing it
-                    if bookmaker_key not in history['bookmakers']:
-                        history['bookmakers'][bookmaker_key] = {
-                            'initial_spread': odds.get('spread'),
-                            'initial_total': odds.get('total'),
-                            'current_spread': odds.get('spread'),
-                            'current_total': odds.get('total'),
-                            'favored_team': odds.get('favored_team'),
-                            'spread_movements': [],
-                            'total_movements': [],
-                            'last_seen': current_time
-                        }
-                        # Document original lines for this new bookmaker
+                    if bookmaker_key not in game_entry.get('bookmakers', {}):
+                        # New bookmaker for existing game
                         self.document_original_lines(game, {bookmaker_key: odds}, current_time)
-                        # Save the new bookmaker initialization
-                        history['last_updated'] = current_time
-                        self.save_history()
-                        continue
-                    
-                    bookmaker_history = history['bookmakers'][bookmaker_key]
-                    # Use the last saved values as the baseline (from previous run or last check)
-                    old_spread = bookmaker_history.get('current_spread')
-                    old_total = bookmaker_history.get('current_total')
-                    old_favored_team = bookmaker_history.get('favored_team')
-                    new_spread = odds.get('spread')
-                    new_total = odds.get('total')
-                    new_favored_team = odds.get('favored_team')
-                    
-                    # Check spread movement
-                    if new_spread is not None and old_spread is not None:
-                        spread_change = abs(new_spread - old_spread)
-                        if spread_change >= SPREAD_MOVEMENT_THRESHOLD:
-                            # Determine movement direction towards teams
-                            movement_towards = self.determine_spread_movement_direction(
-                                game, old_spread, new_spread, old_favored_team, new_favored_team
-                            )
+                        updated = True
+                if updated:
+                    # Reload to get the updated data
+                    original_lines_data = self.load_original_lines()
+                    game_entry = original_lines_data['games'][game_id]
+            
+            # Now check for movements using current values from original_lines.json
+            movement_occurred = False
+            
+            # Collect all movements first, then group and notify
+            spread_movements = []  # List of all spread movements
+            total_movements = []   # List of all total movements
+            
+            for bookmaker_key, odds in bookmaker_odds.items():
+                bookmaker_entry = game_entry.get('bookmakers', {}).get(bookmaker_key)
+                
+                if bookmaker_entry is None:
+                    # This shouldn't happen, but handle it gracefully
+                    continue
+                
+                # Get current values from original_lines.json (or use original if current not set)
+                old_spread = bookmaker_entry.get('current_spread', bookmaker_entry.get('original_spread'))
+                old_total = bookmaker_entry.get('current_total', bookmaker_entry.get('original_total'))
+                old_favored_team = bookmaker_entry.get('favored_team')
+                new_spread = odds.get('spread')
+                new_total = odds.get('total')
+                new_favored_team = odds.get('favored_team')
+                
+                # Check spread movement
+                if new_spread is not None and old_spread is not None:
+                    spread_change = abs(new_spread - old_spread)
+                    if spread_change >= SPREAD_MOVEMENT_THRESHOLD:
+                        # Determine movement direction towards teams
+                        movement_towards = self.determine_spread_movement_direction(
+                            game, old_spread, new_spread, old_favored_team, new_favored_team
+                        )
+                        
+                        movement = {
+                            'timestamp': current_time,
+                            'readable_timestamp': readable_time,
+                            'bookmaker': bookmaker_key,
+                            'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
+                            'old_spread': old_spread,
+                            'new_spread': new_spread,
+                            'movement': new_spread - old_spread,
+                            'absolute_movement': spread_change,
+                            'direction': 'increased' if new_spread > old_spread else 'decreased',
+                            'movement_towards': movement_towards,
+                            'old_favored_team': old_favored_team,
+                            'new_favored_team': new_favored_team
+                        }
+                        
+                        # Document the movement
+                        self.document_movement(game, 'spread', movement, bookmaker_key)
                             
-                            movement = {
-                                'timestamp': current_time,
-                                'readable_timestamp': readable_time,
-                                'bookmaker': bookmaker_key,
-                                'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
-                                'old_spread': old_spread,
-                                'new_spread': new_spread,
-                                'movement': new_spread - old_spread,
-                                'absolute_movement': spread_change,
-                                'direction': 'increased' if new_spread > old_spread else 'decreased',
-                                'movement_towards': movement_towards,
-                                'old_favored_team': old_favored_team,
-                                'new_favored_team': new_favored_team
-                            }
-                            bookmaker_history['spread_movements'].append(movement)
-                            
-                            # Document the movement in the contracts file (still individual)
-                            self.document_movement(game, 'spread', movement, bookmaker_key)
-                            
-                            # Collect for grouping
-                            spread_movements.append(movement)
-                            movement_occurred = True
-                            # Update current value after movement detected
-                            bookmaker_history['current_spread'] = new_spread
-                            bookmaker_history['favored_team'] = new_favored_team
-                        else:
-                            # No significant movement, but still update current value for next comparison
-                            bookmaker_history['current_spread'] = new_spread
-                    elif new_spread is not None:
-                        # First time seeing this spread value, update it
-                        bookmaker_history['current_spread'] = new_spread
-                        bookmaker_history['favored_team'] = new_favored_team
-                    
-                    # Check total movement
-                    if new_total is not None and old_total is not None:
-                        total_change = abs(new_total - old_total)
-                        if total_change >= TOTAL_MOVEMENT_THRESHOLD:
-                            movement = {
-                                'timestamp': current_time,
-                                'readable_timestamp': readable_time,
-                                'bookmaker': bookmaker_key,
-                                'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
-                                'old_total': old_total,
-                                'new_total': new_total,
-                                'movement': new_total - old_total,
-                                'absolute_movement': total_change,
-                                'direction': 'increased' if new_total > old_total else 'decreased'
-                            }
-                            bookmaker_history['total_movements'].append(movement)
-                            
-                            # Document the movement in the contracts file (still individual)
-                            self.document_movement(game, 'total', movement, bookmaker_key)
-                            
-                            # Collect for grouping
-                            total_movements.append(movement)
-                            movement_occurred = True
-                            # Update current value after movement detected
-                            bookmaker_history['current_total'] = new_total
-                        else:
-                            # No significant movement, but still update current value for next comparison
-                            bookmaker_history['current_total'] = new_total
-                    elif new_total is not None:
-                        # First time seeing this total value, update it
-                        bookmaker_history['current_total'] = new_total
-                    
-                    # Update last_seen timestamp for this bookmaker
-                    bookmaker_history['last_seen'] = current_time
+                        # Collect for grouping
+                        spread_movements.append(movement)
+                        movement_occurred = True
+                        # Update current value in original_lines.json after movement detected
+                        bookmaker_entry['current_spread'] = new_spread
+                        bookmaker_entry['favored_team'] = new_favored_team
+                    else:
+                        # No significant movement, but still update current value for next comparison
+                        if new_spread is not None:
+                            bookmaker_entry['current_spread'] = new_spread
+                            bookmaker_entry['favored_team'] = new_favored_team
+                elif new_spread is not None:
+                    # First time seeing this spread value, update it
+                    bookmaker_entry['current_spread'] = new_spread
+                    bookmaker_entry['favored_team'] = new_favored_team
+                
+                # Check total movement
+                if new_total is not None and old_total is not None:
+                    total_change = abs(new_total - old_total)
+                    if total_change >= TOTAL_MOVEMENT_THRESHOLD:
+                        movement = {
+                            'timestamp': current_time,
+                            'readable_timestamp': readable_time,
+                            'bookmaker': bookmaker_key,
+                            'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
+                            'old_total': old_total,
+                            'new_total': new_total,
+                            'movement': new_total - old_total,
+                            'absolute_movement': total_change,
+                            'direction': 'increased' if new_total > old_total else 'decreased'
+                        }
+                        
+                        # Document the movement
+                        self.document_movement(game, 'total', movement, bookmaker_key)
+                        
+                        # Collect for grouping
+                        total_movements.append(movement)
+                        movement_occurred = True
+                        # Update current value in original_lines.json after movement detected
+                        bookmaker_entry['current_total'] = new_total
+                    else:
+                        # No significant movement, but still update current value for next comparison
+                        if new_total is not None:
+                            bookmaker_entry['current_total'] = new_total
+                elif new_total is not None:
+                    # First time seeing this total value, update it
+                    bookmaker_entry['current_total'] = new_total
+            
+            # Save updated current values back to original_lines.json after processing all bookmakers
+            if movement_occurred or any(odds.get('spread') is not None or odds.get('total') is not None 
+                                       for odds in bookmaker_odds.values()):
+                original_lines_data['last_updated'] = current_time
+                self.save_original_lines(original_lines_data)
                 
                 # Group and send notifications for spread movements
                 if spread_movements:
@@ -688,11 +562,17 @@ class SportsbookMonitor:
                         else:
                             # Single bookmaker - send individual notification
                             self.send_total_alert(game, group_movements[0])
-                
-                # Always update last_updated and save history (even if no movement)
-                # This ensures we remember the current lines for the next run
-                history['last_updated'] = current_time
-                self.save_history()
+        
+        # Summary of games processed
+        if games_documented > 0 or games_already_existing > 0 or games_no_odds > 0:
+            print(f"\n📊 Games Summary:")
+            if games_documented > 0:
+                print(f"  ✓ Documented {games_documented} new game(s)")
+            if games_already_existing > 0:
+                print(f"  ℹ️  {games_already_existing} game(s) already in history")
+            if games_no_odds > 0:
+                print(f"  ⚠️  {games_no_odds} game(s) with no bookmaker odds found")
+            print()
     
     def determine_spread_movement_direction(self, game: Dict, old_spread: float, new_spread: float, 
                                            old_favored_team: Optional[str], new_favored_team: Optional[str]) -> str:
@@ -742,24 +622,74 @@ class SportsbookMonitor:
         return "unknown direction"
     
     def load_original_lines(self) -> Dict:
-        """Load original lines from file"""
+        """Load original lines from file (consolidated with NBA player monitor)"""
+        today = datetime.now().strftime('%Y-%m-%d')
+        
         if os.path.exists(ORIGINAL_LINES_FILE):
             try:
                 with open(ORIGINAL_LINES_FILE, 'r') as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    
+                    # Check if it's a new day - clear old data if so
+                    stored_date = data.get('current_date')
+                    if stored_date != today:
+                        print(f"📅 New day detected ({today}). Clearing previous day's data...")
+                        # Clear games and player_props, but preserve structure
+                        data = {
+                            'games': {},
+                            'player_props': {},
+                            'current_date': today,
+                            'last_updated': None,
+                            'total_games': 0,
+                            'total_props': 0
+                        }
+                        # Save the cleared data
+                        with open(ORIGINAL_LINES_FILE, 'w') as f:
+                            json.dump(data, f, indent=2)
+                        print(f"✓ Cleared old data. Starting fresh for {today}")
+                    else:
+                        # Update current_date if not set
+                        if 'current_date' not in data:
+                            data['current_date'] = today
+                    
+                    # Ensure games section exists
+                    if 'games' not in data:
+                        data['games'] = {}
+                    if 'player_props' not in data:
+                        data['player_props'] = {}
+                    return data
             except Exception as e:
                 print(f"Error loading original lines: {e}")
+        
         return {
-            'games': {},
+            'games': {},  # For betting monitor games
+            'player_props': {},  # For NBA player props
+            'current_date': today,
             'last_updated': None,
-            'total_games': 0
+            'total_games': 0,
+            'total_props': 0
         }
     
     def save_original_lines(self, original_lines_data: Dict):
-        """Save original lines to file"""
+        """Save original lines to file (consolidated with NBA player monitor)"""
         try:
+            today = datetime.now().strftime('%Y-%m-%d')
+            
+            # Load existing data to preserve player_props section
+            existing_data = self.load_original_lines()
+            # Update only the games section
+            existing_data['games'] = original_lines_data.get('games', {})
+            existing_data['total_games'] = len(existing_data['games'])
+            existing_data['last_updated'] = original_lines_data.get('last_updated')
+            existing_data['current_date'] = today  # Update date
+            # Preserve player_props data if it exists
+            if 'player_props' not in existing_data:
+                existing_data['player_props'] = {}
+            if 'total_props' not in existing_data:
+                existing_data['total_props'] = len(existing_data.get('player_props', {}))
+            
             with open(ORIGINAL_LINES_FILE, 'w') as f:
-                json.dump(original_lines_data, f, indent=2)
+                json.dump(existing_data, f, indent=2)
         except Exception as e:
             print(f"Error saving original lines: {e}")
     
@@ -768,7 +698,7 @@ class SportsbookMonitor:
         Document the original lines for a game when first discovered
         
         Args:
-            game: Game dictionary
+            game: Game dictionary (should include 'sport' and 'sport_display' fields)
             bookmaker_odds: Dictionary of bookmaker keys to their odds
             timestamp: ISO timestamp when lines were first seen
         """
@@ -776,6 +706,8 @@ class SportsbookMonitor:
         home_team = game.get('home_team', 'Unknown')
         away_team = game.get('away_team', 'Unknown')
         commence_time = game.get('commence_time', '')
+        sport = game.get('sport', 'unknown')
+        sport_display = game.get('sport_display', sport.replace('_', ' ').title() if sport != 'unknown' else 'Unknown')
         readable_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         # Load existing original lines
@@ -786,6 +718,8 @@ class SportsbookMonitor:
             # Create game entry
             game_entry = {
                 'game_id': game_id,
+                'sport': sport,
+                'sport_display': sport_display,
                 'home_team': home_team,
                 'away_team': away_team,
                 'game_time': commence_time,
@@ -801,6 +735,9 @@ class SportsbookMonitor:
                     'bookmaker_name': bookmaker_name,
                     'original_spread': odds.get('spread'),
                     'original_total': odds.get('total'),
+                    'current_spread': odds.get('spread'),  # Initialize current to original
+                    'current_total': odds.get('total'),    # Initialize current to original
+                    'favored_team': odds.get('favored_team'),
                     'documented_at': timestamp,
                     'documented_at_readable': readable_time
                 }
@@ -812,7 +749,7 @@ class SportsbookMonitor:
             # Save to file
             self.save_original_lines(original_lines_data)
             
-            print(f"✓ Documented original lines for: {away_team} @ {home_team}")
+            print(f"✓ Documented original lines for: {away_team} @ {home_team} ({sport_display})")
             print(f"  Bookmakers: {', '.join([self.BOOKMAKER_NAMES.get(b, b) for b in bookmaker_odds.keys()])}")
             print(f"  Saved to: {ORIGINAL_LINES_FILE}")
         else:
@@ -827,35 +764,92 @@ class SportsbookMonitor:
                         'bookmaker_name': bookmaker_name,
                         'original_spread': odds.get('spread'),
                         'original_total': odds.get('total'),
+                        'current_spread': odds.get('spread'),  # Initialize current to original
+                        'current_total': odds.get('total'),    # Initialize current to original
+                        'favored_team': odds.get('favored_team'),
                         'documented_at': timestamp,
                         'documented_at_readable': readable_time
                     }
                     updated = True
             
             if updated:
+                # Also update sport info if it wasn't set before
+                if 'sport' not in game_entry or game_entry.get('sport') == 'unknown':
+                    game_entry['sport'] = sport
+                    game_entry['sport_display'] = sport_display
+                
                 original_lines_data['last_updated'] = timestamp
                 self.save_original_lines(original_lines_data)
-                print(f"✓ Updated original lines for: {away_team} @ {home_team} (new bookmakers added)")
+                print(f"✓ Updated original lines for: {away_team} @ {home_team} ({sport_display}) (new bookmakers added)")
     
     def load_line_movements(self) -> Dict:
-        """Load line movements from file"""
+        """Load line movements from file (consolidated with NBA player monitor)"""
+        today = datetime.now().strftime('%Y-%m-%d')
+        
         if os.path.exists(LINE_MOVEMENTS_FILE):
             try:
                 with open(LINE_MOVEMENTS_FILE, 'r') as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    
+                    # Check if it's a new day - clear old data if so
+                    stored_date = data.get('current_date')
+                    if stored_date != today:
+                        print(f"📅 New day detected ({today}). Clearing previous day's movements...")
+                        # Clear movements, but preserve structure
+                        data = {
+                            'game_movements': [],
+                            'player_prop_movements': [],
+                            'current_date': today,
+                            'last_updated': None,
+                            'total_movements': 0
+                        }
+                        # Save the cleared data
+                        with open(LINE_MOVEMENTS_FILE, 'w') as f:
+                            json.dump(data, f, indent=2)
+                        print(f"✓ Cleared old movements. Starting fresh for {today}")
+                    else:
+                        # Update current_date if not set
+                        if 'current_date' not in data:
+                            data['current_date'] = today
+                    
+                    # Return game_movements section, or create it if doesn't exist
+                    if 'game_movements' not in data:
+                        data['game_movements'] = []
+                    if 'player_prop_movements' not in data:
+                        data['player_prop_movements'] = []
+                    return data
             except Exception as e:
                 print(f"Error loading line movements: {e}")
+        
         return {
-            'movements': [],
+            'game_movements': [],  # For betting monitor movements
+            'player_prop_movements': [],  # For NBA player prop movements
+            'current_date': today,
             'last_updated': None,
             'total_movements': 0
         }
     
     def save_line_movements(self, movements_data: Dict):
-        """Save line movements to file"""
+        """Save line movements to file (consolidated with NBA player monitor)"""
         try:
+            today = datetime.now().strftime('%Y-%m-%d')
+            
+            # Load existing data to preserve player_prop_movements section
+            existing_data = self.load_line_movements()
+            # Update only the game_movements section
+            existing_data['game_movements'] = movements_data.get('movements', [])
+            existing_data['last_updated'] = movements_data.get('last_updated')
+            existing_data['current_date'] = today  # Update date
+            # Calculate total movements
+            total_game_movements = len(existing_data['game_movements'])
+            total_prop_movements = len(existing_data.get('player_prop_movements', []))
+            existing_data['total_movements'] = total_game_movements + total_prop_movements
+            # Preserve player_prop_movements if it exists
+            if 'player_prop_movements' not in existing_data:
+                existing_data['player_prop_movements'] = []
+            
             with open(LINE_MOVEMENTS_FILE, 'w') as f:
-                json.dump(movements_data, f, indent=2)
+                json.dump(existing_data, f, indent=2)
         except Exception as e:
             print(f"Error saving line movements: {e}")
     
@@ -875,13 +869,18 @@ class SportsbookMonitor:
         away_team = game.get('away_team', 'Unknown')
         bookmaker_name = movement.get('bookmaker_name', bookmaker_key)
         commence_time = game.get('commence_time', '')
+        sport = game.get('sport', 'unknown')
+        sport_display = game.get('sport_display', sport.replace('_', ' ').title() if sport != 'unknown' else 'Unknown')
         
         # Load existing movements
         movements_data = self.load_line_movements()
+        game_movements = movements_data.get('game_movements', [])
         
         # Create movement entry with all details
         movement_entry = {
             'game_id': game_id,
+            'sport': sport,
+            'sport_display': sport_display,
             'home_team': home_team,
             'away_team': away_team,
             'game_time': commence_time,
@@ -904,11 +903,14 @@ class SportsbookMonitor:
             movement_entry['new_favored_team'] = movement.get('new_favored_team')
         
         # Add to movements list
-        movements_data['movements'].append(movement_entry)
+        game_movements.append(movement_entry)
+        movements_data['game_movements'] = game_movements
         movements_data['last_updated'] = datetime.now().isoformat()
-        movements_data['total_movements'] = len(movements_data['movements'])
+        # Calculate total (game movements + prop movements)
+        total_prop_movements = len(movements_data.get('player_prop_movements', []))
+        movements_data['total_movements'] = len(game_movements) + total_prop_movements
         
-        # Save to separate file
+        # Save to consolidated file
         self.save_line_movements(movements_data)
         
         print(f"✓ Documented {movement_type} movement ({bookmaker_name}): {away_team} @ {home_team}")
@@ -1021,7 +1023,7 @@ class SportsbookMonitor:
     
     def log_alert(self, alert_type: str, game: Dict, movement: Dict):
         """Log alert to file"""
-        log_file = "sportsbook_alerts.log"
+        log_file = os.path.join(_data_dir, "sportsbook_alerts.log")
         timestamp = datetime.now().isoformat()
         
         log_entry = {
@@ -1041,16 +1043,91 @@ class SportsbookMonitor:
         except Exception as e:
             print(f"Could not write to log file: {e}")
     
+    def select_sports(self) -> List[str]:
+        """
+        Interactive sport selection menu
+        
+        Returns:
+            List of selected sport keys
+        """
+        # Available sports with their display names
+        available_sports = {
+            '1': ('basketball_nba', 'NBA'),
+            '2': ('americanfootball_nfl', 'NFL'),
+            '3': ('basketball_ncaab', 'NCAA Basketball'),
+            '4': ('americanfootball_ncaaf', 'NCAA Football'),
+            '5': ('baseball_mlb', 'MLB'),
+            '6': ('icehockey_nhl', 'NHL'),
+            '7': ('soccer_usa_mls', 'MLS'),
+            '8': ('soccer_epl', 'English Premier League'),
+            '9': ('soccer_uefa_europa_league', 'UEFA Europa League'),
+            '10': ('soccer_uefa_champs_league', 'UEFA Champions League')
+        }
+        
+        print("\n" + "="*60)
+        print("SPORT SELECTION")
+        print("="*60)
+        print("Select which sports you want to monitor (enter numbers separated by commas):")
+        print()
+        
+        for key, (sport_key, sport_name) in available_sports.items():
+            print(f"  {key}. {sport_name}")
+        
+        print()
+        print("Example: Enter '1,2,3' to monitor NBA, NFL, and NCAA Basketball")
+        print("Or press Enter to monitor all sports")
+        print("="*60)
+        
+        while True:
+            try:
+                user_input = input("\nYour selection: ").strip()
+                
+                if not user_input:
+                    # Default to all sports
+                    selected = [sport_key for sport_key, _ in available_sports.values()]
+                    print(f"\n✓ Selected all sports: {', '.join([name for _, name in available_sports.values()])}")
+                    return selected
+                
+                # Parse comma-separated numbers
+                selections = [s.strip() for s in user_input.split(',')]
+                selected_sports = []
+                selected_names = []
+                
+                for selection in selections:
+                    if selection in available_sports:
+                        sport_key, sport_name = available_sports[selection]
+                        if sport_key not in selected_sports:
+                            selected_sports.append(sport_key)
+                            selected_names.append(sport_name)
+                    else:
+                        print(f"⚠️  Invalid selection: {selection}. Please try again.")
+                        break
+                else:
+                    # All selections were valid
+                    if selected_sports:
+                        print(f"\n✓ Selected sports: {', '.join(selected_names)}")
+                        return selected_sports
+                    else:
+                        print("⚠️  No valid sports selected. Please try again.")
+                        
+            except KeyboardInterrupt:
+                print("\n\nSelection cancelled.")
+                return []
+            except Exception as e:
+                print(f"⚠️  Error: {e}. Please try again.")
+    
     def monitor(self, sports: List[str] = None):
         """
         Monitor sportsbook odds for movements across all bookmakers
         
         Args:
-            sports: List of sports to monitor (default: ['basketball_nba', 'americanfootball_nfl', 
-                    'basketball_ncaab', 'americanfootball_ncaaf'])
+            sports: List of sports to monitor (if None, will prompt user to select)
         """
         if sports is None:
-            sports = ['basketball_nba', 'americanfootball_nfl', 'basketball_ncaab', 'americanfootball_ncaaf']
+            sports = self.select_sports()
+            if not sports:
+                print("No sports selected. Exiting.")
+                return
         
         bookmakers_str = ', '.join([self.BOOKMAKER_NAMES.get(b, b) for b in self.bookmakers])
         
@@ -1059,9 +1136,15 @@ class SportsbookMonitor:
             'basketball_nba': 'NBA',
             'americanfootball_nfl': 'NFL',
             'basketball_ncaab': 'NCAA Basketball',
-            'americanfootball_ncaaf': 'NCAA Football'
+            'americanfootball_ncaaf': 'NCAA Football',
+            'baseball_mlb': 'MLB',
+            'icehockey_nhl': 'NHL',
+            'soccer_usa_mls': 'MLS',
+            'soccer_epl': 'English Premier League',
+            'soccer_uefa_europa_league': 'UEFA Europa League',
+            'soccer_uefa_champs_league': 'UEFA Champions League'
         }
-        sports_display = [sport_names.get(s, s) for s in sports]
+        sports_display = [sport_names.get(s, s.replace('_', ' ').title()) for s in sports]
         
         interval_minutes = CHECK_INTERVAL / 60
         print(f"\nStarting Sportsbook monitoring...")
@@ -1081,6 +1164,10 @@ class SportsbookMonitor:
                         
                         if games:
                             print(f"Found {len(games)} games")
+                            # Add sport information to each game
+                            for game in games:
+                                game['sport'] = sport
+                                game['sport_display'] = sport_display
                             self.check_movements(games)
                         else:
                             print(f"No games found for {sport_display}")
@@ -1107,211 +1194,18 @@ class SportsbookMonitor:
             traceback.print_exc()
 
 
-class EnhancedPredictionMarketMonitor:
-    """Enhanced Robinhood monitor with contract documentation"""
-    
-    def __init__(self, username: str = None, password: str = None, mfa_code: str = None, discord_webhook: str = None):
-        self.username = username or os.getenv('ROBINHOOD_USERNAME')
-        self.password = password or os.getenv('ROBINHOOD_PASSWORD')
-        self.mfa_code = mfa_code or os.getenv('ROBINHOOD_MFA')
-        self.authenticated = False
-        self.contracts_cache = []
-        self.documenter = ContractDocumenter()
-        self.discord = DiscordNotifier(webhook_url=discord_webhook)
-    
-    def login(self) -> bool:
-        """Authenticate with Robinhood"""
-        if not ROBINHOOD_AVAILABLE:
-            return False
-        
-        if not self.username or not self.password:
-            print("Error: Robinhood credentials not provided.")
-            return False
-        
-        try:
-            if self.mfa_code:
-                rh.login(self.username, self.password, mfa_code=self.mfa_code)
-            else:
-                rh.login(self.username, self.password)
-            
-            self.authenticated = True
-            print(f"✓ Successfully authenticated as {self.username}")
-            return True
-        except Exception as e:
-            print(f"✗ Authentication failed: {e}")
-            return False
-    
-    def get_prediction_market_contracts(self) -> List[Dict]:
-        """Fetch all prediction market contracts from Robinhood"""
-        if not ROBINHOOD_AVAILABLE:
-            return []
-        
-        contracts = []
-        
-        # Try multiple methods to get contracts
-        methods = [
-            ('get_prediction_markets', []),
-            ('get_all_instruments', []),
-        ]
-        
-        for method_name, args in methods:
-            try:
-                if hasattr(rh, method_name):
-                    result = getattr(rh, method_name)(*args)
-                    if result:
-                        if method_name == 'get_all_instruments':
-                            # Filter for prediction contracts
-                            for item in result:
-                                if self._is_prediction_contract(item):
-                                    contracts.append(item)
-                        else:
-                            contracts = result if isinstance(result, list) else [result]
-                        
-                        if contracts:
-                            print(f"Found {len(contracts)} contracts via {method_name}()")
-                            break
-            except Exception as e:
-                continue
-        
-        # Only document new contracts (document_contract checks if already exists)
-        for contract in contracts:
-            self.documenter.document_contract(contract, source='robinhood')
-        
-        return contracts
-    
-    def _is_prediction_contract(self, instrument: Dict) -> bool:
-        """Determine if an instrument is a prediction market contract"""
-        name = str(instrument.get('name', '')).lower()
-        symbol = str(instrument.get('symbol', '')).lower()
-        type_field = str(instrument.get('type', '')).lower()
-        
-        prediction_keywords = ['prediction', 'yes', 'no', 'contract', 'market']
-        return any(keyword in name or keyword in symbol or keyword in type_field 
-                  for keyword in prediction_keywords)
-    
-    def get_contract_price(self, contract: Dict) -> Optional[float]:
-        """Get the current price of a contract"""
-        if not ROBINHOOD_AVAILABLE:
-            return None
-        
-        try:
-            symbol = contract.get('symbol') or contract.get('id')
-            if not symbol:
-                return None
-            
-            price_data = rh.get_latest_price(symbol)
-            if price_data and len(price_data) > 0:
-                price = float(price_data[0])
-                if price > 1.0:
-                    price = price / 100.0
-                return price
-            return None
-        except:
-            return None
-    
-    def send_notification(self, contract: Dict, price: float):
-        """Send notification when contract exceeds threshold"""
-        contract_name = contract.get('name', contract.get('symbol', 'Unknown Contract'))
-        contract_symbol = contract.get('symbol', 'N/A')
-        price_percent = price * 100
-        
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"\n{'='*60}")
-        print(f"🚨 ROBINHOOD ALERT [{timestamp}]")
-        print(f"Contract: {contract_name}")
-        print(f"Symbol: {contract_symbol}")
-        print(f"Price: {price_percent:.2f}% (exceeds {PRICE_THRESHOLD*100}% threshold)")
-        print(f"{'='*60}\n")
-        
-        if NOTIFICATIONS_AVAILABLE:
-            try:
-                notification.notify(
-                    title="Robinhood Prediction Market Alert",
-                    message=f"{contract_name} is at {price_percent:.2f}%",
-                    timeout=10
-                )
-            except:
-                pass
-        
-        # Send Discord webhook notification
-        self.discord.send_robinhood_alert(contract, price)
-    
-    def monitor_contracts(self):
-        """Main monitoring loop"""
-        if not self.authenticated:
-            return
-        
-        interval_minutes = CHECK_INTERVAL / 60
-        print(f"\nStarting Robinhood monitoring...")
-        print(f"Checking every {interval_minutes} minutes ({CHECK_INTERVAL} seconds)")
-        print(f"Alert threshold: {PRICE_THRESHOLD*100}%")
-        print(f"Press Ctrl+C to stop\n")
-        
-        try:
-            while True:
-                try:
-                    if not self.contracts_cache:
-                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Fetching contracts...")
-                        self.contracts_cache = self.get_prediction_market_contracts()
-                        print(f"Monitoring {len(self.contracts_cache)} contracts")
-                    
-                    for contract in self.contracts_cache:
-                        price = self.get_contract_price(contract)
-                        if price is None:
-                            continue
-                        
-                        contract_id = contract.get('symbol') or contract.get('id', 'unknown')
-                        
-                        if price >= PRICE_THRESHOLD:
-                            if contract_id not in ALERTED_CONTRACTS:
-                                self.send_notification(contract, price)
-                                ALERTED_CONTRACTS.add(contract_id)
-                        else:
-                            ALERTED_CONTRACTS.discard(contract_id)
-                        
-                        time.sleep(0.5)
-                    
-                    print(f"[{datetime.now().strftime('%H:%M:%S')}] Next check in {CHECK_INTERVAL/60:.1f} minutes...\n")
-                    time.sleep(CHECK_INTERVAL)
-                    
-                except KeyboardInterrupt:
-                    raise  # Re-raise to exit outer loop
-                except Exception as e:
-                    print(f"\n⚠️  Error during Robinhood check: {e}")
-                    import traceback
-                    traceback.print_exc()
-                    print(f"Continuing monitoring in {CHECK_INTERVAL/60:.1f} minutes...\n")
-                    time.sleep(CHECK_INTERVAL)  # Wait before retrying
-                
-        except KeyboardInterrupt:
-            print("\n\nRobinhood monitoring stopped.")
-        except Exception as e:
-            print(f"\nFatal error in Robinhood monitoring: {e}")
-            import traceback
-            traceback.print_exc()
-
-
 def main():
     """Main entry point"""
     import argparse
     
     parser = argparse.ArgumentParser(
-        description='Monitor Robinhood prediction markets and Sportsbook odds (DraftKings, FanDuel, BetMGM, Bet365)'
+        description='Monitor Sportsbook odds (DraftKings, FanDuel, BetMGM, Bet365) for point totals and spreads'
     )
-    parser.add_argument('--robinhood-username', '-ru', help='Robinhood username')
-    parser.add_argument('--robinhood-password', '-rp', help='Robinhood password')
-    parser.add_argument('--robinhood-mfa', '-rm', help='Robinhood MFA code')
     parser.add_argument('--odds-api-key', '-ok', help='The Odds API key')
     parser.add_argument('--interval', '-i', type=int, default=1800,
                        help='Check interval in seconds (default: 1800 = 30 minutes)')
-    parser.add_argument('--threshold', '-t', type=float, default=0.80,
-                       help='Robinhood price threshold (default: 0.80)')
     parser.add_argument('--movement-threshold', '-m', type=float, default=2.0,
                        help='Sportsbook movement threshold in points (default: 2.0)')
-    parser.add_argument('--robinhood-only', action='store_true',
-                       help='Only monitor Robinhood (skip sportsbooks)')
-    parser.add_argument('--sportsbook-only', action='store_true',
-                       help='Only monitor sportsbooks (skip Robinhood)')
     parser.add_argument('--bookmakers', nargs='+', 
                        choices=['draftkings', 'fanduel', 'betmgm', 'bet365'],
                        help='Specific bookmakers to monitor (default: all)')
@@ -1321,49 +1215,18 @@ def main():
     args = parser.parse_args()
     
     # Update global configuration
-    global CHECK_INTERVAL, PRICE_THRESHOLD, SPREAD_MOVEMENT_THRESHOLD, TOTAL_MOVEMENT_THRESHOLD
+    global CHECK_INTERVAL, SPREAD_MOVEMENT_THRESHOLD, TOTAL_MOVEMENT_THRESHOLD
     CHECK_INTERVAL = args.interval
-    PRICE_THRESHOLD = args.threshold
     SPREAD_MOVEMENT_THRESHOLD = args.movement_threshold
     TOTAL_MOVEMENT_THRESHOLD = args.movement_threshold
     
-    import threading
-    
-    # Start Robinhood monitoring
-    if not args.sportsbook_only and ROBINHOOD_AVAILABLE:
-        rh_monitor = EnhancedPredictionMarketMonitor(
-            username=args.robinhood_username,
-            password=args.robinhood_password,
-            mfa_code=args.robinhood_mfa,
-            discord_webhook=args.discord_webhook
-        )
-        
-        if rh_monitor.login():
-            if args.robinhood_only:
-                rh_monitor.monitor_contracts()
-            else:
-                rh_thread = threading.Thread(target=rh_monitor.monitor_contracts, daemon=True)
-                rh_thread.start()
-    
     # Start Sportsbook monitoring
-    if not args.robinhood_only:
-        sb_monitor = SportsbookMonitor(
-            api_key=args.odds_api_key, 
-            bookmakers=args.bookmakers,
-            discord_webhook=args.discord_webhook
-        )
-        if args.sportsbook_only:
-            sb_monitor.monitor()
-        else:
-            sb_thread = threading.Thread(target=sb_monitor.monitor, daemon=True)
-            sb_thread.start()
-            
-            # Keep main thread alive
-            try:
-                while True:
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                print("\n\nMonitoring stopped.")
+    sb_monitor = SportsbookMonitor(
+        api_key=args.odds_api_key, 
+        bookmakers=args.bookmakers,
+        discord_webhook=args.discord_webhook
+    )
+    sb_monitor.monitor(sports=None)
 
 
 if __name__ == "__main__":

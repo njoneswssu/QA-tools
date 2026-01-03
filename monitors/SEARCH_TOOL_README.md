@@ -109,9 +109,8 @@ The search tool provides:
 ## Data Sources
 
 The tool searches through:
-- `original_lines.json` - Initial lines when games were first discovered
+- `original_lines.json` - Original lines (when first discovered) and current values (for movement tracking)
 - `line_movements.json` - All significant line movements (≥2 points)
-- `draftkings_history.json` - Current lines and historical tracking
 
 ## Tips
 
