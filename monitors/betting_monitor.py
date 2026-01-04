@@ -57,6 +57,12 @@ class DiscordNotifier:
         """
         self.webhook_url = webhook_url or DISCORD_WEBHOOK_URL
         self.enabled = bool(self.webhook_url and REQUESTS_AVAILABLE)
+        
+        # Debug: Log Discord webhook status
+        if self.webhook_url:
+            print(f"✓ Discord webhook configured: {self.webhook_url[:30]}... (enabled: {self.enabled})")
+        else:
+            print("⚠️  Discord webhook not configured. Set DISCORD_WEBHOOK_URL env var or use --discord-webhook")
     
     def send_webhook(self, title: str, description: str, color: int = 0x00ff00, fields: List[Dict] = None):
         """
@@ -69,6 +75,7 @@ class DiscordNotifier:
             fields: List of field dictionaries with 'name' and 'value' keys
         """
         if not self.enabled:
+            print("⚠️  Discord webhook not enabled (no webhook URL or requests library unavailable)")
             return
         
         try:
@@ -86,8 +93,21 @@ class DiscordNotifier:
             
             response = requests.post(self.webhook_url, json=payload, timeout=10)
             response.raise_for_status()
+            print(f"✓ Discord webhook notification sent successfully")
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️  Error sending Discord webhook: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                try:
+                    error_detail = e.response.json()
+                    print(f"   Discord API Error: {error_detail}")
+                except:
+                    print(f"   HTTP Status: {e.response.status_code}")
+                    if e.response.text:
+                        print(f"   Response: {e.response.text[:200]}")
         except Exception as e:
-            print(f"Error sending Discord webhook: {e}")
+            print(f"⚠️  Unexpected error sending Discord webhook: {e}")
+            import traceback
+            traceback.print_exc()
     
     def send_grouped_spread_alert(self, game: Dict, movements: List[Dict]):
         """Send grouped spread movement alert to Discord for multiple bookmakers with same movement"""
@@ -837,8 +857,9 @@ class SportsbookMonitor:
             # Load existing data to preserve player_prop_movements section
             existing_data = self.load_line_movements()
             # Update only the game_movements section
-            existing_data['game_movements'] = movements_data.get('movements', [])
-            existing_data['last_updated'] = movements_data.get('last_updated')
+            # movements_data already contains the full structure with game_movements
+            existing_data['game_movements'] = movements_data.get('game_movements', [])
+            existing_data['last_updated'] = movements_data.get('last_updated', datetime.now().isoformat())
             existing_data['current_date'] = today  # Update date
             # Calculate total movements
             total_game_movements = len(existing_data['game_movements'])
@@ -851,7 +872,9 @@ class SportsbookMonitor:
             with open(LINE_MOVEMENTS_FILE, 'w') as f:
                 json.dump(existing_data, f, indent=2)
         except Exception as e:
-            print(f"Error saving line movements: {e}")
+            print(f"⚠️  Error saving line movements: {e}")
+            import traceback
+            traceback.print_exc()
     
     def document_movement(self, game: Dict, movement_type: str, movement: Dict, bookmaker_key: str):
         """
