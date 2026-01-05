@@ -43,11 +43,19 @@ PROPS_HISTORY_FILE = os.path.join(_data_dir, "nba_player_props_history.json")
 # Discord webhook (optional)
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
+# Stats integration for projections
+try:
+    from stats_integration import StatsIntegration
+    STATS_AVAILABLE = True
+except ImportError:
+    STATS_AVAILABLE = False
+    print("⚠️  Stats integration not available. Install nba_api and beautifulsoup4 for projections.")
+
 
 class DiscordNotifier:
     """Handles Discord webhook notifications"""
     
-    def __init__(self, webhook_url: str = None):
+    def __init__(self, webhook_url: str = None, monitor_instance=None):
         """
         Initialize Discord notifier
         
@@ -56,6 +64,7 @@ class DiscordNotifier:
         """
         self.webhook_url = webhook_url or DISCORD_WEBHOOK_URL
         self.enabled = bool(self.webhook_url and REQUESTS_AVAILABLE)
+        self.monitor_instance = monitor_instance  # Reference to monitor for accessing stats
         
         # Debug: Log Discord webhook status
         if self.webhook_url:
@@ -108,6 +117,201 @@ class DiscordNotifier:
             import traceback
             traceback.print_exc()
     
+    def send_json_file(self, file_path: str, file_type: str = "nba_player_props_history"):
+        """
+        Send each player prop as a separate Discord webhook notification
+        
+        Args:
+            file_path: Path to the JSON file
+            file_type: Type of file (for display purposes)
+        """
+        if not self.enabled:
+            print("⚠️  Discord webhook not enabled (no webhook URL or requests library unavailable)")
+            return False
+        
+        if not os.path.exists(file_path):
+            print(f"⚠️  File not found: {file_path}")
+            return False
+        
+        try:
+            # Read the JSON file
+            with open(file_path, 'r') as f:
+                content = f.read().strip()
+                if not content:
+                    json_data = {}
+                else:
+                    json_data = json.loads(content)
+            
+            if not json_data or len(json_data) == 0:
+                print("⚠️  No player props found in nba_player_props_history.json")
+                return False
+            
+            print(f"📤 Sending {len(json_data)} player prop notifications to Discord...")
+            
+            # Send a separate notification for each player prop
+            sent_count = 0
+            for prop_id, prop in json_data.items():
+                player_name = prop.get('player_name', 'Unknown Player')
+                game_matchup = prop.get('game_matchup', 'Unknown Game')
+                
+                # Create notification in the style of line movement alerts
+                title = "📊 Player Prop Line"
+                description = f"**{player_name}** - {game_matchup}"
+                
+                fields = []
+                
+                # Add current line with bookmakers
+                lines = prop.get('lines', {})
+                if lines:
+                    line_list = []
+                    for line_key, line_data in lines.items():
+                        line_value = line_data.get('point_line', line_key)
+                        outcome = line_data.get('outcome_type', 'over')
+                        bookmakers = line_data.get('bookmakers', [])
+                        bookmaker_names = [b.get('bookmaker_name', b.get('bookmaker', 'Unknown')) for b in bookmakers]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'Unknown'
+                        
+                        # Add American odds if available
+                        odds_str = ""
+                        if bookmakers and 'american_odds' in bookmakers[0] and bookmakers[0]['american_odds'] is not None:
+                            odds = bookmakers[0]['american_odds']
+                            odds_str = f" ({odds:+d})" if isinstance(odds, (int, float)) else f" ({odds})"
+                        
+                        line_list.append(f"**{line_value:.1f} {outcome.upper()}** - Bookmaker: {bookmakers_str}{odds_str}")
+                    
+                    fields.append({
+                        'name': 'Line',
+                        'value': '\n'.join(line_list),
+                        'inline': False
+                    })
+                else:
+                    # Fallback to original_line if lines structure not available
+                    original_line = prop.get('original_line', prop.get('current_line', 'N/A'))
+                    if original_line != 'N/A':
+                        fields.append({
+                            'name': 'Line',
+                            'value': f"{original_line:.1f}",
+                            'inline': True
+                        })
+                
+                # Add projection if available
+                projection = prop.get('projection')
+                if projection:
+                    proj_points = projection.get('projected_points')
+                    if proj_points:
+                        fields.append({
+                            'name': '📊 Projected Points',
+                            'value': f"{proj_points:.1f} ({projection.get('confidence', 'medium')} confidence)",
+                            'inline': False
+                        })
+                        
+                        # Add justifications
+                        justifications = projection.get('justification', [])
+                        if justifications:
+                            justification_text = '\n'.join(justifications[:5])  # First 5 justifications
+                            fields.append({
+                                'name': 'Justification',
+                                'value': justification_text,
+                                'inline': False
+                            })
+                
+                # Add first seen time
+                first_seen = prop.get('first_seen_readable', prop.get('first_seen', ''))
+                if first_seen:
+                    fields.append({
+                        'name': 'First Seen',
+                        'value': first_seen,
+                        'inline': True
+                    })
+                
+                # Color: blue for data updates
+                color = 0x3498db
+                
+                # Send notification for this prop
+                self.send_webhook(title, description, color, fields)
+                sent_count += 1
+                
+                # Small delay between notifications to avoid rate limiting
+                time.sleep(0.5)
+            
+            print(f"✓ Sent {sent_count} player prop notifications to Discord")
+            return True
+                
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️  Error sending JSON file to Discord: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                try:
+                    error_detail = e.response.json()
+                    print(f"   Discord API Error: {error_detail}")
+                except:
+                    print(f"   HTTP Status: {e.response.status_code}")
+        except Exception as e:
+            print(f"⚠️  Unexpected error sending JSON file: {e}")
+            import traceback
+            traceback.print_exc()
+        
+        return False
+    
+    def _send_json_summary(self, json_data: Dict, file_type: str, file_path: str):
+        """Send a summary of large JSON files"""
+        try:
+            file_size = os.path.getsize(file_path)
+            file_size_mb = file_size / (1024 * 1024)
+            
+            embed = {
+                'title': f'📊 {file_type.replace("_", " ").title()} Summary',
+                'description': f'**File:** `{os.path.basename(file_path)}`\n**Size:** {file_size_mb:.2f} MB (too large to send)\n**Last Updated:** {json_data.get("last_updated", "N/A") if isinstance(json_data, dict) else "N/A"}',
+                'color': 0x3498db,
+                'timestamp': datetime.now().isoformat(),
+                'fields': []
+            }
+            
+            # Add summary stats
+            if isinstance(json_data, dict):
+                if 'total_props' in json_data:
+                    embed['fields'].append({
+                        'name': 'Total Props',
+                        'value': str(json_data.get('total_props', 0)),
+                        'inline': True
+                    })
+                elif len(json_data) > 0:
+                    embed['fields'].append({
+                        'name': 'Total Entries',
+                        'value': str(len(json_data)),
+                        'inline': True
+                    })
+                    
+                    # Show sample of props
+                    sample_props = list(json_data.values())[:5] if isinstance(json_data, dict) else []
+                    if sample_props:
+                        prop_list = []
+                        for prop in sample_props[:5]:
+                            player = prop.get('player_name', 'Unknown')
+                            game = prop.get('game_matchup', 'Unknown')
+                            prop_list.append(f"• {player} - {game}")
+                        
+                        if len(json_data) > 5:
+                            prop_list.append(f"... and {len(json_data) - 5} more props")
+                        
+                        embed['fields'].append({
+                            'name': 'Sample Props',
+                            'value': '\n'.join(prop_list),
+                            'inline': False
+                        })
+            
+            payload = {
+                'embeds': [embed]
+            }
+            
+            response = requests.post(self.webhook_url, json=payload, timeout=30)
+            response.raise_for_status()
+            print(f"✓ Sent {file_type} summary to Discord (file too large: {file_size_mb:.2f} MB)")
+            return True
+            
+        except Exception as e:
+            print(f"⚠️  Error sending JSON summary: {e}")
+            return False
+    
     def send_prop_alert(self, prop: Dict, movement: Dict):
         """Send player prop movement alert to Discord (consolidated across bookmakers)"""
         player_name = prop.get('player_name', 'Unknown Player')
@@ -145,6 +349,29 @@ class DiscordNotifier:
             {'name': 'Bookmakers', 'value': bookmakers_str, 'inline': True},
             {'name': 'Time', 'value': movement.get('readable_timestamp', 'N/A'), 'inline': True}
         ]
+        
+        # Add projection if available
+        if self.monitor_instance and self.monitor_instance.stats:
+            prop_id = prop.get('prop_id') or f"{prop.get('game_id', 'unknown')}_{player_name}_{prop.get('outcome_type', 'over')}"
+            history_entry = self.monitor_instance.history.get(prop_id)
+            if history_entry and 'projection' in history_entry:
+                proj = history_entry['projection']
+                proj_points = proj.get('projected_points')
+                if proj_points:
+                    fields.append({
+                        'name': '📊 Projected Points',
+                        'value': f"{proj_points:.1f} ({proj.get('confidence', 'medium')} confidence)",
+                        'inline': False
+                    })
+                    # Add justifications
+                    justifications = proj.get('justification', [])
+                    if justifications:
+                        justification_text = '\n'.join(justifications[:3])  # First 3 justifications
+                        fields.append({
+                            'name': 'Justification',
+                            'value': justification_text,
+                            'inline': False
+                        })
         
         # Color based on movement size
         absolute_change = movement.get('absolute_movement', 0)
@@ -219,7 +446,21 @@ class NBAPlayerPropsMonitor:
         
         self.bookmakers = bookmakers or self.BOOKMAKERS
         self.history = self.load_history()
-        self.discord = DiscordNotifier(webhook_url=discord_webhook)
+        
+        # Initialize stats integration for projections
+        if STATS_AVAILABLE:
+            try:
+                self.stats = StatsIntegration()
+                print(f"✓ Stats integration initialized (NBA API: {self.stats.nba_api_available}, Scraping: {self.stats.scraping_available})")
+            except Exception as e:
+                print(f"⚠️  Error initializing stats integration: {e}")
+                self.stats = None
+        else:
+            self.stats = None
+            print("⚠️  Stats integration not available. Install nba_api and beautifulsoup4 for projections.")
+        
+        # Initialize Discord notifier with reference to this monitor instance
+        self.discord = DiscordNotifier(webhook_url=discord_webhook, monitor_instance=self)
     
     def _map_bookmaker_id(self, bookmaker_id: str) -> str:
         """
@@ -1022,6 +1263,26 @@ class NBAPlayerPropsMonitor:
                 base_prop = best_line_data['base_prop']
                 primary_line = best_line
                 
+                # Calculate player point projection if stats integration is available
+                projection = None
+                if self.stats:
+                    try:
+                        # Clean player name - remove "1 Nba" suffix if present
+                        clean_player_name = base_prop['player_name'].replace(' 1 Nba', '').replace(' 1 NBA', '').strip()
+                        # Pass both home and away teams to let the stats module determine opponent
+                        projection = self.stats.project_player_points(
+                            clean_player_name,
+                            home_team=base_prop.get('home_team'),
+                            away_team=base_prop.get('away_team'),
+                            sport='nba'
+                        )
+                        if not projection or not projection.get('projected_points'):
+                            print(f"  ⚠️  Could not calculate projection for {clean_player_name}")
+                    except Exception as e:
+                        print(f"  ⚠️  Error calculating projection for {base_prop['player_name']}: {e}")
+                        import traceback
+                        traceback.print_exc()
+                
                 # Create initial history entry
                 self.history[prop_id] = {
                     'game_id': base_prop['game_id'],
@@ -1036,7 +1297,22 @@ class NBAPlayerPropsMonitor:
                     'first_seen': current_time,
                     'last_updated': current_time
                 }
+                
                 history = self.history[prop_id]
+                
+                # Add projection if available (after history is created)
+                if projection and projection.get('projected_points'):
+                    history['projection'] = {
+                        'projected_points': projection['projected_points'],
+                        'confidence': projection.get('confidence', 'medium'),
+                        'justification': projection.get('justification', [])
+                    }
+                    print(f"  📊 Projected Points: {projection['projected_points']:.1f} ({projection.get('confidence', 'medium')} confidence)")
+                    for justification in projection.get('justification', [])[:3]:  # Show first 3 justifications
+                        print(f"     • {justification}")
+                elif self.stats:
+                    # Stats available but projection failed - log it
+                    print(f"  ⚠️  Projection not available for {base_prop['player_name']}")
             
             # FILTER: Only keep point lines (filter out rebounds/assists)
             # Points lines for NBA players are typically 10+ (with some exceptions for role players)
@@ -1336,6 +1612,22 @@ class NBAPlayerPropsMonitor:
         print(f"Bookmakers: {bookmakers_str}")
         print(f"Line Movement: {movement['old_line']:.1f} → {movement['new_line']:.1f}")
         print(f"Change: {movement['movement']:+.1f} points ({movement.get('direction', 'unknown')})")
+        
+        # Add projection if available
+        prop_id = prop.get('prop_id') or f"{prop.get('game_id', 'unknown')}_{player_name}_{prop.get('outcome_type', 'over')}"
+        if prop_id and self.stats:
+            history_entry = self.history.get(prop_id)
+            if history_entry and 'projection' in history_entry:
+                proj = history_entry['projection']
+                proj_points = proj.get('projected_points')
+                if proj_points:
+                    print(f"📊 Projected Points: {proj_points:.1f} ({proj.get('confidence', 'medium')} confidence)")
+                    justifications = proj.get('justification', [])
+                    if justifications:
+                        print(f"   Justification:")
+                        for j in justifications[:3]:
+                            print(f"   • {j}")
+        
         print(f"Movement detected at: {timestamp}")
         print(f"{'='*60}\n")
         
@@ -1445,6 +1737,8 @@ def main():
                        help='Specific bookmakers to monitor (default: all)')
     parser.add_argument('--discord-webhook', '-dw', 
                        help='Discord webhook URL for notifications')
+    parser.add_argument('--send-json', action='store_true',
+                       help='Send nba_player_props_history.json to Discord webhook and exit')
     
     args = parser.parse_args()
     
@@ -1470,6 +1764,22 @@ def main():
         discord_webhook=args.discord_webhook,
         api_provider=api_provider
     )
+    
+    # Handle --send-json flag
+    if args.send_json:
+        if not monitor.discord.enabled:
+            print("⚠️  Discord webhook not configured. Cannot send JSON file.")
+            print("   Set DISCORD_WEBHOOK_URL env var or use --discord-webhook")
+            return
+        
+        print("📤 Sending nba_player_props_history.json to Discord...")
+        success = monitor.discord.send_json_file(PROPS_HISTORY_FILE, "nba_player_props_history")
+        if success:
+            print("✓ Successfully sent nba_player_props_history.json to Discord")
+        else:
+            print("⚠️  Failed to send nba_player_props_history.json to Discord")
+        return
+    
     monitor.monitor()
 
 

@@ -90,7 +90,8 @@ class LineHistorySearcher:
                         'away_team': game_data.get('away_team'),
                         'game_time': game_data.get('game_time'),
                         'first_seen': game_data.get('first_seen_readable'),
-                        'bookmakers': game_data.get('bookmakers', {})
+                        'spreads': game_data.get('spreads', {}),
+                        'totals': game_data.get('totals', {})
                     })
         
         # Search line movements (game_movements section)
@@ -113,19 +114,9 @@ class LineHistorySearcher:
                         'game_id': game_id,
                         'home_team': game_data.get('home_team'),
                         'away_team': game_data.get('away_team'),
-                        'bookmakers': {}
+                        'spreads': game_data.get('spreads', {}),
+                        'totals': game_data.get('totals', {})
                     }
-                    
-                    # Get current lines from each bookmaker
-                    if 'bookmakers' in game_data:
-                        for bookmaker_key, bookmaker_data in game_data['bookmakers'].items():
-                            current_lines_entry['bookmakers'][bookmaker_key] = {
-                                'current_spread': bookmaker_data.get('current_spread', bookmaker_data.get('original_spread')),
-                                'current_total': bookmaker_data.get('current_total', bookmaker_data.get('original_total')),
-                                'favored_team': bookmaker_data.get('favored_team'),
-                                'original_spread': bookmaker_data.get('original_spread'),
-                                'original_total': bookmaker_data.get('original_total')
-                            }
                     
                     results['current_lines'].append(current_lines_entry)
         
@@ -268,7 +259,8 @@ class LineHistorySearcher:
                     'away_team': game_data.get('away_team'),
                     'sport': game_data.get('sport'),
                     'sport_display': game_data.get('sport_display'),
-                    'bookmakers': game_data.get('bookmakers', {}),
+                    'spreads': game_data.get('spreads', {}),
+                    'totals': game_data.get('totals', {}),
                     'first_seen': game_data.get('first_seen'),
                     'game_time': game_data.get('game_time')
                 }
@@ -316,19 +308,10 @@ class LineHistorySearcher:
                             if movement.get('game_id') == game_id:
                                 results['movements'].append(movement)
                     
-                    # Get current lines from bookmakers
-                    current_bookmakers = {}
-                    for bookmaker_key, bookmaker_data in game_data.get('bookmakers', {}).items():
-                        current_bookmakers[bookmaker_key] = {
-                            'current_spread': bookmaker_data.get('current_spread', bookmaker_data.get('original_spread')),
-                            'current_total': bookmaker_data.get('current_total', bookmaker_data.get('original_total')),
-                            'favored_team': bookmaker_data.get('favored_team'),
-                            'original_spread': bookmaker_data.get('original_spread'),
-                            'original_total': bookmaker_data.get('original_total')
-                        }
-                    
+                    # Get current lines (same structure as original_lines)
                     results['current_lines'] = {
-                        'bookmakers': current_bookmakers
+                        'spreads': game_data.get('spreads', {}),
+                        'totals': game_data.get('totals', {})
                     }
                     
                     break
@@ -363,11 +346,19 @@ class LineHistorySearcher:
                     print(f"\nGame: {game['away_team']} @ {game['home_team']}")
                     print(f"  Game Time: {game.get('game_time', 'N/A')}")
                     print(f"  First Seen: {game.get('first_seen', 'N/A')}")
-                    print(f"  Bookmakers:")
-                    for bookmaker_key, bookmaker_data in game.get('bookmakers', {}).items():
-                        print(f"    {bookmaker_data.get('bookmaker_name', bookmaker_key)}:")
-                        print(f"      Original Spread: {bookmaker_data.get('original_spread', 'N/A')}")
-                        print(f"      Original Total: {bookmaker_data.get('original_total', 'N/A')}")
+                    print(f"  Spreads:")
+                    for spread_key, spread_data in game.get('spreads', {}).items():
+                        bookmaker_names = [b['bookmaker_name'] for b in spread_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {spread_data.get('spread', spread_key)}: Bookmaker: {bookmakers_str}")
+                        if 'favored_team' in spread_data:
+                            print(f"      Favored Team: {spread_data['favored_team']}")
+                    
+                    print(f"  Totals:")
+                    for total_key, total_data in game.get('totals', {}).items():
+                        bookmaker_names = [b['bookmaker_name'] for b in total_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {total_data.get('total', total_key)}: Bookmaker: {bookmakers_str}")
                 print()
             
             # Current Lines
@@ -376,14 +367,19 @@ class LineHistorySearcher:
                 print("-" * 80)
                 for game in results['current_lines']:
                     print(f"\nGame: {game['away_team']} @ {game['home_team']}")
-                    print(f"  Bookmakers:")
-                    for bookmaker_key, bookmaker_data in game.get('bookmakers', {}).items():
-                        print(f"    {bookmaker_key.upper()}:")
-                        print(f"      Current Spread: {bookmaker_data.get('current_spread', bookmaker_data.get('original_spread', 'N/A'))}")
-                        print(f"      Current Total: {bookmaker_data.get('current_total', bookmaker_data.get('original_total', 'N/A'))}")
-                        print(f"      Favored Team: {bookmaker_data.get('favored_team', 'N/A')}")
-                        print(f"      Original Spread: {bookmaker_data.get('original_spread', 'N/A')}")
-                        print(f"      Original Total: {bookmaker_data.get('original_total', 'N/A')}")
+                    print(f"  Spreads:")
+                    for spread_key, spread_data in game.get('spreads', {}).items():
+                        bookmaker_names = [b['bookmaker_name'] for b in spread_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {spread_data.get('spread', spread_key)}: Bookmaker: {bookmakers_str}")
+                        if 'favored_team' in spread_data:
+                            print(f"      Favored Team: {spread_data['favored_team']}")
+                    
+                    print(f"  Totals:")
+                    for total_key, total_data in game.get('totals', {}).items():
+                        bookmaker_names = [b['bookmaker_name'] for b in total_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {total_data.get('total', total_key)}: Bookmaker: {bookmakers_str}")
                 print()
             
             # Movements
@@ -391,7 +387,15 @@ class LineHistorySearcher:
                 print(f"📈 LINE MOVEMENTS ({len(results['movements'])} movements found)")
                 print("-" * 80)
                 for movement in results['movements']:
-                    print(f"\n{movement.get('detected_at_readable', 'N/A')} - {movement.get('bookmaker_name', 'N/A')}")
+                    # Handle both old format (single bookmaker) and new format (bookmakers list)
+                    bookmaker_display = 'N/A'
+                    if 'bookmakers' in movement:
+                        bookmaker_names = [b.get('bookmaker_name', b.get('bookmaker', 'Unknown')) for b in movement['bookmakers']]
+                        bookmaker_display = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                    elif 'bookmaker_name' in movement:
+                        bookmaker_display = movement['bookmaker_name']
+                    
+                    print(f"\n{movement.get('detected_at_readable', 'N/A')} - Bookmaker: {bookmaker_display}")
                     print(f"  Game: {movement.get('away_team')} @ {movement.get('home_team')}")
                     print(f"  Type: {movement.get('type', 'N/A').upper()}")
                     print(f"  Previous: {movement.get('previous_value', 'N/A')} → New: {movement.get('new_value', 'N/A')}")
@@ -409,15 +413,21 @@ class LineHistorySearcher:
             
             for game in results['games']:
                 print(f"Game: {game.get('away_team')} @ {game.get('home_team')}")
-                if game.get('bookmakers'):
-                    print(f"  Bookmakers:")
-                    for bookmaker_key, bookmaker_data in game['bookmakers'].items():
-                        print(f"    {bookmaker_data.get('bookmaker_name', bookmaker_key).upper()}:")
-                        print(f"      Current Spread: {bookmaker_data.get('current_spread', bookmaker_data.get('original_spread', 'N/A'))}")
-                        print(f"      Current Total: {bookmaker_data.get('current_total', bookmaker_data.get('original_total', 'N/A'))}")
-                        print(f"      Original Spread: {bookmaker_data.get('original_spread', 'N/A')}")
-                        print(f"      Original Total: {bookmaker_data.get('original_total', 'N/A')}")
-                        print(f"      Favored: {bookmaker_data.get('favored_team', 'N/A')}")
+                if game.get('spreads'):
+                    print(f"  Spreads:")
+                    for spread_key, spread_data in game['spreads'].items():
+                        bookmaker_names = [b['bookmaker_name'] for b in spread_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {spread_data.get('spread', spread_key)}: Bookmaker: {bookmakers_str}")
+                        if 'favored_team' in spread_data:
+                            print(f"      Favored Team: {spread_data['favored_team']}")
+                
+                if game.get('totals'):
+                    print(f"  Totals:")
+                    for total_key, total_data in game['totals'].items():
+                        bookmaker_names = [b['bookmaker_name'] for b in total_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {total_data.get('total', total_key)}: Bookmaker: {bookmakers_str}")
                 print()
         
         elif 'player_name' in results:
@@ -480,27 +490,56 @@ class LineHistorySearcher:
             if results['original_lines']:
                 print("📋 ORIGINAL LINES")
                 print("-" * 80)
-                for bookmaker_key, bookmaker_data in results['original_lines'].get('bookmakers', {}).items():
-                    print(f"  {bookmaker_data.get('bookmaker_name', bookmaker_key)}:")
-                    print(f"    Spread: {bookmaker_data.get('original_spread', 'N/A')}")
-                    print(f"    Total: {bookmaker_data.get('original_total', 'N/A')}")
+                if results['original_lines'].get('spreads'):
+                    print("  Spreads:")
+                    for spread_key, spread_data in results['original_lines']['spreads'].items():
+                        bookmaker_names = [b['bookmaker_name'] for b in spread_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {spread_data.get('spread', spread_key)}: Bookmaker: {bookmakers_str}")
+                        if 'favored_team' in spread_data:
+                            print(f"      Favored Team: {spread_data['favored_team']}")
+                
+                if results['original_lines'].get('totals'):
+                    print("  Totals:")
+                    for total_key, total_data in results['original_lines']['totals'].items():
+                        bookmaker_names = [b['bookmaker_name'] for b in total_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {total_data.get('total', total_key)}: Bookmaker: {bookmakers_str}")
                 print()
             
             if results['current_lines']:
                 print("📊 CURRENT LINES")
                 print("-" * 80)
-                for bookmaker_key, bookmaker_data in results['current_lines'].get('bookmakers', {}).items():
-                    print(f"  {bookmaker_key.upper()}:")
-                    print(f"    Spread: {bookmaker_data.get('current_spread', 'N/A')}")
-                    print(f"    Total: {bookmaker_data.get('current_total', 'N/A')}")
-                    print(f"    Favored: {bookmaker_data.get('favored_team', 'N/A')}")
+                if results['current_lines'].get('spreads'):
+                    print("  Spreads:")
+                    for spread_key, spread_data in results['current_lines']['spreads'].items():
+                        bookmaker_names = [b['bookmaker_name'] for b in spread_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {spread_data.get('spread', spread_key)}: Bookmaker: {bookmakers_str}")
+                        if 'favored_team' in spread_data:
+                            print(f"      Favored Team: {spread_data['favored_team']}")
+                
+                if results['current_lines'].get('totals'):
+                    print("  Totals:")
+                    for total_key, total_data in results['current_lines']['totals'].items():
+                        bookmaker_names = [b['bookmaker_name'] for b in total_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                        print(f"    {total_data.get('total', total_key)}: Bookmaker: {bookmakers_str}")
                 print()
             
             if results['movements']:
                 print(f"📈 LINE MOVEMENTS ({len(results['movements'])} movements)")
                 print("-" * 80)
                 for movement in sorted(results['movements'], key=lambda x: x.get('detected_at', '')):
-                    print(f"  {movement.get('detected_at_readable', 'N/A')} - {movement.get('bookmaker_name', 'N/A')}")
+                    # Handle both old format (single bookmaker) and new format (bookmakers list)
+                    bookmaker_display = 'N/A'
+                    if 'bookmakers' in movement:
+                        bookmaker_names = [b.get('bookmaker_name', b.get('bookmaker', 'Unknown')) for b in movement['bookmakers']]
+                        bookmaker_display = ', '.join(bookmaker_names) if bookmaker_names else 'N/A'
+                    elif 'bookmaker_name' in movement:
+                        bookmaker_display = movement['bookmaker_name']
+                    
+                    print(f"  {movement.get('detected_at_readable', 'N/A')} - Bookmaker: {bookmaker_display}")
                     print(f"    {movement.get('type', 'N/A').upper()}: {movement.get('previous_value', 'N/A')} → {movement.get('new_value', 'N/A')}")
                     print(f"    Change: {movement.get('change', 'N/A'):+.1f} points")
                     if 'movement_towards' in movement:

@@ -1,1017 +1,542 @@
 {
   "games": {
-    "bf731d1bdca3b4b13794fb2cf636054d": {
-      "game_id": "bf731d1bdca3b4b13794fb2cf636054d",
+    "07c210d30cdf1a467ae466394c9c7d2c": {
+      "game_id": "07c210d30cdf1a467ae466394c9c7d2c",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "Miami Heat",
-      "away_team": "Minnesota Timberwolves",
-      "game_time": "2026-01-03T22:10:00Z",
-      "first_seen": "2026-01-03T12:23:53.907369",
-      "first_seen_readable": "2026-01-03 12:23:53",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": 2.5,
-          "original_total": 238.5,
-          "current_spread": 15.5,
-          "current_total": 235.5,
-          "favored_team": "Minnesota Timberwolves",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": 2.5,
-          "original_total": 239.5,
-          "current_spread": 16.5,
-          "current_total": 234.5,
-          "favored_team": "Minnesota Timberwolves",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": 2.5,
-          "original_total": 239.5,
-          "current_spread": 17.5,
-          "current_total": 233.5,
-          "favored_team": "Minnesota Timberwolves",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+      "home_team": "Detroit Pistons",
+      "away_team": "New York Knicks",
+      "game_time": "2026-01-06T00:10:00Z",
+      "first_seen": "2026-01-05T07:59:15.343838",
+      "first_seen_readable": "2026-01-05 07:59:15",
+      "spreads": {
+        "3.5": {
+          "spread": 3.5,
+          "favored_team": "New York Knicks",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
+      },
+      "totals": {
+        "233.5": {
+          "total": 233.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            }
+          ]
+        },
+        "234.5": {
+          "total": 234.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-05T07:59:15.343838",
+      "documented_at_readable": "2026-01-05 07:59:15",
+      "projection": {
+        "projected_total": 226.8,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 101.0)",
+          "Detroit Pistons averages 115.6 PPG",
+          "New York Knicks averages 116.3 PPG",
+          "Detroit Pistons allows 111.3 PPG",
+          "New York Knicks allows 114.9 PPG",
+          "Detroit Pistons strong defense (DRtg: 109.6) limiting New York Knicks offense (ORtg: 118.4)"
+        ]
       }
     },
-    "37cc8f43c363f1d128d628902c096c2e": {
-      "game_id": "37cc8f43c363f1d128d628902c096c2e",
+    "a4735b19c22f9709d23974fe5d264665": {
+      "game_id": "a4735b19c22f9709d23974fe5d264665",
       "sport": "basketball_nba",
       "sport_display": "NBA",
       "home_team": "Toronto Raptors",
       "away_team": "Atlanta Hawks",
-      "game_time": "2026-01-04T00:40:00Z",
-      "first_seen": "2026-01-03T12:23:53.907369",
-      "first_seen_readable": "2026-01-03 12:23:53",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -3.5,
-          "original_total": 237.5,
-          "current_spread": -4.5,
-          "current_total": 231.5,
+      "game_time": "2026-01-06T00:40:00Z",
+      "first_seen": "2026-01-05T07:59:15.343838",
+      "first_seen_readable": "2026-01-05 07:59:15",
+      "spreads": {
+        "-3.5": {
+          "spread": -3.5,
           "favored_team": "Toronto Raptors",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -3.5,
-          "original_total": 236.5,
-          "current_spread": -4.5,
-          "current_total": 231.5,
-          "favored_team": "Toronto Raptors",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -3.5,
-          "original_total": 236.5,
-          "current_spread": -4.5,
-          "current_total": 231.5,
-          "favored_team": "Toronto Raptors",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
+      },
+      "totals": {
+        "234.5": {
+          "total": 234.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            }
+          ]
+        },
+        "235.5": {
+          "total": 235.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-05T07:59:15.343838",
+      "documented_at_readable": "2026-01-05 07:59:15",
+      "projection": {
+        "projected_total": 231.2,
+        "confidence": "high",
+        "justification": [
+          "Fast pace matchup (avg: 102.1)",
+          "Toronto Raptors averages 112.0 PPG",
+          "Atlanta Hawks averages 116.4 PPG",
+          "Toronto Raptors allows 110.9 PPG",
+          "Atlanta Hawks allows 118.5 PPG",
+          "Toronto Raptors strong defense (DRtg: 110.0) limiting Atlanta Hawks offense (ORtg: 114.2)"
+        ]
       }
     },
-    "a2d14bdf31312a6dc0ff70ca56894e69": {
-      "game_id": "a2d14bdf31312a6dc0ff70ca56894e69",
+    "f464229b0fe5abe7e94b312d75639617": {
+      "game_id": "f464229b0fe5abe7e94b312d75639617",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "New York Knicks",
-      "away_team": "Philadelphia 76ers",
-      "game_time": "2026-01-04T00:40:00Z",
-      "first_seen": "2026-01-03T12:23:53.907369",
-      "first_seen_readable": "2026-01-03 12:23:53",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -3.5,
-          "original_total": 233.5,
-          "current_spread": -3.5,
-          "current_total": 235.5,
-          "favored_team": "New York Knicks",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -3.5,
-          "original_total": 232.5,
-          "current_spread": -4.0,
-          "current_total": 235.5,
-          "favored_team": "New York Knicks",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -3.5,
-          "original_total": 232.5,
-          "current_spread": -3.5,
-          "current_total": 234.5,
-          "favored_team": "New York Knicks",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+      "home_team": "Boston Celtics",
+      "away_team": "Chicago Bulls",
+      "game_time": "2026-01-06T00:40:00Z",
+      "first_seen": "2026-01-05T07:59:15.343838",
+      "first_seen_readable": "2026-01-05 07:59:16",
+      "spreads": {
+        "-11.5": {
+          "spread": -11.5,
+          "favored_team": "Boston Celtics",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
+      },
+      "totals": {
+        "235.5": {
+          "total": 235.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            }
+          ]
+        },
+        "234.5": {
+          "total": 234.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-05T07:59:15.343838",
+      "documented_at_readable": "2026-01-05 07:59:16",
+      "projection": {
+        "projected_total": 228.4,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 100.9)",
+          "Boston Celtics averages 114.8 PPG",
+          "Chicago Bulls averages 115.6 PPG",
+          "Boston Celtics allows 109.5 PPG",
+          "Chicago Bulls allows 121.6 PPG",
+          "Chicago Bulls strong defense (DRtg: 116.6) limiting Boston Celtics offense (ORtg: 120.3)"
+        ]
       }
     },
-    "fd9969a95c7308e171377cdc5445be4c": {
-      "game_id": "fd9969a95c7308e171377cdc5445be4c",
+    "5e38fbb5e0a6277859816fe58cf76a1e": {
+      "game_id": "5e38fbb5e0a6277859816fe58cf76a1e",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "Chicago Bulls",
+      "home_team": "Oklahoma City Thunder",
       "away_team": "Charlotte Hornets",
-      "game_time": "2026-01-04T01:10:00Z",
-      "first_seen": "2026-01-03T12:23:53.907369",
-      "first_seen_readable": "2026-01-03 12:23:53",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -1.5,
-          "original_total": 238.5,
-          "current_spread": -1.5,
-          "current_total": 240.5,
-          "favored_team": "Chicago Bulls",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -2.0,
-          "original_total": 237.5,
-          "current_spread": -1.5,
-          "current_total": 240.5,
-          "favored_team": "Chicago Bulls",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -2.5,
-          "original_total": 238.5,
-          "current_spread": -1.5,
-          "current_total": 240.5,
-          "favored_team": "Chicago Bulls",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+      "game_time": "2026-01-06T01:10:00Z",
+      "first_seen": "2026-01-05T07:59:15.343838",
+      "first_seen_readable": "2026-01-05 07:59:16",
+      "spreads": {
+        "-15.5": {
+          "spread": -15.5,
+          "favored_team": "Oklahoma City Thunder",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
+      },
+      "totals": {
+        "234.5": {
+          "total": 234.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-05T07:59:15.343838",
+      "documented_at_readable": "2026-01-05 07:59:16",
+      "projection": {
+        "projected_total": 222.8,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 101.1)",
+          "Oklahoma City Thunder averages 115.9 PPG",
+          "Charlotte Hornets averages 113.3 PPG",
+          "Oklahoma City Thunder allows 105.5 PPG",
+          "Charlotte Hornets allows 115.3 PPG",
+          "Oklahoma City Thunder strong defense (DRtg: 103.4) limiting Charlotte Hornets offense (ORtg: 115.1)"
+        ]
       }
     },
-    "4e5f1567c38f897e5cb4a4fa445d0f3c": {
-      "game_id": "4e5f1567c38f897e5cb4a4fa445d0f3c",
+    "2b779d0954e1c4a13083ebecc0fe65b2": {
+      "game_id": "2b779d0954e1c4a13083ebecc0fe65b2",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "San Antonio Spurs",
-      "away_team": "Portland Trail Blazers",
-      "game_time": "2026-01-04T01:10:00Z",
-      "first_seen": "2026-01-03T12:23:53.907369",
-      "first_seen_readable": "2026-01-03 12:23:53",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -8.5,
-          "original_total": 236.5,
-          "current_spread": -8.5,
-          "current_total": 235.5,
-          "favored_team": "San Antonio Spurs",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -8.5,
-          "original_total": 237.5,
-          "current_spread": -8.0,
-          "current_total": 234.5,
-          "favored_team": "San Antonio Spurs",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -8.5,
-          "original_total": 237.5,
-          "current_spread": -8.5,
-          "current_total": 235.5,
-          "favored_team": "San Antonio Spurs",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+      "home_team": "Houston Rockets",
+      "away_team": "Phoenix Suns",
+      "game_time": "2026-01-06T01:10:00Z",
+      "first_seen": "2026-01-05T07:59:15.343838",
+      "first_seen_readable": "2026-01-05 07:59:16",
+      "spreads": {
+        "-8.5": {
+          "spread": -8.5,
+          "favored_team": "Houston Rockets",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
-      }
+      },
+      "totals": {
+        "222.5": {
+          "total": 222.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        },
+        "223.5": {
+          "total": 223.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-05T07:59:15.343838",
+      "documented_at_readable": "2026-01-05 07:59:16"
     },
-    "d35c2f55df0ee7e2b6ea6b57f58d50bf": {
-      "game_id": "d35c2f55df0ee7e2b6ea6b57f58d50bf",
+    "8e0209fcea74087227f0a490e9277381": {
+      "game_id": "8e0209fcea74087227f0a490e9277381",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "Dallas Mavericks",
-      "away_team": "Houston Rockets",
-      "game_time": "2026-01-04T01:40:00Z",
-      "first_seen": "2026-01-03T12:23:53.907369",
-      "first_seen_readable": "2026-01-03 12:23:53",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": 8.5,
-          "original_total": 226.5,
-          "current_spread": 7.5,
-          "current_total": 227.5,
-          "favored_team": "Houston Rockets",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": 8.0,
-          "original_total": 225.5,
-          "current_spread": 8.0,
-          "current_total": 227.5,
-          "favored_team": "Houston Rockets",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": 8.5,
-          "original_total": 226.5,
-          "current_spread": 7.5,
-          "current_total": 227.5,
-          "favored_team": "Houston Rockets",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+      "home_team": "Philadelphia 76ers",
+      "away_team": "Denver Nuggets",
+      "game_time": "2026-01-06T01:40:00Z",
+      "first_seen": "2026-01-05T07:59:15.343838",
+      "first_seen_readable": "2026-01-05 08:00:16",
+      "spreads": {
+        "-11.5": {
+          "spread": -11.5,
+          "favored_team": "Philadelphia 76ers",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
-      }
-    },
-    "014f7ba8cfa9a886677dda52ff776544": {
-      "game_id": "014f7ba8cfa9a886677dda52ff776544",
-      "sport": "basketball_nba",
-      "sport_display": "NBA",
-      "home_team": "Golden State Warriors",
-      "away_team": "Utah Jazz",
-      "game_time": "2026-01-04T03:10:00Z",
-      "first_seen": "2026-01-03T12:23:53.907369",
-      "first_seen_readable": "2026-01-03 12:23:53",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -12.5,
-          "original_total": 243.5,
-          "current_spread": -10.5,
-          "current_total": 244.5,
-          "favored_team": "Golden State Warriors",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+      },
+      "totals": {
+        "230.5": {
+          "total": 230.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -12.5,
-          "original_total": 242.5,
-          "current_spread": -10.5,
-          "current_total": 245.5,
-          "favored_team": "Golden State Warriors",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -12.5,
-          "original_total": 242.5,
-          "current_spread": -10.5,
-          "current_total": 244.5,
-          "favored_team": "Golden State Warriors",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+        "231.5": {
+          "total": 231.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
         }
-      }
+      },
+      "documented_at": "2026-01-05T07:59:15.343838",
+      "documented_at_readable": "2026-01-05 08:00:16"
     },
-    "951987d285edeebef57679583da56cba": {
-      "game_id": "951987d285edeebef57679583da56cba",
+    "078a4d38068bc82683be486a54fc6995": {
+      "game_id": "078a4d38068bc82683be486a54fc6995",
       "sport": "basketball_nba",
       "sport_display": "NBA",
       "home_team": "Los Angeles Clippers",
-      "away_team": "Boston Celtics",
-      "game_time": "2026-01-04T03:40:00Z",
-      "first_seen": "2026-01-03T12:23:53.907369",
-      "first_seen_readable": "2026-01-03 12:23:53",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -1.5,
-          "original_total": 220.5,
-          "current_spread": -1.5,
-          "current_total": 219.5,
+      "away_team": "Golden State Warriors",
+      "game_time": "2026-01-06T03:10:00Z",
+      "first_seen": "2026-01-05T07:59:15.343838",
+      "first_seen_readable": "2026-01-05 08:00:47",
+      "spreads": {
+        "-1.5": {
+          "spread": -1.5,
           "favored_team": "Los Angeles Clippers",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -1.5,
-          "original_total": 220.5,
-          "current_spread": -1.5,
-          "current_total": 219.5,
+        "-1.0": {
+          "spread": -1.0,
           "favored_team": "Los Angeles Clippers",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -1.5,
-          "original_total": 219.5,
-          "current_spread": -1.5,
-          "current_total": 220.5,
-          "favored_team": "Los Angeles Clippers",
-          "documented_at": "2026-01-03T12:23:53.907369",
-          "documented_at_readable": "2026-01-03 12:23:53"
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
         }
+      },
+      "totals": {
+        "225.5": {
+          "total": 225.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            }
+          ]
+        },
+        "224.5": {
+          "total": 224.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-05T07:59:15.343838",
+      "documented_at_readable": "2026-01-05 08:00:47",
+      "projection": {
+        "projected_total": 223.7,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 99.5)",
+          "Los Angeles Clippers averages 108.9 PPG",
+          "Golden State Warriors averages 109.6 PPG",
+          "Los Angeles Clippers allows 112.6 PPG",
+          "Golden State Warriors allows 111.9 PPG",
+          "Los Angeles Clippers weak defense (DRtg: 115.1) vulnerable to Golden State Warriors strong offense (ORtg: 111.3)"
+        ]
       }
     },
-    "4fd1173e2f647cbbebf6713d39693089": {
-      "game_id": "4fd1173e2f647cbbebf6713d39693089",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Tampa Bay Buccaneers",
-      "away_team": "Carolina Panthers",
-      "game_time": "2026-01-03T21:30:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -3.0,
-          "original_total": 43.5,
-          "current_spread": -5.5,
-          "current_total": 33.5,
-          "favored_team": "Tampa Bay Buccaneers",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
+    "45d0b580462adaf7e3969a7c2b566771": {
+      "game_id": "45d0b580462adaf7e3969a7c2b566771",
+      "sport": "basketball_nba",
+      "sport_display": "NBA",
+      "home_team": "Portland Trail Blazers",
+      "away_team": "Utah Jazz",
+      "game_time": "2026-01-06T03:10:00Z",
+      "first_seen": "2026-01-05T07:59:15.343838",
+      "first_seen_readable": "2026-01-05 08:00:47",
+      "spreads": {
+        "-6.5": {
+          "spread": -6.5,
+          "favored_team": "Portland Trail Blazers",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            }
+          ]
         },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -3.0,
-          "original_total": 43.5,
-          "current_spread": -6.5,
-          "current_total": 32.5,
-          "favored_team": "Tampa Bay Buccaneers",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
+        "-6.0": {
+          "spread": -6.0,
+          "favored_team": "Portland Trail Blazers",
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
         },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -3.0,
-          "original_total": 43.5,
-          "current_spread": -5.5,
-          "current_total": 33.5,
-          "favored_team": "Tampa Bay Buccaneers",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
+        "-5.5": {
+          "spread": -5.5,
+          "favored_team": "Portland Trail Blazers",
+          "bookmakers": [
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
-      }
-    },
-    "c624c615075899bb7be6a39e5eea3b2b": {
-      "game_id": "c624c615075899bb7be6a39e5eea3b2b",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "San Francisco 49ers",
-      "away_team": "Seattle Seahawks",
-      "game_time": "2026-01-04T01:00:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": 2.5,
-          "original_total": 47.5,
-          "current_spread": 2.5,
-          "current_total": 47.5,
-          "favored_team": "Seattle Seahawks",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
+      },
+      "totals": {
+        "243.5": {
+          "total": 243.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            }
+          ]
         },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": 2.5,
-          "original_total": 47.5,
-          "current_spread": 2.5,
-          "current_total": 47.5,
-          "favored_team": "Seattle Seahawks",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": 2.5,
-          "original_total": 47.5,
-          "current_spread": 2.5,
-          "current_total": 47.5,
-          "favored_team": "Seattle Seahawks",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
+        "244.5": {
+          "total": 244.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
-      }
-    },
-    "7906052ca20e6daddf755c7fe3932887": {
-      "game_id": "7906052ca20e6daddf755c7fe3932887",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Atlanta Falcons",
-      "away_team": "New Orleans Saints",
-      "game_time": "2026-01-04T18:00:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -3.5,
-          "original_total": 43.5,
-          "current_spread": -3.5,
-          "current_total": 43.5,
-          "favored_team": "Atlanta Falcons",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -3.5,
-          "original_total": 44.5,
-          "current_spread": -3.5,
-          "current_total": 43.5,
-          "favored_team": "Atlanta Falcons",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -3.5,
-          "original_total": 44.0,
-          "current_spread": -3.5,
-          "current_total": 43.5,
-          "favored_team": "Atlanta Falcons",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "dad5ec44b4df2b91138872aeb4454e1e": {
-      "game_id": "dad5ec44b4df2b91138872aeb4454e1e",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Cincinnati Bengals",
-      "away_team": "Cleveland Browns",
-      "game_time": "2026-01-04T18:00:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -7.5,
-          "original_total": 44.5,
-          "current_spread": -7.5,
-          "current_total": 44.5,
-          "favored_team": "Cincinnati Bengals",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -7.5,
-          "original_total": 44.5,
-          "current_spread": -7.5,
-          "current_total": 44.5,
-          "favored_team": "Cincinnati Bengals",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -7.5,
-          "original_total": 44.5,
-          "current_spread": -7.5,
-          "current_total": 44.5,
-          "favored_team": "Cincinnati Bengals",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "d48a44e7b45f563282fd042c2104da9b": {
-      "game_id": "d48a44e7b45f563282fd042c2104da9b",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "New York Giants",
-      "away_team": "Dallas Cowboys",
-      "game_time": "2026-01-04T18:00:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": 3.5,
-          "original_total": 49.5,
-          "current_spread": 3.5,
-          "current_total": 49.5,
-          "favored_team": "Dallas Cowboys",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": 3.5,
-          "original_total": 49.5,
-          "current_spread": 3.5,
-          "current_total": 49.5,
-          "favored_team": "Dallas Cowboys",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": 3.5,
-          "original_total": 49.5,
-          "current_spread": 3.5,
-          "current_total": 49.5,
-          "favored_team": "Dallas Cowboys",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "41fc7f3165cc9dfdb47c25a9decd7c9b": {
-      "game_id": "41fc7f3165cc9dfdb47c25a9decd7c9b",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Minnesota Vikings",
-      "away_team": "Green Bay Packers",
-      "game_time": "2026-01-04T18:00:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -9.5,
-          "original_total": 36.5,
-          "current_spread": -10.0,
-          "current_total": 37.5,
-          "favored_team": "Minnesota Vikings",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -8.5,
-          "original_total": 36.5,
-          "current_spread": -8.5,
-          "current_total": 36.5,
-          "favored_team": "Minnesota Vikings",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -9.5,
-          "original_total": 37.0,
-          "current_spread": -10.0,
-          "current_total": 37.0,
-          "favored_team": "Minnesota Vikings",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "26b8cf55eeac1bb05b585132f7dcc0e3": {
-      "game_id": "26b8cf55eeac1bb05b585132f7dcc0e3",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Houston Texans",
-      "away_team": "Indianapolis Colts",
-      "game_time": "2026-01-04T18:00:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -10.0,
-          "original_total": 38.5,
-          "current_spread": -10.5,
-          "current_total": 38.5,
-          "favored_team": "Houston Texans",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -10.5,
-          "original_total": 38.5,
-          "current_spread": -10.5,
-          "current_total": 38.5,
-          "favored_team": "Houston Texans",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -10.5,
-          "original_total": 39.0,
-          "current_spread": -10.5,
-          "current_total": 38.5,
-          "favored_team": "Houston Texans",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "623e9172767ca231241e2313bbee095e": {
-      "game_id": "623e9172767ca231241e2313bbee095e",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Jacksonville Jaguars",
-      "away_team": "Tennessee Titans",
-      "game_time": "2026-01-04T18:00:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -13.5,
-          "original_total": 47.5,
-          "current_spread": -13.5,
-          "current_total": 47.5,
-          "favored_team": "Jacksonville Jaguars",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -12.5,
-          "original_total": 47.5,
-          "current_spread": -12.5,
-          "current_total": 47.5,
-          "favored_team": "Jacksonville Jaguars",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -13.5,
-          "original_total": 47.5,
-          "current_spread": -13.5,
-          "current_total": 47.5,
-          "favored_team": "Jacksonville Jaguars",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "2f4cf01e2db22ed928eb8f0357a74007": {
-      "game_id": "2f4cf01e2db22ed928eb8f0357a74007",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Los Angeles Rams",
-      "away_team": "Arizona Cardinals",
-      "game_time": "2026-01-04T21:25:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -8.5,
-          "original_total": 46.5,
-          "current_spread": -9.5,
-          "current_total": 46.5,
-          "favored_team": "Los Angeles Rams",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -8.5,
-          "original_total": 45.5,
-          "current_spread": -8.5,
-          "current_total": 46.5,
-          "favored_team": "Los Angeles Rams",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -8.5,
-          "original_total": 46.5,
-          "current_spread": -8.5,
-          "current_total": 46.5,
-          "favored_team": "Los Angeles Rams",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "bd5134e8440a2b12cc8ac98ab4f18093": {
-      "game_id": "bd5134e8440a2b12cc8ac98ab4f18093",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Buffalo Bills",
-      "away_team": "New York Jets",
-      "game_time": "2026-01-04T21:25:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -7.5,
-          "original_total": 37.5,
-          "current_spread": -7.5,
-          "current_total": 37.5,
-          "favored_team": "Buffalo Bills",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -7.5,
-          "original_total": 37.5,
-          "current_spread": -7.5,
-          "current_total": 37.5,
-          "favored_team": "Buffalo Bills",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -8.0,
-          "original_total": 37.5,
-          "current_spread": -8.0,
-          "current_total": 37.5,
-          "favored_team": "Buffalo Bills",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "1a5451b8f0d74f90937c52bec447dc40": {
-      "game_id": "1a5451b8f0d74f90937c52bec447dc40",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Chicago Bears",
-      "away_team": "Detroit Lions",
-      "game_time": "2026-01-04T21:25:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -3.0,
-          "original_total": 50.5,
-          "current_spread": -3.0,
-          "current_total": 50.5,
-          "favored_team": "Chicago Bears",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -3.0,
-          "original_total": 50.5,
-          "current_spread": -3.0,
-          "current_total": 50.5,
-          "favored_team": "Chicago Bears",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -3.0,
-          "original_total": 50.5,
-          "current_spread": -3.0,
-          "current_total": 50.5,
-          "favored_team": "Chicago Bears",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "30621f6a1072712bee795c15eafe9768": {
-      "game_id": "30621f6a1072712bee795c15eafe9768",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Denver Broncos",
-      "away_team": "Los Angeles Chargers",
-      "game_time": "2026-01-04T21:25:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -13.5,
-          "original_total": 37.5,
-          "current_spread": -13.5,
-          "current_total": 37.5,
-          "favored_team": "Denver Broncos",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -13.5,
-          "original_total": 37.5,
-          "current_spread": -13.5,
-          "current_total": 37.5,
-          "favored_team": "Denver Broncos",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -13.5,
-          "original_total": 37.5,
-          "current_spread": -13.5,
-          "current_total": 37.5,
-          "favored_team": "Denver Broncos",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "de4ae000f7f94eecf9d827eabff2991b": {
-      "game_id": "de4ae000f7f94eecf9d827eabff2991b",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Las Vegas Raiders",
-      "away_team": "Kansas City Chiefs",
-      "game_time": "2026-01-04T21:25:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": 5.5,
-          "original_total": 36.5,
-          "current_spread": 4.5,
-          "current_total": 36.5,
-          "favored_team": "Kansas City Chiefs",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": 5.5,
-          "original_total": 36.5,
-          "current_spread": 4.5,
-          "current_total": 36.5,
-          "favored_team": "Kansas City Chiefs",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": 5.5,
-          "original_total": 36.5,
-          "current_spread": 5.0,
-          "current_total": 36.5,
-          "favored_team": "Kansas City Chiefs",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "d242576b25f56b3f598044c9abfb4df0": {
-      "game_id": "d242576b25f56b3f598044c9abfb4df0",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "New England Patriots",
-      "away_team": "Miami Dolphins",
-      "game_time": "2026-01-04T21:25:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -11.5,
-          "original_total": 45.5,
-          "current_spread": -11.5,
-          "current_total": 45.5,
-          "favored_team": "New England Patriots",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -11.5,
-          "original_total": 45.5,
-          "current_spread": -11.5,
-          "current_total": 45.5,
-          "favored_team": "New England Patriots",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -11.5,
-          "original_total": 45.5,
-          "current_spread": -11.5,
-          "current_total": 45.5,
-          "favored_team": "New England Patriots",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "b6eb23d78a4e1b3bf9946be7cfac0e6b": {
-      "game_id": "b6eb23d78a4e1b3bf9946be7cfac0e6b",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Philadelphia Eagles",
-      "away_team": "Washington Commanders",
-      "game_time": "2026-01-04T21:25:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": -4.5,
-          "original_total": 38.5,
-          "current_spread": -4.5,
-          "current_total": 38.5,
-          "favored_team": "Philadelphia Eagles",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": -3.5,
-          "original_total": 39.5,
-          "current_spread": -4.5,
-          "current_total": 39.5,
-          "favored_team": "Philadelphia Eagles",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": -4.0,
-          "original_total": 39.0,
-          "current_spread": -4.5,
-          "current_total": 39.0,
-          "favored_team": "Philadelphia Eagles",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
-      }
-    },
-    "f609b38fe2bf0687644ad8603e28220b": {
-      "game_id": "f609b38fe2bf0687644ad8603e28220b",
-      "sport": "americanfootball_nfl",
-      "sport_display": "NFL",
-      "home_team": "Pittsburgh Steelers",
-      "away_team": "Baltimore Ravens",
-      "game_time": "2026-01-05T01:20:00Z",
-      "first_seen": "2026-01-03T12:23:55.045838",
-      "first_seen_readable": "2026-01-03 12:23:55",
-      "bookmakers": {
-        "draftkings": {
-          "bookmaker_name": "DraftKings",
-          "original_spread": 3.5,
-          "original_total": 41.5,
-          "current_spread": 3.5,
-          "current_total": 40.5,
-          "favored_team": "Baltimore Ravens",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "fanduel": {
-          "bookmaker_name": "FanDuel",
-          "original_spread": 3.5,
-          "original_total": 41.5,
-          "current_spread": 3.5,
-          "current_total": 40.5,
-          "favored_team": "Baltimore Ravens",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        },
-        "betmgm": {
-          "bookmaker_name": "BetMGM",
-          "original_spread": 3.5,
-          "original_total": 41.5,
-          "current_spread": 3.5,
-          "current_total": 40.5,
-          "favored_team": "Baltimore Ravens",
-          "documented_at": "2026-01-03T12:23:55.045838",
-          "documented_at_readable": "2026-01-03 12:23:55"
-        }
+      },
+      "documented_at": "2026-01-05T07:59:15.343838",
+      "documented_at_readable": "2026-01-05 08:00:47",
+      "projection": {
+        "projected_total": 241.9,
+        "confidence": "high",
+        "justification": [
+          "Fast pace matchup (avg: 103.4)",
+          "Portland Trail Blazers averages 113.7 PPG",
+          "Utah Jazz averages 114.9 PPG",
+          "Portland Trail Blazers allows 117.8 PPG",
+          "Utah Jazz allows 123.2 PPG",
+          "Utah Jazz weak defense (DRtg: 118.7) vulnerable to Portland Trail Blazers strong offense (ORtg: 112.1)"
+        ]
       }
     }
   },
   "player_props": {},
-  "current_date": "2026-01-03",
-  "last_updated": "2026-01-03T19:13:55.458188",
-  "total_games": 24,
+  "current_date": "2026-01-05",
+  "last_updated": "2026-01-05T07:59:15.343838",
+  "total_games": 8,
   "total_props": 0
 }

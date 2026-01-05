@@ -44,11 +44,19 @@ ORIGINAL_LINES_FILE = os.path.join(_data_dir, "original_lines.json")
 # Discord webhook (optional)
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
+# Stats integration for projections
+try:
+    from stats_integration import StatsIntegration
+    STATS_AVAILABLE = True
+except ImportError:
+    STATS_AVAILABLE = False
+    print("⚠️  Stats integration not available. Install nba_api and beautifulsoup4 for projections.")
+
 
 class DiscordNotifier:
     """Handles Discord webhook notifications"""
     
-    def __init__(self, webhook_url: str = None):
+    def __init__(self, webhook_url: str = None, monitor_instance=None):
         """
         Initialize Discord notifier
         
@@ -57,6 +65,7 @@ class DiscordNotifier:
         """
         self.webhook_url = webhook_url or DISCORD_WEBHOOK_URL
         self.enabled = bool(self.webhook_url and REQUESTS_AVAILABLE)
+        self.monitor_instance = monitor_instance  # Reference to monitor for accessing stats
         
         # Debug: Log Discord webhook status
         if self.webhook_url:
@@ -109,6 +118,213 @@ class DiscordNotifier:
             import traceback
             traceback.print_exc()
     
+    def send_json_file(self, file_path: str, file_type: str = "original_lines"):
+        """
+        Send each game's totals and projections as separate Discord webhook notifications
+        
+        Args:
+            file_path: Path to the JSON file
+            file_type: Type of file (for display purposes)
+        """
+        if not self.enabled:
+            print("⚠️  Discord webhook not enabled (no webhook URL or requests library unavailable)")
+            return False
+        
+        if not os.path.exists(file_path):
+            print(f"⚠️  File not found: {file_path}")
+            return False
+        
+        try:
+            # Read the JSON file
+            with open(file_path, 'r') as f:
+                json_data = json.load(f)
+            
+            games = json_data.get('games', {})
+            if not games:
+                print("⚠️  No games found in original_lines.json")
+                return False
+            
+            print(f"📤 Sending {len(games)} game notifications to Discord...")
+            
+            # Send a separate notification for each game
+            sent_count = 0
+            for game_id, game in games.items():
+                home_team = game.get('home_team', 'Unknown')
+                away_team = game.get('away_team', 'Unknown')
+                sport_display = game.get('sport_display', game.get('sport', 'Unknown').replace('_', ' ').title())
+                
+                # Create notification in the style of line movement alerts
+                title = "📊 Game Lines"
+                description = f"**{away_team} @ {home_team}**"
+                
+                fields = []
+                
+                # Add sport
+                fields.append({
+                    'name': 'Sport',
+                    'value': sport_display,
+                    'inline': True
+                })
+                
+                # Add game time
+                game_time = game.get('game_time', '')
+                if game_time:
+                    try:
+                        dt = datetime.fromisoformat(game_time.replace('Z', '+00:00'))
+                        readable_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+                    except:
+                        readable_time = game_time
+                    fields.append({
+                        'name': 'Game Time',
+                        'value': readable_time,
+                        'inline': True
+                    })
+                
+                # Add spreads
+                spreads = game.get('spreads', {})
+                if spreads:
+                    spread_list = []
+                    for spread_key, spread_data in spreads.items():
+                        spread_value = spread_data.get('spread', spread_key)
+                        bookmakers = [b['bookmaker_name'] for b in spread_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmakers)
+                        favored = spread_data.get('favored_team', '')
+                        spread_list.append(f"**{spread_value:.1f}** ({bookmakers_str})")
+                        if favored:
+                            spread_list[-1] += f" - Favored: {favored}"
+                    
+                    fields.append({
+                        'name': 'Spread',
+                        'value': '\n'.join(spread_list),
+                        'inline': False
+                    })
+                
+                # Add totals
+                totals = game.get('totals', {})
+                if totals:
+                    total_list = []
+                    for total_key, total_data in totals.items():
+                        total_value = total_data.get('total', total_key)
+                        bookmakers = [b['bookmaker_name'] for b in total_data.get('bookmakers', [])]
+                        bookmakers_str = ', '.join(bookmakers)
+                        total_list.append(f"**{total_value:.1f}** - Bookmaker: {bookmakers_str}")
+                    
+                    fields.append({
+                        'name': 'Total',
+                        'value': '\n'.join(total_list),
+                        'inline': False
+                    })
+                
+                # Add projection if available
+                projection = game.get('projection')
+                if projection:
+                    proj_total = projection.get('projected_total')
+                    if proj_total:
+                        fields.append({
+                            'name': '📊 Projected Total',
+                            'value': f"{proj_total:.1f} ({projection.get('confidence', 'medium')} confidence)",
+                            'inline': False
+                        })
+                        
+                        # Add justifications
+                        justifications = projection.get('justification', [])
+                        if justifications:
+                            justification_text = '\n'.join(justifications[:5])  # First 5 justifications
+                            fields.append({
+                                'name': 'Justification',
+                                'value': justification_text,
+                                'inline': False
+                            })
+                
+                # Color: blue for data updates
+                color = 0x3498db
+                
+                # Send notification for this game
+                self.send_webhook(title, description, color, fields)
+                sent_count += 1
+                
+                # Small delay between notifications to avoid rate limiting
+                time.sleep(0.5)
+            
+            print(f"✓ Sent {sent_count} game notifications to Discord")
+            return True
+                
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️  Error sending JSON file to Discord: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                try:
+                    error_detail = e.response.json()
+                    print(f"   Discord API Error: {error_detail}")
+                except:
+                    print(f"   HTTP Status: {e.response.status_code}")
+        except Exception as e:
+            print(f"⚠️  Unexpected error sending JSON file: {e}")
+            import traceback
+            traceback.print_exc()
+        
+        return False
+    
+    def _send_json_summary(self, json_data: Dict, file_type: str, file_path: str):
+        """Send a summary of large JSON files"""
+        try:
+            file_size = os.path.getsize(file_path)
+            file_size_mb = file_size / (1024 * 1024)
+            
+            embed = {
+                'title': f'📊 {file_type.replace("_", " ").title()} Summary',
+                'description': f'**File:** `{os.path.basename(file_path)}`\n**Size:** {file_size_mb:.2f} MB (too large to send)\n**Last Updated:** {json_data.get("last_updated", "N/A")}',
+                'color': 0x3498db,
+                'timestamp': datetime.now().isoformat(),
+                'fields': []
+            }
+            
+            # Add summary stats
+            if 'games' in json_data:
+                games = json_data.get('games', {})
+                embed['fields'].append({
+                    'name': 'Total Games',
+                    'value': str(json_data.get('total_games', len(games))),
+                    'inline': True
+                })
+                
+                # Show sample of games
+                if games:
+                    sample_games = list(games.values())[:5]
+                    game_list = []
+                    for game in sample_games:
+                        matchup = f"{game.get('away_team', 'Away')} @ {game.get('home_team', 'Home')}"
+                        game_list.append(f"• {matchup}")
+                    
+                    if len(games) > 5:
+                        game_list.append(f"... and {len(games) - 5} more games")
+                    
+                    embed['fields'].append({
+                        'name': 'Sample Games',
+                        'value': '\n'.join(game_list),
+                        'inline': False
+                    })
+            
+            if 'player_props' in json_data:
+                props = json_data.get('player_props', {})
+                embed['fields'].append({
+                    'name': 'Total Props',
+                    'value': str(json_data.get('total_props', len(props))),
+                    'inline': True
+                })
+            
+            payload = {
+                'embeds': [embed]
+            }
+            
+            response = requests.post(self.webhook_url, json=payload, timeout=30)
+            response.raise_for_status()
+            print(f"✓ Sent {file_type} summary to Discord (file too large: {file_size_mb:.2f} MB)")
+            return True
+            
+        except Exception as e:
+            print(f"⚠️  Error sending JSON summary: {e}")
+            return False
+    
     def send_grouped_spread_alert(self, game: Dict, movements: List[Dict]):
         """Send grouped spread movement alert to Discord for multiple bookmakers with same movement"""
         home_team = game.get('home_team', 'Unknown')
@@ -122,7 +338,7 @@ class DiscordNotifier:
         bookmaker_names = [m.get('bookmaker_name', m.get('bookmaker', 'Unknown')) for m in movements]
         bookmakers_str = ', '.join(bookmaker_names)
         
-        title = f"{direction_emoji} Spread Movement Alert ({len(movements)} bookmakers)"
+        title = f"{direction_emoji} Spread Movement Alert"
         description = f"**{away_team} @ {home_team}**"
         
         fields = [
@@ -130,7 +346,7 @@ class DiscordNotifier:
             {'name': 'New Spread', 'value': f"{first_movement['new_spread']:.1f}", 'inline': True},
             {'name': 'Change', 'value': f"{first_movement['movement']:+.1f} points", 'inline': True},
             {'name': 'Direction', 'value': first_movement.get('direction', 'unknown').title(), 'inline': True},
-            {'name': 'Bookmakers', 'value': bookmakers_str, 'inline': False},
+            {'name': 'Bookmaker', 'value': bookmakers_str, 'inline': False},
             {'name': 'Time', 'value': first_movement.get('readable_timestamp', 'N/A'), 'inline': True}
         ]
         
@@ -169,7 +385,7 @@ class DiscordNotifier:
         bookmaker_names = [m.get('bookmaker_name', m.get('bookmaker', 'Unknown')) for m in movements]
         bookmakers_str = ', '.join(bookmaker_names)
         
-        title = f"{direction_emoji} Total Movement Alert ({len(movements)} bookmakers)"
+        title = f"{direction_emoji} Total Movement Alert"
         description = f"**{away_team} @ {home_team}**"
         
         fields = [
@@ -177,9 +393,33 @@ class DiscordNotifier:
             {'name': 'New Total', 'value': f"{first_movement['new_total']:.1f}", 'inline': True},
             {'name': 'Change', 'value': f"{first_movement['movement']:+.1f} points", 'inline': True},
             {'name': 'Direction', 'value': first_movement.get('direction', 'unknown').title(), 'inline': True},
-            {'name': 'Bookmakers', 'value': bookmakers_str, 'inline': False},
+            {'name': 'Bookmaker', 'value': bookmakers_str, 'inline': False},
             {'name': 'Time', 'value': first_movement.get('readable_timestamp', 'N/A'), 'inline': True}
         ]
+        
+        # Add projection if available
+        game_id = game.get('id')
+        if game_id and self.monitor_instance and self.monitor_instance.stats:
+            original_lines_data = self.monitor_instance.load_original_lines()
+            game_entry = original_lines_data.get('games', {}).get(game_id)
+            if game_entry and 'projection' in game_entry:
+                proj = game_entry['projection']
+                proj_total = proj.get('projected_total')
+                if proj_total:
+                    fields.append({
+                        'name': '📊 Projected Total',
+                        'value': f"{proj_total:.1f} ({proj.get('confidence', 'medium')} confidence)",
+                        'inline': False
+                    })
+                    # Add justifications
+                    justifications = proj.get('justification', [])
+                    if justifications:
+                        justification_text = '\n'.join(justifications[:3])  # First 3 justifications
+                        fields.append({
+                            'name': 'Justification',
+                            'value': justification_text,
+                            'inline': False
+                        })
         
         # Color based on movement size
         absolute_change = first_movement.get('absolute_movement', 0)
@@ -221,7 +461,15 @@ class SportsbookMonitor:
         self.api_key = api_key or os.getenv('ODDS_API_KEY')
         self.base_url = "https://api.the-odds-api.com/v4"
         self.bookmakers = bookmakers or self.BOOKMAKERS
-        self.discord = DiscordNotifier(webhook_url=discord_webhook)
+        
+        # Initialize stats integration for projections
+        if STATS_AVAILABLE:
+            self.stats = StatsIntegration()
+        else:
+            self.stats = None
+        
+        # Initialize Discord notifier with reference to this monitor instance
+        self.discord = DiscordNotifier(webhook_url=discord_webhook, monitor_instance=self)
     
     def get_sportsbook_odds(self, sport: str = 'basketball_nba') -> List[Dict]:
         """
@@ -417,44 +665,142 @@ class SportsbookMonitor:
                 game_entry = original_lines_data['games'][game_id]
             else:
                 games_already_existing += 1
-                # Check if we need to add new bookmakers
+                # Check if we need to add new bookmakers (handle both old and new structure)
+                # Old structure has 'bookmakers' dict, new structure has 'spreads' and 'totals'
+                if 'bookmakers' in game_entry:
+                    # Migrate old structure to new structure
+                    spreads_dict = {}
+                    totals_dict = {}
+                    for bookmaker_key, bookmaker_data in game_entry.get('bookmakers', {}).items():
+                        spread = bookmaker_data.get('original_spread')
+                        total = bookmaker_data.get('original_total')
+                        if spread is not None:
+                            spread_key = str(spread)
+                            if spread_key not in spreads_dict:
+                                spreads_dict[spread_key] = {
+                                    'spread': spread,
+                                    'favored_team': bookmaker_data.get('favored_team'),
+                                    'bookmakers': []
+                                }
+                            spreads_dict[spread_key]['bookmakers'].append({
+                                'bookmaker': bookmaker_key,
+                                'bookmaker_name': bookmaker_data.get('bookmaker_name', self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key))
+                            })
+                        if total is not None:
+                            total_key = str(total)
+                            if total_key not in totals_dict:
+                                totals_dict[total_key] = {
+                                    'total': total,
+                                    'bookmakers': []
+                                }
+                            totals_dict[total_key]['bookmakers'].append({
+                                'bookmaker': bookmaker_key,
+                                'bookmaker_name': bookmaker_data.get('bookmaker_name', self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key))
+                            })
+                    game_entry['spreads'] = spreads_dict
+                    game_entry['totals'] = totals_dict
+                    # Remove old structure
+                    if 'bookmakers' in game_entry:
+                        del game_entry['bookmakers']
+                    # Save migrated structure
+                    original_lines_data['last_updated'] = current_time
+                    self.save_original_lines(original_lines_data)
+                
+                # Check if we need to add new bookmakers to existing groups
                 updated = False
                 for bookmaker_key, odds in bookmaker_odds.items():
-                    if bookmaker_key not in game_entry.get('bookmakers', {}):
-                        # New bookmaker for existing game
+                    # Check if bookmaker exists in any spread group
+                    bookmaker_in_spread = False
+                    for spread_key, spread_data in game_entry.get('spreads', {}).items():
+                        if any(b['bookmaker'] == bookmaker_key for b in spread_data.get('bookmakers', [])):
+                            bookmaker_in_spread = True
+                            break
+                    
+                    # Check if bookmaker exists in any total group
+                    bookmaker_in_total = False
+                    for total_key, total_data in game_entry.get('totals', {}).items():
+                        if any(b['bookmaker'] == bookmaker_key for b in total_data.get('bookmakers', [])):
+                            bookmaker_in_total = True
+                            break
+                    
+                    if not bookmaker_in_spread or not bookmaker_in_total:
+                        # Need to add this bookmaker
                         self.document_original_lines(game, {bookmaker_key: odds}, current_time)
                         updated = True
+                
                 if updated:
                     # Reload to get the updated data
                     original_lines_data = self.load_original_lines()
                     game_entry = original_lines_data['games'][game_id]
             
-            # Now check for movements using current values from original_lines.json
+            # Now check for movements using current values from line_movements.json
             movement_occurred = False
             
-            # Collect all movements first, then group and notify
+            # Load current lines for movement tracking
+            movements_data = self.load_line_movements()
+            current_lines = movements_data.get('current_lines', {})
+            
+            # Initialize current_lines entry for this game if it doesn't exist
+            if game_id not in current_lines:
+                current_lines[game_id] = {
+                    'spreads': {},  # Track current spread per bookmaker
+                    'totals': {}   # Track current total per bookmaker
+                }
+            
+            game_current_lines = current_lines[game_id]
+            
+            # Group current bookmaker odds by spread/total for comparison
+            # We need to compare against original lines (grouped) and track current values per bookmaker
             spread_movements = []  # List of all spread movements
             total_movements = []   # List of all total movements
             
             for bookmaker_key, odds in bookmaker_odds.items():
-                bookmaker_entry = game_entry.get('bookmakers', {}).get(bookmaker_key)
-                
-                if bookmaker_entry is None:
-                    # This shouldn't happen, but handle it gracefully
-                    continue
-                
-                # Get current values from original_lines.json (or use original if current not set)
-                old_spread = bookmaker_entry.get('current_spread', bookmaker_entry.get('original_spread'))
-                old_total = bookmaker_entry.get('current_total', bookmaker_entry.get('original_total'))
-                old_favored_team = bookmaker_entry.get('favored_team')
                 new_spread = odds.get('spread')
                 new_total = odds.get('total')
                 new_favored_team = odds.get('favored_team')
+                
+                # Get old values from current_lines tracking
+                old_spread = game_current_lines['spreads'].get(bookmaker_key)
+                old_total = game_current_lines['totals'].get(bookmaker_key)
+                
+                # If no current value, get from original lines (first time seeing this bookmaker)
+                if old_spread is None:
+                    # Try new structure first (grouped spreads)
+                    for spread_key, spread_data in game_entry.get('spreads', {}).items():
+                        if any(b['bookmaker'] == bookmaker_key for b in spread_data.get('bookmakers', [])):
+                            old_spread = spread_data.get('spread')
+                            break
+                    
+                    # Fallback to old structure if new structure not found
+                    if old_spread is None and 'bookmakers' in game_entry:
+                        bookmaker_entry = game_entry['bookmakers'].get(bookmaker_key)
+                        if bookmaker_entry:
+                            old_spread = bookmaker_entry.get('original_spread')
+                
+                if old_total is None:
+                    # Try new structure first (grouped totals)
+                    for total_key, total_data in game_entry.get('totals', {}).items():
+                        if any(b['bookmaker'] == bookmaker_key for b in total_data.get('bookmakers', [])):
+                            old_total = total_data.get('total')
+                            break
+                    
+                    # Fallback to old structure if new structure not found
+                    if old_total is None and 'bookmakers' in game_entry:
+                        bookmaker_entry = game_entry['bookmakers'].get(bookmaker_key)
+                        if bookmaker_entry:
+                            old_total = bookmaker_entry.get('original_total')
                 
                 # Check spread movement
                 if new_spread is not None and old_spread is not None:
                     spread_change = abs(new_spread - old_spread)
                     if spread_change >= SPREAD_MOVEMENT_THRESHOLD:
+                        # Get old favored team from original lines
+                        old_favored_team = None
+                        for spread_key, spread_data in game_entry.get('spreads', {}).items():
+                            if any(b['bookmaker'] == bookmaker_key for b in spread_data.get('bookmakers', [])):
+                                old_favored_team = spread_data.get('favored_team')
+                                break
+                        
                         # Determine movement direction towards teams
                         movement_towards = self.determine_spread_movement_direction(
                             game, old_spread, new_spread, old_favored_team, new_favored_team
@@ -481,18 +827,15 @@ class SportsbookMonitor:
                         # Collect for grouping
                         spread_movements.append(movement)
                         movement_occurred = True
-                        # Update current value in original_lines.json after movement detected
-                        bookmaker_entry['current_spread'] = new_spread
-                        bookmaker_entry['favored_team'] = new_favored_team
+                        # Update current value in current_lines tracking
+                        game_current_lines['spreads'][bookmaker_key] = new_spread
                     else:
                         # No significant movement, but still update current value for next comparison
                         if new_spread is not None:
-                            bookmaker_entry['current_spread'] = new_spread
-                            bookmaker_entry['favored_team'] = new_favored_team
+                            game_current_lines['spreads'][bookmaker_key] = new_spread
                 elif new_spread is not None:
                     # First time seeing this spread value, update it
-                    bookmaker_entry['current_spread'] = new_spread
-                    bookmaker_entry['favored_team'] = new_favored_team
+                    game_current_lines['spreads'][bookmaker_key] = new_spread
                 
                 # Check total movement
                 if new_total is not None and old_total is not None:
@@ -516,21 +859,22 @@ class SportsbookMonitor:
                         # Collect for grouping
                         total_movements.append(movement)
                         movement_occurred = True
-                        # Update current value in original_lines.json after movement detected
-                        bookmaker_entry['current_total'] = new_total
+                        # Update current value in current_lines tracking
+                        game_current_lines['totals'][bookmaker_key] = new_total
                     else:
                         # No significant movement, but still update current value for next comparison
                         if new_total is not None:
-                            bookmaker_entry['current_total'] = new_total
+                            game_current_lines['totals'][bookmaker_key] = new_total
                 elif new_total is not None:
                     # First time seeing this total value, update it
-                    bookmaker_entry['current_total'] = new_total
+                    game_current_lines['totals'][bookmaker_key] = new_total
             
-            # Save updated current values back to original_lines.json after processing all bookmakers
+            # Save updated current values to line_movements.json
             if movement_occurred or any(odds.get('spread') is not None or odds.get('total') is not None 
                                        for odds in bookmaker_odds.values()):
-                original_lines_data['last_updated'] = current_time
-                self.save_original_lines(original_lines_data)
+                movements_data['current_lines'] = current_lines
+                movements_data['last_updated'] = current_time
+                self.save_line_movements(movements_data)
                 
                 # Group and send notifications for spread movements
                 if spread_movements:
@@ -716,6 +1060,7 @@ class SportsbookMonitor:
     def document_original_lines(self, game: Dict, bookmaker_odds: Dict, timestamp: str):
         """
         Document the original lines for a game when first discovered
+        Groups bookmakers with the same spread/total together
         
         Args:
             game: Game dictionary (should include 'sport' and 'sport_display' fields)
@@ -745,22 +1090,73 @@ class SportsbookMonitor:
                 'game_time': commence_time,
                 'first_seen': timestamp,
                 'first_seen_readable': readable_time,
-                'bookmakers': {}
+                'spreads': {},  # Grouped by spread value
+                'totals': {}    # Grouped by total value
             }
             
-            # Add original lines for each bookmaker
+            # Group bookmakers by spread value
+            spreads_dict = {}
             for bookmaker_key, odds in bookmaker_odds.items():
-                bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
-                game_entry['bookmakers'][bookmaker_key] = {
-                    'bookmaker_name': bookmaker_name,
-                    'original_spread': odds.get('spread'),
-                    'original_total': odds.get('total'),
-                    'current_spread': odds.get('spread'),  # Initialize current to original
-                    'current_total': odds.get('total'),    # Initialize current to original
-                    'favored_team': odds.get('favored_team'),
-                    'documented_at': timestamp,
-                    'documented_at_readable': readable_time
-                }
+                spread = odds.get('spread')
+                if spread is not None:
+                    spread_key = str(spread)
+                    if spread_key not in spreads_dict:
+                        spreads_dict[spread_key] = {
+                            'spread': spread,
+                            'favored_team': odds.get('favored_team'),
+                            'bookmakers': []
+                        }
+                    bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
+                    spreads_dict[spread_key]['bookmakers'].append({
+                        'bookmaker': bookmaker_key,
+                        'bookmaker_name': bookmaker_name
+                    })
+            
+            # Group bookmakers by total value
+            totals_dict = {}
+            for bookmaker_key, odds in bookmaker_odds.items():
+                total = odds.get('total')
+                if total is not None:
+                    total_key = str(total)
+                    if total_key not in totals_dict:
+                        totals_dict[total_key] = {
+                            'total': total,
+                            'bookmakers': []
+                        }
+                    bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
+                    totals_dict[total_key]['bookmakers'].append({
+                        'bookmaker': bookmaker_key,
+                        'bookmaker_name': bookmaker_name
+                    })
+            
+            game_entry['spreads'] = spreads_dict
+            game_entry['totals'] = totals_dict
+            game_entry['documented_at'] = timestamp
+            game_entry['documented_at_readable'] = readable_time
+            
+            # Calculate game total projection if stats integration is available
+            if self.stats:
+                sport_key = sport.replace('basketball_', '').replace('football_', '').replace('_', '')
+                if sport_key == 'nba':
+                    sport_key = 'nba'
+                elif sport_key == 'nfl':
+                    sport_key = 'nfl'
+                elif 'college' in sport_key or 'ncaa' in sport_key:
+                    if 'basketball' in sport_key:
+                        sport_key = 'ncaab'
+                    elif 'football' in sport_key:
+                        sport_key = 'ncaaf'
+                
+                projection = self.stats.project_game_total(home_team, away_team, sport_key)
+                if projection.get('projected_total'):
+                    game_entry['projection'] = {
+                        'projected_total': projection['projected_total'],
+                        'confidence': projection.get('confidence', 'medium'),
+                        'justification': projection.get('justification', [])
+                    }
+                    print(f"  📊 Projected Total: {projection['projected_total']:.1f} ({projection.get('confidence', 'medium')} confidence)")
+                    for justification in projection.get('justification', [])[:3]:  # Show first 3 justifications
+                        print(f"     • {justification}")
             
             original_lines_data['games'][game_id] = game_entry
             original_lines_data['last_updated'] = timestamp
@@ -769,28 +1165,87 @@ class SportsbookMonitor:
             # Save to file
             self.save_original_lines(original_lines_data)
             
+            # Format bookmakers display (grouped by spread/total)
+            bookmaker_display = []
+            for spread_key, spread_data in game_entry.get('spreads', {}).items():
+                bookmaker_names = [b['bookmaker_name'] for b in spread_data.get('bookmakers', [])]
+                if len(bookmaker_names) > 1:
+                    bookmaker_display.append(f"Spread {spread_data['spread']:.1f}: {', '.join(bookmaker_names)}")
+                else:
+                    bookmaker_display.append(f"Spread {spread_data['spread']:.1f}: {bookmaker_names[0] if bookmaker_names else 'Unknown'}")
+            
+            for total_key, total_data in game_entry.get('totals', {}).items():
+                bookmaker_names = [b['bookmaker_name'] for b in total_data.get('bookmakers', [])]
+                if len(bookmaker_names) > 1:
+                    bookmaker_display.append(f"Total {total_data['total']:.1f}: {', '.join(bookmaker_names)}")
+                else:
+                    bookmaker_display.append(f"Total {total_data['total']:.1f}: {bookmaker_names[0] if bookmaker_names else 'Unknown'}")
+            
             print(f"✓ Documented original lines for: {away_team} @ {home_team} ({sport_display})")
-            print(f"  Bookmakers: {', '.join([self.BOOKMAKER_NAMES.get(b, b) for b in bookmaker_odds.keys()])}")
+            for display in bookmaker_display:
+                print(f"  {display}")
             print(f"  Saved to: {ORIGINAL_LINES_FILE}")
         else:
-            # Game exists, check if we need to add new bookmakers
+            # Game exists, check if we need to add new bookmakers to existing groups
             game_entry = original_lines_data['games'][game_id]
             updated = False
             
+            # Ensure spreads and totals dictionaries exist
+            if 'spreads' not in game_entry:
+                game_entry['spreads'] = {}
+            if 'totals' not in game_entry:
+                game_entry['totals'] = {}
+            
+            # Add new bookmakers to spread groups
             for bookmaker_key, odds in bookmaker_odds.items():
-                if bookmaker_key not in game_entry['bookmakers']:
+                spread = odds.get('spread')
+                if spread is not None:
+                    spread_key = str(spread)
                     bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
-                    game_entry['bookmakers'][bookmaker_key] = {
-                        'bookmaker_name': bookmaker_name,
-                        'original_spread': odds.get('spread'),
-                        'original_total': odds.get('total'),
-                        'current_spread': odds.get('spread'),  # Initialize current to original
-                        'current_total': odds.get('total'),    # Initialize current to original
-                        'favored_team': odds.get('favored_team'),
-                        'documented_at': timestamp,
-                        'documented_at_readable': readable_time
-                    }
-                    updated = True
+                    
+                    # Check if this bookmaker is already in any spread group
+                    bookmaker_exists = False
+                    for existing_spread_key, spread_data in game_entry['spreads'].items():
+                        if any(b['bookmaker'] == bookmaker_key for b in spread_data.get('bookmakers', [])):
+                            bookmaker_exists = True
+                            break
+                    
+                    if not bookmaker_exists:
+                        if spread_key not in game_entry['spreads']:
+                            game_entry['spreads'][spread_key] = {
+                                'spread': spread,
+                                'favored_team': odds.get('favored_team'),
+                                'bookmakers': []
+                            }
+                        game_entry['spreads'][spread_key]['bookmakers'].append({
+                            'bookmaker': bookmaker_key,
+                            'bookmaker_name': bookmaker_name
+                        })
+                        updated = True
+                
+                total = odds.get('total')
+                if total is not None:
+                    total_key = str(total)
+                    bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
+                    
+                    # Check if this bookmaker is already in any total group
+                    bookmaker_exists = False
+                    for existing_total_key, total_data in game_entry['totals'].items():
+                        if any(b['bookmaker'] == bookmaker_key for b in total_data.get('bookmakers', [])):
+                            bookmaker_exists = True
+                            break
+                    
+                    if not bookmaker_exists:
+                        if total_key not in game_entry['totals']:
+                            game_entry['totals'][total_key] = {
+                                'total': total,
+                                'bookmakers': []
+                            }
+                        game_entry['totals'][total_key]['bookmakers'].append({
+                            'bookmaker': bookmaker_key,
+                            'bookmaker_name': bookmaker_name
+                        })
+                        updated = True
             
             if updated:
                 # Also update sport info if it wasn't set before
@@ -815,10 +1270,11 @@ class SportsbookMonitor:
                     stored_date = data.get('current_date')
                     if stored_date != today:
                         print(f"📅 New day detected ({today}). Clearing previous day's movements...")
-                        # Clear movements, but preserve structure
+                        # Clear movements and current_lines, but preserve structure
                         data = {
                             'game_movements': [],
                             'player_prop_movements': [],
+                            'current_lines': {},  # Clear current tracking for new day
                             'current_date': today,
                             'last_updated': None,
                             'total_movements': 0
@@ -837,6 +1293,8 @@ class SportsbookMonitor:
                         data['game_movements'] = []
                     if 'player_prop_movements' not in data:
                         data['player_prop_movements'] = []
+                    if 'current_lines' not in data:
+                        data['current_lines'] = {}
                     return data
             except Exception as e:
                 print(f"Error loading line movements: {e}")
@@ -844,6 +1302,7 @@ class SportsbookMonitor:
         return {
             'game_movements': [],  # For betting monitor movements
             'player_prop_movements': [],  # For NBA player prop movements
+            'current_lines': {},  # Track current spread/total values for movement detection
             'current_date': today,
             'last_updated': None,
             'total_movements': 0
@@ -856,9 +1315,9 @@ class SportsbookMonitor:
             
             # Load existing data to preserve player_prop_movements section
             existing_data = self.load_line_movements()
-            # Update only the game_movements section
-            # movements_data already contains the full structure with game_movements
+            # Update game_movements and current_lines
             existing_data['game_movements'] = movements_data.get('game_movements', [])
+            existing_data['current_lines'] = movements_data.get('current_lines', existing_data.get('current_lines', {}))
             existing_data['last_updated'] = movements_data.get('last_updated', datetime.now().isoformat())
             existing_data['current_date'] = today  # Update date
             # Calculate total movements
@@ -879,7 +1338,7 @@ class SportsbookMonitor:
     def document_movement(self, game: Dict, movement_type: str, movement: Dict, bookmaker_key: str):
         """
         Document a significant movement in a separate line movements file
-        Records when the change was detected and what the previous value was
+        Consolidates bookmakers with the same movement into one entry
         
         Args:
             game: Game dictionary
@@ -890,7 +1349,7 @@ class SportsbookMonitor:
         game_id = game.get('id', 'unknown')
         home_team = game.get('home_team', 'Unknown')
         away_team = game.get('away_team', 'Unknown')
-        bookmaker_name = movement.get('bookmaker_name', bookmaker_key)
+        bookmaker_name = movement.get('bookmaker_name', self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key))
         commence_time = game.get('commence_time', '')
         sport = game.get('sport', 'unknown')
         sport_display = game.get('sport_display', sport.replace('_', ' ').title() if sport != 'unknown' else 'Unknown')
@@ -899,34 +1358,75 @@ class SportsbookMonitor:
         movements_data = self.load_line_movements()
         game_movements = movements_data.get('game_movements', [])
         
-        # Create movement entry with all details
-        movement_entry = {
-            'game_id': game_id,
-            'sport': sport,
-            'sport_display': sport_display,
-            'home_team': home_team,
-            'away_team': away_team,
-            'game_time': commence_time,
-            'type': movement_type,
-            'bookmaker': bookmaker_key,
-            'bookmaker_name': bookmaker_name,
-            'detected_at': movement['timestamp'],
-            'detected_at_readable': movement['readable_timestamp'],
-            'previous_value': movement.get(f'old_{movement_type}'),
-            'new_value': movement.get(f'new_{movement_type}'),
-            'change': movement['movement'],
-            'absolute_change': movement['absolute_movement'],
-            'direction': movement['direction']
-        }
+        previous_value = movement.get(f'old_{movement_type}')
+        new_value = movement.get(f'new_{movement_type}')
+        movement_amount = movement['movement']
         
-        # Add spread-specific movement direction if available
-        if movement_type == 'spread' and 'movement_towards' in movement:
-            movement_entry['movement_towards'] = movement['movement_towards']
-            movement_entry['old_favored_team'] = movement.get('old_favored_team')
-            movement_entry['new_favored_team'] = movement.get('new_favored_team')
+        # Check if there's already a movement entry with the same values for this game
+        # Group by: game_id, type, previous_value, new_value, movement_amount
+        existing_movement = None
+        for existing in game_movements:
+            if (existing.get('game_id') == game_id and
+                existing.get('type') == movement_type and
+                existing.get('previous_value') == previous_value and
+                existing.get('new_value') == new_value and
+                existing.get('change') == movement_amount):
+                existing_movement = existing
+                break
         
-        # Add to movements list
-        game_movements.append(movement_entry)
+        if existing_movement:
+            # Add this bookmaker to the existing movement's bookmakers list
+            if 'bookmakers' not in existing_movement:
+                # Convert old single bookmaker format to list format
+                existing_movement['bookmakers'] = [{
+                    'bookmaker': existing_movement.get('bookmaker', 'unknown'),
+                    'bookmaker_name': existing_movement.get('bookmaker_name', 'Unknown')
+                }]
+                # Remove old single bookmaker fields
+                if 'bookmaker' in existing_movement:
+                    del existing_movement['bookmaker']
+                if 'bookmaker_name' in existing_movement:
+                    del existing_movement['bookmaker_name']
+            
+            # Check if this bookmaker is already in the list
+            bookmaker_exists = any(b.get('bookmaker') == bookmaker_key for b in existing_movement['bookmakers'])
+            if not bookmaker_exists:
+                existing_movement['bookmakers'].append({
+                    'bookmaker': bookmaker_key,
+                    'bookmaker_name': bookmaker_name
+                })
+        else:
+            # Create new movement entry with bookmakers list
+            movement_entry = {
+                'game_id': game_id,
+                'sport': sport,
+                'sport_display': sport_display,
+                'home_team': home_team,
+                'away_team': away_team,
+                'game_time': commence_time,
+                'type': movement_type,
+                'bookmakers': [{
+                    'bookmaker': bookmaker_key,
+                    'bookmaker_name': bookmaker_name
+                }],
+                'detected_at': movement['timestamp'],
+                'detected_at_readable': movement['readable_timestamp'],
+                'previous_value': previous_value,
+                'new_value': new_value,
+                'change': movement_amount,
+                'absolute_change': movement['absolute_movement'],
+                'direction': movement['direction']
+            }
+            
+            # Add spread-specific movement direction if available
+            if movement_type == 'spread' and 'movement_towards' in movement:
+                movement_entry['movement_towards'] = movement['movement_towards']
+                movement_entry['old_favored_team'] = movement.get('old_favored_team')
+                movement_entry['new_favored_team'] = movement.get('new_favored_team')
+            
+            # Add to movements list
+            game_movements.append(movement_entry)
+        
         movements_data['game_movements'] = game_movements
         movements_data['last_updated'] = datetime.now().isoformat()
         # Calculate total (game movements + prop movements)
@@ -936,7 +1436,15 @@ class SportsbookMonitor:
         # Save to consolidated file
         self.save_line_movements(movements_data)
         
-        print(f"✓ Documented {movement_type} movement ({bookmaker_name}): {away_team} @ {home_team}")
+        # Get the movement entry (either existing or newly created)
+        movement_entry = existing_movement if existing_movement else game_movements[-1]
+        
+        # Format bookmakers for display
+        bookmaker_list = movement_entry.get('bookmakers', [])
+        bookmaker_names = [b['bookmaker_name'] for b in bookmaker_list]
+        bookmakers_str = ', '.join(bookmaker_names) if len(bookmaker_names) > 1 else bookmaker_names[0]
+        
+        print(f"✓ Documented {movement_type} movement (Bookmaker: {bookmakers_str}): {away_team} @ {home_team}")
         print(f"  Previous: {movement_entry['previous_value']:.1f} → New: {movement_entry['new_value']:.1f}")
         print(f"  Change: {movement_entry['change']:+.1f} points ({movement_entry['direction']})")
         if 'movement_towards' in movement_entry:
@@ -956,9 +1464,9 @@ class SportsbookMonitor:
         
         timestamp = first_movement.get('readable_timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print(f"\n{'='*60}")
-        print(f"📊 SPREAD ALERT - {len(movements)} BOOKMAKERS [{timestamp}]")
+        print(f"📊 SPREAD ALERT [{timestamp}]")
         print(f"Game: {away_team} @ {home_team}")
-        print(f"Bookmakers: {bookmakers_str}")
+        print(f"Bookmaker: {bookmakers_str}")
         print(f"Previous Spread: {first_movement['old_spread']:.1f}")
         print(f"New Spread: {first_movement['new_spread']:.1f}")
         print(f"Change: {first_movement['movement']:+.1f} points ({first_movement.get('direction', 'unknown')})")
@@ -983,12 +1491,29 @@ class SportsbookMonitor:
         
         timestamp = first_movement.get('readable_timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print(f"\n{'='*60}")
-        print(f"📊 TOTAL ALERT - {len(movements)} BOOKMAKERS [{timestamp}]")
+        print(f"📊 TOTAL ALERT [{timestamp}]")
         print(f"Game: {away_team} @ {home_team}")
-        print(f"Bookmakers: {bookmakers_str}")
+        print(f"Bookmaker: {bookmakers_str}")
         print(f"Previous Total: {first_movement['old_total']:.1f}")
         print(f"New Total: {first_movement['new_total']:.1f}")
         print(f"Change: {first_movement['movement']:+.1f} points ({first_movement.get('direction', 'unknown')})")
+        
+        # Add projection if available
+        game_id = game.get('id')
+        if game_id and self.stats:
+            original_lines_data = self.load_original_lines()
+            game_entry = original_lines_data.get('games', {}).get(game_id)
+            if game_entry and 'projection' in game_entry:
+                proj = game_entry['projection']
+                proj_total = proj.get('projected_total')
+                if proj_total:
+                    print(f"📊 Projected Total: {proj_total:.1f} ({proj.get('confidence', 'medium')} confidence)")
+                    justifications = proj.get('justification', [])
+                    if justifications:
+                        print(f"   Justification:")
+                        for j in justifications[:3]:
+                            print(f"   • {j}")
+        
         print(f"Movement detected at: {timestamp}")
         print(f"{'='*60}\n")
         
@@ -1234,6 +1759,8 @@ def main():
                        help='Specific bookmakers to monitor (default: all)')
     parser.add_argument('--discord-webhook', '-dw', 
                        help='Discord webhook URL for notifications')
+    parser.add_argument('--send-json', action='store_true',
+                       help='Send original_lines.json to Discord webhook and exit')
     
     args = parser.parse_args()
     
@@ -1249,6 +1776,22 @@ def main():
         bookmakers=args.bookmakers,
         discord_webhook=args.discord_webhook
     )
+    
+    # Handle --send-json flag
+    if args.send_json:
+        if not sb_monitor.discord.enabled:
+            print("⚠️  Discord webhook not configured. Cannot send JSON file.")
+            print("   Set DISCORD_WEBHOOK_URL env var or use --discord-webhook")
+            return
+        
+        print("📤 Sending original_lines.json to Discord...")
+        success = sb_monitor.discord.send_json_file(ORIGINAL_LINES_FILE, "original_lines")
+        if success:
+            print("✓ Successfully sent original_lines.json to Discord")
+        else:
+            print("⚠️  Failed to send original_lines.json to Discord")
+        return
+    
     sb_monitor.monitor(sports=None)
 
 
