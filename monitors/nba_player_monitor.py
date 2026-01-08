@@ -927,8 +927,8 @@ class NBAPlayerPropsMonitor:
                         if not bookmaker_matches:
                             continue
                         
-                        bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key.title())
-                        
+                            bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key.title())
+                            
                         # Convert player name from format like "LEBRON_JAMES" to "LeBron James"
                         player_name = stat_entity_id.replace('_', ' ').title()
                         
@@ -937,18 +937,18 @@ class NBAPlayerPropsMonitor:
                         prop_entry = {
                             'prop_id': prop_id,
                             'game_id': str(event_id),
-                            'player_name': player_name,
+                                            'player_name': player_name,
                             'game_matchup': game_matchup,
                             'home_team': home_team,
                             'away_team': away_team,
-                            'bookmaker': bookmaker_key,
-                            'bookmaker_name': bookmaker_name,
+                                            'bookmaker': bookmaker_key,
+                                            'bookmaker_name': bookmaker_name,
                             'point_line': float(line_value),
                             'outcome_type': side_id,  # "over" or "under"
                             'american_odds': american_odds,  # American odds (can be None)
-                            'timestamp': datetime.now().isoformat()
-                        }
-                        
+                                            'timestamp': datetime.now().isoformat()
+                                        }
+                                        
                         props.append(prop_entry)
                         bookmakers_processed += 1
                     
@@ -1242,7 +1242,7 @@ class NBAPlayerPropsMonitor:
                         filtered_for_primary = {k: v for k, v in lines_dict.items() if k >= 8.0}
                         if filtered_for_primary:
                             primary_line = max(filtered_for_primary.keys())
-                        else:
+            else:
                             primary_line = max(lines_dict.keys())  # Fallback to highest even if < 8.0
             else:
                 # First time seeing this player prop - use the highest line value (points is typically highest)
@@ -1361,32 +1361,32 @@ class NBAPlayerPropsMonitor:
             outcome_type = base_prop.get('outcome_type', 'over')
             
             # Check for movement using the best line
-            old_line = history.get('current_line')
+                old_line = history.get('current_line')
             current_line = best_line
-            
-            if old_line is not None and old_line != current_line:
-                line_change = abs(current_line - old_line)
                 
-                if line_change >= LINE_MOVEMENT_THRESHOLD:
-                    # Significant movement detected
+            if old_line is not None and old_line != current_line:
+                    line_change = abs(current_line - old_line)
+                    
+                    if line_change >= LINE_MOVEMENT_THRESHOLD:
+                        # Significant movement detected
                     # Get bookmakers for the new line
                     movement_bookmakers = best_line_bookmakers
                     
-                    movement = {
-                        'timestamp': current_time,
-                        'readable_timestamp': readable_time,
+                        movement = {
+                            'timestamp': current_time,
+                            'readable_timestamp': readable_time,
                         'bookmakers': movement_bookmakers,  # All bookmakers with this movement
-                        'old_line': old_line,
-                        'new_line': current_line,
-                        'movement': current_line - old_line,
-                        'absolute_movement': line_change,
-                        'direction': 'increased' if current_line > old_line else 'decreased'
-                    }
-                    
+                            'old_line': old_line,
+                            'new_line': current_line,
+                            'movement': current_line - old_line,
+                            'absolute_movement': line_change,
+                            'direction': 'increased' if current_line > old_line else 'decreased'
+                        }
+                        
                     # Update history with new current line (movements are stored in line_movements.json only)
-                    history['current_line'] = current_line
-                    history['last_updated'] = current_time
-                    
+                        history['current_line'] = current_line
+                        history['last_updated'] = current_time
+                        
                     # Document the movement in line_movements.json (with all bookmakers)
                     consolidated_prop = {
                         'prop_id': prop_id,
@@ -1400,22 +1400,22 @@ class NBAPlayerPropsMonitor:
                         'bookmakers': movement_bookmakers
                     }
                     self.document_movement(consolidated_prop, movement)
-                    
+                        
                     # Send alert (with all bookmakers)
                     self.send_prop_alert(consolidated_prop, movement)
-                    
-                    # Save history
-                    self.save_history()
+                        
+                        # Save history
+                        self.save_history()
+                    else:
+                        # No significant movement, but update current line
+                        history['current_line'] = current_line
+                        history['last_updated'] = current_time
+                        self.save_history()
                 else:
-                    # No significant movement, but update current line
-                    history['current_line'] = current_line
-                    history['last_updated'] = current_time
-                    self.save_history()
-            else:
                 # First time seeing this line value or same line, update it
                 if old_line != current_line:
                     history['current_line'] = current_line
-                history['last_updated'] = current_time
+                    history['last_updated'] = current_time
                 
                 # Print confirmation for new props (only if this is the first time we're seeing this prop)
                 if history.get('first_seen') == current_time:
@@ -1427,7 +1427,7 @@ class NBAPlayerPropsMonitor:
                             name = f"{name} ({odds_str})"
                         bookmaker_display.append(name)
                     bookmakers_str = ', '.join(bookmaker_display) if len(bookmaker_display) > 1 else bookmaker_display[0]
-                    
+            
                     print(f"✓ Documented original line for: {player_name} ({bookmakers_str}) - {base_prop['game_matchup']}")
                     print(f"  Line: {current_line:.1f} points")
                     print(f"  Saved to: {PROPS_HISTORY_FILE}")

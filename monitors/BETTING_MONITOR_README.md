@@ -101,7 +101,7 @@ All discovered games are automatically documented in `original_lines.json`:
           "original_total": 45.5,
           "documented_at": "2024-01-15T10:30:00"
         }
-      }
+    }
     }
   }
 }

@@ -215,6 +215,52 @@ class DiscordNotifier:
                         'inline': False
                     })
                 
+                # Add team defensive stats if available
+                if self.monitor_instance and self.monitor_instance.stats:
+                    sport = game.get('sport', '')
+                    if 'basketball_nba' in sport:
+                        # Get team stats for both teams
+                        home_stats = self.monitor_instance.stats.get_team_stats_nba(home_team)
+                        away_stats = self.monitor_instance.stats.get_team_stats_nba(away_team)
+                        
+                        if home_stats and away_stats:
+                            home_opp_ppg = home_stats.get('opp_ppg')
+                            away_opp_ppg = away_stats.get('opp_ppg')
+                            home_def_rating = home_stats.get('def_rating')
+                            away_def_rating = away_stats.get('def_rating')
+                            
+                            # Add defensive stats fields
+                            home_def_text = ""
+                            if home_opp_ppg is not None:
+                                home_def_text += f"Allows {home_opp_ppg:.1f} PPG"
+                            if home_def_rating is not None:
+                                if home_def_text:
+                                    home_def_text += f" | DRtg: {home_def_rating:.1f}"
+                                else:
+                                    home_def_text = f"DRtg: {home_def_rating:.1f}"
+                            
+                            away_def_text = ""
+                            if away_opp_ppg is not None:
+                                away_def_text += f"Allows {away_opp_ppg:.1f} PPG"
+                            if away_def_rating is not None:
+                                if away_def_text:
+                                    away_def_text += f" | DRtg: {away_def_rating:.1f}"
+                                else:
+                                    away_def_text = f"DRtg: {away_def_rating:.1f}"
+                            
+                            if home_def_text:
+                                fields.append({
+                                    'name': f'🛡️ {home_team} Defense',
+                                    'value': home_def_text,
+                                    'inline': True
+                                })
+                            if away_def_text:
+                                fields.append({
+                                    'name': f'🛡️ {away_team} Defense',
+                                    'value': away_def_text,
+                                    'inline': True
+                                })
+                
                 # Add projection if available
                 projection = game.get('projection')
                 if projection:
@@ -396,6 +442,52 @@ class DiscordNotifier:
             {'name': 'Bookmaker', 'value': bookmakers_str, 'inline': False},
             {'name': 'Time', 'value': first_movement.get('readable_timestamp', 'N/A'), 'inline': True}
         ]
+        
+        # Add team defensive stats if available
+        if self.monitor_instance and self.monitor_instance.stats:
+            sport = game.get('sport', '')
+            if 'basketball_nba' in sport:
+                # Get team stats for both teams
+                home_stats = self.monitor_instance.stats.get_team_stats_nba(home_team)
+                away_stats = self.monitor_instance.stats.get_team_stats_nba(away_team)
+                
+                if home_stats and away_stats:
+                    home_opp_ppg = home_stats.get('opp_ppg')
+                    away_opp_ppg = away_stats.get('opp_ppg')
+                    home_def_rating = home_stats.get('def_rating')
+                    away_def_rating = away_stats.get('def_rating')
+                    
+                    # Add defensive stats fields
+                    home_def_text = ""
+                    if home_opp_ppg is not None:
+                        home_def_text += f"Allows {home_opp_ppg:.1f} PPG"
+                    if home_def_rating is not None:
+                        if home_def_text:
+                            home_def_text += f" | DRtg: {home_def_rating:.1f}"
+                        else:
+                            home_def_text = f"DRtg: {home_def_rating:.1f}"
+                    
+                    away_def_text = ""
+                    if away_opp_ppg is not None:
+                        away_def_text += f"Allows {away_opp_ppg:.1f} PPG"
+                    if away_def_rating is not None:
+                        if away_def_text:
+                            away_def_text += f" | DRtg: {away_def_rating:.1f}"
+                        else:
+                            away_def_text = f"DRtg: {away_def_rating:.1f}"
+                    
+                    if home_def_text:
+                        fields.append({
+                            'name': f'🛡️ {home_team} Defense',
+                            'value': home_def_text,
+                            'inline': True
+                        })
+                    if away_def_text:
+                        fields.append({
+                            'name': f'🛡️ {away_team} Defense',
+                            'value': away_def_text,
+                            'inline': True
+                        })
         
         # Add projection if available
         game_id = game.get('id')
@@ -665,6 +757,34 @@ class SportsbookMonitor:
                 game_entry = original_lines_data['games'][game_id]
             else:
                 games_already_existing += 1
+                # Check if projection is missing and add it if stats integration is available
+                if 'projection' not in game_entry and self.stats:
+                    game_home_team = game_entry.get('home_team', home_team)
+                    game_away_team = game_entry.get('away_team', away_team)
+                    game_sport = game_entry.get('sport', game.get('sport', 'basketball_nba'))
+                    sport_key = game_sport.replace('basketball_', '').replace('football_', '').replace('_', '')
+                    if sport_key == 'nba':
+                        sport_key = 'nba'
+                    elif sport_key == 'nfl':
+                        sport_key = 'nfl'
+                    elif 'college' in sport_key or 'ncaa' in sport_key:
+                        if 'basketball' in sport_key:
+                            sport_key = 'ncaab'
+                        elif 'football' in sport_key:
+                            sport_key = 'ncaaf'
+                    
+                    projection = self.stats.project_game_total(game_home_team, game_away_team, sport_key)
+                    if projection.get('projected_total'):
+                        game_entry['projection'] = {
+                            'projected_total': projection['projected_total'],
+                            'confidence': projection.get('confidence', 'medium'),
+                            'justification': projection.get('justification', [])
+                        }
+                        # Save the updated game entry
+                        original_lines_data['games'][game_id] = game_entry
+                        original_lines_data['last_updated'] = current_time
+                        self.save_original_lines(original_lines_data)
+                        print(f"  📊 Added Projected Total for {game_away_team} @ {game_home_team}: {projection['projected_total']:.1f} ({projection.get('confidence', 'medium')} confidence)")
                 # Check if we need to add new bookmakers (handle both old and new structure)
                 # Old structure has 'bookmakers' dict, new structure has 'spreads' and 'totals'
                 if 'bookmakers' in game_entry:
@@ -734,8 +854,8 @@ class SportsbookMonitor:
                     game_entry = original_lines_data['games'][game_id]
             
             # Now check for movements using current values from line_movements.json
-            movement_occurred = False
-            
+                movement_occurred = False
+                
             # Load current lines for movement tracking
             movements_data = self.load_line_movements()
             current_lines = movements_data.get('current_lines', {})
@@ -751,14 +871,14 @@ class SportsbookMonitor:
             
             # Group current bookmaker odds by spread/total for comparison
             # We need to compare against original lines (grouped) and track current values per bookmaker
-            spread_movements = []  # List of all spread movements
-            total_movements = []   # List of all total movements
-            
-            for bookmaker_key, odds in bookmaker_odds.items():
-                new_spread = odds.get('spread')
-                new_total = odds.get('total')
-                new_favored_team = odds.get('favored_team')
+                spread_movements = []  # List of all spread movements
+                total_movements = []   # List of all total movements
                 
+                for bookmaker_key, odds in bookmaker_odds.items():
+                    new_spread = odds.get('spread')
+                    new_total = odds.get('total')
+                    new_favored_team = odds.get('favored_team')
+                    
                 # Get old values from current_lines tracking
                 old_spread = game_current_lines['spreads'].get(bookmaker_key)
                 old_total = game_current_lines['totals'].get(bookmaker_key)
@@ -790,10 +910,10 @@ class SportsbookMonitor:
                         if bookmaker_entry:
                             old_total = bookmaker_entry.get('original_total')
                 
-                # Check spread movement
-                if new_spread is not None and old_spread is not None:
-                    spread_change = abs(new_spread - old_spread)
-                    if spread_change >= SPREAD_MOVEMENT_THRESHOLD:
+                    # Check spread movement
+                    if new_spread is not None and old_spread is not None:
+                        spread_change = abs(new_spread - old_spread)
+                        if spread_change >= SPREAD_MOVEMENT_THRESHOLD:
                         # Get old favored team from original lines
                         old_favored_team = None
                         for spread_key, spread_data in game_entry.get('spreads', {}).items():
@@ -801,74 +921,74 @@ class SportsbookMonitor:
                                 old_favored_team = spread_data.get('favored_team')
                                 break
                         
-                        # Determine movement direction towards teams
-                        movement_towards = self.determine_spread_movement_direction(
-                            game, old_spread, new_spread, old_favored_team, new_favored_team
-                        )
-                        
-                        movement = {
-                            'timestamp': current_time,
-                            'readable_timestamp': readable_time,
-                            'bookmaker': bookmaker_key,
-                            'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
-                            'old_spread': old_spread,
-                            'new_spread': new_spread,
-                            'movement': new_spread - old_spread,
-                            'absolute_movement': spread_change,
-                            'direction': 'increased' if new_spread > old_spread else 'decreased',
-                            'movement_towards': movement_towards,
-                            'old_favored_team': old_favored_team,
-                            'new_favored_team': new_favored_team
-                        }
-                        
-                        # Document the movement
-                        self.document_movement(game, 'spread', movement, bookmaker_key)
+                            # Determine movement direction towards teams
+                            movement_towards = self.determine_spread_movement_direction(
+                                game, old_spread, new_spread, old_favored_team, new_favored_team
+                            )
                             
-                        # Collect for grouping
-                        spread_movements.append(movement)
-                        movement_occurred = True
+                            movement = {
+                                'timestamp': current_time,
+                                'readable_timestamp': readable_time,
+                                'bookmaker': bookmaker_key,
+                                'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
+                                'old_spread': old_spread,
+                                'new_spread': new_spread,
+                                'movement': new_spread - old_spread,
+                                'absolute_movement': spread_change,
+                                'direction': 'increased' if new_spread > old_spread else 'decreased',
+                                'movement_towards': movement_towards,
+                                'old_favored_team': old_favored_team,
+                                'new_favored_team': new_favored_team
+                            }
+                            
+                        # Document the movement
+                            self.document_movement(game, 'spread', movement, bookmaker_key)
+                            
+                            # Collect for grouping
+                            spread_movements.append(movement)
+                            movement_occurred = True
                         # Update current value in current_lines tracking
                         game_current_lines['spreads'][bookmaker_key] = new_spread
-                    else:
-                        # No significant movement, but still update current value for next comparison
+                        else:
+                            # No significant movement, but still update current value for next comparison
                         if new_spread is not None:
                             game_current_lines['spreads'][bookmaker_key] = new_spread
-                elif new_spread is not None:
-                    # First time seeing this spread value, update it
+                    elif new_spread is not None:
+                        # First time seeing this spread value, update it
                     game_current_lines['spreads'][bookmaker_key] = new_spread
-                
-                # Check total movement
-                if new_total is not None and old_total is not None:
-                    total_change = abs(new_total - old_total)
-                    if total_change >= TOTAL_MOVEMENT_THRESHOLD:
-                        movement = {
-                            'timestamp': current_time,
-                            'readable_timestamp': readable_time,
-                            'bookmaker': bookmaker_key,
-                            'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
-                            'old_total': old_total,
-                            'new_total': new_total,
-                            'movement': new_total - old_total,
-                            'absolute_movement': total_change,
-                            'direction': 'increased' if new_total > old_total else 'decreased'
-                        }
-                        
+                    
+                    # Check total movement
+                    if new_total is not None and old_total is not None:
+                        total_change = abs(new_total - old_total)
+                        if total_change >= TOTAL_MOVEMENT_THRESHOLD:
+                            movement = {
+                                'timestamp': current_time,
+                                'readable_timestamp': readable_time,
+                                'bookmaker': bookmaker_key,
+                                'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
+                                'old_total': old_total,
+                                'new_total': new_total,
+                                'movement': new_total - old_total,
+                                'absolute_movement': total_change,
+                                'direction': 'increased' if new_total > old_total else 'decreased'
+                            }
+                            
                         # Document the movement
-                        self.document_movement(game, 'total', movement, bookmaker_key)
-                        
-                        # Collect for grouping
-                        total_movements.append(movement)
-                        movement_occurred = True
+                            self.document_movement(game, 'total', movement, bookmaker_key)
+                            
+                            # Collect for grouping
+                            total_movements.append(movement)
+                            movement_occurred = True
                         # Update current value in current_lines tracking
                         game_current_lines['totals'][bookmaker_key] = new_total
-                    else:
-                        # No significant movement, but still update current value for next comparison
+                        else:
+                            # No significant movement, but still update current value for next comparison
                         if new_total is not None:
                             game_current_lines['totals'][bookmaker_key] = new_total
-                elif new_total is not None:
-                    # First time seeing this total value, update it
+                    elif new_total is not None:
+                        # First time seeing this total value, update it
                     game_current_lines['totals'][bookmaker_key] = new_total
-            
+                    
             # Save updated current values to line_movements.json
             if movement_occurred or any(odds.get('spread') is not None or odds.get('total') is not None 
                                        for odds in bookmaker_odds.values()):
@@ -926,7 +1046,7 @@ class SportsbookMonitor:
                         else:
                             # Single bookmaker - send individual notification
                             self.send_total_alert(game, group_movements[0])
-        
+                
         # Summary of games processed
         if games_documented > 0 or games_already_existing > 0 or games_no_odds > 0:
             print(f"\n📊 Games Summary:")
@@ -1106,7 +1226,7 @@ class SportsbookMonitor:
                             'favored_team': odds.get('favored_team'),
                             'bookmakers': []
                         }
-                    bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
+                bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
                     spreads_dict[spread_key]['bookmakers'].append({
                         'bookmaker': bookmaker_key,
                         'bookmaker_name': bookmaker_name
@@ -1221,7 +1341,7 @@ class SportsbookMonitor:
                             'bookmaker': bookmaker_key,
                             'bookmaker_name': bookmaker_name
                         })
-                        updated = True
+                    updated = True
                 
                 total = odds.get('total')
                 if total is not None:
@@ -1246,6 +1366,31 @@ class SportsbookMonitor:
                             'bookmaker_name': bookmaker_name
                         })
                         updated = True
+            
+            # Check if projection is missing and add it if stats integration is available
+            if 'projection' not in game_entry and self.stats:
+                # Get sport from game_entry if not in current game data
+                game_sport = game_entry.get('sport', sport)
+                sport_key = game_sport.replace('basketball_', '').replace('football_', '').replace('_', '')
+                if sport_key == 'nba':
+                    sport_key = 'nba'
+                elif sport_key == 'nfl':
+                    sport_key = 'nfl'
+                elif 'college' in sport_key or 'ncaa' in sport_key:
+                    if 'basketball' in sport_key:
+                        sport_key = 'ncaab'
+                    elif 'football' in sport_key:
+                        sport_key = 'ncaaf'
+                
+                projection = self.stats.project_game_total(home_team, away_team, sport_key)
+                if projection.get('projected_total'):
+                    game_entry['projection'] = {
+                        'projected_total': projection['projected_total'],
+                        'confidence': projection.get('confidence', 'medium'),
+                        'justification': projection.get('justification', [])
+                    }
+                    updated = True
+                    print(f"  📊 Added Projected Total: {projection['projected_total']:.1f} ({projection.get('confidence', 'medium')} confidence)")
             
             if updated:
                 # Also update sport info if it wasn't set before
@@ -1397,34 +1542,34 @@ class SportsbookMonitor:
                 })
         else:
             # Create new movement entry with bookmakers list
-            movement_entry = {
-                'game_id': game_id,
+        movement_entry = {
+            'game_id': game_id,
                 'sport': sport,
                 'sport_display': sport_display,
-                'home_team': home_team,
-                'away_team': away_team,
-                'game_time': commence_time,
-                'type': movement_type,
+            'home_team': home_team,
+            'away_team': away_team,
+            'game_time': commence_time,
+            'type': movement_type,
                 'bookmakers': [{
-                    'bookmaker': bookmaker_key,
+            'bookmaker': bookmaker_key,
                     'bookmaker_name': bookmaker_name
                 }],
-                'detected_at': movement['timestamp'],
-                'detected_at_readable': movement['readable_timestamp'],
+            'detected_at': movement['timestamp'],
+            'detected_at_readable': movement['readable_timestamp'],
                 'previous_value': previous_value,
                 'new_value': new_value,
                 'change': movement_amount,
-                'absolute_change': movement['absolute_movement'],
-                'direction': movement['direction']
-            }
-            
-            # Add spread-specific movement direction if available
-            if movement_type == 'spread' and 'movement_towards' in movement:
-                movement_entry['movement_towards'] = movement['movement_towards']
-                movement_entry['old_favored_team'] = movement.get('old_favored_team')
-                movement_entry['new_favored_team'] = movement.get('new_favored_team')
-            
-            # Add to movements list
+            'absolute_change': movement['absolute_movement'],
+            'direction': movement['direction']
+        }
+        
+        # Add spread-specific movement direction if available
+        if movement_type == 'spread' and 'movement_towards' in movement:
+            movement_entry['movement_towards'] = movement['movement_towards']
+            movement_entry['old_favored_team'] = movement.get('old_favored_team')
+            movement_entry['new_favored_team'] = movement.get('new_favored_team')
+        
+        # Add to movements list
             game_movements.append(movement_entry)
         
         movements_data['game_movements'] = game_movements
@@ -1771,11 +1916,11 @@ def main():
     TOTAL_MOVEMENT_THRESHOLD = args.movement_threshold
     
     # Start Sportsbook monitoring
-    sb_monitor = SportsbookMonitor(
-        api_key=args.odds_api_key, 
-        bookmakers=args.bookmakers,
-        discord_webhook=args.discord_webhook
-    )
+        sb_monitor = SportsbookMonitor(
+            api_key=args.odds_api_key, 
+            bookmakers=args.bookmakers,
+            discord_webhook=args.discord_webhook
+        )
     
     # Handle --send-json flag
     if args.send_json:

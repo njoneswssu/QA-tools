@@ -613,18 +613,11 @@ class StatsIntegration:
             if away_opp_ppg:
                 projection['justification'].append(f"{away_team} allows {away_opp_ppg:.1f} PPG")
             
-            # Add defensive rating summary (only if not already covered in matchup analysis)
-            if home_def_rating and away_def_rating and not def_analysis:
-                league_avg = 110.0
-                if home_def_rating < league_avg - 2:
-                    projection['justification'].append(f"{home_team} elite defense (DRtg: {home_def_rating:.1f})")
-                elif home_def_rating > league_avg + 2:
-                    projection['justification'].append(f"{home_team} weak defense (DRtg: {home_def_rating:.1f})")
-                
-                if away_def_rating < league_avg - 2:
-                    projection['justification'].append(f"{away_team} elite defense (DRtg: {away_def_rating:.1f})")
-                elif away_def_rating > league_avg + 2:
-                    projection['justification'].append(f"{away_team} weak defense (DRtg: {away_def_rating:.1f})")
+            # Add defensive ratings to justification
+            if home_def_rating:
+                projection['justification'].append(f"{home_team} defensive rating: {home_def_rating:.1f}")
+            if away_def_rating:
+                projection['justification'].append(f"{away_team} defensive rating: {away_def_rating:.1f}")
             
             # Add matchup analysis (more detailed than summary)
             for analysis in def_analysis:

@@ -106,19 +106,19 @@ class LineHistorySearcher:
         # Search current lines from original_lines.json (now contains current values)
         if 'games' in self.original_lines:
             for game_id, game_data in self.original_lines['games'].items():
-                home_team = game_data.get('home_team', '').lower()
-                away_team = game_data.get('away_team', '').lower()
-                
-                if team_name_lower in home_team or team_name_lower in away_team:
-                    current_lines_entry = {
-                        'game_id': game_id,
-                        'home_team': game_data.get('home_team'),
-                        'away_team': game_data.get('away_team'),
+            home_team = game_data.get('home_team', '').lower()
+            away_team = game_data.get('away_team', '').lower()
+            
+            if team_name_lower in home_team or team_name_lower in away_team:
+                current_lines_entry = {
+                    'game_id': game_id,
+                    'home_team': game_data.get('home_team'),
+                    'away_team': game_data.get('away_team'),
                         'spreads': game_data.get('spreads', {}),
                         'totals': game_data.get('totals', {})
-                    }
-                    
-                    results['current_lines'].append(current_lines_entry)
+                        }
+                
+                results['current_lines'].append(current_lines_entry)
         
         return results
     
@@ -253,18 +253,18 @@ class LineHistorySearcher:
                 if sport_lower not in game_sport and sport_lower not in game_sport_display and sport_key not in game_sport:
                     continue
                 
-                game_entry = {
-                    'game_id': game_id,
-                    'home_team': game_data.get('home_team'),
-                    'away_team': game_data.get('away_team'),
+            game_entry = {
+                'game_id': game_id,
+                'home_team': game_data.get('home_team'),
+                'away_team': game_data.get('away_team'),
                     'sport': game_data.get('sport'),
                     'sport_display': game_data.get('sport_display'),
                     'spreads': game_data.get('spreads', {}),
                     'totals': game_data.get('totals', {}),
-                    'first_seen': game_data.get('first_seen'),
+                'first_seen': game_data.get('first_seen'),
                     'game_time': game_data.get('game_time')
-                }
-                results['games'].append(game_entry)
+            }
+            results['games'].append(game_entry)
         
         return results
     
@@ -293,28 +293,28 @@ class LineHistorySearcher:
         # Search for matching game in original_lines.json
         if 'games' in self.original_lines:
             for game_id, game_data in self.original_lines['games'].items():
-                game_home = game_data.get('home_team', '').lower()
-                game_away = game_data.get('away_team', '').lower()
+            game_home = game_data.get('home_team', '').lower()
+            game_away = game_data.get('away_team', '').lower()
+            
+            if (home_lower in game_home and away_lower in game_away) or \
+               (home_lower in game_away and away_lower in game_home):
                 
-                if (home_lower in game_home and away_lower in game_away) or \
-                   (home_lower in game_away and away_lower in game_home):
-                    
                     # Get original lines (same as game_data)
                     results['original_lines'] = game_data
-                    
-                    # Get movements for this game
+                
+                # Get movements for this game
                     if 'game_movements' in self.line_movements:
                         for movement in self.line_movements['game_movements']:
-                            if movement.get('game_id') == game_id:
-                                results['movements'].append(movement)
-                    
+                        if movement.get('game_id') == game_id:
+                            results['movements'].append(movement)
+                
                     # Get current lines (same structure as original_lines)
-                    results['current_lines'] = {
+                results['current_lines'] = {
                         'spreads': game_data.get('spreads', {}),
                         'totals': game_data.get('totals', {})
-                    }
-                    
-                    break
+                }
+                
+                break
         
         return results
     

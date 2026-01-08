@@ -45,10 +45,10 @@ pip install requests plyer
 
 ```bash
 # BALLDONTLIE API key (recommended for player props)
-export BALLDONTLIE_API_KEY="your_balldontlie_api_key"
+export SPORTSGAMEODDS_API_KEY="43d7d7e2c3fec4b3f0cec2dc20bc3e4c"
 
 # OR The Odds API key
-export ODDS_API_KEY="your_odds_api_key"
+export ODDS_API_KEY="44356dbf1a50af648203c2e31b058d65"
 
 # API Provider selection (optional, default: balldontlie)
 export PROPS_API_PROVIDER="balldontlie"  # or "odds_api"
@@ -58,7 +58,7 @@ export DISCORD_WEBHOOK_URL="your_discord_webhook_url"
 ```
 
 ## Usage
-
+python3 betting_monitor.py --send-json
 ### Basic Usage
 
 ```bash

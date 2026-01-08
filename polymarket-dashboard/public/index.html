@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polymarket Edge Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>📊 Polymarket Edge</h1>
+            </div>
+            <div class="header-controls">
+                <button id="refresh-all" class="btn-primary">🔄 Refresh All</button>
+                <div class="wallet-info">
+                    <div class="balance-display">
+                        <span class="balance-label">Balance:</span>
+                        <span class="balance-amount" id="balance-usdc">$0.00</span>
+                        <span class="balance-currency">USDC</span>
+                    </div>
+                    <span class="status-indicator" id="status"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content - Grid Layout -->
+    <main class="main-content grid-layout">
+        <!-- Left Column -->
+        <div class="left-column">
+            <!-- Edge Opportunities Section -->
+            <section class="dashboard-section" id="edge-section">
+                <div class="section-header">
+                    <h2>🎯 Edge Opportunities</h2>
+                    <button id="refresh-edge" class="btn-secondary">Refresh</button>
+                </div>
+                <div class="edge-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-edges">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avg-edge">0%</div>
+                        <div class="stat-label">Avg Edge</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="high-conf">0</div>
+                        <div class="stat-label">High Conf</div>
+                    </div>
+                </div>
+                <div id="edge-opportunities" class="edge-list scrollable">
+                    <!-- Edge opportunities will be loaded here -->
+                </div>
+            </section>
+
+            <!-- P&L Section -->
+            <section class="dashboard-section" id="pnl-section">
+                <div class="section-header">
+                    <h2>💰 P&L</h2>
+                </div>
+                <div class="pnl-summary-compact">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-pnl">$0.00</div>
+                        <div class="stat-label">Total P&L</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="win-rate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                </div>
+                <div class="chart-container-compact">
+                    <canvas id="pnl-chart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- Middle Column -->
+        <div class="middle-column">
+            <!-- Markets Section -->
+            <section class="dashboard-section full-height" id="markets-section">
+                <div class="section-header">
+                    <h2>📊 Markets</h2>
+                    <div class="filters">
+                        <input type="text" id="market-search" placeholder="Search..." class="search-input">
+                        <select id="category-filter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="crypto">Crypto</option>
+                            <option value="sports">Sports</option>
+                            <option value="politics">Politics</option>
+                            <option value="entertainment">Entertainment</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="markets-grid" class="markets-grid scrollable">
+                    <!-- Markets will be loaded here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-column">
+            <!-- News Feed Section -->
+            <section class="dashboard-section full-height" id="news-section">
+                <div class="section-header">
+                    <h2>📰 News</h2>
+                    <button id="refresh-news" class="btn-secondary">Refresh</button>
+                </div>
+                <div id="news-feed" class="news-feed scrollable">
+                    <!-- News items will be loaded here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Bottom Row - Full Width -->
+        <div class="bottom-row">
+            <!-- Trades Section -->
+            <section class="dashboard-section" id="trades-section">
+                <div class="section-header">
+                    <h2>📋 Trades</h2>
+                    <div class="section-header-actions">
+                        <select id="trade-status-filter" class="filter-select">
+                            <option value="all">All</option>
+                            <option value="pending">Pending</option>
+                            <option value="executed">Executed</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                        <button id="clear-trades" class="btn-danger-small">🗑️ Clear All</button>
+                    </div>
+                </div>
+                <div id="trades-table" class="trades-table scrollable-horizontal">
+                    <!-- Trade history will be loaded here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Trade Modal -->
+    <div id="trade-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-market-name">Market Name</h2>
+            <p id="modal-market-desc" class="market-desc"></p>
+            
+            <div class="trade-form">
+                <div class="price-display">
+                    <div class="price-box">
+                        <span class="price-label">YES</span>
+                        <span class="price-value" id="modal-yes-price">50¢</span>
+                    </div>
+                    <div class="price-box">
+                        <span class="price-label">NO</span>
+                        <span class="price-value" id="modal-no-price">50¢</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Side</label>
+                    <div class="side-toggle">
+                        <button class="side-btn active" data-side="YES">YES</button>
+                        <button class="side-btn" data-side="NO">NO</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="trade-size">Position Size ($)</label>
+                    <input type="number" id="trade-size" min="1" max="1000" value="10" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="trade-price">Limit Price (¢)</label>
+                    <input type="number" id="trade-price" min="1" max="99" value="50" step="1">
+                </div>
+
+                <div class="trade-summary">
+                    <div class="summary-row">
+                        <span>Potential Payout:</span>
+                        <span id="potential-payout">$10.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Potential Profit:</span>
+                        <span id="potential-profit" class="profit-positive">$5.00</span>
+                    </div>
+                </div>
+
+                <button id="execute-trade-btn" class="btn-trade">Place Trade</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
