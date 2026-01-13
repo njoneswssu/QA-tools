@@ -2,23 +2,23 @@
   "game_movements": [],
   "player_prop_movements": [],
   "current_lines": {
-    "37ad3adb35ed4728a96f52ce3ef3be12": {
+    "61fc2e0519808b7939ffa4b246abdc06": {
       "spreads": {
-        "draftkings": -13.5,
-        "fanduel": -13.0,
-        "betmgm": -12.5
+        "draftkings": -1.5,
+        "fanduel": -1.0,
+        "betmgm": -1.5
       },
       "totals": {
-        "draftkings": 250.5,
-        "fanduel": 251.5,
-        "betmgm": 250.5
+        "draftkings": 230.5,
+        "fanduel": 230.5,
+        "betmgm": 230.5
       }
     },
-    "dbad91dbabd7e090fe6d6ad58912cd58": {
+    "bed2aa3c325290237960f892f5a097a6": {
       "spreads": {
-        "draftkings": 5.5,
-        "fanduel": 6.0,
-        "betmgm": 5.5
+        "draftkings": -12.5,
+        "fanduel": -13.0,
+        "betmgm": -12.5
       },
       "totals": {
         "draftkings": 225.5,
@@ -26,56 +26,68 @@
         "betmgm": 225.5
       }
     },
-    "da3e1c4e31d6ac7036e05f00a60ad5f2": {
+    "a13039a9d53bb199d840fbfcf12288e3": {
       "spreads": {
-        "draftkings": 3.5,
-        "fanduel": 3.5,
-        "betmgm": 3.5
+        "draftkings": 1.5,
+        "fanduel": 1.5,
+        "betmgm": 1.5
       },
       "totals": {
-        "draftkings": 220.5,
-        "fanduel": 220.5,
-        "betmgm": 221.5
+        "draftkings": 232.5,
+        "fanduel": 233.5,
+        "betmgm": 233.5
       }
     },
-    "f0e102ee7c0722665cde7d3a4a4dfe1c": {
+    "e7bdcaa4eb0827e34ee88b6f7f4cfbf7": {
       "spreads": {
         "draftkings": -3.5,
-        "fanduel": -3.5,
+        "fanduel": -3.0,
         "betmgm": -3.5
       },
       "totals": {
-        "draftkings": 221.5,
-        "fanduel": 221.5,
-        "betmgm": 221.5
+        "draftkings": 229.5,
+        "fanduel": 228.5,
+        "betmgm": 229.5
       }
     },
-    "09fb007ac62ac7d2e08db4357be2417c": {
+    "a7a281e6b58fc8dcb4460426708635f0": {
       "spreads": {
-        "draftkings": 9.5,
-        "fanduel": 9.5,
-        "betmgm": 9.5
+        "draftkings": -8.5,
+        "fanduel": -8.5,
+        "betmgm": -9.5
+      },
+      "totals": {
+        "draftkings": 230.5,
+        "fanduel": 229.5,
+        "betmgm": 230.5
+      }
+    },
+    "c7c297ef2929312f940160908cc98da1": {
+      "spreads": {
+        "draftkings": 2.5,
+        "fanduel": 2.5,
+        "betmgm": 2.5
+      },
+      "totals": {
+        "draftkings": 231.5,
+        "fanduel": 231.5,
+        "betmgm": 231.5
+      }
+    },
+    "8a94b39d3b7b34471f2dc96fa6f46b59": {
+      "spreads": {
+        "draftkings": -10.5,
+        "fanduel": -10.5,
+        "betmgm": -10.5
       },
       "totals": {
         "draftkings": 226.5,
-        "fanduel": 227.5,
+        "fanduel": 226.5,
         "betmgm": 226.5
-      }
-    },
-    "2532e809417a1fed704519de12ef68c0": {
-      "spreads": {
-        "draftkings": -4.5,
-        "fanduel": -4.5,
-        "betmgm": -4.5
-      },
-      "totals": {
-        "draftkings": 223.5,
-        "fanduel": 223.5,
-        "betmgm": 223.5
       }
     }
   },
-  "current_date": "2026-01-12",
-  "last_updated": "2026-01-12T08:41:26.104591",
+  "current_date": "2026-01-13",
+  "last_updated": "2026-01-13T17:01:03.196913",
   "total_movements": 0
 }

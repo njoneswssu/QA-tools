@@ -11,14 +11,14 @@ import os
 import json
 import time
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 import re
 
 # Configure urllib3 timeout for NBA API
 try:
     import urllib3
-    # Increase default timeout to 60 seconds
-    urllib3.util.timeout.Timeout.DEFAULT_TIMEOUT = 60.0
+    # Increase default timeout to 90 seconds
+    urllib3.util.timeout.Timeout.DEFAULT_TIMEOUT = 90.0
 except:
     pass
 
@@ -53,7 +53,12 @@ class StatsIntegration:
     _team_stats_cache = {}
     _player_stats_cache = {}
     _teamrankings_cache = {}
-    _cache_expiry = 3600  # 1 hour cache
+    _cache_expiry = 7200  # 2 hour cache (increased to reduce API calls)
+    
+    # Cache for league-wide stats (fetch all teams at once)
+    _league_base_stats_cache = {}
+    _league_advanced_stats_cache = {}
+    _league_stats_cache_expiry = 3600  # 1 hour cache for league-wide stats
     
     def __init__(self):
         """Initialize stats integration"""
@@ -129,9 +134,63 @@ class StatsIntegration:
         
         return None
     
+    def _fetch_league_stats_nba(self, season: str) -> Tuple[Optional[Any], Optional[Any]]:
+        """
+        Fetch league-wide base and advanced stats for all teams at once
+        This is more efficient than fetching per team
+        
+        Args:
+            season: Season string (e.g., "2023-24")
+            
+        Returns:
+            Tuple of (base_df, advanced_df) or (None, None) if failed
+        """
+        cache_key = season
+        
+        # Check cache for league stats
+        if cache_key in self._league_base_stats_cache:
+            cached_base, cached_advanced, cached_time = self._league_base_stats_cache[cache_key]
+            if time.time() - cached_time < self._league_stats_cache_expiry:
+                return cached_base, cached_advanced
+        
+        try:
+            # Fetch base stats for all teams at once
+            base_stats = leaguedashteamstats.LeagueDashTeamStats(season=season)
+            base_df = base_stats.get_data_frames()[0]
+            
+            # Fetch advanced stats for all teams at once
+            # Add small delay between calls
+            time.sleep(0.5)
+            advanced_stats = leaguedashteamstats.LeagueDashTeamStats(
+                season=season,
+                measure_type_detailed_defense='Advanced'
+            )
+            advanced_df = advanced_stats.get_data_frames()[0]
+            
+            # Cache the results
+            self._league_base_stats_cache[cache_key] = (base_df, advanced_df, time.time())
+            
+            return base_df, advanced_df
+        except Exception as e:
+            error_msg = str(e).lower()
+            is_timeout = ('timeout' in error_msg or 'timed out' in error_msg or 
+                        'read timeout' in error_msg or 'connection' in error_msg)
+            
+            if is_timeout:
+                # Try to get at least base stats if advanced times out
+                try:
+                    base_stats = leaguedashteamstats.LeagueDashTeamStats(season=season)
+                    base_df = base_stats.get_data_frames()[0]
+                    # Cache base stats only
+                    self._league_base_stats_cache[cache_key] = (base_df, None, time.time())
+                    return base_df, None
+                except:
+                    return None, None
+            return None, None
+    
     def get_team_stats_nba(self, team_name: str, season: str = None) -> Optional[Dict]:
         """
-        Get NBA team stats from nba_api with retry logic
+        Get NBA team stats from nba_api using league-wide fetch (more efficient)
         
         Args:
             team_name: Team name
@@ -143,124 +202,108 @@ class StatsIntegration:
         if not self.nba_api_available:
             return None
         
-        # Check cache
+        # Get current season if not specified
+        if not season:
+            current_year = datetime.now().year
+            if datetime.now().month >= 10:  # NBA season starts in October
+                season = f"{current_year}-{str(current_year + 1)[-2:]}"
+            else:
+                season = f"{current_year - 1}-{str(current_year)[-2:]}"
+        
+        # Check cache for individual team
         cache_key = f"{team_name}_{season}"
         if cache_key in self._team_stats_cache:
             cached_data, cached_time = self._team_stats_cache[cache_key]
             if time.time() - cached_time < self._cache_expiry:
                 return cached_data
         
-        # Retry logic for API calls
-        max_retries = 3
-        retry_delay = 2  # seconds
+        # Get team ID
+        team_id = self.get_nba_team_id(team_name)
+        if not team_id:
+            return None
         
-        for attempt in range(max_retries):
-            try:
-                team_id = self.get_nba_team_id(team_name)
-                if not team_id:
-                    return None
-                
-                # Get current season if not specified
-                if not season:
-                    current_year = datetime.now().year
-                    if datetime.now().month >= 10:  # NBA season starts in October
-                        season = f"{current_year}-{str(current_year + 1)[-2:]}"
-                    else:
-                        season = f"{current_year - 1}-{str(current_year)[-2:]}"
-                
-                # Get base stats for PPG and other basic stats
-                base_stats = leaguedashteamstats.LeagueDashTeamStats(season=season)
-                base_df = base_stats.get_data_frames()[0]
-                
-                # Get advanced stats for defensive rating, pace, and offensive rating
-                advanced_df = None
-                try:
-                    advanced_stats = leaguedashteamstats.LeagueDashTeamStats(
-                        season=season,
-                        measure_type_detailed_defense='Advanced'
-                    )
-                    advanced_df = advanced_stats.get_data_frames()[0]
-                except Exception as e:
-                    # Advanced stats not critical, continue without them
-                    if attempt == max_retries - 1:  # Only log on last attempt
-                        print(f"⚠️  Could not fetch advanced stats for {team_name}: {e}")
-                    advanced_df = None
-                
-                if base_df.empty:
-                    return None
-                
-                # Find the team in base stats
-                base_team_row = base_df[base_df['TEAM_ID'] == team_id]
-                if base_team_row.empty:
-                    return None
-                
-                base_team_row = base_team_row.iloc[0]
-                
-                # Find the team in advanced stats if available
-                advanced_team_row = None
-                if advanced_df is not None and not advanced_df.empty:
-                    advanced_team_row = advanced_df[advanced_df['TEAM_ID'] == team_id]
-                    if not advanced_team_row.empty:
-                        advanced_team_row = advanced_team_row.iloc[0]
-                
-                # Calculate PPG from total points and games played
-                games_played = float(base_team_row['GP']) if 'GP' in base_team_row.index else 1.0
-                total_points = float(base_team_row['PTS']) if 'PTS' in base_team_row.index else None
-                ppg = total_points / games_played if total_points and games_played > 0 else None
-                
-                # Extract key stats
-                stats = {
-                    'team_id': team_id,
-                    'team_name': team_name,
-                    'season': season,
-                    'ppg': ppg,
-                    'opp_ppg': None,  # Will calculate from defensive rating
-                    'pace': float(advanced_team_row['PACE']) if advanced_team_row is not None and 'PACE' in advanced_team_row.index else None,
-                    'off_rating': float(advanced_team_row['OFF_RATING']) if advanced_team_row is not None and 'OFF_RATING' in advanced_team_row.index else None,
-                    'def_rating': float(advanced_team_row['DEF_RATING']) if advanced_team_row is not None and 'DEF_RATING' in advanced_team_row.index else None,
-                    'fg_pct': float(base_team_row['FG_PCT']) if 'FG_PCT' in base_team_row.index else None,
-                    'three_pct': float(base_team_row['FG3_PCT']) if 'FG3_PCT' in base_team_row.index else None,
-                    'ft_pct': float(base_team_row['FT_PCT']) if 'FT_PCT' in base_team_row.index else None,
-                    'rebounds': float(base_team_row['REB']) if 'REB' in base_team_row.index else None,
-                    'assists': float(base_team_row['AST']) if 'AST' in base_team_row.index else None,
-                    'turnovers': float(base_team_row['TOV']) if 'TOV' in base_team_row.index else None,
-                    'games_played': int(games_played) if games_played else 0,
-                }
-                
-                # Calculate points allowed per game from defensive rating and pace
-                # Defensive rating = points allowed per 100 possessions
-                # Pace = possessions per game
-                # Points allowed = (DEF_RATING / 100) * PACE
-                if stats.get('def_rating') and stats.get('pace'):
-                    stats['opp_ppg'] = (stats['def_rating'] / 100.0) * stats['pace']
-                
-                # Cache the result
-                self._team_stats_cache[cache_key] = (stats, time.time())
-                
-                return stats
-                
-            except Exception as e:
-                error_msg = str(e).lower()
-                is_timeout = 'timeout' in error_msg or 'timed out' in error_msg
-                
-                if attempt < max_retries - 1:
-                    # Retry with exponential backoff
-                    wait_time = retry_delay * (2 ** attempt)
-                    if is_timeout:
-                        print(f"⚠️  Timeout fetching stats for {team_name} (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s...")
-                    else:
-                        print(f"⚠️  Error fetching stats for {team_name} (attempt {attempt + 1}/{max_retries}): {e}. Retrying in {wait_time}s...")
-                    time.sleep(wait_time)
-                    continue
-                else:
-                    # Last attempt failed
-                    if is_timeout:
-                        print(f"⚠️  Timeout getting NBA team stats for {team_name} after {max_retries} attempts. The NBA API may be slow or unavailable.")
-                    else:
-                        print(f"⚠️  Error getting NBA team stats for {team_name} after {max_retries} attempts: {e}")
-                    return None
+        # Fetch league-wide stats (all teams at once - more efficient)
+        base_df, advanced_df = self._fetch_league_stats_nba(season)
         
-        return None
+        if base_df is None or base_df.empty:
+            return None
+        
+        # Find the team in base stats
+        base_team_row = base_df[base_df['TEAM_ID'] == team_id]
+        if base_team_row.empty:
+            return None
+        
+        base_team_row = base_team_row.iloc[0]
+        
+        # Find the team in advanced stats if available
+        advanced_team_row = None
+        if advanced_df is not None and not advanced_df.empty:
+            advanced_team_row_df = advanced_df[advanced_df['TEAM_ID'] == team_id]
+            if not advanced_team_row_df.empty:
+                advanced_team_row = advanced_team_row_df.iloc[0]
+        
+        # Calculate PPG from total points and games played
+        games_played = float(base_team_row['GP']) if 'GP' in base_team_row.index else 1.0
+        total_points = float(base_team_row['PTS']) if 'PTS' in base_team_row.index else None
+        ppg = total_points / games_played if total_points and games_played > 0 else None
+        
+        # Extract key stats
+        # Get advanced stats with proper error handling
+        pace = None
+        off_rating = None
+        def_rating = None
+        
+        if advanced_team_row is not None:
+            # Try different possible column names for defensive rating
+            if 'DEF_RATING' in advanced_team_row.index:
+                def_rating = float(advanced_team_row['DEF_RATING'])
+            elif 'DEFRTG' in advanced_team_row.index:
+                def_rating = float(advanced_team_row['DEFRTG'])
+            elif 'DEF_RTG' in advanced_team_row.index:
+                def_rating = float(advanced_team_row['DEF_RTG'])
+            
+            if 'OFF_RATING' in advanced_team_row.index:
+                off_rating = float(advanced_team_row['OFF_RATING'])
+            elif 'OFFRTG' in advanced_team_row.index:
+                off_rating = float(advanced_team_row['OFFRTG'])
+            elif 'OFF_RTG' in advanced_team_row.index:
+                off_rating = float(advanced_team_row['OFF_RTG'])
+            
+            if 'PACE' in advanced_team_row.index:
+                pace = float(advanced_team_row['PACE'])
+        
+        stats = {
+            'team_id': team_id,
+            'team_name': team_name,
+            'season': season,
+            'ppg': ppg,
+            'opp_ppg': None,  # Will calculate from defensive rating if available
+            'pace': pace,
+            'off_rating': off_rating,
+            'def_rating': def_rating,  # Defensive rating included
+            'fg_pct': float(base_team_row['FG_PCT']) if 'FG_PCT' in base_team_row.index else None,
+            'three_pct': float(base_team_row['FG3_PCT']) if 'FG3_PCT' in base_team_row.index else None,
+            'ft_pct': float(base_team_row['FT_PCT']) if 'FT_PCT' in base_team_row.index else None,
+            'rebounds': float(base_team_row['REB']) if 'REB' in base_team_row.index else None,
+            'assists': float(base_team_row['AST']) if 'AST' in base_team_row.index else None,
+            'turnovers': float(base_team_row['TOV']) if 'TOV' in base_team_row.index else None,
+            'games_played': int(games_played) if games_played else 0,
+        }
+        
+        # Calculate points allowed per game from defensive rating and pace
+        # Defensive rating = points allowed per 100 possessions
+        # Pace = possessions per game
+        # Points allowed = (DEF_RATING / 100) * PACE
+        if stats.get('def_rating') and stats.get('pace'):
+            stats['opp_ppg'] = (stats['def_rating'] / 100.0) * stats['pace']
+        elif ppg:
+            # Fallback: estimate opp_ppg from league average if advanced stats unavailable
+            stats['opp_ppg'] = ppg * 0.99
+        
+        # Cache the result
+        self._team_stats_cache[cache_key] = (stats, time.time())
+        
+        return stats
     
     def get_player_stats_nba(self, player_name: str, season: str = None) -> Optional[Dict]:
         """
@@ -504,14 +547,28 @@ class StatsIntegration:
         
         # Get team stats
         if sport.lower() == 'nba':
+            # Try to get stats, but don't block if API is slow
             home_stats = self.get_team_stats_nba(home_team)
+            # Add delay between fetching stats for different teams to avoid rate limiting
+            time.sleep(1.5)  # Delay to avoid overwhelming the API
             away_stats = self.get_team_stats_nba(away_team)
         else:
             home_stats = self.scrape_teamrankings(sport, home_team)
             away_stats = self.scrape_teamrankings(sport, away_team)
         
-        if not home_stats or not away_stats:
+        # If we can't get stats for both teams, try to use cached data or continue with partial stats
+        if not home_stats and not away_stats:
             projection['justification'].append("⚠️  Unable to fetch team stats for projection")
+            return projection
+        
+        # If we only have stats for one team, we can still provide a basic projection
+        if not home_stats:
+            projection['justification'].append(f"⚠️  Unable to fetch stats for {home_team}")
+        if not away_stats:
+            projection['justification'].append(f"⚠️  Unable to fetch stats for {away_team}")
+        
+        # If we don't have both, we can't calculate a meaningful projection
+        if not home_stats or not away_stats:
             return projection
         
         projection['home_team_stats'] = home_stats
