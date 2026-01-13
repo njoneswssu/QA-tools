@@ -741,6 +741,15 @@ class SportsbookMonitor:
             
             if not bookmaker_odds:
                 games_no_odds += 1
+                # Debug: Check if game has bookmakers in API response
+                api_bookmakers = game.get('bookmakers', [])
+                if api_bookmakers:
+                    bookmaker_keys = [b.get('key', 'unknown') for b in api_bookmakers]
+                    print(f"⚠️  Skipping {away_team} @ {home_team} ({sport_display}): No odds from configured bookmakers")
+                    print(f"   API has bookmakers: {', '.join(bookmaker_keys)}")
+                    print(f"   Configured bookmakers: {', '.join(self.bookmakers)}")
+                else:
+                    print(f"⚠️  Skipping {away_team} @ {home_team} ({sport_display}): No bookmakers in API response")
                 continue
             
             # Load original lines data (single source of truth)
@@ -871,14 +880,14 @@ class SportsbookMonitor:
             
             # Group current bookmaker odds by spread/total for comparison
             # We need to compare against original lines (grouped) and track current values per bookmaker
-            spread_movements = []  # List of all spread movements
-            total_movements = []   # List of all total movements
-            
-            for bookmaker_key, odds in bookmaker_odds.items():
-                new_spread = odds.get('spread')
-                new_total = odds.get('total')
-                new_favored_team = odds.get('favored_team')
+                spread_movements = []  # List of all spread movements
+                total_movements = []   # List of all total movements
                 
+                for bookmaker_key, odds in bookmaker_odds.items():
+                    new_spread = odds.get('spread')
+                    new_total = odds.get('total')
+                    new_favored_team = odds.get('favored_team')
+                    
                 # Get old values from current_lines tracking
                 old_spread = game_current_lines['spreads'].get(bookmaker_key)
                 old_total = game_current_lines['totals'].get(bookmaker_key)
@@ -910,10 +919,10 @@ class SportsbookMonitor:
                         if bookmaker_entry:
                             old_total = bookmaker_entry.get('original_total')
                 
-                # Check spread movement
-                if new_spread is not None and old_spread is not None:
-                    spread_change = abs(new_spread - old_spread)
-                    if spread_change >= SPREAD_MOVEMENT_THRESHOLD:
+                    # Check spread movement
+                    if new_spread is not None and old_spread is not None:
+                        spread_change = abs(new_spread - old_spread)
+                        if spread_change >= SPREAD_MOVEMENT_THRESHOLD:
                         # Get old favored team from original lines
                         old_favored_team = None
                         for spread_key, spread_data in game_entry.get('spreads', {}).items():
@@ -921,72 +930,72 @@ class SportsbookMonitor:
                                 old_favored_team = spread_data.get('favored_team')
                                 break
                         
-                        # Determine movement direction towards teams
-                        movement_towards = self.determine_spread_movement_direction(
-                            game, old_spread, new_spread, old_favored_team, new_favored_team
-                        )
-                        
-                        movement = {
-                            'timestamp': current_time,
-                            'readable_timestamp': readable_time,
-                            'bookmaker': bookmaker_key,
-                            'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
-                            'old_spread': old_spread,
-                            'new_spread': new_spread,
-                            'movement': new_spread - old_spread,
-                            'absolute_movement': spread_change,
-                            'direction': 'increased' if new_spread > old_spread else 'decreased',
-                            'movement_towards': movement_towards,
-                            'old_favored_team': old_favored_team,
-                            'new_favored_team': new_favored_team
-                        }
-                        
+                            # Determine movement direction towards teams
+                            movement_towards = self.determine_spread_movement_direction(
+                                game, old_spread, new_spread, old_favored_team, new_favored_team
+                            )
+                            
+                            movement = {
+                                'timestamp': current_time,
+                                'readable_timestamp': readable_time,
+                                'bookmaker': bookmaker_key,
+                                'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
+                                'old_spread': old_spread,
+                                'new_spread': new_spread,
+                                'movement': new_spread - old_spread,
+                                'absolute_movement': spread_change,
+                                'direction': 'increased' if new_spread > old_spread else 'decreased',
+                                'movement_towards': movement_towards,
+                                'old_favored_team': old_favored_team,
+                                'new_favored_team': new_favored_team
+                            }
+                            
                         # Document the movement
-                        self.document_movement(game, 'spread', movement, bookmaker_key)
-                        
-                        # Collect for grouping
-                        spread_movements.append(movement)
-                        movement_occurred = True
+                            self.document_movement(game, 'spread', movement, bookmaker_key)
+                            
+                            # Collect for grouping
+                            spread_movements.append(movement)
+                            movement_occurred = True
                         # Update current value in current_lines tracking
                         game_current_lines['spreads'][bookmaker_key] = new_spread
-                    else:
-                        # No significant movement, but still update current value for next comparison
+                        else:
+                            # No significant movement, but still update current value for next comparison
                         if new_spread is not None:
                             game_current_lines['spreads'][bookmaker_key] = new_spread
-                elif new_spread is not None:
-                    # First time seeing this spread value, update it
+                    elif new_spread is not None:
+                        # First time seeing this spread value, update it
                     game_current_lines['spreads'][bookmaker_key] = new_spread
-                
-                # Check total movement
-                if new_total is not None and old_total is not None:
-                    total_change = abs(new_total - old_total)
-                    if total_change >= TOTAL_MOVEMENT_THRESHOLD:
-                        movement = {
-                            'timestamp': current_time,
-                            'readable_timestamp': readable_time,
-                            'bookmaker': bookmaker_key,
-                            'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
-                            'old_total': old_total,
-                            'new_total': new_total,
-                            'movement': new_total - old_total,
-                            'absolute_movement': total_change,
-                            'direction': 'increased' if new_total > old_total else 'decreased'
-                        }
-                        
+                    
+                    # Check total movement
+                    if new_total is not None and old_total is not None:
+                        total_change = abs(new_total - old_total)
+                        if total_change >= TOTAL_MOVEMENT_THRESHOLD:
+                            movement = {
+                                'timestamp': current_time,
+                                'readable_timestamp': readable_time,
+                                'bookmaker': bookmaker_key,
+                                'bookmaker_name': self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key),
+                                'old_total': old_total,
+                                'new_total': new_total,
+                                'movement': new_total - old_total,
+                                'absolute_movement': total_change,
+                                'direction': 'increased' if new_total > old_total else 'decreased'
+                            }
+                            
                         # Document the movement
-                        self.document_movement(game, 'total', movement, bookmaker_key)
-                        
-                        # Collect for grouping
-                        total_movements.append(movement)
-                        movement_occurred = True
+                            self.document_movement(game, 'total', movement, bookmaker_key)
+                            
+                            # Collect for grouping
+                            total_movements.append(movement)
+                            movement_occurred = True
                         # Update current value in current_lines tracking
                         game_current_lines['totals'][bookmaker_key] = new_total
-                    else:
-                        # No significant movement, but still update current value for next comparison
+                        else:
+                            # No significant movement, but still update current value for next comparison
                         if new_total is not None:
                             game_current_lines['totals'][bookmaker_key] = new_total
-                elif new_total is not None:
-                    # First time seeing this total value, update it
+                    elif new_total is not None:
+                        # First time seeing this total value, update it
                     game_current_lines['totals'][bookmaker_key] = new_total
                     
             # Save updated current values to line_movements.json
@@ -1055,7 +1064,7 @@ class SportsbookMonitor:
             if games_already_existing > 0:
                 print(f"  ℹ️  {games_already_existing} game(s) already in history")
             if games_no_odds > 0:
-                print(f"  ⚠️  {games_no_odds} game(s) with no bookmaker odds found")
+                print(f"  ⚠️  {games_no_odds} game(s) with no bookmaker odds found (see warnings above for details)")
             print()
     
     def determine_spread_movement_direction(self, game: Dict, old_spread: float, new_spread: float, 
@@ -1110,9 +1119,42 @@ class SportsbookMonitor:
         today = datetime.now().strftime('%Y-%m-%d')
         
         if os.path.exists(ORIGINAL_LINES_FILE):
+            # Check if file is empty before trying to parse
+            file_size = os.path.getsize(ORIGINAL_LINES_FILE)
+            if file_size == 0:
+                print(f"⚠️  {ORIGINAL_LINES_FILE} is empty. Initializing with default structure...")
+                default_data = {
+                    'games': {},
+                    'player_props': {},
+                    'current_date': today,
+                    'last_updated': None,
+                    'total_games': 0,
+                    'total_props': 0
+                }
+                # Save default structure
+                with open(ORIGINAL_LINES_FILE, 'w') as f:
+                    json.dump(default_data, f, indent=2)
+                return default_data
+            
             try:
                 with open(ORIGINAL_LINES_FILE, 'r') as f:
-                    data = json.load(f)
+                    content = f.read().strip()
+                    if not content:
+                        # File exists but is empty after reading
+                        print(f"⚠️  {ORIGINAL_LINES_FILE} appears empty. Initializing with default structure...")
+                        default_data = {
+                            'games': {},
+                            'player_props': {},
+                            'current_date': today,
+                            'last_updated': None,
+                            'total_games': 0,
+                            'total_props': 0
+                        }
+                        with open(ORIGINAL_LINES_FILE, 'w') as f:
+                            json.dump(default_data, f, indent=2)
+                        return default_data
+                    
+                    data = json.loads(content)
                     
                     # Check if it's a new day - clear old data if so
                     stored_date = data.get('current_date')
@@ -1142,9 +1184,21 @@ class SportsbookMonitor:
                     if 'player_props' not in data:
                         data['player_props'] = {}
                     return data
+            except json.JSONDecodeError as e:
+                print(f"⚠️  Error parsing JSON from {ORIGINAL_LINES_FILE}: {e}")
+                print(f"   File may be corrupted. Creating backup and initializing new file...")
+                # Create backup of corrupted file
+                backup_path = f"{ORIGINAL_LINES_FILE}.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                try:
+                    import shutil
+                    shutil.copy2(ORIGINAL_LINES_FILE, backup_path)
+                    print(f"   Backup created: {backup_path}")
+                except Exception as backup_error:
+                    print(f"   Could not create backup: {backup_error}")
             except Exception as e:
-                print(f"Error loading original lines: {e}")
+                print(f"⚠️  Error loading original lines from {ORIGINAL_LINES_FILE}: {e}")
         
+        # Return default structure if file doesn't exist or error occurred
         return {
             'games': {},  # For betting monitor games
             'player_props': {},  # For NBA player props
@@ -1226,7 +1280,7 @@ class SportsbookMonitor:
                             'favored_team': odds.get('favored_team'),
                             'bookmakers': []
                         }
-                    bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
+                bookmaker_name = self.BOOKMAKER_NAMES.get(bookmaker_key, bookmaker_key)
                     spreads_dict[spread_key]['bookmakers'].append({
                         'bookmaker': bookmaker_key,
                         'bookmaker_name': bookmaker_name
@@ -1542,26 +1596,26 @@ class SportsbookMonitor:
                 })
         else:
             # Create new movement entry with bookmakers list
-            movement_entry = {
-                'game_id': game_id,
+        movement_entry = {
+            'game_id': game_id,
                 'sport': sport,
                 'sport_display': sport_display,
-                'home_team': home_team,
-                'away_team': away_team,
-                'game_time': commence_time,
-                'type': movement_type,
+            'home_team': home_team,
+            'away_team': away_team,
+            'game_time': commence_time,
+            'type': movement_type,
                 'bookmakers': [{
-                    'bookmaker': bookmaker_key,
+            'bookmaker': bookmaker_key,
                     'bookmaker_name': bookmaker_name
                 }],
-                'detected_at': movement['timestamp'],
-                'detected_at_readable': movement['readable_timestamp'],
+            'detected_at': movement['timestamp'],
+            'detected_at_readable': movement['readable_timestamp'],
                 'previous_value': previous_value,
                 'new_value': new_value,
                 'change': movement_amount,
-                'absolute_change': movement['absolute_movement'],
-                'direction': movement['direction']
-            }
+            'absolute_change': movement['absolute_movement'],
+            'direction': movement['direction']
+        }
         
         # Add spread-specific movement direction if available
         if movement_type == 'spread' and 'movement_towards' in movement:
@@ -1582,7 +1636,9 @@ class SportsbookMonitor:
         self.save_line_movements(movements_data)
         
         # Get the movement entry (either existing or newly created)
-        movement_entry = existing_movement if existing_movement else game_movements[-1]
+        # If existing_movement was found, use it; otherwise movement_entry was already created in the else block
+        if existing_movement:
+            movement_entry = existing_movement
         
         # Format bookmakers for display
         bookmaker_list = movement_entry.get('bookmakers', [])
@@ -1916,11 +1972,11 @@ def main():
     TOTAL_MOVEMENT_THRESHOLD = args.movement_threshold
     
     # Start Sportsbook monitoring
-    sb_monitor = SportsbookMonitor(
-        api_key=args.odds_api_key, 
-        bookmakers=args.bookmakers,
-        discord_webhook=args.discord_webhook
-    )
+        sb_monitor = SportsbookMonitor(
+            api_key=args.odds_api_key, 
+            bookmakers=args.bookmakers,
+            discord_webhook=args.discord_webhook
+        )
     
     # Handle --send-json flag
     if args.send_json:

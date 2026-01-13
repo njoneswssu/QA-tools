@@ -36,7 +36,7 @@ try:
     from nba_api.stats.endpoints import (
         teamgamelog, playergamelog, teamdashboardbygeneralsplits,
         playerdashboardbygeneralsplits, leaguedashteamstats, leaguedashplayerstats,
-        commonplayerinfo
+        commonplayerinfo, boxscoretraditionalv2
     )
     from nba_api.stats.static import teams, players
     from nba_api.live.nba.endpoints import scoreboard
@@ -258,8 +258,6 @@ class StatsIntegration:
                         print(f"⚠️  Timeout getting NBA team stats for {team_name} after {max_retries} attempts. The NBA API may be slow or unavailable.")
                     else:
                         print(f"⚠️  Error getting NBA team stats for {team_name} after {max_retries} attempts: {e}")
-                    import traceback
-                    traceback.print_exc()
                     return None
         
         return None
@@ -373,8 +371,6 @@ class StatsIntegration:
                         print(f"⚠️  Timeout getting NBA player stats for {player_name} after {max_retries} attempts. The NBA API may be slow or unavailable.")
                     else:
                         print(f"⚠️  Error getting NBA player stats for {player_name} after {max_retries} attempts: {e}")
-                    import traceback
-                    traceback.print_exc()
                     return None
         
         return None
@@ -600,8 +596,99 @@ class StatsIntegration:
                         def_adjustment *= 0.99
                         def_analysis.append(f"{away_team} strong defense (DRtg: {away_def_rating:.1f}) limiting {home_team} offense (ORtg: {home_off_rating:.1f})")
             
-            # Apply adjustments
-            projected_total = projected_total * pace_adjustment * def_adjustment
+            # Factor in injuries for NBA games
+            injury_adjustment = 0.0
+            injury_notes = []
+            
+            if sport.lower() == 'nba':
+                # Get injuries for both teams
+                home_injuries = self.get_team_injuries_nba(home_team)
+                away_injuries = self.get_team_injuries_nba(away_team)
+                
+                # Get starting lineups to check if starters are injured
+                home_starters = self.get_starting_lineup_nba(home_team)
+                away_starters = self.get_starting_lineup_nba(away_team)
+                
+                # Create sets of starter names for quick lookup
+                home_starter_names = {s['player_name'].lower() for s in home_starters}
+                away_starter_names = {s['player_name'].lower() for s in away_starters}
+                
+                # Check home team injuries
+                home_injured_starters = []
+                for injury in home_injuries:
+                    player_name = injury['player_name']
+                    status = injury['status']
+                    injury_desc = injury.get('injury', '')
+                    
+                    # Only count Out or Doubtful starters as significant
+                    if status in ['Out', 'Doubtful']:
+                        # Check if this player is a starter
+                        is_starter = any(player_name.lower() in starter_name or starter_name in player_name.lower() 
+                                       for starter_name in home_starter_names)
+                        
+                        if is_starter:
+                            home_injured_starters.append({
+                                'player': player_name,
+                                'status': status,
+                                'injury': injury_desc,
+                                'ppg': next((s['ppg'] for s in home_starters if player_name.lower() in s['player_name'].lower() or s['player_name'].lower() in player_name.lower()), 0)
+                            })
+                
+                # Check away team injuries
+                away_injured_starters = []
+                for injury in away_injuries:
+                    player_name = injury['player_name']
+                    status = injury['status']
+                    injury_desc = injury.get('injury', '')
+                    
+                    # Only count Out or Doubtful starters as significant
+                    if status in ['Out', 'Doubtful']:
+                        # Check if this player is a starter
+                        is_starter = any(player_name.lower() in starter_name or starter_name in player_name.lower() 
+                                       for starter_name in away_starter_names)
+                        
+                        if is_starter:
+                            away_injured_starters.append({
+                                'player': player_name,
+                                'status': status,
+                                'injury': injury_desc,
+                                'ppg': next((s['ppg'] for s in away_starters if player_name.lower() in s['player_name'].lower() or s['player_name'].lower() in player_name.lower()), 0)
+                            })
+                
+                # Calculate injury adjustment
+                # Each injured starter reduces total by 2-4 points based on their PPG
+                for injured in home_injured_starters:
+                    # More impactful players (higher PPG) have bigger impact
+                    ppg = injured['ppg']
+                    if ppg >= 20:
+                        adjustment = -4.0  # Star player out
+                    elif ppg >= 15:
+                        adjustment = -3.0  # Key starter out
+                    elif ppg >= 10:
+                        adjustment = -2.0  # Regular starter out
+                    else:
+                        adjustment = -1.5  # Bench/role player
+                    
+                    injury_adjustment += adjustment
+                    injury_notes.append(f"{home_team}: {injured['player']} {injured['status']} ({injured['injury']}) - {abs(adjustment):.1f} pts")
+                
+                for injured in away_injured_starters:
+                    # More impactful players (higher PPG) have bigger impact
+                    ppg = injured['ppg']
+                    if ppg >= 20:
+                        adjustment = -4.0  # Star player out
+                    elif ppg >= 15:
+                        adjustment = -3.0  # Key starter out
+                    elif ppg >= 10:
+                        adjustment = -2.0  # Regular starter out
+                    else:
+                        adjustment = -1.5  # Bench/role player
+                    
+                    injury_adjustment += adjustment
+                    injury_notes.append(f"{away_team}: {injured['player']} {injured['status']} ({injured['injury']}) - {abs(adjustment):.1f} pts")
+            
+            # Apply all adjustments
+            projected_total = projected_total * pace_adjustment * def_adjustment + injury_adjustment
             projection['projected_total'] = round(projected_total, 1)
             
             # Build justification with defensive metrics
@@ -623,6 +710,14 @@ class StatsIntegration:
             for analysis in def_analysis:
                 projection['justification'].append(analysis)
             
+            # Add injury information
+            if injury_notes:
+                projection['justification'].append("⚠️ Injuries affecting projection:")
+                for note in injury_notes:
+                    projection['justification'].append(f"  • {note}")
+                if injury_adjustment < 0:
+                    projection['justification'].append(f"  Total adjusted by {injury_adjustment:.1f} points due to injuries")
+            
             # Confidence assessment
             if home_stats.get('games_played', 0) > 20 and away_stats.get('games_played', 0) > 20:
                 projection['confidence'] = 'high'
@@ -632,6 +727,200 @@ class StatsIntegration:
                 projection['confidence'] = 'low'
         
         return projection
+    
+    def get_team_injuries_nba(self, team_name: str) -> List[Dict]:
+        """
+        Get injury reports for an NBA team by scraping ESPN
+        
+        Args:
+            team_name: Team name (e.g., "Lakers", "Los Angeles Lakers")
+            
+        Returns:
+            List of dictionaries with injury information:
+            [{'player_name': str, 'status': str, 'injury': str, 'position': str}]
+            Status can be: 'Out', 'Doubtful', 'Questionable', 'Probable', 'Available'
+        """
+        if not self.scraping_available:
+            return []
+        
+        injuries = []
+        
+        try:
+            # Map team names to ESPN team abbreviations/IDs
+            team_abbrev_map = {
+                'atlanta hawks': 'atl', 'boston celtics': 'bos', 'brooklyn nets': 'bkn',
+                'charlotte hornets': 'cha', 'chicago bulls': 'chi', 'cleveland cavaliers': 'cle',
+                'dallas mavericks': 'dal', 'denver nuggets': 'den', 'detroit pistons': 'det',
+                'golden state warriors': 'gs', 'houston rockets': 'hou', 'indiana pacers': 'ind',
+                'los angeles clippers': 'lac', 'los angeles lakers': 'lal', 'memphis grizzlies': 'mem',
+                'miami heat': 'mia', 'milwaukee bucks': 'mil', 'minnesota timberwolves': 'min',
+                'new orleans pelicans': 'no', 'new york knicks': 'ny', 'oklahoma city thunder': 'okc',
+                'orlando magic': 'orl', 'philadelphia 76ers': 'phi', 'phoenix suns': 'phx',
+                'portland trail blazers': 'por', 'sacramento kings': 'sac', 'san antonio spurs': 'sa',
+                'toronto raptors': 'tor', 'utah jazz': 'utah', 'washington wizards': 'wsh'
+            }
+            
+            team_name_lower = team_name.lower()
+            team_abbrev = None
+            
+            # Find team abbreviation
+            for key, abbrev in team_abbrev_map.items():
+                if key in team_name_lower or team_name_lower in key:
+                    team_abbrev = abbrev
+                    break
+            
+            if not team_abbrev:
+                return []
+            
+            # ESPN injury report URL
+            url = f"https://www.espn.com/nba/team/injuries/_/name/{team_abbrev}"
+            
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            # Find injury table
+            injury_table = soup.find('table', class_=re.compile(r'injury|player', re.I))
+            if not injury_table:
+                # Try alternative selectors
+                injury_table = soup.find('div', class_=re.compile(r'injury', re.I))
+            
+            if injury_table:
+                rows = injury_table.find_all('tr')[1:] if injury_table.name == 'table' else injury_table.find_all('div', class_=re.compile(r'row|player', re.I))
+                
+                for row in rows:
+                    try:
+                        cells = row.find_all(['td', 'div'])
+                        if len(cells) >= 3:
+                            player_name = cells[0].get_text(strip=True)
+                            status = cells[1].get_text(strip=True)
+                            injury = cells[2].get_text(strip=True) if len(cells) > 2 else ''
+                            
+                            # Normalize status
+                            status_lower = status.lower()
+                            if 'out' in status_lower:
+                                normalized_status = 'Out'
+                            elif 'doubtful' in status_lower:
+                                normalized_status = 'Doubtful'
+                            elif 'questionable' in status_lower:
+                                normalized_status = 'Questionable'
+                            elif 'probable' in status_lower:
+                                normalized_status = 'Probable'
+                            else:
+                                normalized_status = 'Available'
+                            
+                            injuries.append({
+                                'player_name': player_name,
+                                'status': normalized_status,
+                                'injury': injury,
+                                'position': ''  # ESPN doesn't always show position in injury table
+                            })
+                    except Exception as e:
+                        continue
+        except Exception as e:
+            # Silently fail - injuries are optional
+            pass
+        
+        return injuries
+    
+    def get_starting_lineup_nba(self, team_name: str, game_date: str = None) -> List[Dict]:
+        """
+        Get typical starting lineup for an NBA team
+        Uses recent game data to determine most common starters
+        
+        Args:
+            team_name: Team name
+            game_date: Game date (YYYY-MM-DD format), defaults to today
+            
+        Returns:
+            List of dictionaries with player info:
+            [{'player_name': str, 'position': str, 'ppg': float}]
+        """
+        if not self.nba_api_available:
+            return []
+        
+        starters = []
+        
+        try:
+            team_id = self.get_nba_team_id(team_name)
+            if not team_id:
+                return []
+            
+            # Get current season
+            current_year = datetime.now().year
+            if datetime.now().month >= 10:
+                season = f"{current_year}-{str(current_year + 1)[-2:]}"
+            else:
+                season = f"{current_year - 1}-{str(current_year)[-2:]}"
+            
+            # Get team game log to find recent games
+            team_games = teamgamelog.TeamGameLog(team_id=team_id, season=season)
+            games_df = team_games.get_data_frames()[0]
+            
+            if games_df.empty:
+                return []
+            
+            # Get last 10 games to determine typical starters
+            recent_games = games_df.head(10)
+            game_ids = recent_games['Game_ID'].tolist()
+            
+            # Get player stats for recent games to find most common starters
+            # We'll use a simplified approach: get top 5 players by minutes in recent games
+            player_minutes = {}
+            
+            for game_id in game_ids[:5]:  # Check last 5 games
+                try:
+                    boxscore = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
+                    player_stats = boxscore.get_data_frames()[0]
+                    
+                    # Filter for this team
+                    team_players = player_stats[player_stats['TEAM_ID'] == team_id]
+                    
+                    # Get top 5 by minutes played
+                    top_players = team_players.nlargest(5, 'MIN')
+                    
+                    for _, player in top_players.iterrows():
+                        player_id = player['PLAYER_ID']
+                        player_name = player['PLAYER_NAME']
+                        minutes = player['MIN']
+                        
+                        if player_id not in player_minutes:
+                            player_minutes[player_id] = {
+                                'name': player_name,
+                                'total_minutes': 0,
+                                'games': 0,
+                                'ppg': 0,
+                                'total_points': 0
+                            }
+                        
+                        player_minutes[player_id]['total_minutes'] += minutes
+                        player_minutes[player_id]['games'] += 1
+                        player_minutes[player_id]['total_points'] += player.get('PTS', 0)
+                except Exception:
+                    continue
+            
+            # Get top 5 players by average minutes (typical starters)
+            sorted_players = sorted(player_minutes.items(), 
+                                  key=lambda x: x[1]['total_minutes'] / max(x[1]['games'], 1), 
+                                  reverse=True)[:5]
+            
+            for player_id, player_data in sorted_players:
+                avg_ppg = player_data['total_points'] / max(player_data['games'], 1)
+                starters.append({
+                    'player_name': player_data['name'],
+                    'position': '',  # Would need additional API call to get position
+                    'ppg': avg_ppg
+                })
+        except Exception as e:
+            # Silently fail - starting lineup is optional
+            pass
+        
+        return starters
     
     def get_player_team(self, player_name: str) -> Optional[str]:
         """
