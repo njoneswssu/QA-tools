@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Color Clearer</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Excel Color Clearer</h1>
+            <p class="subtitle">Clear cells by background color</p>
+        </div>
+
+        <div class="input-section">
+            <label for="hexInput">Enter Hex Color Code:</label>
+            <div class="hex-input-group">
+                <input 
+                    type="text" 
+                    id="hexInput" 
+                    placeholder="#FF0000 or FF0000"
+                    maxlength="7"
+                    autocomplete="off"
+                >
+                <div id="colorPreview" class="color-preview"></div>
+            </div>
+            <p class="hint">Example: #FF0000, #00FF00, or FFAA00</p>
+        </div>
+
+        <div class="options-section">
+            <label class="checkbox-label">
+                <input type="checkbox" id="allSheets" checked>
+                <span>Process all sheets in workbook</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="confirmBefore">
+                <span>Confirm before clearing</span>
+            </label>
+        </div>
+
+        <button id="clearButton" class="clear-button">
+            Clear Cells
+        </button>
+
+        <div id="status" class="status"></div>
+        <div id="results" class="results"></div>
+
+        <div class="tips">
+            <details>
+                <summary>💡 Not working? Click here for tips</summary>
+                <ul>
+                    <li><strong>Refresh page</strong> (Ctrl+R) and wait 15-20 seconds</li>
+                    <li>Make sure you can <strong>edit cells</strong> (not view-only)</li>
+                    <li><strong>Close and reopen extension</strong> after waiting</li>
+                    <li>Check browser console (F12) for "Excel API is ready" message</li>
+                </ul>
+            </details>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
+

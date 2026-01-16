@@ -1,16 +1,42 @@
 {
-  "game_movements": [],
+  "game_movements": [
+    {
+      "game_id": "e7bdcaa4eb0827e34ee88b6f7f4cfbf7",
+      "sport": "basketball_nba",
+      "sport_display": "NBA",
+      "home_team": "Milwaukee Bucks",
+      "away_team": "Minnesota Timberwolves",
+      "game_time": "2026-01-14T01:10:00Z",
+      "type": "spread",
+      "bookmakers": [
+        {
+          "bookmaker": "draftkings",
+          "bookmaker_name": "DraftKings"
+        }
+      ],
+      "detected_at": "2026-01-13T19:18:26.781000",
+      "detected_at_readable": "2026-01-13 19:18:26",
+      "previous_value": -3.5,
+      "new_value": -1.5,
+      "change": 2.0,
+      "absolute_change": 2.0,
+      "direction": "increased",
+      "movement_towards": "towards Minnesota Timberwolves (away team improving, home team getting fewer points)",
+      "old_favored_team": "Milwaukee Bucks",
+      "new_favored_team": "Milwaukee Bucks"
+    }
+  ],
   "player_prop_movements": [],
   "current_lines": {
     "61fc2e0519808b7939ffa4b246abdc06": {
       "spreads": {
         "draftkings": -1.5,
-        "fanduel": -1.0,
+        "fanduel": -1.5,
         "betmgm": -1.5
       },
       "totals": {
-        "draftkings": 230.5,
-        "fanduel": 230.5,
+        "draftkings": 233.5,
+        "fanduel": 232.5,
         "betmgm": 230.5
       }
     },
@@ -21,21 +47,21 @@
         "betmgm": -12.5
       },
       "totals": {
-        "draftkings": 225.5,
-        "fanduel": 225.5,
-        "betmgm": 225.5
+        "draftkings": 224.5,
+        "fanduel": 224.5,
+        "betmgm": 224.5
       }
     },
     "a13039a9d53bb199d840fbfcf12288e3": {
       "spreads": {
-        "draftkings": 1.5,
-        "fanduel": 1.5,
-        "betmgm": 1.5
+        "draftkings": 2.5,
+        "fanduel": 2.5,
+        "betmgm": 2.5
       },
       "totals": {
-        "draftkings": 232.5,
-        "fanduel": 233.5,
-        "betmgm": 233.5
+        "draftkings": 235.5,
+        "fanduel": 235.5,
+        "betmgm": 235.5
       }
     },
     "e7bdcaa4eb0827e34ee88b6f7f4cfbf7": {
@@ -88,6 +114,6 @@
     }
   },
   "current_date": "2026-01-13",
-  "last_updated": "2026-01-13T17:01:03.196913",
-  "total_movements": 0
+  "last_updated": "2026-01-13T19:18:29.106274",
+  "total_movements": 1
 }

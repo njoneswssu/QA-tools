@@ -1,0 +1,26 @@
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary files
+temp/
+tmp/
+
+# Backup files
+*.bak
+*.backup
+
+# PNG icons (if using SVG)
+# Uncomment if you want to ignore PNG versions
+# icons/*.png
+

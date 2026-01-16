@@ -272,15 +272,38 @@ class DiscordNotifier:
                             'inline': False
                         })
                         
-                        # Add justifications
+                        # Add justifications (prioritize showing injury info)
                         justifications = projection.get('justification', [])
                         if justifications:
-                            justification_text = '\n'.join(justifications[:5])  # First 5 justifications
-                            fields.append({
-                                'name': 'Justification',
-                                'value': justification_text,
-                                'inline': False
-                            })
+                            # Separate injury notes from other justifications
+                            injury_justifications = [j for j in justifications if '⚠️ Injuries' in j or '•' in j and ('Out' in j or 'Doubtful' in j or 'adjusted by' in j.lower())]
+                            other_justifications = [j for j in justifications if j not in injury_justifications]
+                            
+                            # Show injury information first if available
+                            if injury_justifications:
+                                injury_text = '\n'.join(injury_justifications)
+                                fields.append({
+                                    'name': '⚠️ Injuries Affecting Projection',
+                                    'value': injury_text,
+                                    'inline': False
+                                })
+                            
+                            # Show other justifications
+                            if other_justifications:
+                                justification_text = '\n'.join(other_justifications[:5])  # First 5 other justifications
+                                fields.append({
+                                    'name': '📊 Projection Details',
+                                    'value': justification_text,
+                                    'inline': False
+                                })
+                            elif not injury_justifications:
+                                # Fallback: show first 5 if no injuries
+                                justification_text = '\n'.join(justifications[:5])
+                                fields.append({
+                                    'name': 'Justification',
+                                    'value': justification_text,
+                                    'inline': False
+                                })
                 
                 # Color: blue for data updates
                 color = 0x3498db
@@ -503,15 +526,38 @@ class DiscordNotifier:
                         'value': f"{proj_total:.1f} ({proj.get('confidence', 'medium')} confidence)",
                         'inline': False
                     })
-                    # Add justifications
+                    # Add justifications (prioritize showing injury info)
                     justifications = proj.get('justification', [])
                     if justifications:
-                        justification_text = '\n'.join(justifications[:3])  # First 3 justifications
-                        fields.append({
-                            'name': 'Justification',
-                            'value': justification_text,
-                            'inline': False
-                        })
+                        # Separate injury notes from other justifications
+                        injury_justifications = [j for j in justifications if '⚠️ Injuries' in j or '•' in j and ('Out' in j or 'Doubtful' in j or 'adjusted by' in j.lower())]
+                        other_justifications = [j for j in justifications if j not in injury_justifications]
+                        
+                        # Show injury information first if available
+                        if injury_justifications:
+                            injury_text = '\n'.join(injury_justifications)
+                            fields.append({
+                                'name': '⚠️ Injuries Affecting Projection',
+                                'value': injury_text,
+                                'inline': False
+                            })
+                        
+                        # Show other justifications (limit to avoid Discord field length limits)
+                        if other_justifications:
+                            justification_text = '\n'.join(other_justifications[:5])  # First 5 other justifications
+                            fields.append({
+                                'name': '📊 Projection Details',
+                                'value': justification_text,
+                                'inline': False
+                            })
+                        elif not injury_justifications:
+                            # Fallback: show first 3 if no injuries
+                            justification_text = '\n'.join(justifications[:3])
+                            fields.append({
+                                'name': 'Justification',
+                                'value': justification_text,
+                                'inline': False
+                            })
         
         # Color based on movement size
         absolute_change = first_movement.get('absolute_movement', 0)
@@ -1588,6 +1634,8 @@ class SportsbookMonitor:
                     'bookmaker': bookmaker_key,
                     'bookmaker_name': bookmaker_name
                 })
+            # Use existing movement as movement_entry
+            movement_entry = existing_movement
         else:
             # Create new movement entry with bookmakers list
             movement_entry = {
@@ -1617,7 +1665,8 @@ class SportsbookMonitor:
             movement_entry['old_favored_team'] = movement.get('old_favored_team')
             movement_entry['new_favored_team'] = movement.get('new_favored_team')
         
-        # Add to movements list
+        # Add to movements list (only if it's a new entry)
+        if not existing_movement:
             game_movements.append(movement_entry)
         
         movements_data['game_movements'] = game_movements
@@ -1628,11 +1677,6 @@ class SportsbookMonitor:
         
         # Save to consolidated file
         self.save_line_movements(movements_data)
-        
-        # Get the movement entry (either existing or newly created)
-        # If existing_movement was found, use it; otherwise movement_entry was already created in the else block
-        if existing_movement:
-            movement_entry = existing_movement
         
         # Format bookmakers for display
         bookmaker_list = movement_entry.get('bookmakers', [])
