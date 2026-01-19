@@ -1876,7 +1876,10 @@ async function testMerchant(merchant) {
 
 // Save merchant result to database
 async function saveMerchantResult(merchant, result) {
-    if (!testSession) return;
+    if (!testSession) {
+        console.warn('⚠️ [saveMerchantResult] No test session - result not saved');
+        return;
+    }
     
     try {
         const testData = {
@@ -1897,13 +1900,22 @@ async function saveMerchantResult(merchant, result) {
             detailed_analysis: result.reason
         };
         
-        await fetch('/api/merchant-results', {
+        const response = await fetch('/api/merchant-results', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(testData)
         });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(`HTTP ${response.status}: ${errorData.error || 'Failed to save result'}`);
+        }
+        
+        const savedData = await response.json();
+        console.log(`✅ [saveMerchantResult] Saved result for ${merchant.MerchantName} (ID: ${savedData.id || 'unknown'})`);
     } catch (error) {
-        console.error('Failed to save result:', error);
+        console.error(`❌ [saveMerchantResult] Failed to save result for ${merchant.MerchantName}:`, error);
+        // Don't throw - allow test to continue even if save fails
     }
 }
 
@@ -4224,7 +4236,7 @@ async function loadTesterStats(range = '1m', customFrom = null, customTo = null)
         // Fetch all merchant results for these sessions
         const allResults = [];
         for (const session of filteredSessions) {
-            const resultsResponse = await fetch(`/api/merchant-results?sessionId=${session.session_id}&limit=10000`);
+            const resultsResponse = await fetch(`/api/merchant-results?session_id=${session.session_id}&limit=10000`);
             if (resultsResponse.ok) {
                 const data = await resultsResponse.json();
                 const results = data.data || data;
