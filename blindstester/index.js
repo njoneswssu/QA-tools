@@ -891,6 +891,7 @@ class BlindsConfiguratorTester {
     this.completedProducts = new Set(); // Track completed products
     this.completedTests = new Map(); // Track completed tests by product-width
     this.progressFile = null; // Will be set when tests start
+    this.resultsFilename = null; // Track the results filename for resume
   }
 
   setProgressFile(configName) {
@@ -899,7 +900,7 @@ class BlindsConfiguratorTester {
 
   loadProgress() {
     if (!this.progressFile || !fs.existsSync(this.progressFile)) {
-      return { completedProducts: [], completedTests: {} };
+      return { completedProducts: [], completedTests: {}, resultsFilename: null };
     }
     
     try {
@@ -914,10 +915,15 @@ class BlindsConfiguratorTester {
         console.log(chalk.gray(`  ✓ ${testCount} test(s) already completed`));
       }
       
+      // Store the results filename if resuming
+      if (progress.resultsFilename) {
+        console.log(chalk.gray(`  📄 Will append to: ${path.basename(progress.resultsFilename)}`));
+      }
+      
       return progress;
     } catch (error) {
       console.log(chalk.yellow(`⚠️  Could not load progress: ${error.message}`));
-      return { completedProducts: [], completedTests: {} };
+      return { completedProducts: [], completedTests: {}, resultsFilename: null };
     }
   }
 
@@ -932,7 +938,8 @@ class BlindsConfiguratorTester {
     const progress = {
       completedProducts: Array.from(this.completedProducts),
       completedTests: completedTestsObj,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
+      resultsFilename: this.resultsFilename // Track the results filename
     };
     
     try {
@@ -1395,6 +1402,11 @@ class BlindsConfiguratorTester {
         }
       }
       
+      // Load the saved results filename to append to it
+      if (progress.resultsFilename) {
+        this.resultsFilename = progress.resultsFilename;
+      }
+      
       console.log(chalk.green(`\n✓ Loaded progress: ${this.completedProducts.size} products fully completed`));
       
       const totalTests = Object.values(progress.completedTests || {}).reduce((sum, arr) => sum + arr.length, 0);
@@ -1528,7 +1540,7 @@ class BlindsConfiguratorTester {
         
         // Mark test as completed and save progress IMMEDIATELY after adding to results
         // This ensures progress is tracked even if shutdown happens before the status check
-        const testKey = `${width}`;
+        // (testKey already declared above at line 1497)
         if (!this.completedTests.has(product.product)) {
           this.completedTests.set(product.product, new Set());
         }
@@ -1704,7 +1716,9 @@ async function main() {
   try {
     // Check for existing progress BEFORE opening browser
     const configName = config ? config.name : 'configuration';
+    console.log(chalk.gray(`\n  🔍 Checking for progress file for: ${configName}`));
     tester.setProgressFile(configName);
+    console.log(chalk.gray(`  📁 Progress file path: ${tester.progressFile}`));
     const progress = tester.loadProgress();
     
     let resumeFromProgress = false;
@@ -1728,11 +1742,28 @@ async function main() {
         const totalTests = Object.values(progress.completedTests).reduce((sum, arr) => sum + arr.length, 0);
         console.log(chalk.white(`   ${totalTests} individual test(s) completed`));
         if (!hasCompletedProducts) {
-          // Show which products have partial progress
+          // Show which products have partial progress with specific widths
           console.log(chalk.gray('   Partial progress for:'));
           Object.keys(progress.completedTests).forEach((product, index) => {
-            const testCount = progress.completedTests[product].length;
-            console.log(chalk.gray(`     ${index + 1}. ${product} (${testCount} test${testCount === 1 ? '' : 's'})`));
+            const tests = progress.completedTests[product];
+            const testCount = tests.length;
+            
+            // Separate width tests from special tests
+            const widthTests = tests.filter(t => !isNaN(parseInt(t))).sort((a, b) => parseInt(a) - parseInt(b));
+            const specialTests = tests.filter(t => isNaN(parseInt(t)));
+            
+            let testDetails = [];
+            if (specialTests.includes('144-height-test')) {
+              testDetails.push('144" height test');
+            }
+            if (widthTests.length > 0) {
+              testDetails.push(`widths: ${widthTests.map(w => w + '"').join(', ')}`);
+            }
+            if (specialTests.includes('max-width')) {
+              testDetails.push('max width test');
+            }
+            
+            console.log(chalk.gray(`     ${index + 1}. ${product} (${testDetails.join(', ')})`));
           });
         }
       }
@@ -1763,6 +1794,15 @@ async function main() {
     
     // NOW initialize the browser (only if we're continuing)
     await tester.initialize();
+    
+    // If resuming, use the saved results filename from progress
+    if (resumeFromProgress && tester.resultsFilename) {
+      options.output = tester.resultsFilename;
+      console.log(chalk.gray(`  📄 Will append results to: ${path.basename(options.output)}\n`));
+    } else {
+      // Starting fresh or no saved filename - use the generated one
+      tester.resultsFilename = options.output;
+    }
     
     await tester.runTests(productsToTest, resumeFromProgress);
     tester.printSummary();

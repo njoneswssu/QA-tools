@@ -2,7 +2,7 @@
 BLINDS MAX HEIGHT TEST RESULTS - Compact Grid
 ════════════════════════════════════════════════════════════════════════════════════════════════════
 
-3% Catalina:
-  Widths:     112"
-  Max Height: 132"
-  Status:     ✅PASS
+1% Catalina:
+  Widths:     88"  |  94"
+  Max Height: 96"  |  78"
+  Status:     ✅PASS | ✅PASS
