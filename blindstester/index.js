@@ -10,54 +10,69 @@ import readline from 'readline';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Available test configurations
-const TEST_CONFIGS = {
-  'cordless': {
-    name: 'Cordless',
-    gridImage: 'configs/grids/cordless-grid.png',
-    configFile: 'configs/cordless-config.js'
-  },
-  'cordloop': {
-    name: 'Cordloop',
-    gridImage: 'configs/grids/cordloop-grid.png',
-    configFile: 'configs/cordloop-config.js'
-  },
-  'medium-cassette': {
-    name: 'Medium Cassette Valance',
-    gridImage: 'configs/grids/medium-cassette-grid.png',
-    configFile: 'configs/medium-cassette-config.js'
-  },
-  'large-cassette': {
-    name: 'Large Cassette Valance',
-    gridImage: 'configs/grids/large-cassette-grid.png',
-    configFile: 'configs/large-cassette-config.js'
-  },
-  'motorization': {
-    name: 'Motorization',
-    gridImage: 'configs/grids/motorization-grid.png',
-    configFile: 'configs/motorization-config.js'
-  },
-  'cordless-2on1': {
-    name: 'Cordless 2 on 1',
-    gridImage: 'configs/grids/cordless-2on1-grid.png',
-    configFile: 'configs/cordless-2on1-config.js'
-  },
-  'cordloop-2on1': {
-    name: 'Cordloop 2 on 1',
-    gridImage: 'configs/grids/cordloop-2on1-grid.png',
-    configFile: 'configs/cordloop-2on1-config.js'
-  },
-  'large-cassette-2on1': {
-    name: 'Large Cassette Valance 2 on 1',
-    gridImage: 'configs/grids/large-cassette-2on1-grid.png',
-    configFile: 'configs/large-cassette-2on1-config.js'
-  },
-  'motorization-2on1': {
-    name: 'Motorization 2 on 1',
-    gridImage: 'configs/grids/motorization-2on1-grid.png',
-    configFile: 'configs/motorization-2on1-config.js'
-  }
+// Configuration storage file
+const CONFIG_STORAGE_FILE = path.join(__dirname, 'configs', 'saved-configs.json');
+
+// Available lift types
+const LIFT_TYPES = {
+  'cordless': 'Cordless',
+  'cordloop': 'Cordloop',
+  'medium-cassette': 'Medium Cassette Valance',
+  'large-cassette': 'Large Cassette Valance',
+  'motorization': 'Motorization',
+  'cordless-2on1': 'Cordless 2 on 1',
+  'cordloop-2on1': 'Cordloop 2 on 1',
+  'large-cassette-2on1': 'Large Cassette Valance 2 on 1',
+  'motorization-2on1': 'Motorization 2 on 1'
 };
+
+// Available models
+const MODELS = [
+  'Roller',
+  'Solar',
+  'Roman',
+  'Banded',
+  'Faux Wood',
+  'Real Wood',
+  'Verticals',
+  'Perceptions',
+  'Cellular',
+  'Cellular 9/16"',
+  'Cellular 9/16" Day/Night',
+  'Cellular Day/Night',
+  'Classic Value Faux Wood',
+  'Naturals',
+  'Sheer',
+  'Vertical Cellular',
+  'Panel',
+  'Riviera Select',
+  'Riviera Complete',
+  'Riviera Classic'
+];
+
+// Available brands
+const BRANDS = ['Home Depot', 'Lowe\'s'];
+
+function loadSavedConfigs() {
+  if (fs.existsSync(CONFIG_STORAGE_FILE)) {
+    try {
+      const data = fs.readFileSync(CONFIG_STORAGE_FILE, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      console.log(chalk.yellow(`⚠️  Could not load saved configs: ${error.message}`));
+      return {};
+    }
+  }
+  return {};
+}
+
+function saveSavedConfigs(configs) {
+  const configDir = path.dirname(CONFIG_STORAGE_FILE);
+  if (!fs.existsSync(configDir)) {
+    fs.mkdirSync(configDir, { recursive: true });
+  }
+  fs.writeFileSync(CONFIG_STORAGE_FILE, JSON.stringify(configs, null, 2));
+}
 
 function askQuestion(query) {
   const rl = readline.createInterface({
@@ -71,74 +86,236 @@ function askQuestion(query) {
   }));
 }
 
-async function selectTestConfiguration() {
+async function selectLiftType() {
   console.log(chalk.bold.cyan('\n🎯 What do you want to test?\n'));
   
-  const options = Object.entries(TEST_CONFIGS);
-  options.forEach(([key, config], index) => {
-    console.log(chalk.white(`  ${index + 1}. ${config.name}`));
+  const options = Object.entries(LIFT_TYPES);
+  options.forEach(([key, name], index) => {
+    console.log(chalk.white(`  ${index + 1}. ${name}`));
   });
   
-  console.log(chalk.gray('\n  Enter number (1-9) or press Enter to skip interactive mode:\n'));
+  console.log(chalk.red(`\n  ${options.length + 1}. 🗑️  Delete All Test Results`));
+  console.log(chalk.gray('\n  Enter number (1-10) or press Enter to skip interactive mode:\n'));
   
   const answer = await askQuestion('  Selection: ');
   
   if (!answer || answer.trim() === '') {
-    console.log(chalk.yellow('\n  ⏭️  Skipping interactive mode, using default config...\n'));
     return null;
   }
   
   const selection = parseInt(answer.trim());
   
-  if (isNaN(selection) || selection < 1 || selection > options.length) {
-    console.log(chalk.red('\n  ❌ Invalid selection. Using default config...\n'));
+  if (isNaN(selection) || selection < 1 || selection > options.length + 1) {
+    console.log(chalk.red('\n  ❌ Invalid selection.\n'));
     return null;
   }
   
-  const [key, selectedConfig] = options[selection - 1];
-  console.log(chalk.green(`\n  ✓ Selected: ${selectedConfig.name}\n`));
+  // Check if delete option was selected
+  if (selection === options.length + 1) {
+    return { action: 'delete-results' };
+  }
   
-  return { key, ...selectedConfig };
+  const [key, name] = options[selection - 1];
+  return { key, name };
 }
 
-async function validateConfiguration(configSelection) {
-  if (!configSelection) return null;
+async function deleteAllResults() {
+  const resultsDir = path.join(__dirname, 'test-results');
   
-  const { name, gridImage, configFile } = configSelection;
+  if (!fs.existsSync(resultsDir)) {
+    console.log(chalk.yellow('\n  ℹ️  No test-results folder found.\n'));
+    return;
+  }
   
-  // Check if grid image exists
-  const gridPath = path.join(__dirname, gridImage);
+  const files = fs.readdirSync(resultsDir);
+  
+  if (files.length === 0) {
+    console.log(chalk.yellow('\n  ℹ️  No test results to delete.\n'));
+    return;
+  }
+  
+  console.log(chalk.cyan(`\n📁 Found ${files.length} files in test-results/\n`));
+  files.forEach(file => {
+    console.log(chalk.gray(`  - ${file}`));
+  });
+  
+  console.log(chalk.yellow('\n⚠️  This will permanently delete all test result files!'));
+  const confirm = await askQuestion(chalk.white('\n  Are you sure? Type "yes" to confirm: '));
+  
+  if (confirm.toLowerCase() === 'yes') {
+    console.log(chalk.red('\n🗑️  Deleting all test results...\n'));
+    let deletedCount = 0;
+    
+    files.forEach(file => {
+      const filePath = path.join(resultsDir, file);
+      try {
+        fs.unlinkSync(filePath);
+        console.log(chalk.gray(`  ✓ Deleted ${file}`));
+        deletedCount++;
+      } catch (error) {
+        console.log(chalk.red(`  ✗ Failed to delete ${file}: ${error.message}`));
+      }
+    });
+    
+    console.log(chalk.green(`\n✅ Successfully deleted ${deletedCount} files\n`));
+  } else {
+    console.log(chalk.yellow('\n  ❌ Deletion cancelled.\n'));
+  }
+}
+
+async function selectModel() {
+  console.log(chalk.bold.cyan('\n🏷️  What model?\n'));
+  
+  MODELS.forEach((model, index) => {
+    console.log(chalk.white(`  ${index + 1}. ${model}`));
+  });
+  
+  console.log(chalk.gray('\n  Enter number (1-20):\n'));
+  
+  const answer = await askQuestion('  Selection: ');
+  const selection = parseInt(answer.trim());
+  
+  if (isNaN(selection) || selection < 1 || selection > MODELS.length) {
+    console.log(chalk.red('\n  ❌ Invalid selection.\n'));
+    return null;
+  }
+  
+  return MODELS[selection - 1];
+}
+
+async function selectBrand() {
+  console.log(chalk.bold.cyan('\n🏪 What brand?\n'));
+  
+  BRANDS.forEach((brand, index) => {
+    console.log(chalk.white(`  ${index + 1}. ${brand}`));
+  });
+  
+  console.log(chalk.gray('\n  Enter number (1-2):\n'));
+  
+  const answer = await askQuestion('  Selection: ');
+  const selection = parseInt(answer.trim());
+  
+  if (isNaN(selection) || selection < 1 || selection > BRANDS.length) {
+    console.log(chalk.red('\n  ❌ Invalid selection.\n'));
+    return null;
+  }
+  
+  return BRANDS[selection - 1];
+}
+
+function buildConfigKey(liftType, model, brand) {
+  const modelKey = model.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const brandKey = brand.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  return `${liftType}-${modelKey}-${brandKey}`;
+}
+
+function buildConfigName(liftTypeName, model, brand) {
+  return `${liftTypeName} - ${model} - ${brand}`;
+}
+
+function buildGridImagePath(configKey) {
+  return `configs/grids/${configKey}.png`;
+}
+
+function buildConfigFilePath(configKey) {
+  return `configs/${configKey}-config.js`;
+}
+
+async function validateAndGetConfiguration(liftType, liftTypeName, model, brand) {
+  const configKey = buildConfigKey(liftType, model, brand);
+  const configName = buildConfigName(liftTypeName, model, brand);
+  const gridImagePath = buildGridImagePath(configKey);
+  const configFilePath = buildConfigFilePath(configKey);
+  
+  console.log(chalk.cyan(`\n📋 Configuration: ${configName}`));
+  console.log(chalk.gray(`   Key: ${configKey}\n`));
+  
+  // Load saved configs
+  const savedConfigs = loadSavedConfigs();
+  let configData = savedConfigs[configKey];
+  
+  // Check if URL exists
+  let configuratorUrl = null;
+  if (configData && configData.url) {
+    console.log(chalk.cyan(`📍 Found saved URL:\n   ${configData.url}\n`));
+    const confirmAnswer = await askQuestion(chalk.white('  Is this the correct URL? (y/n): '));
+    
+    if (confirmAnswer.toLowerCase() === 'n' || confirmAnswer.toLowerCase() === 'no') {
+      console.log(chalk.yellow('\n  Please paste the new configurator URL:\n'));
+      const newUrl = await askQuestion('  URL: ');
+      if (newUrl && newUrl.trim()) {
+        configuratorUrl = newUrl.trim();
+        // Update saved config
+        if (!configData) configData = {};
+        configData.url = configuratorUrl;
+        savedConfigs[configKey] = configData;
+        saveSavedConfigs(savedConfigs);
+        console.log(chalk.green('\n  ✓ URL updated and saved\n'));
+      }
+    } else {
+      configuratorUrl = configData.url;
+      console.log(chalk.green('  ✓ Using saved URL\n'));
+    }
+  } else {
+    // No URL saved, ask for it
+    console.log(chalk.yellow('  ⚠️  No saved URL found for this configuration.\n'));
+    console.log(chalk.white('  Please paste the configurator URL:\n'));
+    const newUrl = await askQuestion('  URL: ');
+    
+    if (newUrl && newUrl.trim()) {
+      configuratorUrl = newUrl.trim();
+      // Save the URL
+      if (!configData) configData = {};
+      configData.url = configuratorUrl;
+      savedConfigs[configKey] = configData;
+      saveSavedConfigs(savedConfigs);
+      console.log(chalk.green('\n  ✓ URL saved for future use\n'));
+    } else {
+      console.log(chalk.red('\n  ❌ No URL provided. Cannot proceed.\n'));
+      return null;
+    }
+  }
+  
+  // Check grid image
+  console.log(chalk.cyan('📋 Validating files...\n'));
+  
+  const gridPath = path.join(__dirname, gridImagePath);
   const gridExists = fs.existsSync(gridPath);
   
-  // Check if config file exists
-  const configPath = path.join(__dirname, configFile);
-  const configExists = fs.existsSync(configPath);
-  
-  console.log(chalk.cyan(`📋 Validating configuration for: ${name}\n`));
-  
   if (!gridExists) {
-    console.log(chalk.red(`  ❌ Grid image not found: ${gridImage}`));
-    console.log(chalk.yellow(`\n  Please add the grid image to: ${gridPath}`));
+    console.log(chalk.red(`  ❌ Grid image not found: ${gridImagePath}`));
+    console.log(chalk.yellow(`\n  Please add the grid image to:`));
+    console.log(chalk.white(`     ${gridPath}`));
     console.log(chalk.gray(`  Then run the test again.\n`));
     return null;
   } else {
-    console.log(chalk.green(`  ✓ Grid image found: ${gridImage}`));
+    console.log(chalk.green(`  ✓ Grid image found: ${gridImagePath}`));
   }
   
+  // Check config file
+  const configPath = path.join(__dirname, configFilePath);
+  const configExists = fs.existsSync(configPath);
+  
   if (!configExists) {
-    console.log(chalk.red(`  ❌ Config file not found: ${configFile}`));
+    console.log(chalk.red(`  ❌ Config file not found: ${configFilePath}`));
     console.log(chalk.yellow(`\n  Please create the config file:`));
     console.log(chalk.white(`     1. Copy: configs/example-config.js`));
-    console.log(chalk.white(`     2. Save as: ${configFile}`));
+    console.log(chalk.white(`     2. Save as: ${configFilePath}`));
     console.log(chalk.white(`     3. Extract test data from grid image`));
     console.log(chalk.white(`     4. Update config with URL and test data\n`));
     console.log(chalk.gray(`  See configs/README.md for instructions.\n`));
     return null;
   } else {
-    console.log(chalk.green(`  ✓ Config file found: ${configFile}\n`));
+    console.log(chalk.green(`  ✓ Config file found: ${configFilePath}\n`));
   }
   
-  return configPath;
+  return {
+    configKey,
+    configName,
+    configuratorUrl,
+    gridImagePath,
+    configFilePath: configPath
+  };
 }
 
 const program = new Command();
@@ -166,14 +343,47 @@ let configuratorUrl;
 
 // Interactive mode if no config specified and not skipped
 if (!options.config && !options.skipInteractive) {
-  const selection = await selectTestConfiguration();
-  if (selection) {
-    const validatedConfigPath = await validateConfiguration(selection);
-    if (validatedConfigPath) {
-      options.config = validatedConfigPath;
-    } else {
-      console.log(chalk.yellow('⚠️  Falling back to default configuration...\n'));
+  console.log(chalk.bold.blue('\n╔════════════════════════════════════════════╗'));
+  console.log(chalk.bold.blue('║   Blinds Max Height Tester - Interactive   ║'));
+  console.log(chalk.bold.blue('╚════════════════════════════════════════════╝'));
+  
+  const liftTypeSelection = await selectLiftType();
+  
+  if (liftTypeSelection) {
+    // Check if delete action was selected
+    if (liftTypeSelection.action === 'delete-results') {
+      await deleteAllResults();
+      process.exit(0);
     }
+    
+    const model = await selectModel();
+    
+    if (model) {
+      const brand = await selectBrand();
+      
+      if (brand) {
+        const validatedConfig = await validateAndGetConfiguration(
+          liftTypeSelection.key,
+          liftTypeSelection.name,
+          model,
+          brand
+        );
+        
+        if (validatedConfig) {
+          console.log(chalk.green('✅ Configuration validated successfully!\n'));
+          options.config = validatedConfig.configFilePath;
+          configuratorUrl = validatedConfig.configuratorUrl;
+        } else {
+          console.log(chalk.yellow('⚠️  Configuration incomplete. Falling back to default...\n'));
+        }
+      } else {
+        console.log(chalk.yellow('⚠️  No brand selected. Falling back to default...\n'));
+      }
+    } else {
+      console.log(chalk.yellow('⚠️  No model selected. Falling back to default...\n'));
+    }
+  } else {
+    console.log(chalk.yellow('⚠️  Skipping interactive mode, using default config...\n'));
   }
 }
 
@@ -186,7 +396,9 @@ if (options.config) {
     const configModule = await import(configPath);
     config = configModule.config;
     testData = config.testData;
-    configuratorUrl = options.url || config.url;
+    if (!configuratorUrl) {
+      configuratorUrl = options.url || config.url;
+    }
     console.log(chalk.green(`✓ Loaded config: ${config.name}`));
     if (config.gridImage) {
       console.log(chalk.gray(`  Grid image: ${config.gridImage}\n`));

@@ -38,17 +38,18 @@ blindstester/
 # Install dependencies
 npm install
 
-# Start with interactive menu
+# Start with 3-step interactive wizard
 npm start
 
-# You'll be prompted:
-# 🎯 What do you want to test?
-#   1. Cordless
-#   2. Cordloop
-#   3. Medium Cassette Valance
-#   ... (9 options total)
-#
-# Select a number or press Enter to skip
+# Step 1: Choose lift type (Cordless, Cordloop, etc.)
+# Step 2: Choose model (Roller, Solar, Cellular, etc.)
+# Step 3: Choose brand (Home Depot or Lowe's)
+# 
+# The tool will:
+# - Remember your configurator URL
+# - Validate grid images exist
+# - Validate config files exist
+# - Guide you through any missing setup
 ```
 
 ### Command Line Mode
@@ -75,28 +76,32 @@ npm run clean-results -- --force
 
 ## 🔧 Multiple Configurations
 
-### Using Interactive Mode
+### Using Enhanced Interactive Mode
 
-The easiest way to test different configurations:
+The easiest way to test different configurations with a **3-step wizard**:
 
-1. Run `npm start`
-2. Select from 9 pre-configured options
-3. The tool validates the config and grid image exist
-4. If missing, you get clear instructions on what to add
+1. **Run** `npm start`
+2. **Select lift type** - Cordless, Motorization, etc.
+3. **Select model** - Roller, Cellular, Faux Wood, etc. (20 options)
+4. **Select brand** - Home Depot or Lowe's
+5. **Paste URL** (first time only - it's saved for future use!)
+6. Tool validates everything and guides you through setup
 
-See [docs/INTERACTIVE-MODE.md](docs/INTERACTIVE-MODE.md) for complete guide.
+The tool automatically:
+- ✅ **Remembers URLs** - Saved in `configs/saved-configs.json`
+- ✅ **Validates files** - Checks grid images and config files
+- ✅ **Provides guidance** - Clear instructions for missing files
+- ✅ **Generates names** - Consistent file naming automatically
 
-### Available Configurations
+See [docs/ENHANCED-INTERACTIVE-MODE.md](docs/ENHANCED-INTERACTIVE-MODE.md) for complete guide.
 
-- **Cordless** - Standard cordless blinds
-- **Cordloop** - Continuous cord loop lift
-- **Medium Cassette Valance** - Medium-sized cassette
-- **Large Cassette Valance** - Large-sized cassette
-- **Motorization** - Motorized lift option
-- **Cordless 2 on 1** - Two blinds, one headrail
-- **Cordloop 2 on 1** - Cord loop with 2-on-1
-- **Large Cassette Valance 2 on 1** - Large cassette with 2-on-1
-- **Motorization 2 on 1** - Motorized with 2-on-1
+### Available Options
+
+**Lift Types (9):** Cordless, Cordloop, Medium Cassette, Large Cassette, Motorization, and 2-on-1 variants
+
+**Models (20):** Roller, Solar, Roman, Banded, Faux Wood, Real Wood, Verticals, Perceptions, Cellular (multiple types), Classic Value Faux Wood, Naturals, Sheer, Vertical Cellular, Panel, Riviera Select/Complete/Classic
+
+**Brands (2):** Home Depot, Lowe's
 
 ### Creating New Configurations
 
