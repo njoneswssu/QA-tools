@@ -1,4 +1,3 @@
-import fs from 'fs';
 import chalk from 'chalk';
 
 // Generate a grid report similar to the original image format
@@ -117,16 +116,7 @@ export function generateGridReport(results, configName = 'configuration') {
   lines.push(`Report generated: ${new Date().toISOString()}`);
   lines.push('═'.repeat(120));
   
-  const report = lines.join('\n');
-  
-  // Write to file
-  fs.writeFileSync(outputFile, report);
-  
-  // Also print to console
-  console.log('\n\n');
-  console.log(report);
-  
-  return report;
+  return lines.join('\n');
 }
 
 export function generateCompactGrid(results, configName = 'configuration') {
@@ -189,8 +179,5 @@ export function generateCompactGrid(results, configName = 'configuration') {
     lines.push('');
   });
   
-  const report = lines.join('\n');
-  fs.writeFileSync(outputFile, report);
-  
-  return report;
+  return lines.join('\n');
 }
