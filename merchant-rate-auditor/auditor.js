@@ -12,6 +12,15 @@ const readline = require('readline');
  * Audits Wildlink merchant rate JSON feeds for problematic rates:
  * - Rates with "ShareASale commission" in the name
  * - Rates with hex code-like values instead of actual commission amounts
+ * - Zero rates with EXACTLY "online purchase" as the name (flagged)
+ * - Zero rates with product-like names (NOT flagged - these are OK)
+ * - Product-like rate names that DON'T match merchant category (flagged)
+ * - Product-like rate names that DO match merchant category (NOT flagged - these are OK)
+ * - Rates with underscores in the name
+ * - Rates with "in app" or "iOS in-app" patterns
+ * 
+ * Categories are embedded in the merchant data from: https://www.wildlink.me/data/{appId}/merchant/1
+ * Each merchant has a Categories array with multiple category names.
  */
 
 // Configuration
@@ -286,10 +295,131 @@ function isInvalidRateName(name) {
 }
 
 /**
+ * Check if rate amount is zero or "0"
+ */
+function isZeroRate(rate) {
+  if (!rate.Amount) return false;
+  const amount = String(rate.Amount).trim();
+  return amount === '0' || amount === '0.0' || amount === '0.00' || parseFloat(amount) === 0;
+}
+
+/**
+ * Check if a rate name is EXACTLY "online purchase" (and nothing else)
+ * Must be exact match to flag zero rates
+ */
+function isExactlyOnlinePurchase(name) {
+  if (!name || typeof name !== 'string') return false;
+  const trimmed = name.trim().toLowerCase();
+  return trimmed === 'online purchase';
+}
+
+/**
+ * Check if a rate name contains underscores
+ */
+function containsUnderscore(name) {
+  if (!name || typeof name !== 'string') return false;
+  return name.includes('_');
+}
+
+/**
+ * Check if a rate name contains "in app" or "in-app" or "iOS in-app" patterns
+ */
+function containsInAppRate(name) {
+  if (!name || typeof name !== 'string') return false;
+  const lowerName = name.toLowerCase();
+  return /in[\s-]?app/i.test(lowerName) || /ios\s+in[\s-]?app/i.test(lowerName);
+}
+
+/**
+ * Map of category keywords to related product/service terms
+ * This helps identify when a rate name is contextually related to the merchant's category
+ */
+const CATEGORY_RELATED_TERMS = {
+  'travel': ['booking', 'flight', 'hotel', 'reservation', 'trip', 'vacation', 'stay', 'cruise', 'tour', 'ticket', 'itinerary', 'package', 'desk', 'mobile'],
+  'hotel': ['booking', 'reservation', 'stay', 'room', 'suite', 'night', 'check-in', 'accommodation'],
+  'vacation': ['booking', 'package', 'trip', 'resort', 'getaway', 'holiday', 'destination'],
+  'flight': ['booking', 'ticket', 'airfare', 'airline', 'departure', 'arrival', 'domestic', 'international'],
+  'air': ['booking', 'flight', 'ticket', 'airfare', 'airline', 'departure', 'arrival'],
+  'car rental': ['booking', 'reservation', 'vehicle', 'rental', 'pickup', 'return'],
+  'jewelry': ['diamond', 'ring', 'necklace', 'bracelet', 'earring', 'gold', 'silver', 'platinum', 'gem', 'stone', 'pendant', 'watch', 'jewel'],
+  'clothing': ['shirt', 'pant', 'dress', 'shoe', 'jacket', 'coat', 'sweater', 'jean', 'top', 'bottom', 'apparel', 'garment'],
+  'apparel': ['shirt', 'pant', 'dress', 'shoe', 'jacket', 'coat', 'sweater', 'jean', 'top', 'bottom', 'clothing', 'garment'],
+  'electronics': ['phone', 'laptop', 'tablet', 'computer', 'tv', 'camera', 'headphone', 'speaker', 'device', 'gadget'],
+  'furniture': ['chair', 'table', 'desk', 'sofa', 'bed', 'cabinet', 'shelf', 'couch', 'dresser'],
+  'home': ['furniture', 'appliance', 'decor', 'kitchen', 'bedroom', 'bathroom', 'living', 'dining'],
+  'beauty': ['makeup', 'cosmetic', 'skincare', 'fragrance', 'perfume', 'lotion', 'cream', 'serum'],
+  'health': ['vitamin', 'supplement', 'medicine', 'wellness', 'fitness', 'nutrition'],
+  'food': ['grocery', 'meal', 'snack', 'beverage', 'drink', 'restaurant', 'dining'],
+  'automotive': ['car', 'truck', 'vehicle', 'auto', 'tire', 'part', 'accessory', 'motor'],
+  'sports': ['equipment', 'gear', 'apparel', 'shoe', 'athletic', 'fitness', 'training'],
+  'toys': ['game', 'toy', 'puzzle', 'doll', 'action', 'figure', 'playset'],
+  'books': ['book', 'ebook', 'audiobook', 'textbook', 'novel', 'magazine', 'publication'],
+  'music': ['album', 'song', 'cd', 'vinyl', 'track', 'instrument', 'audio'],
+  'pet': ['dog', 'cat', 'pet', 'animal', 'food', 'toy', 'supply', 'care'],
+  'office': ['desk', 'chair', 'supply', 'stationery', 'paper', 'pen', 'folder', 'organizer'],
+  'garden': ['plant', 'seed', 'tool', 'outdoor', 'lawn', 'flower', 'pot', 'soil'],
+  'baby': ['infant', 'toddler', 'baby', 'diaper', 'formula', 'stroller', 'crib', 'nursery']
+};
+
+/**
+ * Check if rate name matches or is related to any of the merchant categories
+ * Includes both direct matching and contextual relationship matching
+ */
+function rateMatchesMerchantCategory(rateName, merchantCategories) {
+  if (!rateName || !merchantCategories || merchantCategories.length === 0) return false;
+  
+  const lowerRateName = rateName.trim().toLowerCase();
+  
+  // Check against each category
+  for (const category of merchantCategories) {
+    if (!category) continue;
+    const lowerCategory = category.trim().toLowerCase();
+    
+    // Direct match
+    if (lowerRateName === lowerCategory) return true;
+    
+    // Check if category contains the rate name or vice versa
+    if (lowerCategory.includes(lowerRateName) || lowerRateName.includes(lowerCategory)) return true;
+    
+    // Check for plurals/singulars
+    const singularRate = lowerRateName.replace(/s$/, '');
+    const singularCategory = lowerCategory.replace(/s$/, '');
+    
+    if (singularRate === singularCategory) return true;
+    if (lowerCategory.includes(singularRate) || (singularRate && lowerCategory.endsWith(singularRate))) return true;
+    if (lowerRateName.includes(singularCategory) || (singularCategory && lowerRateName.endsWith(singularCategory))) return true;
+    
+    // Check for contextually related terms
+    // For each word in the category, check if there are related terms that match the rate name
+    const categoryWords = lowerCategory.split(/[\s,&-]+/).filter(word => word.length > 2);
+    
+    for (const categoryWord of categoryWords) {
+      const relatedTerms = CATEGORY_RELATED_TERMS[categoryWord];
+      if (relatedTerms) {
+        for (const term of relatedTerms) {
+          // Check if the rate name contains this related term
+          if (lowerRateName.includes(term) || term.includes(lowerRateName)) {
+            return true;
+          }
+          // Check for word boundaries to avoid partial matches
+          const wordBoundaryPattern = new RegExp(`\\b${term}\\b`, 'i');
+          if (wordBoundaryPattern.test(lowerRateName)) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+  
+  return false;
+}
+
+/**
  * Validate a single rate object
  */
-function validateRate(rate, merchantId) {
+function validateRate(rate, merchantId, merchantCategories = null) {
   const issues = [];
+  const isZero = isZeroRate(rate);
   
   // Check for ShareASale commission in name
   if (containsShareASale(rate.Name)) {
@@ -331,14 +461,32 @@ function validateRate(rate, merchantId) {
     });
   }
   
-  // Check for product-like names (e.g., "gummies returning", "gummies new")
-  if (rate.Name && isProductLikeName(rate.Name)) {
+  // NEW RULE: If rate is 0 and name is EXACTLY "online purchase", flag it
+  if (isZero && rate.Name && isExactlyOnlinePurchase(rate.Name)) {
     issues.push({
-      type: 'product_like_name',
+      type: 'zero_rate_online_purchase',
       severity: 'high',
-      message: `Rate name looks like a product name instead of a rate description: "${rate.Name}"`,
+      message: `Zero rate with exactly "online purchase" name should be flagged: "${rate.Name}" (Amount: ${rate.Amount})`,
       rate: rate
     });
+  }
+  
+  // Check for product-like names (e.g., "gummies returning", "gummies new")
+  // Skip this check if:
+  // 1. Rate is 0 (zero rates with product-like names are OK)
+  // 2. Rate name matches any of the merchant categories (e.g., "Dishwashers" for a dishwasher merchant)
+  if (!isZero && rate.Name && isProductLikeName(rate.Name)) {
+    // Check if rate name matches merchant categories before flagging
+    const matchesCategory = merchantCategories && rateMatchesMerchantCategory(rate.Name, merchantCategories);
+    
+    if (!matchesCategory) {
+      issues.push({
+        type: 'product_like_name',
+        severity: 'high',
+        message: `Rate name looks like a product name instead of a rate description: "${rate.Name}"`,
+        rate: rate
+      });
+    }
   }
   
   // Check for percentage values in rate name (e.g., "30%", "5%")
@@ -357,6 +505,26 @@ function validateRate(rate, merchantId) {
       type: 'invalid_rate_name',
       severity: 'high',
       message: `Rate name doesn't make sense for a merchant rate: "${rate.Name}"`,
+      rate: rate
+    });
+  }
+  
+  // NEW RULE: Flag rates with underscores in the name
+  if (rate.Name && containsUnderscore(rate.Name)) {
+    issues.push({
+      type: 'underscore_in_name',
+      severity: 'high',
+      message: `Rate name contains underscore character: "${rate.Name}"`,
+      rate: rate
+    });
+  }
+  
+  // NEW RULE: Flag rates with "in app" or "iOS in-app" patterns
+  if (rate.Name && containsInAppRate(rate.Name)) {
+    issues.push({
+      type: 'in_app_rate',
+      severity: 'high',
+      message: `Rate name contains in-app purchase pattern: "${rate.Name}"`,
       rate: rate
     });
   }
@@ -385,7 +553,7 @@ function validateRate(rate, merchantId) {
 }
 
 /**
- * Fetch merchant data for a specific app ID to get merchant names
+ * Fetch merchant data for a specific app ID to get merchant names and categories
  */
 async function fetchMerchantData(appId) {
   const url = `${CONFIG.baseUrl}/${appId}/merchant/1`;
@@ -399,11 +567,19 @@ async function fetchMerchantData(appId) {
     });
     
     if (response.data && Array.isArray(response.data)) {
-      // Create a mapping from merchant ID to merchant name
+      // Create a mapping from merchant ID to merchant name and categories
       const merchantMap = {};
       for (const merchant of response.data) {
-        if (merchant.ID && merchant.Name) {
-          merchantMap[merchant.ID.toString()] = merchant.Name;
+        if (merchant.ID) {
+          // Extract category names from the Categories array
+          const categories = merchant.Categories && Array.isArray(merchant.Categories)
+            ? merchant.Categories.map(cat => cat.Name).filter(Boolean)
+            : [];
+          
+          merchantMap[merchant.ID.toString()] = {
+            name: merchant.Name || `Merchant ID ${merchant.ID}`,
+            categories: categories
+          };
         }
       }
       return merchantMap;
@@ -411,7 +587,39 @@ async function fetchMerchantData(appId) {
     return {};
   } catch (error) {
     // If merchant data fetch fails, we'll continue without names
-    console.warn(chalk.yellow(`⚠️  Could not fetch merchant names for App ID ${appId}: ${error.message}`));
+    console.warn(chalk.yellow(`⚠️  Could not fetch merchant data for App ID ${appId}: ${error.message}`));
+    return {};
+  }
+}
+
+/**
+ * Fetch category data for a specific app ID (for reference, not currently used)
+ */
+async function fetchCategoryData(appId) {
+  const url = `${CONFIG.baseUrl}/${appId}/category/1`;
+  
+  try {
+    const response = await axios.get(url, {
+      timeout: 30000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; MerchantRateAuditor/1.0)'
+      }
+    });
+    
+    if (response.data && Array.isArray(response.data)) {
+      // Create a mapping from category ID to category name
+      const categoryMap = {};
+      for (const category of response.data) {
+        if (category.ID) {
+          categoryMap[category.ID.toString()] = category.Name || null;
+        }
+      }
+      return categoryMap;
+    }
+    return {};
+  } catch (error) {
+    // If category data fetch fails, we'll continue without categories
+    console.warn(chalk.yellow(`⚠️  Could not fetch categories for App ID ${appId}: ${error.message}`));
     return {};
   }
 }
@@ -453,15 +661,15 @@ async function fetchMerchantRates(appId) {
  * Audit merchant rates for a specific app ID
  */
 async function auditAppId(appId) {
-  // Fetch both merchant rates and merchant data (for names)
-  console.log(chalk.blue(`📡 Fetching merchant names for App ID ${appId}...`));
+  // Fetch merchant rates and merchant data (which includes categories)
+  console.log(chalk.blue(`📡 Fetching data for App ID ${appId}...`));
   const [rateData, merchantMap] = await Promise.all([
     fetchMerchantRates(appId),
     fetchMerchantData(appId)
   ]);
   
   if (merchantMap && Object.keys(merchantMap).length > 0) {
-    console.log(chalk.green(`✅ Loaded ${Object.keys(merchantMap).length} merchant names`));
+    console.log(chalk.green(`✅ Loaded ${Object.keys(merchantMap).length} merchants with categories`));
   }
   
   if (!rateData) {
@@ -486,16 +694,24 @@ async function auditAppId(appId) {
     totalMerchants++;
     totalRates += rates.length;
     
-    // Get merchant name from the map
-    const merchantName = merchantMap[merchantId] || `Merchant ID ${merchantId}`;
+    // Get merchant info from the map
+    const merchantInfo = merchantMap[merchantId];
+    const merchantName = merchantInfo?.name || `Merchant ID ${merchantId}`;
+    const merchantCategories = merchantInfo?.categories || [];
     
-    // Validate each rate
+    // Format categories for display (join with comma)
+    const merchantCategoryDisplay = merchantCategories.length > 0 
+      ? merchantCategories.join(', ') 
+      : null;
+    
+    // Validate each rate, passing the merchant categories array
     for (const rate of rates) {
-      const rateIssues = validateRate(rate, merchantId);
+      const rateIssues = validateRate(rate, merchantId, merchantCategories);
       if (rateIssues.length > 0) {
         issues.push({
           merchantId,
           merchantName,
+          merchantCategory: merchantCategoryDisplay,
           appId,
           issues: rateIssues
         });
@@ -569,6 +785,9 @@ function printResults(report) {
       for (const issueGroup of result.issues) {
         console.log(chalk.yellow(`\n    Merchant: ${issueGroup.merchantName || `ID ${issueGroup.merchantId}`}`));
         console.log(chalk.gray(`      Merchant ID: ${issueGroup.merchantId}`));
+        if (issueGroup.merchantCategory) {
+          console.log(chalk.gray(`      Category: ${issueGroup.merchantCategory}`));
+        }
         for (const issue of issueGroup.issues) {
           const severityColor = issue.severity === 'high' ? chalk.red : chalk.yellow;
           console.log(severityColor(`      [${issue.type.toUpperCase()}] ${issue.message}`));
@@ -612,6 +831,7 @@ function generateSimplifiedExport(report) {
     for (const issueGroup of result.issues) {
       const merchantName = issueGroup.merchantName || `Merchant ID ${issueGroup.merchantId}`;
       const merchantId = issueGroup.merchantId;
+      const merchantCategory = issueGroup.merchantCategory || null;
       const appId = result.appId;
       
       // Process each issue in this group
@@ -624,6 +844,7 @@ function generateSimplifiedExport(report) {
           merchantIssuesMap.set(key, {
             merchantName,
             merchantId,
+            merchantCategory,
             appId,
             issueType: issue.type,
             severity: issue.severity,
@@ -648,6 +869,7 @@ function generateSimplifiedExport(report) {
   return Array.from(merchantIssuesMap.values()).map(item => ({
     merchantName: item.merchantName,
     merchantId: item.merchantId,
+    merchantCategory: item.merchantCategory,
     appId: item.appId,
     issueType: item.issueType,
     severity: item.severity,
@@ -667,8 +889,8 @@ function exportToCSV(exportData, filepath) {
     return;
   }
   
-  // CSV header
-  const headers = ['Merchant Name', 'Merchant ID', 'App ID', 'Issue Type', 'Severity', 'Reason', 'Rate Name', 'Rate Amount', 'Count'];
+  // CSV header - simplified to just Merchant Name and Reason
+  const headers = ['Merchant Name', 'Reason'];
   
   // Escape CSV values (handle quotes and commas)
   const escapeCSV = (value) => {
@@ -680,19 +902,12 @@ function exportToCSV(exportData, filepath) {
     return str;
   };
   
-  // Build CSV content
+  // Build CSV content with just merchant name and reason
   const csvRows = [
     headers.map(escapeCSV).join(','),
     ...exportData.map(row => [
       escapeCSV(row.merchantName),
-      escapeCSV(row.merchantId),
-      escapeCSV(row.appId),
-      escapeCSV(row.issueType),
-      escapeCSV(row.severity),
-      escapeCSV(row.reason),
-      escapeCSV(row.rateName),
-      escapeCSV(row.rateAmount),
-      escapeCSV(row.count || 1)
+      escapeCSV(row.reason)
     ].join(','))
   ];
   
@@ -1218,6 +1433,11 @@ module.exports = {
   containsCommission,
   isInvalidRateName,
   isProductLikeName,
-  containsPercentageInName
+  containsPercentageInName,
+  isZeroRate,
+  isExactlyOnlinePurchase,
+  containsUnderscore,
+  containsInAppRate,
+  rateMatchesMerchantCategory
 };
 
