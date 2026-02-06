@@ -1,81 +1,743 @@
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 /**
- * Navigate to product through categories
+ * Get Edge user profile directory path
+ * @returns {string} Path to Edge user profile directory
+ */
+function getEdgeUserDataDir() {
+  const platform = os.platform();
+  const homeDir = os.homedir();
+  
+  if (platform === 'darwin') {
+    // macOS
+    return path.join(homeDir, 'Library', 'Application Support', 'Microsoft Edge');
+  } else if (platform === 'win32') {
+    // Windows
+    return path.join(homeDir, 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data');
+  } else {
+    // Linux
+    return path.join(homeDir, '.config', 'microsoft-edge');
+  }
+}
+
+/**
+ * Get a copy of Edge profile for testing (to avoid profile lock)
+ * @returns {string} Path to copied profile directory
+ */
+function getEdgeProfileCopy() {
+  const originalProfile = getEdgeUserDataDir();
+  const tempDir = os.tmpdir();
+  const profileCopy = path.join(tempDir, 'lowes-edge-profile-' + Date.now());
+  
+  // Check if original profile exists
+  if (!fs.existsSync(originalProfile)) {
+    console.log(`   ⚠️  Edge profile not found at ${originalProfile}, using temporary profile`);
+    return null;
+  }
+  
+  // For now, we'll use the profile directly with a separate directory
+  // to avoid copying large profile data
+  return profileCopy;
+}
+
+/**
+ * Navigate to product by pasting URL in address bar and waiting for user to press Enter
  * @param {Page} page - Playwright page object
  * @param {Object} product - Product object
  */
-async function navigateThroughCategories(page, product) {
-  console.log(`   📂 Step 1: Navigating to Blinds category...`);
+async function navigateToProductOrganically(page, product) {
+  console.log(`   🔗 Step 1: Preparing to enter product URL into address bar...`);
+  console.log(`   📋 Product URL: ${product.url}`);
   
-  // Navigate to blinds category page
-  await page.goto('https://www.lowes.com/c/Blinds-window-treatments', {
-    waitUntil: 'domcontentloaded',
-    timeout: 60000
-  });
-  await page.waitForTimeout(3000);
+  // Wait for the test to start - give the browser time to be ready
+  console.log(`   ⏳ Waiting for browser to be ready...`);
+  await page.waitForTimeout(3000 + Math.random() * 2000); // Wait 3-5 seconds
   
-  // Check for access denied
-  const categoryCheck = await page.evaluate(() => {
-    return {
-      title: document.title,
-      bodyText: document.body?.textContent?.substring(0, 200) || ''
-    };
-  });
-  
-  if (categoryCheck.title.includes('Access Denied') || categoryCheck.bodyText.includes('Access Denied')) {
-    console.log(`   ⚠️  Access denied on category page - trying direct product navigation...`);
-    await page.goto(product.url, {
-      waitUntil: 'domcontentloaded',
-      timeout: 60000
-    });
-    return;
+  // Ensure page is focused
+  try {
+    await page.bringToFront();
+    await page.waitForTimeout(500);
+  } catch (e) {
+    // Continue anyway
   }
   
-  console.log(`   📂 Step 2: Navigating to product page from category...`);
+  const platform = os.platform();
   
-  // Try to find and click product link in category, or navigate directly
-  const omniItemId = product.url.split('omniItemId=')[1]?.split('&')[0];
+  // First, set the URL to clipboard using the browser's clipboard API
+  console.log(`   📋 Setting URL to clipboard...`);
+  try {
+    const clipboardSet = await page.evaluate(async (url) => {
+      try {
+        // Try modern clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+          return true;
+        }
+        // Fallback to execCommand
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return success;
+      } catch (e) {
+        console.error('Clipboard error:', e);
+        return false;
+      }
+    }, product.url);
+    
+    if (!clipboardSet) {
+      console.log(`   ⚠️  Could not set clipboard, will try typing instead`);
+    } else {
+      console.log(`   ✓ URL copied to clipboard`);
+    }
+  } catch (e) {
+    console.log(`   ⚠️  Clipboard setup failed: ${e.message}, will try typing instead`);
+  }
   
-  // Look for product link in category page
-  const productLinkFound = await page.evaluate((omniItemId) => {
-    const links = Array.from(document.querySelectorAll('a[href]'));
-    for (const link of links) {
-      const href = link.getAttribute('href') || '';
-      if (href.includes(omniItemId) || (href.includes('configure/blinds') && href.includes(omniItemId))) {
-        link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Wait a moment for clipboard to be ready
+  await page.waitForTimeout(500);
+  
+  // Copy URL to clipboard and display visual instructions
+  // Since automation to address bar is unreliable via CDP, we'll use a visual overlay
+  console.log(`   📋 Preparing URL for manual entry...`);
+  console.log(`   📋 URL: ${product.url}`);
+  
+  // Ensure URL is in clipboard
+  let clipboardReady = false;
+  try {
+    const clipboardSet = await page.evaluate(async (url) => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+          return true;
+        }
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return success;
+      } catch (e) {
+        return false;
+      }
+    }, product.url);
+    
+    if (clipboardSet) {
+      clipboardReady = true;
+      console.log(`   ✓ URL copied to clipboard`);
+    }
+  } catch (e) {
+    console.log(`   ⚠️  Clipboard copy failed: ${e.message}`);
+  }
+  
+  // Display visual overlay with instructions
+  try {
+    await page.evaluate(({ url, platform }) => {
+      const existing = document.getElementById('lowes-url-instructions');
+      if (existing) existing.remove();
+      
+      const overlay = document.createElement('div');
+      overlay.id = 'lowes-url-instructions';
+      overlay.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 40px;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        z-index: 999999;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 600px;
+        text-align: center;
+      `;
+      
+      overlay.innerHTML = `
+        <h2 style="margin: 0 0 20px 0; font-size: 24px;">📋 Product URL</h2>
+        <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <div style="flex: 1; word-break: break-all; font-family: monospace; font-size: 14px; color: white;">
+            ${url}
+          </div>
+          <button id="copy-url-btn" style="background: white; color: #667eea; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; white-space: nowrap; flex-shrink: 0;">
+            📋 Copy
+          </button>
+        </div>
+        <p style="margin: 15px 0 0 0; font-size: 14px; opacity: 0.9;">
+          Paste into address bar and press Enter
+        </p>
+        <button id="close-instructions" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: normal; margin-top: 15px;">
+          Close
+        </button>
+      `;
+      
+      document.body.appendChild(overlay);
+      
+      // Copy button functionality
+      const copyBtn = document.getElementById('copy-url-btn');
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = '✓ Copied!';
+          copyBtn.style.background = '#4ade80';
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.style.background = 'white';
+          }, 2000);
+        } catch (e) {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = url;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-9999px';
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = '✓ Copied!';
+          copyBtn.style.background = '#4ade80';
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.style.background = 'white';
+          }, 2000);
+        }
+      });
+      
+      // Close button functionality
+      document.getElementById('close-instructions').addEventListener('click', () => {
+        overlay.remove();
+      });
+      
+      setTimeout(() => {
+        if (document.getElementById('lowes-url-instructions')) {
+          document.getElementById('lowes-url-instructions').remove();
+        }
+      }, 30000);
+    }, { url: product.url, platform: platform });
+    
+    console.log(`   ✓ Visual instructions displayed on page`);
+  } catch (e) {
+    console.log(`   ⚠️  Could not display visual instructions: ${e.message}`);
+  }
+  
+  // Console instructions
+  console.log(`\n   ╔══════════════════════════════════════════════════════════════╗`);
+  console.log(`   ║  PRODUCT URL - Copy and paste into address bar            ║`);
+  console.log(`   ╠══════════════════════════════════════════════════════════════╣`);
+  console.log(`   ║  ${product.url.padEnd(58)} ║`);
+  console.log(`   ╚══════════════════════════════════════════════════════════════╝`);
+  console.log(`   💡 URL is in clipboard${clipboardReady ? ' (ready!)' : ''} - paste into address bar and press Enter`);
+  console.log(`   💡 The automation will automatically detect navigation and continue\n`);
+  
+  // Wait for the URL to change (user pressed Enter) - monitor actively
+  const initialUrl = page.url();
+  let urlChanged = false;
+  let waitTime = 0;
+  const maxWaitTime = 300000; // 5 minutes max wait
+  const checkInterval = 500; // Check every 500ms for faster detection
+  
+  console.log(`   ⏳ Monitoring for navigation (current URL: ${initialUrl.substring(0, 60)}...)`);
+  
+  // Set up navigation event listener for instant detection
+  let navigationDetected = false;
+  const navigationHandler = async (frame) => {
+    if (frame === page.mainFrame() && !navigationDetected) {
+      const currentUrl = frame.url();
+      if (currentUrl !== initialUrl) {
+        const isOnProductPage = currentUrl.includes('lowes.com') && 
+                                (currentUrl.includes('/p/') || 
+                                 currentUrl.includes('/configure/') || 
+                                 currentUrl.includes('omniItemId='));
+        
+        if (isOnProductPage) {
+          navigationDetected = true;
+          urlChanged = true;
+          console.log(`   ✅ Navigation event detected! Product page loaded`);
+          console.log(`   📍 URL: ${currentUrl.substring(0, 100)}...`);
+        }
+      }
+    }
+  };
+  
+  page.on('framenavigated', navigationHandler);
+  
+  // Poll for URL changes (backup method)
+  while (!urlChanged && waitTime < maxWaitTime) {
+    await page.waitForTimeout(checkInterval);
+    waitTime += checkInterval;
+    
+    try {
+      const currentUrl = page.url();
+      
+      // Check if URL changed to a product page
+      if (currentUrl !== initialUrl) {
+        const isOnProductPage = currentUrl.includes('lowes.com') && 
+                                (currentUrl.includes('/p/') || 
+                                 currentUrl.includes('/configure/') || 
+                                 currentUrl.includes('omniItemId='));
+        
+        if (isOnProductPage) {
+          urlChanged = true;
+          console.log(`   ✅ Navigation detected! Product page loaded`);
+          console.log(`   📍 URL: ${currentUrl.substring(0, 100)}...`);
+          break;
+        } else {
+          // URL changed but not to product page yet - keep monitoring
+          if (waitTime % 5000 === 0) { // Log every 5 seconds
+            console.log(`   🔄 URL changed, but not on product page yet: ${currentUrl.substring(0, 80)}...`);
+          }
+        }
+      }
+      
+      // Show progress every 10 seconds
+      if (waitTime % 10000 === 0 && waitTime > 0) {
+        console.log(`   ⏳ Still waiting for navigation... (${(waitTime / 1000).toFixed(1)}s elapsed)`);
+      }
+    } catch (e) {
+      // Page might have navigated, check again
+      try {
+        const currentUrl = page.url();
+        if (currentUrl !== initialUrl) {
+          const isOnProductPage = currentUrl.includes('lowes.com') && 
+                                  (currentUrl.includes('/p/') || 
+                                   currentUrl.includes('/configure/') || 
+                                   currentUrl.includes('omniItemId='));
+          if (isOnProductPage) {
+            urlChanged = true;
+            break;
+          }
+        }
+      } catch (e2) {
+        // Continue polling
+      }
+    }
+  }
+  
+  // Remove event listener
+  page.off('framenavigated', navigationHandler);
+  
+  // If navigation detected, wait for page to load
+  if (urlChanged) {
+    try {
+      await page.waitForLoadState('networkidle', { timeout: 30000 });
+    } catch (e) {
+      // Continue anyway
+    }
+    await page.waitForTimeout(3000 + Math.random() * 2000);
+  }
+  
+  if (!urlChanged) {
+    console.log(`   ⚠️  Timeout waiting for navigation`);
+    console.log(`   💡 Please manually navigate to the product page`);
+    console.log(`   💡 The automation will check if you're on the product page...`);
+    
+    // Check if user manually navigated anyway
+    await page.waitForTimeout(5000);
+    const finalUrl = page.url();
+    const isOnProductPage = finalUrl.includes('lowes.com') && 
+                            (finalUrl.includes('/p/') || 
+                             finalUrl.includes('/configure/') || 
+                             finalUrl.includes('omniItemId='));
+    
+    if (isOnProductPage) {
+      console.log(`   ✅ You're on a product page - continuing!`);
+      urlChanged = true;
+    } else {
+      throw new Error('Navigation timeout - please manually navigate to the product page and the automation will continue');
+    }
+  }
+  
+  // Verify we're on a product page
+  const currentUrl = page.url();
+  const isOnProductPage = currentUrl.includes('lowes.com') && 
+                          (currentUrl.includes('/p/') || 
+                           currentUrl.includes('/configure/') || 
+                           currentUrl.includes('omniItemId='));
+  
+  if (isOnProductPage) {
+    // Check for access denied
+    const denied = await handleAccessDenied(page, 60);
+    if (denied) {
+      console.log(`   ✅ Successfully navigated to product page`);
+      return;
+    } else {
+      throw new Error('Access denied after navigation');
+    }
+  } else {
+    console.log(`   ⚠️  Not on a product page yet - current URL: ${currentUrl}`);
+    console.log(`   💡 Please navigate to the product page`);
+    await handleAccessDenied(page, 120);
+    
+    // Final check
+    const finalUrl = page.url();
+    const finalIsOnProductPage = finalUrl.includes('lowes.com') && 
+                                 (finalUrl.includes('/p/') || 
+                                  finalUrl.includes('/configure/') || 
+                                  finalUrl.includes('omniItemId='));
+    
+    if (finalIsOnProductPage) {
+      console.log(`   ✅ Now on product page - continuing!`);
+      return;
+    } else {
+      throw new Error('Not on product page after navigation');
+    }
+  }
+}
+
+/**
+ * Look for and click "Customize" button, then wait for color selector
+ * @param {Page} page - Playwright page object
+ * @param {Function} checkAccessDeniedPeriodic - Function to check for access denied
+ * @returns {Promise<boolean>} True if customize button was clicked, false otherwise
+ */
+async function clickCustomizeButton(page, checkAccessDeniedPeriodic) {
+  console.log(`   🔍 Looking for "Customize" button...`);
+  let customizeClicked = false;
+  
+  try {
+    // Common selectors for customize button
+    const customizeSelectors = [
+      'button:has-text("Customize")',
+      'a:has-text("Customize")',
+      'button[aria-label*="Customize" i]',
+      'a[aria-label*="Customize" i]',
+      'button[data-testid*="customize" i]',
+      'a[data-testid*="customize" i]',
+      'button.customize',
+      'a.customize',
+      '[class*="customize" i]',
+      'button:contains("Customize")',
+      'a:contains("Customize")'
+    ];
+    
+    // Try to find customize button by selector
+    for (const selector of customizeSelectors) {
+      try {
+        const customizeBtn = await page.$(selector);
+        if (customizeBtn && await customizeBtn.isVisible()) {
+          console.log(`   ✓ Found "Customize" button with selector: ${selector}`);
+          await customizeBtn.scrollIntoViewIfNeeded();
+          await page.waitForTimeout(500);
+          await customizeBtn.click({ delay: 100 + Math.random() * 100 });
+          await page.waitForTimeout(2000 + Math.random() * 1000);
+          customizeClicked = true;
+          console.log(`   ✅ Clicked "Customize" button`);
+          break;
+        }
+      } catch (e) {
+        // Try next selector
+      }
+    }
+    
+    // If not found by selector, try finding by text content
+    if (!customizeClicked) {
+      const allButtons = await page.$$('button, a, span, div');
+      for (const btn of allButtons) {
+        try {
+          const text = await btn.textContent();
+          const isVisible = await btn.isVisible();
+          
+          if (text && isVisible && text.trim().toLowerCase().includes('customize')) {
+            // Make sure it's actually a clickable customize button
+            const tagName = await btn.evaluate(el => el.tagName.toLowerCase());
+            if (tagName === 'button' || tagName === 'a' || 
+                (await btn.evaluate(el => window.getComputedStyle(el).cursor === 'pointer'))) {
+              console.log(`   ✓ Found "Customize" button by text: "${text.trim()}"`);
+              await btn.scrollIntoViewIfNeeded();
+              await page.waitForTimeout(500);
+              await btn.click({ delay: 100 + Math.random() * 100 });
+              await page.waitForTimeout(2000 + Math.random() * 1000);
+              customizeClicked = true;
+              console.log(`   ✅ Clicked "Customize" button`);
+              break;
+            }
+          }
+        } catch (e) {
+          // Continue to next button
+        }
+      }
+    }
+    
+    if (!customizeClicked) {
+      console.log(`   ℹ️  No "Customize" button found - product may already be in customize mode`);
+    }
+    
+    // Wait for customize panel/options to load if button was clicked
+    if (customizeClicked) {
+      await page.waitForTimeout(2000 + Math.random() * 2000);
+      // Check for access denied after clicking customize
+      if (checkAccessDeniedPeriodic) {
+        await checkAccessDeniedPeriodic();
+      }
+    }
+    
+    // Look for color selector after customize is clicked or if already in customize mode
+    console.log(`   🎨 Looking for color selector...`);
+    await page.waitForTimeout(2000);
+    
+    // Check if color selector is available
+    const colorSelectorAvailable = await page.evaluate(() => {
+      // Look for common color selector patterns
+      const colorSelectors = [
+        'input[type="search"][placeholder*="Color" i]',
+        'input[placeholder*="Search by Color" i]',
+        '[class*="color" i][class*="selector" i]',
+        '[class*="color" i][class*="grid" i]',
+        '[data-testid*="color" i]',
+        'button[aria-label*="color" i]',
+        'div[class*="swatch" i]',
+        'img[alt*="color" i]'
+      ];
+      
+      for (const selector of colorSelectors) {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+          return true;
+        }
+      }
+      
+      // Also check for text content
+      const allElements = document.querySelectorAll('*');
+      for (const el of allElements) {
+        const text = el.textContent || '';
+        if (text.includes('Color Name') || text.includes('Search by Color')) {
+          return true;
+        }
+      }
+      
+      return false;
+    });
+    
+    if (colorSelectorAvailable) {
+      console.log(`   ✅ Color selector is available`);
+    } else {
+      console.log(`   ℹ️  Color selector not immediately visible (may load after interaction)`);
+    }
+    
+  } catch (error) {
+    console.log(`   ⚠️  Error looking for/clicking "Customize" button: ${error.message}`);
+    // Continue anyway - product might not have a customize button
+  }
+  
+  return customizeClicked;
+}
+
+/**
+ * Helper function to search and click product by ID
+ */
+async function searchAndClickProduct(page, productId, product) {
+  // Similar logic but using product ID
+  console.log(`   🔍 Searching by product ID: ${productId}`);
+  
+  // Type product ID in search
+  const searchBox = await page.$('input[type="search"], input[placeholder*="Search" i]');
+  if (searchBox) {
+    await searchBox.click();
+    await page.waitForTimeout(500);
+    await searchBox.fill(productId);
+    await page.waitForTimeout(500);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(2000);
+    
+    // Click product link
+    await page.click(`a[href*="${productId}"]`, { timeout: 5000 });
+    await page.waitForTimeout(2000);
+  }
+}
+
+/**
+ * Check for access denied and wait for manual intervention if needed
+ * @param {Page} page - Playwright page object
+ * @param {number} waitTime - Time to wait in seconds (default 60)
+ * @returns {Promise<boolean>} True if access denied was resolved, false otherwise
+ */
+async function handleAccessDenied(page, waitTime = 60) {
+  const checkAccessDenied = async () => {
+    try {
+      const pageInfo = await page.evaluate(() => {
+        return {
+          title: document.title,
+          bodyText: document.body?.textContent?.substring(0, 500) || '',
+          url: window.location.href
+        };
+      });
+      
+      const isDenied = pageInfo.title.includes('Access Denied') || 
+                      pageInfo.bodyText.includes('Access Denied') ||
+                      pageInfo.url.includes('errors.edgesuite.net') ||
+                      pageInfo.bodyText.includes('Reference #') ||
+                      pageInfo.bodyText.includes('You don\'t have permission');
+      
+      return isDenied;
+    } catch (e) {
+      return false;
+    }
+  };
+  
+  const isDenied = await checkAccessDenied();
+  
+  if (isDenied) {
+    console.log(`\n   ⚠️  ACCESS DENIED DETECTED`);
+    console.log(`   💡 The browser window is open - please manually navigate to the product page`);
+    console.log(`   💡 Steps to fix:`);
+    console.log(`      1. In the browser window, manually navigate to lowes.com`);
+    console.log(`      2. Search for the product and click on it`);
+    console.log(`      3. Wait for the product page to load`);
+    console.log(`   💡 The automation will check every 5 seconds and continue when you're on the product page`);
+    console.log(`   💡 Waiting up to ${waitTime} seconds for manual navigation...\n`);
+    
+    const startTime = Date.now();
+    const checkInterval = 5000; // Check every 5 seconds
+    
+    while (Date.now() - startTime < waitTime * 1000) {
+      await page.waitForTimeout(checkInterval);
+      
+      const stillDenied = await checkAccessDenied();
+      
+      if (!stillDenied) {
+        // Check if we're on a product page
+        const currentUrl = page.url();
+        const isOnProductPage = currentUrl.includes('lowes.com') && 
+                                (currentUrl.includes('/p/') || 
+                                 currentUrl.includes('/configure/') || 
+                                 currentUrl.includes('omniItemId='));
+        
+        if (isOnProductPage) {
+          console.log(`   ✅ Manual navigation successful - you're on a product page!`);
+          console.log(`   ✅ Automation will continue with testing...\n`);
+          return true;
+        } else if (currentUrl.includes('lowes.com') && !currentUrl.includes('errors.edgesuite.net')) {
+          console.log(`   ✓ You're on lowes.com - please navigate to the product page`);
+          // Continue waiting
+        }
+      } else {
+        console.log(`   ⏳ Still waiting... (${Math.floor((Date.now() - startTime) / 1000)}s elapsed)`);
+      }
+    }
+    
+    // Final check
+    const finalCheck = await checkAccessDenied();
+    if (!finalCheck) {
+      const currentUrl = page.url();
+      const isOnProductPage = currentUrl.includes('lowes.com') && 
+                              (currentUrl.includes('/p/') || 
+                               currentUrl.includes('/configure/') || 
+                               currentUrl.includes('omniItemId='));
+      
+      if (isOnProductPage) {
+        console.log(`   ✅ Manual navigation successful!`);
         return true;
       }
     }
+    
+    console.log(`   ⚠️  Timeout reached - access denied may still be present`);
     return false;
-  }, omniItemId);
-  
-  if (productLinkFound) {
-    console.log(`   👆 Clicking product link from category page...`);
-    try {
-      await page.click(`a[href*="${omniItemId}"]`, { timeout: 5000 });
-      await page.waitForTimeout(3000);
-      console.log(`   ✓ Clicked product from category`);
-    } catch (e) {
-      // If click fails, navigate directly
-      console.log(`   🔗 Click failed, navigating directly to product...`);
-      await page.goto(product.url, {
-        waitUntil: 'domcontentloaded',
-        timeout: 60000
-      });
-    }
-  } else {
-    // If product not found in category, navigate directly
-    console.log(`   🔗 Product not found in category, navigating directly...`);
-    await page.goto(product.url, {
-      waitUntil: 'domcontentloaded',
-      timeout: 60000
-    });
   }
   
-  await page.waitForTimeout(2000);
+  return true; // No access denied detected
+}
+
+/**
+ * Establish session with extended warm-up period and realistic behavior
+ * @param {Page} page - Playwright page object
+ */
+async function establishSession(page) {
+  console.log(`   🔐 Establishing session with extended warm-up period...`);
+  console.log(`   ⏳ This may take 30-60 seconds to build a good session...`);
+  
+  // Extended warm-up: Visit multiple pages with realistic delays
+  const pagesToVisit = [
+    'https://www.lowes.com',
+    'https://www.lowes.com/c/Blinds-window-treatments',
+    'https://www.lowes.com/c/Windows-doors',
+    'https://www.lowes.com'
+  ];
+  
+  for (let i = 0; i < pagesToVisit.length; i++) {
+    const url = pagesToVisit[i];
+    console.log(`   📍 Warm-up ${i + 1}/${pagesToVisit.length}: Visiting ${url}...`);
+    
+    try {
+      await page.goto(url, {
+        waitUntil: 'networkidle', // Wait for network to be idle (more realistic)
+        timeout: 90000
+      });
+      
+      // Wait longer on each page (5-10 seconds)
+      const waitTime = 5000 + Math.random() * 5000;
+      await page.waitForTimeout(waitTime);
+      
+      // Check for access denied
+      const denied = await handleAccessDenied(page, 60); // Longer wait time
+      if (!denied) {
+        console.log(`   ⚠️  Access denied detected on ${url}`);
+        console.log(`   💡 Please manually navigate to lowes.com in the browser`);
+        console.log(`   💡 Waiting up to 2 minutes for manual navigation...`);
+        await handleAccessDenied(page, 120); // Wait up to 2 minutes
+      }
+      
+      // Extensive human-like behavior simulation
+      // Scroll multiple times
+      for (let scroll = 0; scroll < 3; scroll++) {
+        await page.evaluate(() => {
+          window.scrollTo(0, Math.random() * 1500);
+        });
+        await page.waitForTimeout(1000 + Math.random() * 2000);
+      }
+      
+      // Move mouse in a pattern
+      for (let move = 0; move < 3; move++) {
+        await page.mouse.move(
+          200 + Math.random() * 600, 
+          200 + Math.random() * 600,
+          { steps: 10 } // Smooth mouse movement
+        );
+        await page.waitForTimeout(500 + Math.random() * 1000);
+      }
+      
+      // Random clicks on non-interactive areas (simulates reading)
+      try {
+        await page.mouse.click(400 + Math.random() * 200, 300 + Math.random() * 200, { delay: 100 });
+        await page.waitForTimeout(500);
+      } catch (e) {
+        // Ignore click errors
+      }
+      
+      // Wait between page visits (longer delays)
+      if (i < pagesToVisit.length - 1) {
+        const betweenPageDelay = 3000 + Math.random() * 4000; // 3-7 seconds
+        console.log(`   ⏳ Waiting ${(betweenPageDelay / 1000).toFixed(1)}s before next page...`);
+        await page.waitForTimeout(betweenPageDelay);
+      }
+      
+    } catch (e) {
+      console.log(`   ⚠️  Error visiting ${url}: ${e.message}`);
+      // Continue with next page
+    }
+  }
+  
+  // Final check - make sure we're on lowes.com
+  const finalUrl = page.url();
+  if (!finalUrl.includes('lowes.com') || finalUrl.includes('errors.edgesuite.net')) {
+    console.log(`   ⚠️  Not on lowes.com after warm-up - waiting for manual navigation...`);
+    await handleAccessDenied(page, 120);
+  }
+  
+  console.log(`   ✅ Extended warm-up complete - session should be well established`);
 }
 
 /**
@@ -119,237 +781,55 @@ async function testProduct(product, options = {}) {
     connectedToExisting = true; // Assume we're using existing connection
     console.log('   ✓ Using shared browser context for sequential testing');
   } else {
-    // Create new browser/context
+    // Connect to existing Edge instance via remote debugging (opens in new tab)
+    console.log('   🔌 Connecting to existing Edge instance on port 9222...');
+    
+    // Try both localhost and 127.0.0.1
+    let connectionError = null;
     try {
-      // Strategy 1: Try to connect to existing Chrome instance (opens in new tab)
-      console.log('   🔌 Attempting to connect to Chrome on port 9222...');
-      
-      // Try both localhost and 127.0.0.1
-      let connectionError = null;
+      browser = await chromium.connectOverCDP('http://localhost:9222');
+    } catch (e1) {
+      connectionError = e1;
+      console.log(`   ⚠️  localhost failed: ${e1.message}, trying 127.0.0.1...`);
       try {
-        browser = await chromium.connectOverCDP('http://localhost:9222');
-      } catch (e1) {
-        connectionError = e1;
-        console.log(`   ⚠️  localhost failed: ${e1.message}, trying 127.0.0.1...`);
-        try {
-          browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
-        } catch (e2) {
-          connectionError = e2;
-          throw e2; // Re-throw to trigger fallback
-        }
+        browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
+      } catch (e2) {
+        connectionError = e2;
+        console.log('\n   ❌ ERROR: Could not connect to Edge on port 9222');
+        console.log('\n   📋 To fix this, you need to start Edge with remote debugging enabled:');
+        console.log('\n   macOS:');
+        console.log('   "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge" --remote-debugging-port=9222');
+        console.log('\n   Windows:');
+        console.log('   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe" --remote-debugging-port=9222');
+        console.log('\n   Linux:');
+        console.log('   microsoft-edge --remote-debugging-port=9222');
+        console.log('\n   💡 Make sure Edge is completely closed before starting with this flag');
+        console.log('   💡 You can verify it\'s working by visiting: http://localhost:9222/json');
+        throw new Error('Edge must be started with --remote-debugging-port=9222. See instructions above.');
       }
-      
-      connectedToExisting = true;
-      console.log('   ✓ Connected to existing Chrome instance');
-      
-      // Get all contexts - manually opened tabs are usually in the default context
-      const contexts = browser.contexts();
-      console.log(`   📋 Found ${contexts.length} context(s)`);
-      
-      // First, try to find a page with the product URL in any context
-      let foundPage = null;
-      let foundContext = null;
-      
-      for (const ctx of contexts) {
-        try {
-          const pages = ctx.pages();
-          console.log(`   🔍 Checking context with ${pages.length} page(s)...`);
-          
-          for (const p of pages) {
-            try {
-              const url = p.url();
-              console.log(`      - Page URL: ${url.substring(0, 80)}...`);
-              
-              // Check if this page matches the product URL
-              if (url.includes('lowes.com/configure') || 
-                  url.includes(product.url) ||
-                  (url.includes('lowes.com') && url.includes(product.url.split('?')[0]))) {
-                foundPage = p;
-                foundContext = ctx;
-                console.log(`   ✅ Found existing tab with product page!`);
-                break;
-              }
-            } catch (e) {
-              // Page might be closed or inaccessible, skip it
-            }
-          }
-          
-          if (foundPage) break;
-        } catch (e) {
-          console.log(`   ⚠️  Error checking context: ${e.message}`);
-        }
-      }
-      
-      if (foundPage && foundContext) {
-        // Verify the found page actually contains lowes.com
-        try {
-          const foundUrl = foundPage.url();
-          if (foundUrl.includes('lowes.com')) {
-            // Use the existing page and context
-            localPage = foundPage;
-            localContext = foundContext;
-            console.log('   ✓ Using existing tab with Lowe\'s product page');
-          } else {
-            // Found page doesn't have lowes.com - create new tab instead
-            console.log('   ⚠️  Found page does not contain lowes.com, creating new tab');
-            if (contexts.length > 0) {
-              localContext = contexts[0];
-            } else {
-              localContext = await browser.newContext({
-                viewport: { width: 1920, height: 1080 },
-                userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                locale: 'en-US',
-                timezoneId: 'America/New_York',
-                permissions: ['geolocation'],
-                geolocation: { longitude: -74.006, latitude: 40.7128 },
-                colorScheme: 'light',
-                extraHTTPHeaders: {
-                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                  'Accept-Language': 'en-US,en;q=0.9',
-                  'Accept-Encoding': 'gzip, deflate, br',
-                  'Connection': 'keep-alive',
-                  'Upgrade-Insecure-Requests': '1'
-                }
-              });
-            }
-            localPage = await localContext.newPage();
-            console.log('   ✓ Created new tab for testing');
-          }
-        } catch (e) {
-          // Error checking URL - create new tab to be safe
-          console.log('   ⚠️  Error checking found page URL, creating new tab');
-          if (contexts.length > 0) {
-            localContext = contexts[0];
-          } else {
-            localContext = await browser.newContext({
-              viewport: { width: 1920, height: 1080 },
-              userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              locale: 'en-US',
-              timezoneId: 'America/New_York',
-              permissions: ['geolocation'],
-              geolocation: { longitude: -74.006, latitude: 40.7128 },
-              colorScheme: 'light',
-              extraHTTPHeaders: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1'
-              }
-            });
-          }
-          localPage = await localContext.newPage();
-          console.log('   ✓ Created new tab for testing');
-        }
-      } else {
-        // No matching tab found - check existing pages for lowes.com
-        let hasLowesPage = false;
-        let lowesContext = null;
-        let lowesPage = null;
-        
-        // Check all contexts and pages for any lowes.com page
-        for (const ctx of contexts) {
-          try {
-            const pages = ctx.pages();
-            for (const p of pages) {
-              try {
-                const url = p.url();
-                if (url.includes('lowes.com')) {
-                  hasLowesPage = true;
-                  lowesContext = ctx;
-                  lowesPage = p;
-                  break;
-                }
-              } catch (e) {
-                // Skip inaccessible pages
-              }
-            }
-            if (hasLowesPage) break;
-          } catch (e) {
-            // Skip inaccessible contexts
-          }
-        }
-        
-        if (hasLowesPage && lowesPage && lowesContext) {
-          // Found a lowes.com page - use it
-          localPage = lowesPage;
-          localContext = lowesContext;
-          console.log('   ✓ Using existing Lowe\'s page');
-        } else {
-          // No lowes.com page found - create new tab
-          if (contexts.length > 0) {
-            localContext = contexts[0]; // Use default context (where manually opened tabs are)
-            console.log('   ✓ Using default Chrome context, creating new tab');
-          } else {
-            // No contexts available, create one (shouldn't happen, but just in case)
-            localContext = await browser.newContext({
-              viewport: { width: 1920, height: 1080 },
-              userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              locale: 'en-US',
-              timezoneId: 'America/New_York',
-              permissions: ['geolocation'],
-              geolocation: { longitude: -74.006, latitude: 40.7128 },
-              colorScheme: 'light',
-              extraHTTPHeaders: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1'
-              }
-            });
-            console.log('   ✓ Created new context in existing Chrome');
-          }
-          
-          // Always create a new page - don't reuse non-Lowe's pages
-          localPage = await localContext.newPage();
-          console.log('   ✓ Created new tab for testing (no Lowe\'s page found)');
-        }
-      }
-    } catch (cdpError) {
-      // Strategy 2: Launch new Chrome instance
-      console.log(`   ⚠️  Could not connect to Chrome on port 9222: ${cdpError.message}`);
-      console.log('   ℹ️  Launching new Chrome instance instead...');
-      console.log('   💡 Tip: To open in tabs, start Chrome with: chrome --remote-debugging-port=9222');
-      console.log('   💡 Make sure Chrome is completely closed before starting with remote debugging');
-      
-      browser = await chromium.launch({ 
-        headless: headless,
-        channel: 'chrome',
-        args: [
-          '--disable-blink-features=AutomationControlled',
-          '--disable-dev-shm-usage',
-          '--no-first-run'
-        ]
-      });
-      
-      // Create browser context with realistic settings
-      localContext = await browser.newContext({
-        viewport: { width: 1920, height: 1080 },
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        locale: 'en-US',
-        timezoneId: 'America/New_York',
-        permissions: ['geolocation'],
-        geolocation: { longitude: -74.006, latitude: 40.7128 },
-        colorScheme: 'light',
-        extraHTTPHeaders: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Cache-Control': 'max-age=0',
-          'DNT': '1',
-          'Referer': 'https://www.google.com/'
-        }
-      });
-      
-      localPage = await localContext.newPage();
     }
+    
+    connectedToExisting = true;
+    console.log('   ✓ Connected to existing Edge instance');
+    
+    // Get all contexts - use the default context (where manually opened tabs are)
+    const contexts = browser.contexts();
+    console.log(`   📋 Found ${contexts.length} context(s)`);
+    
+    // Use the first available context (usually the default one with your tabs)
+    // If no contexts exist, create a new one
+    if (contexts.length > 0) {
+      localContext = contexts[0];
+      console.log('   ✓ Using existing Edge context');
+    } else {
+      // Create a new context in the connected browser
+      localContext = await browser.newContext();
+      console.log('   ✓ Created new context in existing Edge');
+    }
+    
+    // Always create a new page (new tab) for testing
+    localPage = await localContext.newPage();
+    console.log('   ✓ Created new tab in existing Edge instance');
   }
   
   // Use localPage and localContext for the rest of the function
@@ -363,18 +843,26 @@ async function testProduct(product, options = {}) {
     return result;
   }
   
-  // Remove webdriver property to avoid detection
+  // Enhanced anti-detection script
   await page.addInitScript(() => {
+      // Remove webdriver property
       Object.defineProperty(navigator, 'webdriver', {
         get: () => false,
       });
       
-      // Override the plugins property to use a custom getter
+      // Override plugins to look real
       Object.defineProperty(navigator, 'plugins', {
-        get: () => [1, 2, 3, 4, 5],
+        get: () => {
+          const plugins = [
+            { name: 'Chrome PDF Plugin', filename: 'internal-pdf-viewer', description: 'Portable Document Format' },
+            { name: 'Chrome PDF Viewer', filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai', description: '' },
+            { name: 'Native Client', filename: 'internal-nacl-plugin', description: '' }
+          ];
+          return plugins;
+        },
       });
       
-      // Override the languages property to use a custom getter
+      // Override languages
       Object.defineProperty(navigator, 'languages', {
         get: () => ['en-US', 'en'],
       });
@@ -382,6 +870,9 @@ async function testProduct(product, options = {}) {
       // Override chrome property
       window.chrome = {
         runtime: {},
+        loadTimes: function() {},
+        csi: function() {},
+        app: {}
       };
       
       // Override permissions
@@ -391,6 +882,58 @@ async function testProduct(product, options = {}) {
           Promise.resolve({ state: Notification.permission }) :
           originalQuery(parameters)
       );
+      
+      // Override getBattery
+      if (navigator.getBattery) {
+        navigator.getBattery = () => Promise.resolve({
+          charging: true,
+          chargingTime: 0,
+          dischargingTime: Infinity,
+          level: 1
+        });
+      }
+      
+      // Override platform
+      Object.defineProperty(navigator, 'platform', {
+        get: () => 'MacIntel',
+      });
+      
+      // Override hardwareConcurrency
+      Object.defineProperty(navigator, 'hardwareConcurrency', {
+        get: () => 8,
+      });
+      
+      // Override deviceMemory
+      Object.defineProperty(navigator, 'deviceMemory', {
+        get: () => 8,
+      });
+      
+      // Override connection
+      if (navigator.connection) {
+        Object.defineProperty(navigator, 'connection', {
+          get: () => ({
+            effectiveType: '4g',
+            rtt: 50,
+            downlink: 10,
+            saveData: false
+          }),
+        });
+      }
+      
+      // Remove automation indicators
+      delete navigator.__proto__.webdriver;
+      
+      // Override toString methods
+      const getParameter = WebGLRenderingContext.prototype.getParameter;
+      WebGLRenderingContext.prototype.getParameter = function(parameter) {
+        if (parameter === 37445) {
+          return 'Intel Inc.';
+        }
+        if (parameter === 37446) {
+          return 'Intel Iris OpenGL Engine';
+        }
+        return getParameter.call(this, parameter);
+      };
     });
     
   page.setDefaultTimeout(60000);
@@ -432,48 +975,187 @@ async function testProduct(product, options = {}) {
     
     if (isOnProductPage) {
       console.log(`   ✅ Already on product page - ready to test!`);
+      // Wait for page to be ready
+      await page.waitForTimeout(2000);
+      
+      // Immediately look for customize button once product page is detected
+      await clickCustomizeButton(page, null);
     } else {
-      // Navigate to product page
-      console.log(`   🛒 Navigating to product page...`);
-      try {
-        await page.goto(product.url, {
-          waitUntil: 'domcontentloaded',
-          timeout: 60000
-        });
-        await page.waitForTimeout(3000);
-        console.log(`   ✅ Navigated to product page`);
-      } catch (e) {
-        console.log(`   ⚠️  Navigation error: ${e.message}`);
-        throw new Error(`Failed to navigate to product: ${e.message}`);
+      // Navigate to product by pasting URL in address bar
+      console.log(`   🛒 Navigating to product...`);
+      let navigationSuccess = false;
+      let retryCount = 0;
+      const maxRetries = 3; // Increased retries
+      
+      while (!navigationSuccess && retryCount <= maxRetries) {
+        try {
+          if (retryCount > 0) {
+            console.log(`   🔄 Retry attempt ${retryCount}/${maxRetries}...`);
+            // Wait longer between retries (exponential backoff)
+            const backoffDelay = Math.min(10000 * Math.pow(2, retryCount - 1), 30000); // Up to 30 seconds
+            console.log(`   ⏳ Waiting ${(backoffDelay / 1000).toFixed(1)}s before retry...`);
+            await page.waitForTimeout(backoffDelay);
+          }
+          
+          await navigateToProductOrganically(page, product);
+          
+          // Wait longer for page to fully load
+          await page.waitForTimeout(5000 + Math.random() * 5000);
+          
+          // Check for access denied after navigation (with longer wait)
+          const denied = await handleAccessDenied(page, 90); // 90 seconds wait
+          if (denied) {
+            // Verify we're actually on a product page
+            const currentUrl = page.url();
+            const isOnProductPage = currentUrl.includes('lowes.com') && 
+                                    (currentUrl.includes('/p/') || 
+                                     currentUrl.includes('/configure/') || 
+                                     currentUrl.includes('omniItemId='));
+            
+            if (isOnProductPage) {
+              // Additional wait to ensure page is fully loaded
+              await page.waitForTimeout(3000 + Math.random() * 3000);
+              navigationSuccess = true;
+              console.log(`   ✅ Navigated to product page organically`);
+              
+              // Immediately look for customize button once product page is detected
+              // (checkAccessDeniedPeriodic will be defined later, pass null for now)
+              await clickCustomizeButton(page, null);
+            } else {
+              throw new Error('Not on product page after navigation');
+            }
+          } else {
+            throw new Error('Access denied after navigation');
+          }
+        } catch (e) {
+          retryCount++;
+          console.log(`   ⚠️  Navigation attempt ${retryCount} failed: ${e.message}`);
+          
+          if (retryCount > maxRetries) {
+            console.log(`\n   ❌ All automated navigation attempts failed`);
+            console.log(`   💡 MANUAL INTERVENTION REQUIRED:`);
+            console.log(`   💡 The browser tab is open - please manually:`);
+            console.log(`      1. Navigate to lowes.com`);
+            console.log(`      2. Search for: ${product.name || product.model}`);
+            console.log(`      3. Click on the product`);
+            console.log(`      4. Wait for the product page to load`);
+            console.log(`   💡 The automation will check every 5 seconds and continue when you're ready`);
+            console.log(`   💡 Waiting up to 3 minutes for manual navigation...\n`);
+            
+            // Wait for manual navigation with longer timeout
+            const manualSuccess = await handleAccessDenied(page, 180); // 3 minutes
+            if (manualSuccess) {
+              const currentUrl = page.url();
+              const isOnProductPage = currentUrl.includes('lowes.com') && 
+                                      (currentUrl.includes('/p/') || 
+                                       currentUrl.includes('/configure/') || 
+                                       currentUrl.includes('omniItemId='));
+              
+              if (isOnProductPage) {
+                navigationSuccess = true;
+                console.log(`   ✅ Manual navigation successful - continuing with test`);
+                
+                // Immediately look for customize button once product page is detected
+                await clickCustomizeButton(page, null);
+              } else {
+                console.log(`   ⚠️  You're on lowes.com but not on a product page yet`);
+                console.log(`   💡 Please navigate to the product page`);
+                await handleAccessDenied(page, 120); // Wait another 2 minutes
+                const finalUrl = page.url();
+                if (finalUrl.includes('/p/') || finalUrl.includes('/configure/') || finalUrl.includes('omniItemId=')) {
+                  navigationSuccess = true;
+                }
+              }
+            }
+            
+            if (!navigationSuccess) {
+              throw new Error('Failed to navigate to product after all attempts and manual intervention. Please try again later or use a different approach.');
+            }
+          }
+        }
       }
     }
     
-    // Wait for page to fully load and check for access denied
-    await page.waitForTimeout(2000);
+    // Final check for access denied before proceeding (with longer wait)
+    await page.waitForTimeout(3000 + Math.random() * 2000);
     
-    const pageCheck = await page.evaluate(() => {
-      return {
-        title: document.title,
-        bodyText: document.body?.textContent?.substring(0, 200) || '',
-        url: window.location.href
-      };
-    });
-    
-    if (pageCheck.title.includes('Access Denied') || pageCheck.bodyText.includes('Access Denied')) {
-      console.log(`   ⚠️  Access denied detected on product page`);
-      throw new Error('Access denied on product page');
+    const finalCheck = await handleAccessDenied(page, 30);
+    if (!finalCheck) {
+      console.log(`   ⚠️  Access denied still present - waiting for manual resolution...`);
+      console.log(`   💡 Please manually navigate to the product page if needed`);
+      await handleAccessDenied(page, 120); // Wait up to 2 minutes
     }
     
     console.log(`   ✅ Product page loaded successfully`);
     
+    // Periodic check for access denied (catches errors after page refreshes)
+    const checkAccessDeniedPeriodic = async () => {
+      try {
+        const check = await page.evaluate(() => {
+          const bodyText = document.body?.textContent || '';
+          const title = document.title || '';
+          const url = window.location.href || '';
+          
+          return {
+            denied: bodyText.includes('Access Denied') || 
+                   title.includes('Access Denied') ||
+                   url.includes('errors.edgesuite.net') ||
+                   bodyText.includes('Reference #') ||
+                   bodyText.includes('You don\'t have permission'),
+            url: url
+          };
+        });
+        
+        if (check.denied) {
+          console.log(`\n   ⚠️  ACCESS DENIED DETECTED (after page interaction)`);
+          console.log(`   💡 Current URL: ${check.url}`);
+          console.log(`   💡 The browser window is open - please manually navigate back to the product page`);
+          console.log(`   💡 Waiting up to 60 seconds for manual navigation...\n`);
+          
+          const resolved = await handleAccessDenied(page, 60);
+          if (!resolved) {
+            throw new Error('Access denied persists after manual intervention timeout');
+          }
+          
+          console.log(`   ✅ Access denied resolved - continuing with test`);
+        }
+      } catch (e) {
+        // Ignore check errors, but log them
+        if (e.message.includes('Access denied')) {
+          throw e;
+        }
+      }
+    };
+    
     // Wait for page to fully load before starting interactions
     await page.waitForTimeout(3000);
+    
+    // Check for access denied before starting
+    await checkAccessDeniedPeriodic();
     
     // Scroll to top to ensure we can see configuration options
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(1000);
     
+    // Customize button should already be clicked (done immediately after product page detection)
+    // But check again in case it wasn't found the first time
     console.log(`   🔧 Starting product configuration (width, height, color)...`);
+    
+    // Try clicking customize again if needed (in case it wasn't found earlier)
+    try {
+      const customizeAlreadyClicked = await page.evaluate(() => {
+        // Check if we're already in customize mode by looking for configuration options
+        const hasConfigOptions = document.querySelector('select[name*="width" i], select[name*="height" i], [class*="color" i][class*="selector" i]');
+        return !!hasConfigOptions;
+      });
+      
+      if (!customizeAlreadyClicked) {
+        console.log(`   🔍 Re-checking for "Customize" button...`);
+        await clickCustomizeButton(page, checkAccessDeniedPeriodic);
+      }
+    } catch (e) {
+      // Continue anyway
+    }
     
     // Simulate human-like behavior: scroll and mouse movement
     try {
@@ -494,38 +1176,6 @@ async function testProduct(product, options = {}) {
       await page.waitForTimeout(500);
     } catch (e) {
       // Ignore errors from mouse/scroll simulation
-    }
-    
-    // Check if we got an access denied page (re-check after navigation)
-    // Don't throw error - just log it and continue (browser stays open)
-    const productPageTitle = await page.title();
-    const productPageUrl = page.url();
-    const productPageContent = await page.content();
-    
-    const isProductPageDenied = productPageTitle.includes('Access Denied') || 
-                                productPageContent.includes('Access Denied') || 
-                                productPageContent.includes('errors.edgesuite.net') ||
-                                productPageUrl.includes('errors.edgesuite.net') ||
-                                productPageContent.includes('Reference #');
-    
-    if (isProductPageDenied) {
-      console.log(`   ⚠️  Access denied on product page - browser will remain open for manual review`);
-      result.error = 'Access Denied: Lowe\'s is blocking automated access. Browser window remains open for manual review.';
-      // Don't throw - continue with what we can do (browser stays open)
-    }
-    
-    // Additional check: look for common access denied indicators
-    const hasAccessDenied = await page.evaluate(() => {
-      const bodyText = document.body?.textContent || '';
-      return bodyText.includes('Access Denied') || 
-             bodyText.includes('You don\'t have permission') ||
-             document.querySelector('h1')?.textContent?.includes('Access Denied');
-    });
-    
-    if (hasAccessDenied && !result.error) {
-      console.log(`   ⚠️  Access denied detected - browser will remain open for manual review`);
-      result.error = 'Access Denied: Lowe\'s is blocking automated access. Browser window remains open for manual review.';
-      // Don't throw - continue (browser stays open)
     }
 
     // Select random width if not provided (18-84)
@@ -636,8 +1286,14 @@ async function testProduct(product, options = {}) {
       console.log(`   ⚠️  Could not select height: ${error.message}`);
     }
 
-    // Wait for price to update after dimension selection
-    await page.waitForTimeout(2000);
+    // Wait longer for price to update after dimension selection (page may refresh)
+    await page.waitForTimeout(4000 + Math.random() * 3000);
+    
+    // Check for access denied after dimension selection (page may refresh)
+    await checkAccessDeniedPeriodic();
+    
+    // Additional wait to ensure page is stable
+    await page.waitForTimeout(2000 + Math.random() * 2000);
 
     // Try to select a color from the grid of swatches
     // Look specifically for color swatch buttons/images, not generic clickable elements
@@ -796,8 +1452,14 @@ async function testProduct(product, options = {}) {
       console.log(`   ⚠️  Could not select color: ${error.message}`);
     }
 
-    // Wait for price to update after color selection
-    await page.waitForTimeout(2000);
+    // Wait longer for price to update after color selection (page may refresh)
+    await page.waitForTimeout(4000 + Math.random() * 3000);
+    
+    // Check for access denied after color selection (page may refresh)
+    await checkAccessDeniedPeriodic();
+    
+    // Additional wait to ensure page is stable
+    await page.waitForTimeout(2000 + Math.random() * 2000);
 
     // Extract prices from the page - look for Lowe's specific price structure
     const prices = await page.evaluate(() => {
@@ -1100,205 +1762,176 @@ async function testProducts(products, options = {}) {
   let connectedToExisting = false; // Track if we connected to existing Chrome
   
   try {
-    console.log('\n🚀 Opening Google Chrome browser...');
+    console.log('\n🚀 Connecting to existing Edge instance...');
     
-    // Strategy 1: Try to connect to existing Chrome instance (opens in new tab)
+    // Connect to existing Edge instance via remote debugging (REQUIRED)
     try {
       browser = await chromium.connectOverCDP('http://localhost:9222');
-      connectedToExisting = true;
-      console.log('   ✓ Connected to existing Chrome instance (will open in new tab)');
-      
-      // Get existing context or create new one
-      const contexts = browser.contexts();
-      if (contexts.length > 0) {
-        context = contexts[0];
-        console.log('   ✓ Using existing Chrome context');
-      } else {
-        context = await browser.newContext({
-          viewport: { width: 1920, height: 1080 },
-          userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          locale: 'en-US',
-          timezoneId: 'America/New_York',
-          permissions: ['geolocation'],
-          geolocation: { longitude: -74.006, latitude: 40.7128 },
-          colorScheme: 'light',
-          extraHTTPHeaders: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-User': '?1',
-            'Cache-Control': 'max-age=0',
-            'DNT': '1'
-          }
-        });
-        console.log('   ✓ Created new context in existing Chrome (opens as tab)');
+    } catch (e1) {
+      console.log(`   ⚠️  localhost failed: ${e1.message}, trying 127.0.0.1...`);
+      try {
+        browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
+      } catch (e2) {
+        console.log('\n   ❌ ERROR: Could not connect to Edge on port 9222');
+        console.log('\n   📋 To fix this, you need to start Edge with remote debugging enabled:');
+        console.log('\n   macOS:');
+        console.log('   "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge" --remote-debugging-port=9222');
+        console.log('\n   Windows:');
+        console.log('   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe" --remote-debugging-port=9222');
+        console.log('\n   Linux:');
+        console.log('   microsoft-edge --remote-debugging-port=9222');
+        console.log('\n   💡 Make sure Edge is completely closed before starting with this flag');
+        console.log('   💡 You can verify it\'s working by visiting: http://localhost:9222/json');
+        throw new Error('Edge must be started with --remote-debugging-port=9222. See instructions above.');
       }
-    } catch (cdpError) {
-      // Strategy 2: Use a temporary profile directory (avoids profile lock)
-      console.log('   ℹ️  No existing Chrome instance found, launching new Chrome...');
-      console.log('   💡 Tip: To open in tabs, start Chrome with: chrome --remote-debugging-port=9222');
-      
-      // Use a temporary profile directory to avoid conflicts with running Chrome
-      const os = require('os');
-      const tempProfileDir = path.join(os.tmpdir(), 'lowes-test-profile-' + Date.now());
-      
-      // Launch with temporary profile - this avoids the profile lock issue
-      context = await chromium.launchPersistentContext(tempProfileDir, {
-        headless: false, // Always visible
-        channel: 'chrome', // Use installed Google Chrome
-        args: [
-          '--disable-blink-features=AutomationControlled',
-          '--disable-dev-shm-usage',
-          '--no-first-run'
-        ],
-        viewport: { width: 1920, height: 1080 },
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        locale: 'en-US',
-        timezoneId: 'America/New_York',
-        permissions: ['geolocation'],
-        geolocation: { longitude: -74.006, latitude: 40.7128 },
-        colorScheme: 'light',
-        extraHTTPHeaders: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Cache-Control': 'max-age=0',
-          'DNT': '1'
-        }
-      });
-      
-      browser = context.browser();
-      console.log('   ✓ Launched Chrome with temporary profile (avoids profile lock)');
-    }
-    console.log('   ✓ Chrome browser opened');
-    // Get or create a page from the context
-    const pages = context.pages();
-    if (pages.length > 0) {
-      page = pages[0]; // Use existing page
-    } else {
-      page = await context.newPage(); // Create new page if none exists
     }
     
-    // Remove webdriver property to avoid detection
+    connectedToExisting = true;
+    console.log('   ✓ Connected to existing Edge instance (will open in new tab)');
+    
+    // Get existing context or use the default one
+    const contexts = browser.contexts();
+    if (contexts.length > 0) {
+      context = contexts[0];
+      console.log('   ✓ Using existing Edge context');
+    } else {
+      // Create a new context in the connected browser
+      context = await browser.newContext();
+      console.log('   ✓ Created new context in existing Edge');
+    }
+    
+    // Always create a new page (new tab) for testing
+    page = await context.newPage();
+    console.log('   ✓ Created new tab in existing Edge instance');
+    
+    // Enhanced anti-detection script (same as in testProduct)
     await page.addInitScript(() => {
+      // Remove webdriver property
       Object.defineProperty(navigator, 'webdriver', {
         get: () => false,
       });
       
+      // Override plugins to look real
       Object.defineProperty(navigator, 'plugins', {
-        get: () => [1, 2, 3, 4, 5],
+        get: () => {
+          const plugins = [
+            { name: 'Chrome PDF Plugin', filename: 'internal-pdf-viewer', description: 'Portable Document Format' },
+            { name: 'Chrome PDF Viewer', filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai', description: '' },
+            { name: 'Native Client', filename: 'internal-nacl-plugin', description: '' }
+          ];
+          return plugins;
+        },
       });
       
+      // Override languages
       Object.defineProperty(navigator, 'languages', {
         get: () => ['en-US', 'en'],
       });
       
+      // Override chrome property
       window.chrome = {
         runtime: {},
+        loadTimes: function() {},
+        csi: function() {},
+        app: {}
       };
       
+      // Override permissions
       const originalQuery = window.navigator.permissions.query;
       window.navigator.permissions.query = (parameters) => (
         parameters.name === 'notifications' ?
           Promise.resolve({ state: Notification.permission }) :
           originalQuery(parameters)
       );
+      
+      // Override getBattery
+      if (navigator.getBattery) {
+        navigator.getBattery = () => Promise.resolve({
+          charging: true,
+          chargingTime: 0,
+          dischargingTime: Infinity,
+          level: 1
+        });
+      }
+      
+      // Override platform
+      Object.defineProperty(navigator, 'platform', {
+        get: () => 'MacIntel',
+      });
+      
+      // Override hardwareConcurrency
+      Object.defineProperty(navigator, 'hardwareConcurrency', {
+        get: () => 8,
+      });
+      
+      // Override deviceMemory
+      Object.defineProperty(navigator, 'deviceMemory', {
+        get: () => 8,
+      });
+      
+      // Override connection
+      if (navigator.connection) {
+        Object.defineProperty(navigator, 'connection', {
+          get: () => ({
+            effectiveType: '4g',
+            rtt: 50,
+            downlink: 10,
+            saveData: false
+          }),
+        });
+      }
+      
+      // Remove automation indicators
+      delete navigator.__proto__.webdriver;
+      
+      // Override toString methods
+      const getParameter = WebGLRenderingContext.prototype.getParameter;
+      WebGLRenderingContext.prototype.getParameter = function(parameter) {
+        if (parameter === 37445) {
+          return 'Intel Inc.';
+        }
+        if (parameter === 37446) {
+          return 'Intel Iris OpenGL Engine';
+        }
+        return getParameter.call(this, parameter);
+      };
     });
     
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
     
-    // Visit lowes.com homepage FIRST to establish session
-    // This session will be maintained across all product tests
-    console.log('📍 Establishing session on lowes.com homepage...');
-    try {
-      // Navigate with realistic referrer
-      await page.goto('https://www.lowes.com', { 
-        waitUntil: 'domcontentloaded',
-        timeout: 60000,
-        referer: 'https://www.google.com/' // Look like coming from Google search
-      });
-      
-      // Wait for page to load with realistic delays
-      await page.waitForTimeout(3000 + Math.random() * 2000); // 3-5 seconds
-      
-      // Handle cookie consent if present
-      try {
-        const cookieButtons = await page.$$('button[id*="accept" i], button[class*="accept" i], button:has-text("Accept"), button:has-text("I Accept")');
-        for (const btn of cookieButtons) {
-          if (await btn.isVisible()) {
-            await btn.click();
-            await page.waitForTimeout(1000);
-            console.log('   ✓ Accepted cookies');
-            break;
-          }
-        }
-      } catch (e) {
-        // No cookie banner
-      }
-      
-      // Simulate human behavior - scroll and interact
-      await page.evaluate(() => {
-        window.scrollTo(0, 300 + Math.random() * 200);
-      });
-      await page.waitForTimeout(1000 + Math.random() * 1000);
-      
-      // Move mouse to simulate human
-      await page.mouse.move(400 + Math.random() * 200, 300 + Math.random() * 200);
-      await page.waitForTimeout(500);
-      
-      // Check if blocked on homepage
-      const homepageTitle = await page.title();
-      const homepageUrl = page.url();
-      const homepageContent = await page.content();
-      
-      if (homepageTitle.includes('Access Denied') || 
-          homepageUrl.includes('errors.edgesuite.net') ||
-          homepageContent.includes('Access Denied')) {
-        console.log(`   ⚠️  Access denied on homepage detected`);
-        console.log(`   💡 Workaround: The browser window is open - please manually navigate to lowes.com`);
-        console.log(`   💡 Once you're on lowes.com, the automation will continue with product testing`);
-        console.log(`   💡 Waiting 30 seconds for manual navigation...`);
-        
-        // Wait for user to manually navigate
-        await page.waitForTimeout(30000);
-        
-        // Check again after manual navigation
-        const newUrl = page.url();
-        if (newUrl.includes('lowes.com') && !newUrl.includes('errors.edgesuite.net')) {
-          console.log('   ✅ Manual navigation successful - continuing with automation');
-        } else {
-          throw new Error('Access Denied: Please manually navigate to lowes.com in the browser window, then the automation will continue');
-        }
-      } else {
-        // Session is now established - proceed to products
-        console.log('✅ Session established - ready to test products\n');
-      }
-    } catch (e) {
-      console.error(`❌ Failed to establish session: ${e.message}`);
-      console.log(`   💡 The browser window is still open - you can manually navigate to lowes.com`);
-      console.log(`   💡 The automation will attempt to continue after 30 seconds...`);
-      await page.waitForTimeout(30000);
-      // Don't throw - try to continue anyway
-    }
-    
-    // Now test all products using the established session
+    // Now test all products
     for (const product of products) {
       // Check if we should stop before each product
       if (shouldStop()) {
         console.log('\n🛑 Testing stopped by user');
         break;
+      }
+      
+      // Pause before each product to allow manual navigation if needed
+      console.log(`\n⏸️  Preparing to test: ${product.name}`);
+      console.log(`   💡 If you need to manually navigate, do so now in the browser tab`);
+      console.log(`   💡 The automation will start in 5 seconds...`);
+      await page.waitForTimeout(5000);
+      
+      // Check current state before starting
+      const currentUrl = page.url();
+      if (!currentUrl.includes('lowes.com') || currentUrl.includes('errors.edgesuite.net')) {
+        console.log(`   ⚠️  Not on lowes.com - waiting for manual navigation...`);
+        const resolved = await handleAccessDenied(page, 60);
+        if (!resolved) {
+          console.log(`   ⚠️  Still not on lowes.com - attempting to navigate...`);
+          try {
+            await page.goto('https://www.lowes.com', {
+              waitUntil: 'networkidle',
+              timeout: 90000
+            });
+            await page.waitForTimeout(5000 + Math.random() * 5000);
+            await handleAccessDenied(page, 60);
+          } catch (e) {
+            console.log(`   ⚠️  Navigation failed: ${e.message}`);
+          }
+        }
       }
       
       try {
@@ -1310,11 +1943,18 @@ async function testProducts(products, options = {}) {
         });
         results.push(result);
         
-        // Add delay between tests
+        // Add longer delay between tests to avoid rate limiting
         if (products.indexOf(product) < products.length - 1 && !shouldStop()) {
-          const delay = 3000 + Math.random() * 3000; // 3-6 seconds
-          console.log(`   ⏳ Waiting ${(delay / 1000).toFixed(1)}s before next product...\n`);
+          const delay = 8000 + Math.random() * 7000; // 8-15 seconds between products
+          console.log(`   ⏳ Waiting ${(delay / 1000).toFixed(1)}s before next product (avoiding rate limits)...\n`);
           await new Promise(resolve => setTimeout(resolve, delay));
+          
+          // Re-check access denied between products
+          const betweenCheck = await handleAccessDenied(page, 10);
+          if (!betweenCheck) {
+            console.log(`   ⚠️  Access denied detected between products - waiting for resolution...`);
+            await handleAccessDenied(page, 60);
+          }
         }
       } catch (error) {
         if (error.message.includes('stopped by user')) {
