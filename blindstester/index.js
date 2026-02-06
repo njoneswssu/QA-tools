@@ -879,10 +879,11 @@ if (!options.output) {
 }
 
 class BlindsConfiguratorTester {
-  constructor(configuratorUrl, headless = false, is2on1 = false) {
+  constructor(configuratorUrl, headless = false, is2on1 = false, configName = 'configuration') {
     this.configuratorUrl = configuratorUrl;
     this.headless = headless;
     this.is2on1 = is2on1;
+    this.configName = configName; // Store config name for reports
     this.browser = null;
     this.page = null;
     this.results = [];
@@ -1635,12 +1636,12 @@ class BlindsConfiguratorTester {
     console.log(chalk.green(`\n💾 JSON results saved to: ${path.basename(outputFile)}`));
 
     const gridOutputFile = outputFile.replace('.json', '-grid.txt');
-    const gridReport = generateGridReport(this.results);
+    const gridReport = generateGridReport(this.results, this.configName);
     fs.writeFileSync(gridOutputFile, gridReport);
     console.log(chalk.cyan(`📋 Grid report saved to: ${path.basename(gridOutputFile)}`));
 
     const compactOutputFile = outputFile.replace('.json', '-compact.txt');
-    const compactGrid = generateCompactGrid(this.results);
+    const compactGrid = generateCompactGrid(this.results, this.configName);
     fs.writeFileSync(compactOutputFile, compactGrid);
     console.log(chalk.cyan(`📊 Compact grid saved to: ${path.basename(compactOutputFile)}`));
   }
@@ -1691,8 +1692,9 @@ async function main() {
   }
 
   const is2on1 = config && config.name && config.name.toLowerCase().includes('2on1');
+  const configName = config ? config.name : 'configuration';
   
-  const tester = new BlindsConfiguratorTester(configuratorUrl, options.headless, is2on1);
+  const tester = new BlindsConfiguratorTester(configuratorUrl, options.headless, is2on1, configName);
 
   if (is2on1) {
     console.log(chalk.yellow('🔧 Detected 2 on 1 configuration - will test for 2 on 1 headrail option\n'));

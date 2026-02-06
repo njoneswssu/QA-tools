@@ -2,11 +2,11 @@ import fs from 'fs';
 import chalk from 'chalk';
 
 // Generate a grid report similar to the original image format
-export function generateGridReport(results, outputFile = 'grid-report.txt') {
+export function generateGridReport(results, configName = 'configuration') {
   const lines = [];
   
   lines.push('═'.repeat(120));
-  lines.push('BLINDS MAX HEIGHT TEST RESULTS - Grid Format');
+  lines.push(`BLINDS MAX HEIGHT TEST RESULTS - Grid Format - ${configName}`);
   lines.push('═'.repeat(120));
   lines.push('');
   lines.push('Legend: ✅ PASS | 🐛 BUG | ❌ FAIL | ⚠️  UNEXPECTED');
@@ -33,7 +33,7 @@ export function generateGridReport(results, outputFile = 'grid-report.txt') {
   // Generate grid for each product
   Object.keys(byProduct).sort().forEach(product => {
     lines.push('─'.repeat(120));
-    lines.push(`PRODUCT: ${product}`);
+    lines.push(`PRODUCT: ${product} (${configName})`);
     lines.push('─'.repeat(120));
     
     const widths = Object.keys(byProduct[product]).map(Number).sort((a, b) => a - b);
@@ -129,11 +129,11 @@ export function generateGridReport(results, outputFile = 'grid-report.txt') {
   return report;
 }
 
-export function generateCompactGrid(results, outputFile = 'compact-grid.txt') {
+export function generateCompactGrid(results, configName = 'configuration') {
   const lines = [];
   
   lines.push('═'.repeat(100));
-  lines.push('BLINDS MAX HEIGHT TEST RESULTS - Compact Grid');
+  lines.push(`BLINDS MAX HEIGHT TEST RESULTS - Compact Grid - ${configName}`);
   lines.push('═'.repeat(100));
   lines.push('');
   
@@ -164,7 +164,7 @@ export function generateCompactGrid(results, outputFile = 'compact-grid.txt') {
   
   // Print grid
   Object.keys(byProduct).sort().forEach(product => {
-    lines.push(`${product}:`);
+    lines.push(`${product} (${configName}):`);
     
     const widths = byProduct[product].sort((a, b) => a.width - b.width);
     
