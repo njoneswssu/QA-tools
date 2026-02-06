@@ -7,22 +7,18 @@ Automated testing tool for Home Depot custom blinds configurator to verify max h
 ```
 blindstester/
 ├── index.js              # Main test runner
-├── test-data.js          # Test data (products, widths, max heights)
+├── create-config.js      # Config file generator
 ├── grid-reporter.js      # Report generation
-├── cli.js                # CLI helper
-├── show-focus.js         # Show test scope
 ├── package.json          # Dependencies
 │
-├── docs/                 # Documentation files
-│   ├── README-FINAL.md   # Complete documentation
-│   ├── QUICKSTART.md     # Quick start guide
-│   └── ...
+├── configs/              # Configuration files
+│   ├── example-config.js # Example configuration
+│   ├── saved-configs.json # Saved configurator URLs
+│   └── README.md         # Config folder guide
 │
-├── debug-scripts/        # Debug and utility scripts
-│   ├── inspect.js
-│   ├── manual-test.js
-│   ├── quick-test.js
-│   └── ...
+├── docs/                 # Documentation
+│   ├── HOW-TO-PASTE-GRID.md           # Paste grid guide
+│   └── PARTIAL-SAVE-AND-2ON1-TESTING.md # Latest features
 │
 └── test-results/         # Test output (JSON, grid, compact)
     ├── test-results-*.json
@@ -62,12 +58,12 @@ If you prefer to save grid data for reuse:
 npm run create-config
 #
 # Choose method:
-#   1. Auto-extract from image (OCR) - Sometimes unreliable
-#   2. Paste from spreadsheet - 2 min ⭐ RECOMMENDED
+#   1. Paste from spreadsheet - 2 min ⭐ RECOMMENDED
+#   2. Auto-extract from image (OCR) - Sometimes unreliable
 #   3. Manual entry - 10 min (fallback)
 ```
 
-See [docs/SUPER-EASY-CONFIG.md](docs/SUPER-EASY-CONFIG.md) for config file methods.
+Saved configs load instantly on subsequent runs.
 
 ### Interactive Testing Mode
 
@@ -126,11 +122,9 @@ The easiest way to test different configurations with a **3-step wizard**:
 
 The tool automatically:
 - ✅ **Remembers URLs** - Saved in `configs/saved-configs.json`
-- ✅ **Validates files** - Checks grid images and config files
+- ✅ **Saves your data** - Config files load instantly next time
 - ✅ **Provides guidance** - Clear instructions for missing files
 - ✅ **Generates names** - Consistent file naming automatically
-
-See [docs/ENHANCED-INTERACTIVE-MODE.md](docs/ENHANCED-INTERACTIVE-MODE.md) for complete guide.
 
 ### Available Options
 
@@ -142,22 +136,31 @@ See [docs/ENHANCED-INTERACTIVE-MODE.md](docs/ENHANCED-INTERACTIVE-MODE.md) for c
 
 ### Creating New Configurations
 
-You can create multiple configurations for different products or scenarios:
+You can create multiple configurations for different products:
 
-1. **Add grid image** to `configs/grids/` folder
-2. **Create config file** (see `configs/example-config.js`)
-3. **Run with config**: `npm start -- --config configs/your-config.js`
+1. **Run `npm start`** and select options
+2. **Paste grid data** when prompted
+3. **Config saved automatically** for future use
 
-See `configs/README.md` for detailed instructions.
+See `configs/README.md` for manual config creation.
 
 ## 📊 How It Works
 
+### For Regular Configs
 1. **Selects mount type** (inside/outside)
 2. **Enters dimensions** (width and height)
 3. **Selects matching color swatch** (required for validation)
 4. **Checks if Single headrail is available**
    - ✅ PASS: Single NOT available (properly blocked)
    - 🐛 BUG: Single IS available (should be blocked)
+
+### For 2 on 1 Configs
+1. **Selects mount type** (inside/outside)
+2. **Enters dimensions** (width and height)
+3. **Selects matching color swatch** (required for validation)
+4. **Checks if 2 on 1 headrail is available**
+   - ✅ PASS: 2 on 1 NOT available (properly blocked)
+   - 🐛 BUG: 2 on 1 IS available (should be blocked)
 
 ## 🎯 Test Strategy
 
@@ -197,10 +200,11 @@ npm run clean-results -- --force
 ## 🛑 Stopping Tests
 
 Press **Ctrl+C** to gracefully stop tests:
-- Waits for current test to complete
-- Saves partial results
-- Press Ctrl+C twice to force exit
+- **1st Ctrl+C**: Waits for current test to complete, then saves results
+- **2nd Ctrl+C**: Force exit - saves partial results immediately
 
 ## 📚 Documentation
 
-See `docs/README-FINAL.md` for complete documentation.
+- **[docs/HOW-TO-PASTE-GRID.md](docs/HOW-TO-PASTE-GRID.md)** - How to paste grid data
+- **[docs/PARTIAL-SAVE-AND-2ON1-TESTING.md](docs/PARTIAL-SAVE-AND-2ON1-TESTING.md)** - Latest features
+- **[configs/README.md](configs/README.md)** - Config file guide

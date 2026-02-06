@@ -788,14 +788,65 @@ if (!options.output) {
 }
 
 class BlindsConfiguratorTester {
-  constructor(configuratorUrl, headless = false) {
+  constructor(configuratorUrl, headless = false, is2on1 = false) {
     this.configuratorUrl = configuratorUrl;
     this.headless = headless;
+    this.is2on1 = is2on1;
     this.browser = null;
     this.page = null;
     this.results = [];
     this.shutdownRequested = false;
     this.isTestingConfiguration = false;
+    this.completedProducts = new Set(); // Track completed products
+    this.progressFile = null; // Will be set when tests start
+  }
+
+  setProgressFile(configName) {
+    this.progressFile = path.join(__dirname, 'test-results', `.progress-${configName}.json`);
+  }
+
+  loadProgress() {
+    if (!this.progressFile || !fs.existsSync(this.progressFile)) {
+      return { completedProducts: [] };
+    }
+    
+    try {
+      const data = fs.readFileSync(this.progressFile, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      console.log(chalk.yellow(`⚠️  Could not load progress: ${error.message}`));
+      return { completedProducts: [] };
+    }
+  }
+
+  saveProgress() {
+    if (!this.progressFile) return;
+    
+    const progress = {
+      completedProducts: Array.from(this.completedProducts),
+      lastUpdated: new Date().toISOString()
+    };
+    
+    try {
+      const outputDir = path.dirname(this.progressFile);
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+      fs.writeFileSync(this.progressFile, JSON.stringify(progress, null, 2));
+    } catch (error) {
+      console.log(chalk.yellow(`⚠️  Could not save progress: ${error.message}`));
+    }
+  }
+
+  clearProgress() {
+    if (this.progressFile && fs.existsSync(this.progressFile)) {
+      try {
+        fs.unlinkSync(this.progressFile);
+        console.log(chalk.gray('  Progress file cleared'));
+      } catch (error) {
+        console.log(chalk.yellow(`⚠️  Could not clear progress: ${error.message}`));
+      }
+    }
   }
 
   async initialize() {
@@ -811,6 +862,15 @@ class BlindsConfiguratorTester {
     if (this.browser) {
       await this.browser.close();
     }
+  }
+
+  async cleanupAndSave(outputFile) {
+    // Save results first, then cleanup browser
+    if (this.results.length > 0) {
+      console.log(chalk.cyan('\n💾 Saving partial results before exit...'));
+      await this.saveResults(outputFile);
+    }
+    await this.cleanup();
   }
 
   async navigateToConfigurator() {
@@ -980,6 +1040,48 @@ class BlindsConfiguratorTester {
     }
   }
 
+  async canSelect2on1Headrail() {
+    console.log(chalk.cyan('  🔍 Checking if 2 on 1 headrail is available...'));
+    try {
+      await this.page.evaluate(() => window.scrollBy(0, 400));
+      await this.page.waitForTimeout(3000);
+
+      const allButtons = await this.page.$$('button');
+      let twoOnOneButton = null;
+      
+      for (const button of allButtons) {
+        const text = await button.textContent();
+        const trimmedText = text.trim().toLowerCase();
+        
+        // Look for "2 on 1" button
+        if (trimmedText.includes('2 on 1') || trimmedText.includes('2on1') || trimmedText.includes('2-on-1')) {
+          const isVisible = await button.isVisible();
+          const isDisabled = await button.isDisabled();
+          const opacity = await button.evaluate(el => window.getComputedStyle(el).opacity);
+          const pointerEvents = await button.evaluate(el => window.getComputedStyle(el).pointerEvents);
+          const display = await button.evaluate(el => window.getComputedStyle(el).display);
+          const visibility = await button.evaluate(el => window.getComputedStyle(el).visibility);
+          
+          if (isVisible && !isDisabled && opacity !== '0' && pointerEvents !== 'none' && display !== 'none' && visibility !== 'hidden') {
+            twoOnOneButton = button;
+            break;
+          }
+        }
+      }
+
+      if (twoOnOneButton) {
+        console.log(chalk.yellow('  ⚠️  2 on 1 headrail IS available (should be blocked!)'));
+        return true;
+      } else {
+        console.log(chalk.green('  ✓ 2 on 1 headrail NOT available (correctly hidden)'));
+        return false;
+      }
+    } catch (error) {
+      console.log(chalk.yellow(`  ⚠️  Error checking 2 on 1 headrail: ${error.message}`));
+      return false;
+    }
+  }
+
   async checkForErrors() {
     console.log(chalk.cyan('  🔍 Checking for validation errors...'));
     try {
@@ -1006,9 +1108,18 @@ class BlindsConfiguratorTester {
     }
   }
 
-  async testConfiguration(product, width, maxHeight, testHeight) {
+  async testConfiguration(product, width, maxHeight, testHeight, isMaxWidthTest = false, is144Test = false) {
     console.log(chalk.cyan(`\n🧪 Testing: ${product} @ ${width}" width`));
     console.log(chalk.gray(`   Max Height: ${maxHeight}" | Testing: ${testHeight}"`));
+    if (this.is2on1) {
+      console.log(chalk.gray(`   Mode: 2 on 1 headrail test`));
+    }
+    if (isMaxWidthTest) {
+      console.log(chalk.yellow(`   ⚠️  Max Width Test: Testing beyond max width`));
+    }
+    if (is144Test) {
+      console.log(chalk.cyan(`   ✨ 144" Test: Verifying 144" height is allowed`));
+    }
 
     const testResult = {
       product,
@@ -1016,13 +1127,22 @@ class BlindsConfiguratorTester {
       maxHeight,
       testHeight,
       singleAvailable: null,
+      twoOnOneAvailable: null,
+      mountType: null,
+      isMaxWidthTest,
+      is144Test,
       status: 'FAIL',
       timestamp: new Date().toISOString()
     };
 
     try {
       await this.navigateToConfigurator();
-      await this.selectMountType('inside');
+      
+      // Random mount selection
+      const mountType = Math.random() < 0.5 ? 'inside' : 'outside';
+      testResult.mountType = mountType;
+      console.log(chalk.gray(`   Mount: ${mountType}`));
+      await this.selectMountType(mountType);
       
       const dimensionsSet = await this.enterDimensions(width, testHeight);
       if (!dimensionsSet) {
@@ -1039,23 +1159,82 @@ class BlindsConfiguratorTester {
         return testResult;
       }
 
-      const singleAvailable = await this.canSelectSingleHeadrail();
-      testResult.singleAvailable = singleAvailable;
+      if (this.is2on1) {
+        // For 2on1 configurations, check if 2on1 headrail option is available
+        const twoOnOneAvailable = await this.canSelect2on1Headrail();
+        testResult.twoOnOneAvailable = twoOnOneAvailable;
 
-      await this.checkForErrors();
+        await this.checkForErrors();
 
-      if (testHeight > maxHeight && !singleAvailable) {
-        testResult.status = 'PASS';
-        console.log(chalk.green(`  ✅ PASS: Correctly blocked ${testHeight}" (max: ${maxHeight}") - Single headrail not available`));
-      } else if (testHeight > maxHeight && singleAvailable) {
-        testResult.status = 'BUG';
-        console.log(chalk.red(`  🐛 BUG: Allowed ${testHeight}" (max: ${maxHeight}") - Single headrail still available!`));
-      } else if (testHeight <= maxHeight && singleAvailable) {
-        testResult.status = 'PASS';
-        console.log(chalk.green(`  ✅ PASS: ${testHeight}" allowed (at or below max: ${maxHeight}") - Single headrail available`));
+        if (is144Test) {
+          // For 144" test, headrail SHOULD be available
+          if (twoOnOneAvailable) {
+            testResult.status = 'PASS';
+            console.log(chalk.green(`  ✅ PASS: 144" height allowed - 2 on 1 headrail available`));
+          } else {
+            testResult.status = 'BUG';
+            console.log(chalk.red(`  🐛 BUG: 144" height - 2 on 1 headrail NOT available (should be available)!`));
+          }
+        } else if (isMaxWidthTest) {
+          // For max width test, headrail should NOT be available
+          if (!twoOnOneAvailable) {
+            testResult.status = 'PASS';
+            console.log(chalk.green(`  ✅ PASS: Width ${width}" exceeds max - 2 on 1 headrail correctly unavailable`));
+          } else {
+            testResult.status = 'BUG';
+            console.log(chalk.red(`  🐛 BUG: Width ${width}" exceeds max - 2 on 1 headrail still available!`));
+          }
+        } else if (testHeight > maxHeight && !twoOnOneAvailable) {
+          testResult.status = 'PASS';
+          console.log(chalk.green(`  ✅ PASS: Correctly blocked ${testHeight}" (max: ${maxHeight}") - 2 on 1 headrail not available`));
+        } else if (testHeight > maxHeight && twoOnOneAvailable) {
+          testResult.status = 'BUG';
+          console.log(chalk.red(`  🐛 BUG: Allowed ${testHeight}" (max: ${maxHeight}") - 2 on 1 headrail still available!`));
+        } else if (testHeight <= maxHeight && twoOnOneAvailable) {
+          testResult.status = 'PASS';
+          console.log(chalk.green(`  ✅ PASS: ${testHeight}" allowed (at or below max: ${maxHeight}") - 2 on 1 headrail available`));
+        } else {
+          testResult.status = 'UNEXPECTED';
+          console.log(chalk.yellow(`  ⚠️  UNEXPECTED: ${testHeight}" (max: ${maxHeight}") - 2on1=${twoOnOneAvailable}`));
+        }
       } else {
-        testResult.status = 'UNEXPECTED';
-        console.log(chalk.yellow(`  ⚠️  UNEXPECTED: ${testHeight}" (max: ${maxHeight}") - Single=${singleAvailable}`));
+        // For regular configurations, check if single headrail option is available
+        const singleAvailable = await this.canSelectSingleHeadrail();
+        testResult.singleAvailable = singleAvailable;
+
+        await this.checkForErrors();
+
+        if (is144Test) {
+          // For 144" test, headrail SHOULD be available
+          if (singleAvailable) {
+            testResult.status = 'PASS';
+            console.log(chalk.green(`  ✅ PASS: 144" height allowed - Single headrail available`));
+          } else {
+            testResult.status = 'BUG';
+            console.log(chalk.red(`  🐛 BUG: 144" height - Single headrail NOT available (should be available)!`));
+          }
+        } else if (isMaxWidthTest) {
+          // For max width test, headrail should NOT be available
+          if (!singleAvailable) {
+            testResult.status = 'PASS';
+            console.log(chalk.green(`  ✅ PASS: Width ${width}" exceeds max - Single headrail correctly unavailable`));
+          } else {
+            testResult.status = 'BUG';
+            console.log(chalk.red(`  🐛 BUG: Width ${width}" exceeds max - Single headrail still available!`));
+          }
+        } else if (testHeight > maxHeight && !singleAvailable) {
+          testResult.status = 'PASS';
+          console.log(chalk.green(`  ✅ PASS: Correctly blocked ${testHeight}" (max: ${maxHeight}") - Single headrail not available`));
+        } else if (testHeight > maxHeight && singleAvailable) {
+          testResult.status = 'BUG';
+          console.log(chalk.red(`  🐛 BUG: Allowed ${testHeight}" (max: ${maxHeight}") - Single headrail still available!`));
+        } else if (testHeight <= maxHeight && singleAvailable) {
+          testResult.status = 'PASS';
+          console.log(chalk.green(`  ✅ PASS: ${testHeight}" allowed (at or below max: ${maxHeight}") - Single headrail available`));
+        } else {
+          testResult.status = 'UNEXPECTED';
+          console.log(chalk.yellow(`  ⚠️  UNEXPECTED: ${testHeight}" (max: ${maxHeight}") - Single=${singleAvailable}`));
+        }
       }
 
     } catch (error) {
@@ -1077,10 +1256,22 @@ class BlindsConfiguratorTester {
     }
   }
 
-  async runTests(productsToTest) {
+  async runTests(productsToTest, resumeFromProgress = false) {
     const configName = config ? config.name : 'configuration';
     console.log(chalk.cyan(`\n🎯 Starting test for ${configName}`));
-    console.log(chalk.gray('\n   Press Ctrl+C to stop after current test completes and save results\n'));
+    
+    // Set up progress tracking
+    this.setProgressFile(configName);
+    
+    // Load previous progress if resuming
+    if (resumeFromProgress) {
+      const progress = this.loadProgress();
+      this.completedProducts = new Set(progress.completedProducts);
+      console.log(chalk.green(`\n✓ Loaded progress: ${this.completedProducts.size} products already completed`));
+      console.log(chalk.gray('  Will skip completed products\n'));
+    }
+    
+    console.log(chalk.gray('   Press Ctrl+C to stop after current test completes and save results\n'));
 
     for (const product of productsToTest) {
       if (this.shutdownRequested) {
@@ -1088,10 +1279,47 @@ class BlindsConfiguratorTester {
         break;
       }
 
+      // Skip if already completed
+      if (this.completedProducts.has(product.product)) {
+        console.log(chalk.gray(`\n⏭️  Skipping ${product.product} - already completed`));
+        continue;
+      }
+
       console.log(chalk.bold.blue(`\n📦 Testing Product: ${product.product}`));
 
       let shouldSkipWidth = false;
 
+      // STEP 1: Test 144" height first (one width breakpoint)
+      // Find a breakpoint that supports 144" height
+      const breakpoint144 = product.widthBreakpoints.find(bp => bp.maxHeight === 144);
+      
+      if (breakpoint144 && !this.shutdownRequested) {
+        const testWidth = breakpoint144.width - 2;
+        console.log(chalk.cyan(`\n📏 STEP 1: Testing 144" height capability @ ${testWidth}" width`));
+        console.log(chalk.gray(`   Verifying that 144" height is allowed with headrail available\n`));
+        
+        this.isTestingConfiguration = true;
+        const test144Result = await this.testConfiguration(
+          product.product,
+          testWidth,
+          144,
+          144,
+          false,  // isMaxWidthTest
+          true    // is144Test
+        );
+        this.isTestingConfiguration = false;
+        
+        this.results.push(test144Result);
+        
+        if (test144Result.status === 'SKIPPED' || test144Result.status === 'ERROR') {
+          console.log(chalk.yellow(`  ⏭️  Skipping all tests for ${product.product} - 144" test ${test144Result.status}`));
+          shouldSkipWidth = true;
+          // Don't mark as completed if we skipped due to error
+          continue;
+        }
+      }
+
+      // STEP 2: Test regular width breakpoints (height above max)
       for (const breakpoint of product.widthBreakpoints) {
         if (this.shutdownRequested) {
           console.log(chalk.yellow('\n⏹️  Stopping tests due to shutdown request'));
@@ -1104,17 +1332,32 @@ class BlindsConfiguratorTester {
         }
 
         const { width, maxHeight } = breakpoint;
+        
+        // Skip if maxHeight is already 144" (already tested in STEP 1)
+        if (maxHeight === 144) {
+          console.log(chalk.gray(`\n📏 Skipping width ${width - 2}" - maxHeight is 144" (already tested in STEP 1)`));
+          continue;
+        }
+        
         const testWidth = width - 2;
         
+        // Calculate test height, but cap at 144" maximum
         const minAbove = maxHeight + 1;
-        const maxAbove = maxHeight + 20;
+        const maxAbove = Math.min(maxHeight + 20, 144); // Cap at 144"
         const randomHeight = Math.floor(Math.random() * (maxAbove - minAbove + 1)) + minAbove;
         
-        console.log(chalk.cyan(`\n📏 Testing width ${testWidth}" (max height: ${maxHeight}")`));
-        console.log(chalk.yellow(`   Note: Testing at ${randomHeight}" (randomly selected above max height)`));
+        console.log(chalk.cyan(`\n📏 STEP 2: Testing width ${testWidth}" (max height: ${maxHeight}")`));
+        console.log(chalk.yellow(`   Testing at ${randomHeight}" (randomly selected above max height, capped at 144")`));
         
         this.isTestingConfiguration = true;
-        const testResult = await this.testConfiguration(product.product, testWidth, maxHeight, randomHeight);
+        const testResult = await this.testConfiguration(
+          product.product,
+          testWidth,
+          maxHeight,
+          randomHeight,
+          false,  // isMaxWidthTest
+          false   // is144Test
+        );
         this.isTestingConfiguration = false;
         
         this.results.push(testResult);
@@ -1128,6 +1371,41 @@ class BlindsConfiguratorTester {
           console.log(chalk.yellow(`  ⏭️  Skipping remaining widths for ${product.product} due to ${testResult.status}`));
           shouldSkipWidth = true;
         }
+      }
+
+      // STEP 3: Test max width restriction (after all normal width tests)
+      if (!shouldSkipWidth && !this.shutdownRequested && product.widthBreakpoints.length > 0) {
+        // Find the maximum width from all breakpoints
+        const maxWidth = Math.max(...product.widthBreakpoints.map(bp => bp.width));
+        const beyondMaxWidth = maxWidth + 12; // Test 12" beyond max width
+        
+        // Use a reasonable height (not at max) for this test
+        const testHeight = 72;
+        
+        console.log(chalk.cyan(`\n📏 STEP 3: Testing max width restriction`));
+        console.log(chalk.yellow(`   Max width in table: ${maxWidth}"`));
+        console.log(chalk.yellow(`   Testing at: ${beyondMaxWidth}" (beyond max width)`));
+        console.log(chalk.gray(`   Headrail should NOT be available\n`));
+        
+        this.isTestingConfiguration = true;
+        const maxWidthTest = await this.testConfiguration(
+          product.product,
+          beyondMaxWidth,
+          testHeight, // Use as "maxHeight" but won't be compared in max width test
+          testHeight,
+          true,   // isMaxWidthTest
+          false   // is144Test
+        );
+        this.isTestingConfiguration = false;
+        
+        this.results.push(maxWidthTest);
+      }
+
+      // Mark product as completed (if not aborted)
+      if (!this.shutdownRequested && !shouldSkipWidth) {
+        this.completedProducts.add(product.product);
+        this.saveProgress();
+        console.log(chalk.green(`\n✅ Completed all tests for ${product.product}`));
       }
     }
   }
@@ -1197,21 +1475,80 @@ async function main() {
     }
   }
 
-  const tester = new BlindsConfiguratorTester(configuratorUrl, options.headless);
+  const is2on1 = config && config.name && config.name.toLowerCase().includes('2on1');
+  
+  const tester = new BlindsConfiguratorTester(configuratorUrl, options.headless, is2on1);
 
-  process.on('SIGINT', () => {
-    tester.requestShutdown();
-  });
+  if (is2on1) {
+    console.log(chalk.yellow('🔧 Detected 2 on 1 configuration - will test for 2 on 1 headrail option\n'));
+  }
 
-  process.on('SIGTERM', () => {
-    tester.requestShutdown();
-  });
+  let shutdownCount = 0;
+  const handleShutdown = async () => {
+    shutdownCount++;
+    if (shutdownCount === 1) {
+      tester.requestShutdown();
+    } else if (shutdownCount === 2) {
+      console.log(chalk.red('\n🛑 Force exit requested. Saving results immediately...\n'));
+      await tester.cleanupAndSave(options.output);
+      process.exit(0);
+    }
+  };
+
+  process.on('SIGINT', handleShutdown);
+  process.on('SIGTERM', handleShutdown);
 
   try {
     await tester.initialize();
-    await tester.runTests(productsToTest);
+    
+    // Check for existing progress
+    const configName = config ? config.name : 'configuration';
+    tester.setProgressFile(configName);
+    const progress = tester.loadProgress();
+    
+    let resumeFromProgress = false;
+    
+    if (progress.completedProducts && progress.completedProducts.length > 0) {
+      // Found previous progress, ask user
+      console.log(chalk.cyan('\n📋 Previous test progress found!'));
+      console.log(chalk.white(`   ${progress.completedProducts.length} product(s) already completed:`));
+      progress.completedProducts.forEach((product, index) => {
+        console.log(chalk.gray(`     ${index + 1}. ${product}`));
+      });
+      console.log();
+      
+      const totalProducts = productsToTest.length;
+      const remaining = totalProducts - progress.completedProducts.length;
+      
+      console.log(chalk.white('   What would you like to do?\n'));
+      console.log(chalk.white('     1. Resume from where you left off (test remaining products)'));
+      console.log(chalk.white('     2. Start fresh (clear progress and test all products)'));
+      console.log(chalk.white('     3. Exit\n'));
+      
+      const choice = await askQuestion('   Selection (1-3): ');
+      
+      if (choice.trim() === '1') {
+        resumeFromProgress = true;
+        console.log(chalk.green(`\n✓ Resuming tests - ${remaining} product(s) remaining\n`));
+      } else if (choice.trim() === '2') {
+        tester.clearProgress();
+        console.log(chalk.yellow('\n✓ Starting fresh - all products will be tested\n'));
+      } else {
+        console.log(chalk.yellow('\n⏹️  Exiting.\n'));
+        await tester.cleanup();
+        process.exit(0);
+      }
+    }
+    
+    await tester.runTests(productsToTest, resumeFromProgress);
     tester.printSummary();
     await tester.saveResults(options.output);
+    
+    // Clear progress file on successful completion
+    if (!tester.shutdownRequested) {
+      tester.clearProgress();
+      console.log(chalk.green('\n✅ All tests completed! Progress file cleared.\n'));
+    }
   } catch (error) {
     console.error(chalk.red(`\n❌ Fatal error: ${error.message}`));
     console.error(error.stack);
