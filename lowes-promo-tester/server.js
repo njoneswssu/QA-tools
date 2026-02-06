@@ -6,6 +6,23 @@ const { initDatabase } = require('./database/init');
 const { testProduct } = require('./scrapers/lowes-tester');
 const { chromium } = require('playwright');
 const fs = require('fs');
+const os = require('os');
+
+/**
+ * Get Edge user profile directory path
+ */
+function getEdgeUserDataDir() {
+  const platform = os.platform();
+  const homeDir = os.homedir();
+  
+  if (platform === 'darwin') {
+    return path.join(homeDir, 'Library', 'Application Support', 'Microsoft Edge');
+  } else if (platform === 'win32') {
+    return path.join(homeDir, 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data');
+  } else {
+    return path.join(homeDir, '.config', 'microsoft-edge');
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -438,101 +455,140 @@ async function testAllProductsSequentially(products) {
   testingState.currentProduct = null;
 
   try {
-    // Connect to existing Chrome or launch new one
+    // Connect to existing Edge instance via remote debugging (REQUIRED)
     const { chromium } = require('playwright');
     
+    console.log('   🔌 Connecting to existing Edge instance on port 9222...');
     try {
       browser = await chromium.connectOverCDP('http://localhost:9222');
-      connectedToExisting = true;
-      console.log('   ✓ Connected to existing Chrome instance');
+    } catch (e1) {
+      console.log(`   ⚠️  localhost failed: ${e1.message}, trying 127.0.0.1...`);
+      try {
+        browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
+      } catch (e2) {
+        console.log('\n   ❌ ERROR: Could not connect to Edge on port 9222');
+        console.log('\n   📋 To fix this, you need to start Edge with remote debugging enabled:');
+        console.log('\n   macOS:');
+        console.log('   "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge" --remote-debugging-port=9222');
+        console.log('\n   Windows:');
+        console.log('   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe" --remote-debugging-port=9222');
+        console.log('\n   Linux:');
+        console.log('   microsoft-edge --remote-debugging-port=9222');
+        console.log('\n   💡 Make sure Edge is completely closed before starting with this flag');
+        console.log('   💡 You can verify it\'s working by visiting: http://localhost:9222/json');
+        throw new Error('Edge must be started with --remote-debugging-port=9222. See instructions above.');
+      }
+    }
+    
+    connectedToExisting = true;
+    console.log('   ✓ Connected to existing Edge instance');
+    
+    // Get existing context or use the default one
+    const contexts = browser.contexts();
+    if (contexts.length > 0) {
+      context = contexts[0];
+      console.log('   ✓ Using existing Edge context');
+    } else {
+      // Create a new context in the connected browser
+      context = await browser.newContext();
+      console.log('   ✓ Created new context in existing Edge');
+    }
+    
+    // Always create a new page (new tab) for testing
+    page = await context.newPage();
+    console.log('   ✓ Created new tab in existing Edge instance');
+
+    // Enhanced anti-detection scripts
+    await page.addInitScript(() => {
+      // Remove webdriver property
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => false,
+      });
       
-      const contexts = browser.contexts();
-      if (contexts.length > 0) {
-        context = contexts[0];
-      } else {
-        context = await browser.newContext({
-          viewport: { width: 1920, height: 1080 },
-          userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          locale: 'en-US',
-          timezoneId: 'America/New_York',
-          permissions: ['geolocation'],
-          geolocation: { longitude: -74.006, latitude: 40.7128 },
-          colorScheme: 'light',
-          extraHTTPHeaders: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1'
-          }
+      // Override plugins to look real
+      Object.defineProperty(navigator, 'plugins', {
+        get: () => {
+          const plugins = [
+            { name: 'Chrome PDF Plugin', filename: 'internal-pdf-viewer', description: 'Portable Document Format' },
+            { name: 'Chrome PDF Viewer', filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai', description: '' },
+            { name: 'Native Client', filename: 'internal-nacl-plugin', description: '' }
+          ];
+          return plugins;
+        },
+      });
+      
+      // Override languages
+      Object.defineProperty(navigator, 'languages', {
+        get: () => ['en-US', 'en'],
+      });
+      
+      // Override chrome property
+      window.chrome = {
+        runtime: {},
+        loadTimes: function() {},
+        csi: function() {},
+        app: {}
+      };
+      
+      // Override permissions
+      const originalQuery = window.navigator.permissions.query;
+      window.navigator.permissions.query = (parameters) => (
+        parameters.name === 'notifications' ?
+          Promise.resolve({ state: Notification.permission }) :
+          originalQuery(parameters)
+      );
+      
+      // Override getBattery
+      if (navigator.getBattery) {
+        navigator.getBattery = () => Promise.resolve({
+          charging: true,
+          chargingTime: 0,
+          dischargingTime: Infinity,
+          level: 1
         });
       }
       
-      // Check if any existing pages contain lowes.com
-      const pages = context.pages();
-      let hasLowesPage = false;
-      let lowesPage = null;
-      
-      for (const p of pages) {
-        try {
-          const url = p.url();
-          if (url.includes('lowes.com')) {
-            hasLowesPage = true;
-            lowesPage = p;
-            break;
-          }
-        } catch (e) {
-          // Skip inaccessible pages
-        }
-      }
-      
-      if (hasLowesPage && lowesPage) {
-        // Use existing Lowe's page
-        page = lowesPage;
-        console.log('   ✓ Using existing Lowe\'s page for sequential testing');
-      } else {
-        // No Lowe's page found - create new tab
-        page = await context.newPage();
-        console.log('   ✓ Created new tab for sequential testing (no Lowe\'s page found)');
-      }
-    } catch (cdpError) {
-      // Launch new Chrome if connection fails
-      browser = await chromium.launch({
-        headless: false,
-        channel: 'chrome',
-        args: [
-          '--disable-blink-features=AutomationControlled',
-          '--disable-dev-shm-usage',
-          '--no-first-run'
-        ]
+      // Override platform
+      Object.defineProperty(navigator, 'platform', {
+        get: () => 'MacIntel',
       });
       
-      context = await browser.newContext({
-        viewport: { width: 1920, height: 1080 },
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        locale: 'en-US',
-        timezoneId: 'America/New_York',
-        permissions: ['geolocation'],
-        geolocation: { longitude: -74.006, latitude: 40.7128 },
-        colorScheme: 'light',
-        extraHTTPHeaders: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1'
-        }
+      // Override hardwareConcurrency
+      Object.defineProperty(navigator, 'hardwareConcurrency', {
+        get: () => 8,
       });
       
-      page = await context.newPage();
-    }
-
-    // Add anti-detection scripts
-    await page.addInitScript(() => {
-      Object.defineProperty(navigator, 'webdriver', { get: () => false });
-      Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
-      Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
-      window.chrome = { runtime: {} };
+      // Override deviceMemory
+      Object.defineProperty(navigator, 'deviceMemory', {
+        get: () => 8,
+      });
+      
+      // Override connection
+      if (navigator.connection) {
+        Object.defineProperty(navigator, 'connection', {
+          get: () => ({
+            effectiveType: '4g',
+            rtt: 50,
+            downlink: 10,
+            saveData: false
+          }),
+        });
+      }
+      
+      // Remove automation indicators
+      delete navigator.__proto__.webdriver;
+      
+      // Override toString methods
+      const getParameter = WebGLRenderingContext.prototype.getParameter;
+      WebGLRenderingContext.prototype.getParameter = function(parameter) {
+        if (parameter === 37445) {
+          return 'Intel Inc.';
+        }
+        if (parameter === 37446) {
+          return 'Intel Iris OpenGL Engine';
+        }
+        return getParameter.call(this, parameter);
+      };
     });
 
     page.setDefaultTimeout(60000);
