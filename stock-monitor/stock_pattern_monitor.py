@@ -3,6 +3,10 @@ Stock Pattern Monitor - Technical Analysis for Top Tech Stocks
 Monitors chart patterns and sends Discord notifications for trading signals
 """
 
+import os
+# Force yfinance to use requests backend to avoid curl_cffi issues
+os.environ['YF_USE_CURL_CFFI'] = '0'
+
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -16,7 +20,6 @@ from dataclasses import dataclass, asdict
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.patches import Rectangle
-import os
 import base64
 from io import BytesIO
 
@@ -118,25 +121,50 @@ class StockPatternMonitor:
     
     def fetch_stock_data(self, symbol: str) -> Optional[pd.DataFrame]:
         """Fetch historical stock data"""
-        try:
-            ticker = yf.Ticker(symbol)
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=self.lookback_days)
-            
-            df = ticker.history(start=start_date, end=end_date)
-            
-            if df.empty:
-                logger.warning(f"No data for {symbol}")
-                return None
-            
-            # Calculate technical indicators
-            df = self.calculate_indicators(df)
-            
-            return df
-            
-        except Exception as e:
-            logger.error(f"Error fetching data for {symbol}: {e}")
-            return None
+        max_retries = 3
+        retry_delay = 2
+        
+        for attempt in range(max_retries):
+            try:
+                end_date = datetime.now()
+                start_date = end_date - timedelta(days=self.lookback_days)
+                
+                # Use download with proper parameters for v1.1.0
+                df = yf.download(
+                    symbol, 
+                    start=start_date, 
+                    end=end_date,
+                    progress=False,
+                    timeout=10
+                )
+                
+                if df.empty:
+                    if attempt < max_retries - 1:
+                        logger.warning(f"No data for {symbol}, retrying in {retry_delay}s (attempt {attempt + 1}/{max_retries})")
+                        time.sleep(retry_delay)
+                        continue
+                    else:
+                        logger.warning(f"No data for {symbol} after {max_retries} attempts")
+                        return None
+                
+                # Flatten multi-level columns if present (yf.download returns multi-level for single ticker)
+                if isinstance(df.columns, pd.MultiIndex):
+                    df.columns = df.columns.droplevel(1)
+                
+                # Calculate technical indicators
+                df = self.calculate_indicators(df)
+                
+                return df
+                
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    logger.warning(f"Error fetching data for {symbol} (attempt {attempt + 1}/{max_retries}): {e}")
+                    time.sleep(retry_delay)
+                else:
+                    logger.error(f"Error fetching data for {symbol} after {max_retries} attempts: {e}")
+                    return None
+        
+        return None
     
     def calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """Calculate technical indicators"""
