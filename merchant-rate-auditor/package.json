@@ -1,0 +1,23 @@
+{
+  "name": "merchant-rate-auditor",
+  "version": "1.0.0",
+  "description": "Audit tool for Wildlink merchant rate JSON feeds",
+  "main": "auditor.js",
+  "scripts": {
+    "start": "node auditor.js",
+    "audit": "node auditor.js"
+  },
+  "keywords": [
+    "wildlink",
+    "merchant",
+    "rate",
+    "audit"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2"
+  }
+}
+
