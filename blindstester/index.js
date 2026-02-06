@@ -875,7 +875,8 @@ const focusProducts = testData
 // Set output filename with config name if available
 if (!options.output) {
   const configName = config ? config.name.replace(/[^a-z0-9]/gi, '-').toLowerCase() : 'test-results';
-  options.output = `test-results/${configName}-${new Date().toISOString().replace(/:/g, '-')}.json`;
+  const configFolder = config ? config.name.replace(/[^a-z0-9]/gi, '-').toLowerCase() : 'default';
+  options.output = `test-results/${configFolder}/${configName}-${new Date().toISOString().replace(/:/g, '-')}.json`;
 }
 
 class BlindsConfiguratorTester {
@@ -896,7 +897,15 @@ class BlindsConfiguratorTester {
   }
 
   setProgressFile(configName) {
-    this.progressFile = path.join(__dirname, 'test-results', `.progress-${configName}.json`);
+    const configFolder = configName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const progressDir = path.join(__dirname, 'test-results', configFolder);
+    
+    // Ensure the config folder exists
+    if (!fs.existsSync(progressDir)) {
+      fs.mkdirSync(progressDir, { recursive: true });
+    }
+    
+    this.progressFile = path.join(progressDir, `.progress-${configName}.json`);
   }
 
   loadProgress() {
@@ -1021,7 +1030,8 @@ class BlindsConfiguratorTester {
     await this.page.waitForTimeout(1000);
     
     const buttonText = type === 'inside' ? 'Inside Mount' : 'Outside Mount';
-    const button = await this.page.locator(`button:has-text("${buttonText}")`);
+    // Use .first() to select the first matching button if multiple exist
+    const button = await this.page.locator(`button:has-text("${buttonText}")`).first();
     await button.click();
     await this.page.waitForTimeout(1500);
     console.log(chalk.green(`  ✓ Selected ${buttonText}`));
@@ -1632,16 +1642,36 @@ class BlindsConfiguratorTester {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    fs.writeFileSync(outputFile, JSON.stringify(this.results, null, 2));
+    // If resuming and file exists, load previous results and combine them
+    let allResults = [...this.results];
+    if (fs.existsSync(outputFile)) {
+      try {
+        const existingData = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+        if (Array.isArray(existingData)) {
+          // Merge existing results with new results (avoiding duplicates)
+          const existingMap = new Map(existingData.map(r => [`${r.product}-${r.width}-${r.testHeight}`, r]));
+          this.results.forEach(r => {
+            const key = `${r.product}-${r.width}-${r.testHeight}`;
+            existingMap.set(key, r); // Overwrite with new result if exists
+          });
+          allResults = Array.from(existingMap.values());
+          console.log(chalk.gray(`  📝 Merged ${existingData.length} previous results with ${this.results.length} new results`));
+        }
+      } catch (error) {
+        console.log(chalk.yellow(`  ⚠️  Could not load previous results: ${error.message}`));
+      }
+    }
+
+    fs.writeFileSync(outputFile, JSON.stringify(allResults, null, 2));
     console.log(chalk.green(`\n💾 JSON results saved to: ${path.basename(outputFile)}`));
 
     const gridOutputFile = outputFile.replace('.json', '-grid.txt');
-    const gridReport = generateGridReport(this.results, this.configName);
+    const gridReport = generateGridReport(allResults, this.configName);
     fs.writeFileSync(gridOutputFile, gridReport);
     console.log(chalk.cyan(`📋 Grid report saved to: ${path.basename(gridOutputFile)}`));
 
     const compactOutputFile = outputFile.replace('.json', '-compact.txt');
-    const compactGrid = generateCompactGrid(this.results, this.configName);
+    const compactGrid = generateCompactGrid(allResults, this.configName);
     fs.writeFileSync(compactOutputFile, compactGrid);
     console.log(chalk.cyan(`📊 Compact grid saved to: ${path.basename(compactOutputFile)}`));
   }
