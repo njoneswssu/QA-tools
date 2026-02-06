@@ -1,0 +1,6 @@
+node_modules/
+test-results-*.json
+*.log
+.DS_Store
+playwright-report/
+test-results/
