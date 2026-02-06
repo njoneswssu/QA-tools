@@ -4177,6 +4177,7 @@ async function clearTest() {
 
 let statsChart = null;
 let currentStatsRange = '1m';
+let isLoadingStats = false; // Prevent concurrent stats loads
 
 // Open stats modal
 async function openTesterStats() {
@@ -4194,6 +4195,12 @@ function closeTesterStats() {
 
 // Load tester stats
 async function loadTesterStats(range = '1m', customFrom = null, customTo = null) {
+    // Prevent concurrent loads
+    if (isLoadingStats) {
+        console.log('📊 [loadTesterStats] Already loading stats, skipping duplicate call');
+        return;
+    }
+    
     const testerName = localStorage.getItem('tester_name');
     
     if (!testerName) {
@@ -4202,7 +4209,18 @@ async function loadTesterStats(range = '1m', customFrom = null, customTo = null)
         return;
     }
     
+    isLoadingStats = true;
+    
     try {
+        // Show loading state (but don't clear existing stats until new data is loaded)
+        const statsModal = document.getElementById('tester-stats-modal');
+        const isModalOpen = statsModal && statsModal.style.display === 'block';
+        
+        // Only show loading if modal is already open (preserve existing data during load)
+        if (isModalOpen) {
+            // Don't clear stats - just update them when new data arrives
+        }
+        
         // Calculate date range
         let fromDate, toDate;
         toDate = new Date();
@@ -4262,22 +4280,53 @@ async function loadTesterStats(range = '1m', customFrom = null, customTo = null)
         const successfulMerchants = uniqueResults.filter(r => r.test_status === 'success').length;
         const flaggedMerchants = uniqueResults.filter(r => r.test_status === 'flagged').length;
         
-        // Update summary cards
-        document.getElementById('total-tests-stat').textContent = totalTests;
-        document.getElementById('total-merchants-stat').textContent = totalMerchants;
-        document.getElementById('successful-merchants-stat').textContent = successfulMerchants;
-        document.getElementById('flagged-merchants-stat').textContent = flaggedMerchants;
+        // Check if modal is open and has existing stats (to preserve them)
+        const statsModal = document.getElementById('tester-stats-modal');
+        const isModalOpen = statsModal && statsModal.style.display === 'block';
+        const hasExistingStats = isModalOpen && (
+            parseInt(document.getElementById('total-tests-stat').textContent) > 0 ||
+            parseInt(document.getElementById('total-merchants-stat').textContent) > 0
+        );
         
-        // Prepare chart data (use deduplicated results)
-        const chartData = prepareChartData(uniqueResults, fromDate, toDate);
-        renderStatsChart(chartData);
-        
-        // Display recent sessions
-        displayRecentSessions(filteredSessions.slice(0, 10));
+        // Update summary cards (only update if we have valid data, or if modal was just opened)
+        if (totalTests > 0 || totalMerchants > 0 || allResults.length > 0) {
+            document.getElementById('total-tests-stat').textContent = totalTests;
+            document.getElementById('total-merchants-stat').textContent = totalMerchants;
+            document.getElementById('successful-merchants-stat').textContent = successfulMerchants;
+            document.getElementById('flagged-merchants-stat').textContent = flaggedMerchants;
+            
+            // Prepare chart data (use deduplicated results)
+            const chartData = prepareChartData(uniqueResults, fromDate, toDate);
+            renderStatsChart(chartData);
+            
+            // Display recent sessions
+            displayRecentSessions(filteredSessions.slice(0, 10));
+        } else {
+            // If no data found, preserve existing stats if modal is open
+            if (hasExistingStats) {
+                console.log('📊 [loadTesterStats] No new data found, preserving existing stats display');
+                // Don't update anything - keep existing stats visible
+            } else {
+                // Modal just opened with no data - show zeros (this is expected)
+                document.getElementById('total-tests-stat').textContent = totalTests;
+                document.getElementById('total-merchants-stat').textContent = totalMerchants;
+                document.getElementById('successful-merchants-stat').textContent = successfulMerchants;
+                document.getElementById('flagged-merchants-stat').textContent = flaggedMerchants;
+            }
+        }
         
     } catch (error) {
         console.error('Error loading tester stats:', error);
-        showError('Failed to load testing statistics');
+        // Don't show error if modal is open - preserve existing stats
+        const statsModal = document.getElementById('tester-stats-modal');
+        const isModalOpen = statsModal && statsModal.style.display === 'block';
+        if (!isModalOpen) {
+            showError('Failed to load testing statistics');
+        } else {
+            console.warn('⚠️ [loadTesterStats] Error loading stats but modal is open - preserving existing display');
+        }
+    } finally {
+        isLoadingStats = false;
     }
 }
 
