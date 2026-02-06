@@ -23,7 +23,10 @@ const LIFT_TYPES = {
   'cordless-2on1': 'Cordless 2 on 1',
   'cordloop-2on1': 'Cordloop 2 on 1',
   'large-cassette-2on1': 'Large Cassette Valance 2 on 1',
-  'motorization-2on1': 'Motorization 2 on 1'
+  'motorization-2on1': 'Motorization 2 on 1',
+  'motorization-wand': 'Motorization Wand',
+  'motorization-wand-2on1': 'Motorization Wand 2 on 1',
+  'motorization-tdbu': 'Motorization TDBU'
 };
 
 // Available models
@@ -95,7 +98,7 @@ async function selectLiftType() {
   });
   
   console.log(chalk.red(`\n  ${options.length + 1}. 🗑️  Delete All Test Results`));
-  console.log(chalk.gray('\n  Enter number (1-10) or press Enter to skip interactive mode:\n'));
+  console.log(chalk.gray('\n  Enter number (1-13) or press Enter to skip interactive mode:\n'));
   
   const answer = await askQuestion('  Selection: ');
   
@@ -221,6 +224,193 @@ function buildConfigFilePath(configKey) {
   return `configs/${configKey}-config.js`;
 }
 
+async function askMultilineInput(query) {
+  console.log(chalk.cyan(query));
+  console.log(chalk.gray('═══════════════════════════════════════════════════════'));
+  console.log(chalk.white('Paste your grid (including header row with widths)'));
+  console.log(chalk.gray('Then type "done" on a new line and press Enter'));
+  console.log(chalk.gray('═══════════════════════════════════════════════════════\n'));
+  
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise(resolve => {
+    const lines = [];
+
+    rl.on('line', (line) => {
+      if (line.trim().toLowerCase() === 'done') {
+        rl.close();
+      } else {
+        lines.push(line);
+      }
+    });
+
+    rl.on('close', () => {
+      resolve(lines.join('\n'));
+    });
+  });
+}
+
+function parseGridData(text) {
+  console.log(chalk.cyan('\n📊 Parsing grid data...\n'));
+  
+  const lines = text.split('\n').filter(line => line.trim());
+  if (lines.length < 2) {
+    console.log(chalk.red('❌ Not enough lines. Need at least header + 1 product.\n'));
+    return null;
+  }
+  
+  // Split by tabs or multiple spaces or pipes
+  const splitLine = (line) => line.split(/\t+|\s{2,}|\|/).map(s => s.trim()).filter(s => s);
+  
+  const headerParts = splitLine(lines[0]);
+  
+  // Find width columns (should contain numbers with " or just numbers)
+  const widthIndices = [];
+  const widthValues = [];
+  
+  headerParts.forEach((part, index) => {
+    const match = part.match(/^(\d+)\"?$/);
+    if (match) {
+      widthIndices.push(index);
+      widthValues.push(parseInt(match[1]));
+    }
+  });
+  
+  if (widthValues.length === 0) {
+    console.log(chalk.red('❌ Could not find width columns in header.\n'));
+    console.log(chalk.gray('Expected format: Product Name | 72" | 96" | ...\n'));
+    return null;
+  }
+  
+  console.log(chalk.green(`✓ Found ${widthValues.length} width columns: ${widthValues.join('", ')}"\n`));
+  
+  const products = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const parts = splitLine(lines[i]);
+    if (parts.length < 2) continue;
+    
+    const productName = parts[0];
+    if (!productName || productName.length < 2) continue;
+    
+    const widthBreakpoints = [];
+    
+    for (let j = 0; j < widthIndices.length; j++) {
+      const heightStr = parts[widthIndices[j]];
+      if (!heightStr) continue;
+      
+      const heightMatch = heightStr.match(/(\d+)/);
+      if (heightMatch) {
+        widthBreakpoints.push({
+          width: widthValues[j],
+          maxHeight: parseInt(heightMatch[1])
+        });
+      }
+    }
+    
+    if (widthBreakpoints.length > 0) {
+      products.push({
+        product: productName,
+        widthBreakpoints
+      });
+      console.log(chalk.gray(`  ${products.length}. ${productName} - ${widthBreakpoints.length} widths`));
+    }
+  }
+  
+  console.log(chalk.green(`\n✓ Successfully parsed ${products.length} products!\n`));
+  return products;
+}
+
+async function extractDataFromGridImage(gridImagePath) {
+  console.log(chalk.cyan(`\n🔍 Reading grid image with OCR: ${gridImagePath}\n`));
+  console.log(chalk.gray('This may take 30-60 seconds...\n'));
+  
+  try {
+    const Tesseract = await import('tesseract.js');
+    
+    const { data: { text } } = await Tesseract.default.recognize(
+      gridImagePath,
+      'eng',
+      {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            const percent = Math.round(m.progress * 100);
+            process.stdout.write(`\r  Progress: ${percent}%`);
+          }
+        }
+      }
+    );
+    
+    console.log('\n');
+    
+    // Parse the extracted text
+    const lines = text.split('\n').filter(line => line.trim());
+    const products = [];
+    
+    // Find width columns
+    let widthValues = [];
+    for (const line of lines) {
+      const widths = line.match(/(\d+)"\s/g);
+      if (widths && widths.length >= 2) {
+        widthValues = widths.map(w => parseInt(w.replace('"', '').trim()));
+        console.log(chalk.green(`✓ Found ${widthValues.length} width columns: ${widthValues.join('", ')}"\n`));
+        break;
+      }
+    }
+    
+    if (widthValues.length === 0) {
+      console.log(chalk.red('❌ Could not find width columns in grid image\n'));
+      return null;
+    }
+    
+    // Parse product lines
+    for (const line of lines) {
+      // Skip header lines
+      if (line.includes('Width') || line.includes('width')) continue;
+      if (!line.trim()) continue;
+      
+      // Extract product name (first non-numeric text before numbers)
+      const productMatch = line.match(/^([^0-9]+?)(?:\s+\d)/);
+      if (!productMatch) continue;
+      
+      const productName = productMatch[1].trim();
+      if (!productName || productName.length < 3) continue;
+      
+      // Extract height values (find all numbers after product name)
+      const numbers = line.match(/\d+/g);
+      if (!numbers || numbers.length < widthValues.length + 1) continue;
+      
+      // Skip the first number if it's part of the product name (e.g., "3% Catalina")
+      let startIndex = 0;
+      if (productName.match(/\d+/)) {
+        startIndex = 1;
+      }
+      
+      const heights = numbers.slice(startIndex, startIndex + widthValues.length).map(Number);
+      
+      if (heights.length === widthValues.length) {
+        const widthBreakpoints = widthValues.map((width, index) => ({
+          width,
+          maxHeight: heights[index]
+        }));
+        
+        products.push({
+          product: productName,
+          widthBreakpoints
+        });
+      }
+    }
+    
+    return products;
+  } catch (error) {
+    console.log(chalk.red(`\n❌ OCR extraction failed: ${error.message}\n`));
+    return null;
+  }
+}
+
 async function validateAndGetConfiguration(liftType, liftTypeName, model, brand) {
   const configKey = buildConfigKey(liftType, model, brand);
   const configName = buildConfigName(liftTypeName, model, brand);
@@ -276,37 +466,174 @@ async function validateAndGetConfiguration(liftType, liftTypeName, model, brand)
     }
   }
   
-  // Check grid image
-  console.log(chalk.cyan('📋 Validating files...\n'));
-  
-  const gridPath = path.join(__dirname, gridImagePath);
-  const gridExists = fs.existsSync(gridPath);
-  
-  if (!gridExists) {
-    console.log(chalk.red(`  ❌ Grid image not found: ${gridImagePath}`));
-    console.log(chalk.yellow(`\n  Please add the grid image to:`));
-    console.log(chalk.white(`     ${gridPath}`));
-    console.log(chalk.gray(`  Then run the test again.\n`));
-    return null;
-  } else {
-    console.log(chalk.green(`  ✓ Grid image found: ${gridImagePath}`));
-  }
-  
-  // Check config file
-  const configPath = path.join(__dirname, configFilePath);
-  const configExists = fs.existsSync(configPath);
-  
-  if (!configExists) {
-    console.log(chalk.red(`  ❌ Config file not found: ${configFilePath}`));
-    console.log(chalk.yellow(`\n  Please create the config file:`));
-    console.log(chalk.white(`     1. Copy: configs/example-config.js`));
-    console.log(chalk.white(`     2. Save as: ${configFilePath}`));
-    console.log(chalk.white(`     3. Extract test data from grid image`));
-    console.log(chalk.white(`     4. Update config with URL and test data\n`));
-    console.log(chalk.gray(`  See configs/README.md for instructions.\n`));
-    return null;
-  } else {
-    console.log(chalk.green(`  ✓ Config file found: ${configFilePath}\n`));
+  // Validation loop - keep trying until config exists or user gives up
+  while (true) {
+    // Check config file
+    console.log(chalk.cyan('📋 Validating configuration...\n'));
+    
+    const configPath = path.join(__dirname, configFilePath);
+    const configExists = fs.existsSync(configPath);
+    
+    let hasErrors = false;
+    let hasGarbageData = false;
+    
+    // If config exists, validate it contains good data
+    if (configExists) {
+      try {
+        const configModule = await import(configPath + '?t=' + Date.now()); // Cache bust
+        const loadedConfig = configModule.config;
+        
+        // Check if product names look like garbage (OCR errors)
+        if (loadedConfig && loadedConfig.testData) {
+          const badProducts = loadedConfig.testData.filter(p => 
+            /[\[\]—]/.test(p.product) || // Contains brackets or em dashes
+            p.product.length < 3 || // Too short
+            !p.product.match(/[a-zA-Z]/) // No letters
+          );
+          
+          if (badProducts.length > 0) {
+            hasGarbageData = true;
+            console.log(chalk.yellow(`  ⚠️  Config file has questionable product names:\n`));
+            badProducts.slice(0, 3).forEach(p => {
+              console.log(chalk.red(`     "${p.product}" ← Looks like OCR error`));
+            });
+            if (badProducts.length > 3) {
+              console.log(chalk.red(`     ... and ${badProducts.length - 3} more\n`));
+            } else {
+              console.log();
+            }
+            
+            console.log(chalk.yellow('  This config was likely created by OCR and has errors.'));
+            console.log(chalk.cyan('  Recommended: Replace it with pasted data\n'));
+          } else {
+            console.log(chalk.green(`  ✓ Config file found: ${configFilePath}`));
+            console.log(chalk.green(`  ✓ Config data looks valid (${loadedConfig.testData.length} products)\n`));
+          }
+        } else {
+          console.log(chalk.green(`  ✓ Config file found: ${configFilePath}\n`));
+        }
+      } catch (error) {
+        console.log(chalk.yellow(`  ⚠️  Could not validate config: ${error.message}\n`));
+      }
+    }
+    
+    if (!configExists || hasGarbageData) {
+      if (hasGarbageData) {
+        console.log(chalk.red(`  ❌ Config file has bad data (OCR errors detected)`));
+      } else {
+        console.log(chalk.red(`  ❌ Config file not found: ${configFilePath}`));
+      }
+      
+      console.log(chalk.yellow(`\n  📝 You need to provide your grid data to run tests.\n`));
+      
+      console.log(chalk.cyan('  Option 1: Paste grid data now (Quick & Accurate) ⭐'));
+      console.log(chalk.white('     Copy your grid from Excel/Sheets/Website and paste it here.'));
+      console.log(chalk.gray('     Takes 2 minutes, very reliable!\n'));
+      
+      console.log(chalk.cyan('  Option 2: Create config file separately'));
+      console.log(chalk.white('     Run: npm run create-config'));
+      console.log(chalk.gray('     Then retry\n'));
+      
+      hasErrors = true;
+    } else {
+      console.log(chalk.green(`  ✓ Config file found: ${configFilePath}\n`));
+    }
+    
+    if (hasErrors) {
+      // If config doesn't exist or has garbage, offer to paste grid data now
+      if (!configExists || hasGarbageData) {
+        console.log(chalk.cyan('  What would you like to do?\n'));
+        console.log(chalk.white('    1. Paste grid data now (creates config automatically)'));
+        console.log(chalk.white('    2. Retry (after creating config file separately)'));
+        console.log(chalk.white('    3. Exit\n'));
+        
+        const action = await askQuestion('  Selection (1-3): ');
+        
+        if (action.trim() === '1') {
+          // Paste grid data
+          console.log(chalk.cyan('\n📋 Ready to receive grid data!\n'));
+          console.log(chalk.white('EXAMPLE FORMAT:\n'));
+          console.log(chalk.gray('Width To:  36"  42"  48"  60"  66"  72"'));
+          console.log(chalk.gray('3% Catalina  144  144  144  144  144  132'));
+          console.log(chalk.gray('5% Catalina  144  144  144  144  144  132'));
+          console.log(chalk.gray('...\n'));
+          console.log(chalk.yellow('Copy your entire grid (with header row) and paste below:'));
+          
+          const pastedData = await askMultilineInput('');
+          
+          if (pastedData && pastedData.trim()) {
+            const extractedData = parseGridData(pastedData);
+            
+            if (extractedData && extractedData.length > 0) {
+              // Auto-save as config file
+              console.log(chalk.cyan('\n💾 Saving as config file...\n'));
+              try {
+                const configContent = `export const config = {
+  name: "${configKey}",
+  url: "${configuratorUrl}",
+  gridImage: "${gridImagePath}",
+  testData: ${JSON.stringify(extractedData, null, 4).replace(/"([^"]+)":/g, '$1:')}
+};
+`;
+                const fullConfigPath = path.join(__dirname, 'configs', `${configKey}-config.js`);
+                fs.writeFileSync(fullConfigPath, configContent);
+                console.log(chalk.green(`✓ Config file saved: configs/${configKey}-config.js`));
+                console.log(chalk.gray('  (Next time, this will load instantly!)\n'));
+                console.log(chalk.cyan('🚀 Starting tests...\n'));
+                
+                // Return success with extracted data
+                return {
+                  configKey,
+                  configName,
+                  configuratorUrl,
+                  gridImagePath,
+                  configFilePath: fullConfigPath,
+                  testData: extractedData
+                };
+              } catch (saveError) {
+                console.log(chalk.red(`\n❌ Could not save config file: ${saveError.message}\n`));
+                return null;
+              }
+            } else {
+              console.log(chalk.red('\n❌ Could not parse pasted data.'));
+              console.log(chalk.yellow('Please check the format and try again.\n'));
+              continue; // Loop back to retry options
+            }
+          } else {
+            console.log(chalk.red('\n❌ No data pasted.\n'));
+            continue; // Loop back to retry options
+          }
+        } else if (action.trim() === '2') {
+          // Retry - loop will continue
+          console.log(chalk.cyan('\n🔄 Rechecking files...\n'));
+          continue;
+        } else {
+          // Exit
+          console.log(chalk.yellow('\n  ⏹️  Exiting. Run the tool again when ready.\n'));
+          return null;
+        }
+      } else {
+        // Original retry logic when only grid is missing
+        console.log(chalk.cyan('  What would you like to do?\n'));
+        console.log(chalk.white('    1. Retry (after adding missing files)'));
+        console.log(chalk.white('    2. Exit\n'));
+        
+        const retryAnswer = await askQuestion('  Selection (1-2): ');
+        
+        if (retryAnswer.trim() === '1') {
+          // Loop will continue and check again
+          console.log(chalk.cyan('\n🔄 Rechecking files...\n'));
+          continue;
+        } else {
+          // User wants to exit
+          console.log(chalk.yellow('\n  ⏹️  Exiting. Run the tool again when ready.\n'));
+          return null;
+        }
+      }
+    } else {
+      // Both files exist, break out of loop
+      break;
+    }
   }
   
   return {
@@ -314,7 +641,7 @@ async function validateAndGetConfiguration(liftType, liftTypeName, model, brand)
     configName,
     configuratorUrl,
     gridImagePath,
-    configFilePath: configPath
+    configFilePath: path.join(__dirname, configFilePath)
   };
 }
 
@@ -371,19 +698,43 @@ if (!options.config && !options.skipInteractive) {
         
         if (validatedConfig) {
           console.log(chalk.green('✅ Configuration validated successfully!\n'));
-          options.config = validatedConfig.configFilePath;
-          configuratorUrl = validatedConfig.configuratorUrl;
+          
+          if (validatedConfig.testData) {
+            // Data was extracted from grid, use it directly
+            testData = validatedConfig.testData;
+            configuratorUrl = validatedConfig.configuratorUrl;
+            config = {
+              name: validatedConfig.configName,
+              url: configuratorUrl,
+              gridImage: validatedConfig.gridImagePath,
+              testData: testData
+            };
+            console.log(chalk.cyan('📊 Using pasted grid data\n'));
+          } else {
+            // Load from config file
+            options.config = validatedConfig.configFilePath;
+            configuratorUrl = validatedConfig.configuratorUrl;
+          }
         } else {
-          console.log(chalk.yellow('⚠️  Configuration incomplete. Falling back to default...\n'));
+          console.log(chalk.red('\n❌ Configuration validation failed or cancelled.\n'));
+          process.exit(1);
         }
       } else {
-        console.log(chalk.yellow('⚠️  No brand selected. Falling back to default...\n'));
+        console.log(chalk.red('\n❌ No brand selected. Exiting.\n'));
+        process.exit(1);
       }
     } else {
-      console.log(chalk.yellow('⚠️  No model selected. Falling back to default...\n'));
+      console.log(chalk.red('\n❌ No model selected. Exiting.\n'));
+      process.exit(1);
     }
   } else {
-    console.log(chalk.yellow('⚠️  Skipping interactive mode, using default config...\n'));
+    console.log(chalk.yellow('⚠️  Skipping interactive mode.\n'));
+    console.log(chalk.red('❌ No configuration provided.\n'));
+    console.log(chalk.yellow('To run tests, you need to either:'));
+    console.log(chalk.white('  1. Use interactive mode (don\'t press Enter, select an option)'));
+    console.log(chalk.white('  2. Use --config flag: npm start -- --config configs/your-config.js'));
+    console.log(chalk.white('  3. Use --skip-interactive with --config flag\n'));
+    process.exit(1);
   }
 }
 
@@ -409,12 +760,15 @@ if (options.config) {
     console.log(chalk.gray('Example: export const config = { name: "...", url: "...", testData: [...] };\n'));
     process.exit(1);
   }
-} else {
-  // Load default config from test-data.js
-  const { testData: defaultTestData } = await import('./test-data.js');
-  testData = defaultTestData;
-  configuratorUrl = options.url || 'https://www.homedepot.com/custom-blinds/Configurator/Draft?draftProductId=722389';
-  console.log(chalk.cyan('📋 Using default configuration\n'));
+} else if (!config || !testData) {
+  // No config loaded from interactive mode or command line
+  console.log(chalk.red('\n❌ No configuration provided.\n'));
+  console.log(chalk.yellow('To run tests, you need to either:'));
+  console.log(chalk.white('  1. Use interactive mode (npm start) and complete the setup'));
+  console.log(chalk.white('  2. Specify a config file (npm start -- --config configs/your-config.js)'));
+  console.log(chalk.white('  3. Skip interactive mode requires a config (--skip-interactive --config ...)\n'));
+  console.log(chalk.gray('Cannot run tests without proper configuration.\n'));
+  process.exit(1);
 }
 
 // Generate focusProducts from loaded testData
@@ -461,9 +815,17 @@ class BlindsConfiguratorTester {
 
   async navigateToConfigurator() {
     console.log(chalk.cyan(`📍 Navigating to: ${this.configuratorUrl}`));
-    await this.page.goto(this.configuratorUrl, { waitUntil: 'networkidle' });
-    await this.page.waitForTimeout(3000);
-    console.log(chalk.green('  ✓ Page loaded'));
+    try {
+      await this.page.goto(this.configuratorUrl, { 
+        waitUntil: 'domcontentloaded',  // Less strict than 'networkidle'
+        timeout: 60000  // 60 seconds
+      });
+      await this.page.waitForTimeout(3000);
+      console.log(chalk.green('  ✓ Page loaded'));
+    } catch (error) {
+      console.log(chalk.yellow(`  ⚠️  Page load warning: ${error.message}`));
+      console.log(chalk.cyan('  Continuing anyway...\n'));
+    }
   }
 
   async selectMountType(type = 'inside') {
@@ -716,7 +1078,8 @@ class BlindsConfiguratorTester {
   }
 
   async runTests(productsToTest) {
-    console.log(chalk.cyan(`\n🎯 Starting tests for ${productsToTest.length} products`));
+    const configName = config ? config.name : 'configuration';
+    console.log(chalk.cyan(`\n🎯 Starting test for ${configName}`));
     console.log(chalk.gray('\n   Press Ctrl+C to stop after current test completes and save results\n'));
 
     for (const product of productsToTest) {

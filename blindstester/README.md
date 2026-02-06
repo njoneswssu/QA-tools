@@ -32,7 +32,44 @@ blindstester/
 
 ## 🚀 Quick Start
 
-### Interactive Mode (Recommended)
+### Super Simple Setup (Just Paste Your Grid!)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Run tests
+npm start
+#
+#    Select: Lift type, model, brand
+#    Paste: Configurator URL (first time)
+#    Paste: Grid data from your spreadsheet
+#
+#    Tests run immediately! ⭐
+
+# That's it!
+```
+
+**No files needed!** Just copy/paste your grid = automatic testing.
+
+See [docs/HOW-TO-PASTE-GRID.md](docs/HOW-TO-PASTE-GRID.md) for detailed paste instructions.
+
+### Optional: Create Config File
+
+If you prefer to save grid data for reuse:
+
+```bash
+npm run create-config
+#
+# Choose method:
+#   1. Auto-extract from image (OCR) - Sometimes unreliable
+#   2. Paste from spreadsheet - 2 min ⭐ RECOMMENDED
+#   3. Manual entry - 10 min (fallback)
+```
+
+See [docs/SUPER-EASY-CONFIG.md](docs/SUPER-EASY-CONFIG.md) for config file methods.
+
+### Interactive Testing Mode
 
 ```bash
 # Install dependencies
@@ -97,7 +134,7 @@ See [docs/ENHANCED-INTERACTIVE-MODE.md](docs/ENHANCED-INTERACTIVE-MODE.md) for c
 
 ### Available Options
 
-**Lift Types (9):** Cordless, Cordloop, Medium Cassette, Large Cassette, Motorization, and 2-on-1 variants
+**Lift Types (12):** Cordless, Cordloop, Medium Cassette, Large Cassette, Motorization, Motorization Wand, Motorization TDBU, and 2-on-1 variants
 
 **Models (20):** Roller, Solar, Roman, Banded, Faux Wood, Real Wood, Verticals, Perceptions, Cellular (multiple types), Classic Value Faux Wood, Naturals, Sheer, Vertical Cellular, Panel, Riviera Select/Complete/Classic
 

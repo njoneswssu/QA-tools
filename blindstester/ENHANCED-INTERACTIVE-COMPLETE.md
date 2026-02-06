@@ -10,8 +10,8 @@ The blinds tester now features a **comprehensive 3-step interactive wizard** tha
 
 1. **What do you want to test?**
    - Choose lift type: Cordless, Cordloop, Medium Cassette, Large Cassette, Motorization
-   - Plus 2-on-1 variants
-   - **OR: Delete All Test Results** (option 10)
+   - Plus 2-on-1 variants and Motorization Wand/TDBU variants
+   - **OR: Delete All Test Results** (option 13)
 
 2. **What model?**
    - Choose from 20 models:
@@ -230,7 +230,7 @@ npm start
 
 ## 📊 Available Options
 
-### Lift Types (9)
+### Lift Types (12)
 
 1. Cordless
 2. Cordloop
@@ -241,6 +241,9 @@ npm start
 7. Cordloop 2 on 1
 8. Large Cassette Valance 2 on 1
 9. Motorization 2 on 1
+10. Motorization Wand
+11. Motorization Wand 2 on 1
+12. Motorization TDBU
 
 ### Models (20)
 
@@ -272,7 +275,7 @@ npm start
 
 ## 🔧 Total Possible Configurations
 
-**9 lift types × 20 models × 2 brands = 360 possible configurations!**
+**12 lift types × 20 models × 2 brands = 480 possible configurations!**
 
 The tool can handle all of them with automatic:
 - URL storage
@@ -429,4 +432,4 @@ Just run `npm start` again and select different options!
 **Implementation Date:** February 6, 2026  
 **Status:** ✅ Complete and tested  
 **Backward Compatible:** ✅ Yes  
-**Total Configurations Supported:** 360 (9 × 20 × 2)
+**Total Configurations Supported:** 480 (12 × 20 × 2)

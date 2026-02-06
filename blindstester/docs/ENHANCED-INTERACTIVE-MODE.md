@@ -70,10 +70,13 @@ If you need to clear all test results:
   7. Cordloop 2 on 1
   8. Large Cassette Valance 2 on 1
   9. Motorization 2 on 1
+  10. Motorization Wand
+  11. Motorization Wand 2 on 1
+  12. Motorization TDBU
 
-  10. 🗑️  Delete All Test Results
+  13. 🗑️  Delete All Test Results
 
-  Enter number (1-10) or press Enter to skip interactive mode:
+  Enter number (1-13) or press Enter to skip interactive mode:
 
   Selection: 1
 ```
@@ -183,6 +186,67 @@ After URL is confirmed, the tool validates files:
 ✅ Configuration validated successfully!
 ```
 
+### Step 5a: If Files Are Missing - Retry Loop
+
+If files are missing, you can retry after adding them:
+
+```
+📋 Validating files...
+
+  ❌ Grid image not found: configs/grids/cordless-roller-home-depot.png
+
+  Please add the grid image to:
+     /full/path/to/configs/grids/cordless-roller-home-depot.png
+
+  ❌ Config file not found: configs/cordless-roller-home-depot-config.js
+
+  Please create the config file:
+     1. Copy: configs/example-config.js
+     2. Save as: configs/cordless-roller-home-depot-config.js
+     3. Extract test data from grid image
+     4. Update config with URL and test data
+
+  See configs/README.md for instructions.
+
+  What would you like to do?
+
+    1. Retry (after adding missing files)
+    2. Exit
+
+  Selection (1-2): 1
+
+🔄 Rechecking files...
+
+📋 Validating files...
+
+  ✓ Grid image found: configs/grids/cordless-roller-home-depot.png
+  ❌ Config file not found: configs/cordless-roller-home-depot-config.js
+  
+  [Still missing config file...]
+  
+  What would you like to do?
+
+    1. Retry (after adding missing files)
+    2. Exit
+
+  Selection (1-2): 1
+
+🔄 Rechecking files...
+
+📋 Validating files...
+
+  ✓ Grid image found: configs/grids/cordless-roller-home-depot.png
+  ✓ Config file found: configs/cordless-roller-home-depot-config.js
+
+✅ Configuration validated successfully!
+```
+
+**Benefits:**
+- ✅ **No need to restart** - Add files and retry in the same session
+- ✅ **Instant validation** - See immediately if files are recognized
+- ✅ **Step by step** - Add one file, check, add another, check
+- ✅ **No fallback** - Won't start with wrong configuration
+
 ## File Naming Convention
 
 The tool automatically generates consistent file names based on your selections:
@@ -272,17 +336,23 @@ Please add the grid image to: /full/path/to/cordless-roller-home-depot.png
 2. Take a screenshot of the max height grid
 3. Save as `configs/grids/cordless-roller-home-depot.png`
 
-**Try Again**
-```bash
-npm start
+**Select Retry (Don't Need to Restart!)**
 ```
-- Select: 1 (Cordless)
-- Select: 1 (Roller)
-- Select: 1 (Home Depot)
-- URL already saved, confirm: y
+What would you like to do?
 
+  1. Retry (after adding missing files)
+  2. Exit
+
+Selection (1-2): 1
+
+🔄 Rechecking files...
 ```
-✓ Grid image found: configs/grids/cordless-roller-home-depot-grid.png
+
+**Now Grid Found, Config Still Missing**
+```
+📋 Validating files...
+
+✓ Grid image found: configs/grids/cordless-roller-home-depot.png
 ❌ Config file not found: configs/cordless-roller-home-depot-config.js
 
 Please create the config file:
@@ -290,25 +360,31 @@ Please create the config file:
   2. Save as: configs/cordless-roller-home-depot-config.js
   3. Extract test data from grid image
   4. Update config with URL and test data
+
+What would you like to do?
+
+  1. Retry (after adding missing files)
+  2. Exit
+
+Selection (1-2): _
 ```
 
 **Action: Create Config File**
 ```bash
+# In another terminal/window:
 cp configs/example-config.js configs/cordless-roller-home-depot-config.js
 # Edit the file, extract test data from grid, save
 ```
 
-**Try Once More**
-```bash
-npm start
+**Select Retry Again**
 ```
-- Select: 1 (Cordless)
-- Select: 1 (Roller)
-- Select: 1 (Home Depot)
-- URL already saved, confirm: y
+Selection (1-2): 1
 
-```
-✓ Grid image found: configs/grids/cordless-roller-home-depot-grid.png
+🔄 Rechecking files...
+
+📋 Validating files...
+
+✓ Grid image found: configs/grids/cordless-roller-home-depot.png
 ✓ Config file found: configs/cordless-roller-home-depot-config.js
 
 ✅ Configuration validated successfully!
@@ -323,7 +399,7 @@ npm start
 npm start
 ```
 - Select: 1 (Cordless)
-- Select: 1 (Roller)  
+- Select: 1 (Roller)
 - Select: 1 (Home Depot)
 - URL confirmed: y
 - ✅ Test runs immediately!
