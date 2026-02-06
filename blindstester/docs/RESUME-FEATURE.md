@@ -109,7 +109,8 @@ Selection (1-3): 1
 Selection (1-3): 2
 
 ✓ Starting fresh - all products will be tested
-  Progress file cleared
+  A new results file will be created
+  Previous results are preserved
 
 🎯 Starting test for motorization-solar-home-depot
 
@@ -117,12 +118,45 @@ Selection (1-3): 2
 ...
 ```
 
+**What happens:**
+- Progress file is cleared
+- All products are tested again
+- **New results file created** with current timestamp
+- Previous results files are **preserved** (not deleted)
+
 **Option 3: Exit**
 ```
 Selection (1-3): 3
 
 ⏹️  Exiting.
 ```
+
+---
+
+### Important: Results Files Are Never Deleted
+
+**Resume (Option 1):**
+- Continues in the **same test run**
+- Results append to the same session
+- Single results file when done
+
+**Start Fresh (Option 2):**
+- Starts a **new test run**
+- Creates **new results file** with new timestamp
+- **Previous results preserved** (not deleted)
+
+**Example:**
+```
+test-results/
+├── motorization-solar-home-depot-2026-02-06T14-30-00.000Z.json  ← Old (3 products)
+├── motorization-solar-home-depot-2026-02-06T14-30-00.000Z-grid.txt
+├── motorization-solar-home-depot-2026-02-06T14-30-00.000Z-compact.txt
+├── motorization-solar-home-depot-2026-02-06T15-45-00.000Z.json  ← New (20 products)
+├── motorization-solar-home-depot-2026-02-06T15-45-00.000Z-grid.txt
+└── motorization-solar-home-depot-2026-02-06T15-45-00.000Z-compact.txt
+```
+
+You can compare results between runs to see if behavior changed.
 
 ---
 
@@ -221,6 +255,22 @@ Or delete specific config:
 ```bash
 rm test-results/.progress-motorization-solar-home-depot.json
 ```
+
+### Delete Old Results (Optional)
+
+Results files are **never automatically deleted**. To clean up old results:
+
+```bash
+# Delete all results
+npm run clean-results -- --force
+
+# Or manually delete specific results
+rm test-results/motorization-solar-home-depot-2026-02-06T14-*.json
+rm test-results/motorization-solar-home-depot-2026-02-06T14-*-grid.txt
+rm test-results/motorization-solar-home-depot-2026-02-06T14-*-compact.txt
+```
+
+**Tip:** Keep old results to compare behavior across different test runs!
 
 ## What Gets Tracked
 

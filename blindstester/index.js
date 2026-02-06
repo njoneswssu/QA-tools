@@ -166,41 +166,59 @@ async function deleteAllResults() {
   }
 }
 
-async function selectModel() {
+async function selectModel(showGoBack = false) {
   console.log(chalk.bold.cyan('\n🏷️  What model?\n'));
   
   MODELS.forEach((model, index) => {
     console.log(chalk.white(`  ${index + 1}. ${model}`));
   });
   
-  console.log(chalk.gray('\n  Enter number (1-20):\n'));
+  if (showGoBack) {
+    console.log(chalk.yellow(`\n  ${MODELS.length + 1}. ⬅️  Go back`));
+  }
+  
+  console.log(chalk.gray(`\n  Enter number (1-${MODELS.length}${showGoBack ? ` or ${MODELS.length + 1} to go back` : ''}):\n`));
   
   const answer = await askQuestion('  Selection: ');
   const selection = parseInt(answer.trim());
   
-  if (isNaN(selection) || selection < 1 || selection > MODELS.length) {
+  if (isNaN(selection) || selection < 1 || selection > (showGoBack ? MODELS.length + 1 : MODELS.length)) {
     console.log(chalk.red('\n  ❌ Invalid selection.\n'));
     return null;
+  }
+  
+  // Check if go back was selected
+  if (showGoBack && selection === MODELS.length + 1) {
+    return { action: 'go-back' };
   }
   
   return MODELS[selection - 1];
 }
 
-async function selectBrand() {
+async function selectBrand(showGoBack = false) {
   console.log(chalk.bold.cyan('\n🏪 What brand?\n'));
   
   BRANDS.forEach((brand, index) => {
     console.log(chalk.white(`  ${index + 1}. ${brand}`));
   });
   
-  console.log(chalk.gray('\n  Enter number (1-2):\n'));
+  if (showGoBack) {
+    console.log(chalk.yellow(`\n  ${BRANDS.length + 1}. ⬅️  Go back`));
+  }
+  
+  console.log(chalk.gray(`\n  Enter number (1-${BRANDS.length}${showGoBack ? ` or ${BRANDS.length + 1} to go back` : ''}):\n`));
   
   const answer = await askQuestion('  Selection: ');
   const selection = parseInt(answer.trim());
   
-  if (isNaN(selection) || selection < 1 || selection > BRANDS.length) {
+  if (isNaN(selection) || selection < 1 || selection > (showGoBack ? BRANDS.length + 1 : BRANDS.length)) {
     console.log(chalk.red('\n  ❌ Invalid selection.\n'));
     return null;
+  }
+  
+  // Check if go back was selected
+  if (showGoBack && selection === BRANDS.length + 1) {
+    return { action: 'go-back' };
   }
   
   return BRANDS[selection - 1];
@@ -434,13 +452,44 @@ async function validateAndGetConfiguration(liftType, liftTypeName, model, brand)
       console.log(chalk.yellow('\n  Please paste the new configurator URL:\n'));
       const newUrl = await askQuestion('  URL: ');
       if (newUrl && newUrl.trim()) {
+        const oldUrl = configuratorUrl;
         configuratorUrl = newUrl.trim();
+        
+        // Check if URL actually changed
+        const urlChanged = oldUrl !== configuratorUrl;
+        
         // Update saved config
         if (!configData) configData = {};
         configData.url = configuratorUrl;
         savedConfigs[configKey] = configData;
         saveSavedConfigs(savedConfigs);
         console.log(chalk.green('\n  ✓ URL updated and saved\n'));
+        
+        // If URL changed and config exists, ask about updating grid data
+        if (urlChanged) {
+          const configPath = path.join(__dirname, configFilePath);
+          const configExists = fs.existsSync(configPath);
+          
+          if (configExists) {
+            console.log(chalk.yellow('  ⚠️  The configurator URL has changed!\n'));
+            console.log(chalk.white('  The product grid data might have changed too.\n'));
+            console.log(chalk.cyan('  Do you want to update the grid data? (y/n): '));
+            
+            const updateGridAnswer = await askQuestion('  ');
+            
+            if (updateGridAnswer.toLowerCase() === 'y' || updateGridAnswer.toLowerCase() === 'yes') {
+              // Delete old config file so validation loop will prompt for new data
+              try {
+                fs.unlinkSync(configPath);
+                console.log(chalk.yellow('\n  ✓ Old grid data cleared. You will be prompted to paste new data.\n'));
+              } catch (error) {
+                console.log(chalk.red(`\n  ❌ Could not delete old config: ${error.message}\n`));
+              }
+            } else {
+              console.log(chalk.green('\n  ✓ Keeping existing grid data. Starting tests with current data.\n'));
+            }
+          }
+        }
       }
     } else {
       configuratorUrl = configData.url;
@@ -674,67 +723,109 @@ if (!options.config && !options.skipInteractive) {
   console.log(chalk.bold.blue('║   Blinds Max Height Tester - Interactive   ║'));
   console.log(chalk.bold.blue('╚════════════════════════════════════════════╝'));
   
-  const liftTypeSelection = await selectLiftType();
+  let liftTypeSelection = null;
+  let model = null;
+  let brand = null;
+  let validatedConfig = null;
   
-  if (liftTypeSelection) {
-    // Check if delete action was selected
-    if (liftTypeSelection.action === 'delete-results') {
-      await deleteAllResults();
-      process.exit(0);
+  // Navigation loop to allow going back
+  while (true) {
+    // Step 1: Select lift type
+    if (!liftTypeSelection) {
+      liftTypeSelection = await selectLiftType();
+      
+      if (!liftTypeSelection) {
+        console.log(chalk.yellow('⚠️  Skipping interactive mode.\n'));
+        console.log(chalk.red('❌ No configuration provided.\n'));
+        console.log(chalk.yellow('To run tests, you need to either:'));
+        console.log(chalk.white('  1. Use interactive mode (don\'t press Enter, select an option)'));
+        console.log(chalk.white('  2. Use --config flag: npm start -- --config configs/your-config.js'));
+        console.log(chalk.white('  3. Use --skip-interactive with --config flag\n'));
+        process.exit(1);
+      }
+      
+      // Check if delete action was selected
+      if (liftTypeSelection.action === 'delete-results') {
+        await deleteAllResults();
+        process.exit(0);
+      }
+      
+      continue; // Go to next step
     }
     
-    const model = await selectModel();
-    
-    if (model) {
-      const brand = await selectBrand();
+    // Step 2: Select model
+    if (!model) {
+      model = await selectModel(true); // Show go back option
       
-      if (brand) {
-        const validatedConfig = await validateAndGetConfiguration(
-          liftTypeSelection.key,
-          liftTypeSelection.name,
-          model,
-          brand
-        );
-        
-        if (validatedConfig) {
-          console.log(chalk.green('✅ Configuration validated successfully!\n'));
-          
-          if (validatedConfig.testData) {
-            // Data was extracted from grid, use it directly
-            testData = validatedConfig.testData;
-            configuratorUrl = validatedConfig.configuratorUrl;
-            config = {
-              name: validatedConfig.configName,
-              url: configuratorUrl,
-              gridImage: validatedConfig.gridImagePath,
-              testData: testData
-            };
-            console.log(chalk.cyan('📊 Using pasted grid data\n'));
-          } else {
-            // Load from config file
-            options.config = validatedConfig.configFilePath;
-            configuratorUrl = validatedConfig.configuratorUrl;
-          }
-        } else {
-          console.log(chalk.red('\n❌ Configuration validation failed or cancelled.\n'));
-          process.exit(1);
-        }
-      } else {
+      if (!model) {
+        console.log(chalk.red('\n❌ No model selected. Exiting.\n'));
+        process.exit(1);
+      }
+      
+      // Check if go back was selected
+      if (typeof model === 'object' && model.action === 'go-back') {
+        liftTypeSelection = null; // Reset to go back
+        model = null;
+        continue;
+      }
+      
+      continue; // Go to next step
+    }
+    
+    // Step 3: Select brand
+    if (!brand) {
+      brand = await selectBrand(true); // Show go back option
+      
+      if (!brand) {
         console.log(chalk.red('\n❌ No brand selected. Exiting.\n'));
         process.exit(1);
       }
-    } else {
-      console.log(chalk.red('\n❌ No model selected. Exiting.\n'));
-      process.exit(1);
+      
+      // Check if go back was selected
+      if (typeof brand === 'object' && brand.action === 'go-back') {
+        model = null; // Reset to go back
+        brand = null;
+        continue;
+      }
+      
+      continue; // Go to validation
     }
-  } else {
-    console.log(chalk.yellow('⚠️  Skipping interactive mode.\n'));
-    console.log(chalk.red('❌ No configuration provided.\n'));
-    console.log(chalk.yellow('To run tests, you need to either:'));
-    console.log(chalk.white('  1. Use interactive mode (don\'t press Enter, select an option)'));
-    console.log(chalk.white('  2. Use --config flag: npm start -- --config configs/your-config.js'));
-    console.log(chalk.white('  3. Use --skip-interactive with --config flag\n'));
-    process.exit(1);
+    
+    // Step 4: Validate configuration
+    if (!validatedConfig) {
+      validatedConfig = await validateAndGetConfiguration(
+        liftTypeSelection.key,
+        liftTypeSelection.name,
+        model,
+        brand
+      );
+      
+      if (validatedConfig) {
+        console.log(chalk.green('✅ Configuration validated successfully!\n'));
+        
+        if (validatedConfig.testData) {
+          // Data was extracted from grid, use it directly
+          testData = validatedConfig.testData;
+          configuratorUrl = validatedConfig.configuratorUrl;
+          config = {
+            name: validatedConfig.configName,
+            url: configuratorUrl,
+            gridImage: validatedConfig.gridImagePath,
+            testData: testData
+          };
+          console.log(chalk.cyan('📊 Using pasted grid data\n'));
+        } else {
+          // Load from config file
+          options.config = validatedConfig.configFilePath;
+          configuratorUrl = validatedConfig.configuratorUrl;
+        }
+        
+        break; // Exit navigation loop
+      } else {
+        console.log(chalk.red('\n❌ Configuration validation failed or cancelled.\n'));
+        process.exit(1);
+      }
+    }
   }
 }
 
@@ -798,6 +889,7 @@ class BlindsConfiguratorTester {
     this.shutdownRequested = false;
     this.isTestingConfiguration = false;
     this.completedProducts = new Set(); // Track completed products
+    this.completedTests = new Map(); // Track completed tests by product-width
     this.progressFile = null; // Will be set when tests start
   }
 
@@ -807,23 +899,39 @@ class BlindsConfiguratorTester {
 
   loadProgress() {
     if (!this.progressFile || !fs.existsSync(this.progressFile)) {
-      return { completedProducts: [] };
+      return { completedProducts: [], completedTests: {} };
     }
     
     try {
       const data = fs.readFileSync(this.progressFile, 'utf8');
-      return JSON.parse(data);
+      const progress = JSON.parse(data);
+      console.log(chalk.gray(`\n  📂 Progress file exists: ${path.basename(this.progressFile)}`));
+      console.log(chalk.gray(`  📅 Last updated: ${progress.lastUpdated || 'unknown'}`));
+      
+      // Show what's been tested
+      if (progress.completedTests && Object.keys(progress.completedTests).length > 0) {
+        const testCount = Object.values(progress.completedTests).reduce((sum, arr) => sum + arr.length, 0);
+        console.log(chalk.gray(`  ✓ ${testCount} test(s) already completed`));
+      }
+      
+      return progress;
     } catch (error) {
       console.log(chalk.yellow(`⚠️  Could not load progress: ${error.message}`));
-      return { completedProducts: [] };
+      return { completedProducts: [], completedTests: {} };
     }
   }
 
   saveProgress() {
     if (!this.progressFile) return;
     
+    const completedTestsObj = {};
+    this.completedTests.forEach((widths, product) => {
+      completedTestsObj[product] = Array.from(widths);
+    });
+    
     const progress = {
       completedProducts: Array.from(this.completedProducts),
+      completedTests: completedTestsObj,
       lastUpdated: new Date().toISOString()
     };
     
@@ -833,6 +941,9 @@ class BlindsConfiguratorTester {
         fs.mkdirSync(outputDir, { recursive: true });
       }
       fs.writeFileSync(this.progressFile, JSON.stringify(progress, null, 2));
+      
+      const totalTests = Object.values(completedTestsObj).reduce((sum, arr) => sum + arr.length, 0);
+      console.log(chalk.gray(`  💾 Progress saved: ${this.completedProducts.size} products, ${totalTests} tests completed`));
     } catch (error) {
       console.log(chalk.yellow(`⚠️  Could not save progress: ${error.message}`));
     }
@@ -847,6 +958,9 @@ class BlindsConfiguratorTester {
         console.log(chalk.yellow(`⚠️  Could not clear progress: ${error.message}`));
       }
     }
+    // Reset the completed products set and tests map
+    this.completedProducts = new Set();
+    this.completedTests = new Map();
   }
 
   async initialize() {
@@ -869,7 +983,13 @@ class BlindsConfiguratorTester {
     if (this.results.length > 0) {
       console.log(chalk.cyan('\n💾 Saving partial results before exit...'));
       await this.saveResults(outputFile);
+      
+      // If we're saving partial results, also save progress unconditionally
+      // This ensures we don't lose track of what we've tested so far
+      console.log(chalk.cyan('💾 Saving progress for resume...'));
+      this.saveProgress();
     }
+    
     await this.cleanup();
   }
 
@@ -1266,9 +1386,23 @@ class BlindsConfiguratorTester {
     // Load previous progress if resuming
     if (resumeFromProgress) {
       const progress = this.loadProgress();
-      this.completedProducts = new Set(progress.completedProducts);
-      console.log(chalk.green(`\n✓ Loaded progress: ${this.completedProducts.size} products already completed`));
-      console.log(chalk.gray('  Will skip completed products\n'));
+      this.completedProducts = new Set(progress.completedProducts || []);
+      
+      // Load completed tests map
+      if (progress.completedTests) {
+        for (const [product, widths] of Object.entries(progress.completedTests)) {
+          this.completedTests.set(product, new Set(widths));
+        }
+      }
+      
+      console.log(chalk.green(`\n✓ Loaded progress: ${this.completedProducts.size} products fully completed`));
+      
+      const totalTests = Object.values(progress.completedTests || {}).reduce((sum, arr) => sum + arr.length, 0);
+      if (totalTests > 0) {
+        console.log(chalk.green(`✓ ${totalTests} individual test(s) already completed`));
+      }
+      
+      console.log(chalk.gray('  Will skip completed tests\n'));
     }
     
     console.log(chalk.gray('   Press Ctrl+C to stop after current test completes and save results\n'));
@@ -1294,28 +1428,48 @@ class BlindsConfiguratorTester {
       const breakpoint144 = product.widthBreakpoints.find(bp => bp.maxHeight === 144);
       
       if (breakpoint144 && !this.shutdownRequested) {
-        const testWidth = breakpoint144.width - 2;
-        console.log(chalk.cyan(`\n📏 STEP 1: Testing 144" height capability @ ${testWidth}" width`));
-        console.log(chalk.gray(`   Verifying that 144" height is allowed with headrail available\n`));
+        // Check if 144" test was already completed
+        const test144Key = '144-height-test';
+        const completedWidths = this.completedTests.get(product.product);
         
-        this.isTestingConfiguration = true;
-        const test144Result = await this.testConfiguration(
-          product.product,
-          testWidth,
-          144,
-          144,
-          false,  // isMaxWidthTest
-          true    // is144Test
-        );
-        this.isTestingConfiguration = false;
-        
-        this.results.push(test144Result);
-        
-        if (test144Result.status === 'SKIPPED' || test144Result.status === 'ERROR') {
-          console.log(chalk.yellow(`  ⏭️  Skipping all tests for ${product.product} - 144" test ${test144Result.status}`));
-          shouldSkipWidth = true;
-          // Don't mark as completed if we skipped due to error
-          continue;
+        if (completedWidths && completedWidths.has(test144Key)) {
+          console.log(chalk.gray(`\n⏭️  Skipping STEP 1 (144" height test) for ${product.product} - already completed`));
+        } else {
+          const testWidth = breakpoint144.width - 2;
+          console.log(chalk.cyan(`\n📏 STEP 1: Testing 144" height capability @ ${testWidth}" width`));
+          console.log(chalk.gray(`   Verifying that 144" height is allowed with headrail available\n`));
+          
+          this.isTestingConfiguration = true;
+          const test144Result = await this.testConfiguration(
+            product.product,
+            testWidth,
+            144,
+            144,
+            false,  // isMaxWidthTest
+            true    // is144Test
+          );
+          this.isTestingConfiguration = false;
+          
+          this.results.push(test144Result);
+          
+          // Mark 144" test as completed and save progress
+          if (!this.completedTests.has(product.product)) {
+            this.completedTests.set(product.product, new Set());
+          }
+          this.completedTests.get(product.product).add(test144Key);
+          
+          // Save progress after 144" test
+          if (!this.shutdownRequested) {
+            console.log(chalk.gray(`  💾 Saving progress...`));
+            this.saveProgress();
+          }
+          
+          if (test144Result.status === 'SKIPPED' || test144Result.status === 'ERROR') {
+            console.log(chalk.yellow(`  ⏭️  Skipping all tests for ${product.product} - 144" test ${test144Result.status}`));
+            shouldSkipWidth = true;
+            // Don't mark as completed if we skipped due to error
+            continue;
+          }
         }
       }
 
@@ -1336,6 +1490,16 @@ class BlindsConfiguratorTester {
         // Skip if maxHeight is already 144" (already tested in STEP 1)
         if (maxHeight === 144) {
           console.log(chalk.gray(`\n📏 Skipping width ${width - 2}" - maxHeight is 144" (already tested in STEP 1)`));
+          continue;
+        }
+        
+        // Generate a unique test key for this product-width combination
+        const testKey = `${width}`;
+        
+        // Check if this specific test was already completed
+        const completedWidths = this.completedTests.get(product.product);
+        if (completedWidths && completedWidths.has(testKey)) {
+          console.log(chalk.gray(`\n⏭️  Skipping ${product.product} @ ${width}" - already completed`));
           continue;
         }
         
@@ -1362,6 +1526,21 @@ class BlindsConfiguratorTester {
         
         this.results.push(testResult);
         
+        // Mark test as completed and save progress IMMEDIATELY after adding to results
+        // This ensures progress is tracked even if shutdown happens before the status check
+        const testKey = `${width}`;
+        if (!this.completedTests.has(product.product)) {
+          this.completedTests.set(product.product, new Set());
+        }
+        this.completedTests.get(product.product).add(testKey);
+        
+        // Save progress after every test (not just successful ones)
+        // This ensures we never lose track of what's been tested
+        if (!this.shutdownRequested) {
+          console.log(chalk.gray(`  💾 Saving progress...`));
+          this.saveProgress();
+        }
+        
         if (this.shutdownRequested) {
           console.log(chalk.yellow('\n⏹️  Test completed. Shutting down...'));
           break;
@@ -1375,30 +1554,50 @@ class BlindsConfiguratorTester {
 
       // STEP 3: Test max width restriction (after all normal width tests)
       if (!shouldSkipWidth && !this.shutdownRequested && product.widthBreakpoints.length > 0) {
-        // Find the maximum width from all breakpoints
-        const maxWidth = Math.max(...product.widthBreakpoints.map(bp => bp.width));
-        const beyondMaxWidth = maxWidth + 12; // Test 12" beyond max width
+        // Check if max width test was already completed
+        const maxWidthKey = 'max-width';
+        const completedWidths = this.completedTests.get(product.product);
         
-        // Use a reasonable height (not at max) for this test
-        const testHeight = 72;
-        
-        console.log(chalk.cyan(`\n📏 STEP 3: Testing max width restriction`));
-        console.log(chalk.yellow(`   Max width in table: ${maxWidth}"`));
-        console.log(chalk.yellow(`   Testing at: ${beyondMaxWidth}" (beyond max width)`));
-        console.log(chalk.gray(`   Headrail should NOT be available\n`));
-        
-        this.isTestingConfiguration = true;
-        const maxWidthTest = await this.testConfiguration(
-          product.product,
-          beyondMaxWidth,
-          testHeight, // Use as "maxHeight" but won't be compared in max width test
-          testHeight,
-          true,   // isMaxWidthTest
-          false   // is144Test
-        );
-        this.isTestingConfiguration = false;
-        
-        this.results.push(maxWidthTest);
+        if (completedWidths && completedWidths.has(maxWidthKey)) {
+          console.log(chalk.gray(`\n⏭️  Skipping STEP 3 (max width test) for ${product.product} - already completed`));
+        } else {
+          // Find the maximum width from all breakpoints
+          const maxWidth = Math.max(...product.widthBreakpoints.map(bp => bp.width));
+          const beyondMaxWidth = maxWidth + 12; // Test 12" beyond max width
+          
+          // Use a reasonable height (not at max) for this test
+          const testHeight = 72;
+          
+          console.log(chalk.cyan(`\n📏 STEP 3: Testing max width restriction`));
+          console.log(chalk.yellow(`   Max width in table: ${maxWidth}"`));
+          console.log(chalk.yellow(`   Testing at: ${beyondMaxWidth}" (beyond max width)`));
+          console.log(chalk.gray(`   Headrail should NOT be available\n`));
+          
+          this.isTestingConfiguration = true;
+          const maxWidthTest = await this.testConfiguration(
+            product.product,
+            beyondMaxWidth,
+            testHeight, // Use as "maxHeight" but won't be compared in max width test
+            testHeight,
+            true,   // isMaxWidthTest
+            false   // is144Test
+          );
+          this.isTestingConfiguration = false;
+          
+          this.results.push(maxWidthTest);
+          
+          // Mark max width test as completed and save progress
+          if (!this.completedTests.has(product.product)) {
+            this.completedTests.set(product.product, new Set());
+          }
+          this.completedTests.get(product.product).add(maxWidthKey);
+          
+          // Save progress after max width test
+          if (!this.shutdownRequested) {
+            console.log(chalk.gray(`  💾 Saving progress...`));
+            this.saveProgress();
+          }
+        }
       }
 
       // Mark product as completed (if not aborted)
@@ -1406,6 +1605,10 @@ class BlindsConfiguratorTester {
         this.completedProducts.add(product.product);
         this.saveProgress();
         console.log(chalk.green(`\n✅ Completed all tests for ${product.product}`));
+      } else if (this.shutdownRequested) {
+        console.log(chalk.yellow(`\n⚠️  Product ${product.product} not marked as completed (shutdown requested)`));
+      } else if (shouldSkipWidth) {
+        console.log(chalk.yellow(`\n⚠️  Product ${product.product} not marked as completed (tests were skipped)`));
       }
     }
   }
@@ -1499,55 +1702,85 @@ async function main() {
   process.on('SIGTERM', handleShutdown);
 
   try {
-    await tester.initialize();
-    
-    // Check for existing progress
+    // Check for existing progress BEFORE opening browser
     const configName = config ? config.name : 'configuration';
     tester.setProgressFile(configName);
     const progress = tester.loadProgress();
     
     let resumeFromProgress = false;
     
-    if (progress.completedProducts && progress.completedProducts.length > 0) {
-      // Found previous progress, ask user
+    // Check if there's any progress at all (completed products OR completed tests)
+    const hasCompletedProducts = progress.completedProducts && progress.completedProducts.length > 0;
+    const hasCompletedTests = progress.completedTests && Object.keys(progress.completedTests).length > 0;
+    
+    if (hasCompletedProducts || hasCompletedTests) {
+      // Found previous progress, ask user BEFORE opening browser
       console.log(chalk.cyan('\n📋 Previous test progress found!'));
-      console.log(chalk.white(`   ${progress.completedProducts.length} product(s) already completed:`));
-      progress.completedProducts.forEach((product, index) => {
-        console.log(chalk.gray(`     ${index + 1}. ${product}`));
-      });
+      
+      if (hasCompletedProducts) {
+        console.log(chalk.white(`   ${progress.completedProducts.length} product(s) fully completed:`));
+        progress.completedProducts.forEach((product, index) => {
+          console.log(chalk.gray(`     ${index + 1}. ${product}`));
+        });
+      }
+      
+      if (hasCompletedTests) {
+        const totalTests = Object.values(progress.completedTests).reduce((sum, arr) => sum + arr.length, 0);
+        console.log(chalk.white(`   ${totalTests} individual test(s) completed`));
+        if (!hasCompletedProducts) {
+          // Show which products have partial progress
+          console.log(chalk.gray('   Partial progress for:'));
+          Object.keys(progress.completedTests).forEach((product, index) => {
+            const testCount = progress.completedTests[product].length;
+            console.log(chalk.gray(`     ${index + 1}. ${product} (${testCount} test${testCount === 1 ? '' : 's'})`));
+          });
+        }
+      }
       console.log();
       
-      const totalProducts = productsToTest.length;
-      const remaining = totalProducts - progress.completedProducts.length;
-      
       console.log(chalk.white('   What would you like to do?\n'));
-      console.log(chalk.white('     1. Resume from where you left off (test remaining products)'));
-      console.log(chalk.white('     2. Start fresh (clear progress and test all products)'));
+      console.log(chalk.white('     1. Resume from where you left off'));
+      console.log(chalk.white('     2. Start fresh (clear progress and test all products in new file)'));
       console.log(chalk.white('     3. Exit\n'));
       
       const choice = await askQuestion('   Selection (1-3): ');
       
       if (choice.trim() === '1') {
         resumeFromProgress = true;
-        console.log(chalk.green(`\n✓ Resuming tests - ${remaining} product(s) remaining\n`));
+        console.log(chalk.green(`\n✓ Resuming tests from where you left off\n`));
+        console.log(chalk.gray('  Will skip completed tests and continue\n'));
       } else if (choice.trim() === '2') {
         tester.clearProgress();
         console.log(chalk.yellow('\n✓ Starting fresh - all products will be tested\n'));
+        console.log(chalk.gray('  Progress tracking reset for new test run\n'));
+        console.log(chalk.gray('  A new results file will be created\n'));
+        console.log(chalk.gray('  Previous results are preserved\n'));
       } else {
         console.log(chalk.yellow('\n⏹️  Exiting.\n'));
-        await tester.cleanup();
         process.exit(0);
       }
     }
+    
+    // NOW initialize the browser (only if we're continuing)
+    await tester.initialize();
     
     await tester.runTests(productsToTest, resumeFromProgress);
     tester.printSummary();
     await tester.saveResults(options.output);
     
+    // Save progress on graceful shutdown (so resume works)
+    const totalTests = Array.from(tester.completedTests.values()).reduce((sum, set) => sum + set.size, 0);
+    if (tester.shutdownRequested && totalTests > 0) {
+      console.log(chalk.cyan('💾 Saving progress for resume...'));
+      tester.saveProgress();
+    }
+    
     // Clear progress file on successful completion
     if (!tester.shutdownRequested) {
       tester.clearProgress();
       console.log(chalk.green('\n✅ All tests completed! Progress file cleared.\n'));
+    } else {
+      console.log(chalk.yellow('\n⏸️  Tests paused. Run again to resume from where you left off.\n'));
     }
   } catch (error) {
     console.error(chalk.red(`\n❌ Fatal error: ${error.message}`));

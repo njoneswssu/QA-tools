@@ -2,17 +2,7 @@
 BLINDS MAX HEIGHT TEST RESULTS - Compact Grid
 ════════════════════════════════════════════════════════════════════════════════════════════════════
 
-[mation Traal vas:
-  Widths:     34"
-  Max Height: 14"
-  Status:     ✅PASS
-
-[sbewpore — [raal taal:
-  Widths:     34"
-  Max Height: 14"
-  Status:     ✅PASS
-
-[stacscia — Tiaaliaal:
-  Widths:     34"
-  Max Height: 1"
+3% Catalina:
+  Widths:     112"
+  Max Height: 132"
   Status:     ✅PASS
