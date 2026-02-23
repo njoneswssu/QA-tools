@@ -1,43 +1,153 @@
 {
   "games": {
-    "61fc2e0519808b7939ffa4b246abdc06": {
-      "game_id": "61fc2e0519808b7939ffa4b246abdc06",
+    "74a2ce699a67094d664e6f11f876fd8b": {
+      "game_id": "74a2ce699a67094d664e6f11f876fd8b",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "Miami Heat",
-      "away_team": "Phoenix Suns",
-      "game_time": "2026-01-14T00:40:00Z",
-      "first_seen": "2026-01-13T16:41:43.355868",
-      "first_seen_readable": "2026-01-13 16:41:43",
+      "home_team": "Dallas Mavericks",
+      "away_team": "Utah Jazz",
+      "game_time": "2026-01-17T22:10:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:43:37",
       "spreads": {
-        "-1.5": {
-          "spread": -1.5,
-          "favored_team": "Miami Heat",
+        "-3.5": {
+          "spread": -3.5,
+          "favored_team": "Dallas Mavericks",
           "bookmakers": [
             {
               "bookmaker": "draftkings",
               "bookmaker_name": "DraftKings"
             },
             {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
               "bookmaker": "betmgm",
               "bookmaker_name": "BetMGM"
             }
           ]
-        },
-        "-1.0": {
-          "spread": -1.0,
-          "favored_team": "Miami Heat",
+        }
+      },
+      "totals": {
+        "241.5": {
+          "total": 241.5,
           "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
             {
               "bookmaker": "fanduel",
               "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:43:37",
+      "projection": {
+        "projected_total": 238.6,
+        "confidence": "high",
+        "justification": [
+          "Fast pace matchup (avg: 102.9)",
+          "Dallas Mavericks averages 110.0 PPG",
+          "Utah Jazz averages 115.3 PPG",
+          "Dallas Mavericks allows 113.9 PPG",
+          "Utah Jazz allows 124.0 PPG",
+          "Dallas Mavericks defensive rating: 111.6",
+          "Utah Jazz defensive rating: 119.5",
+          "Utah Jazz weak defense (DRtg: 119.5) vulnerable to Dallas Mavericks strong offense (ORtg: 108.7)"
+        ]
+      }
+    },
+    "ee33d9e84247204b91f88df26df1db6f": {
+      "game_id": "ee33d9e84247204b91f88df26df1db6f",
+      "sport": "basketball_nba",
+      "sport_display": "NBA",
+      "home_team": "Atlanta Hawks",
+      "away_team": "Boston Celtics",
+      "game_time": "2026-01-18T00:40:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:43:42",
+      "spreads": {
+        "3.5": {
+          "spread": 3.5,
+          "favored_team": "Boston Celtics",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
             }
           ]
         }
       },
       "totals": {
+        "229.5": {
+          "total": 229.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
+        },
         "230.5": {
           "total": 230.5,
+          "bookmakers": [
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:43:42",
+      "projection": {
+        "projected_total": 226.1,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 100.2)",
+          "Atlanta Hawks averages 115.8 PPG",
+          "Boston Celtics averages 114.2 PPG",
+          "Atlanta Hawks allows 117.7 PPG",
+          "Boston Celtics allows 109.1 PPG",
+          "Atlanta Hawks defensive rating: 114.0",
+          "Boston Celtics defensive rating: 112.3",
+          "Atlanta Hawks strong defense (DRtg: 114.0) limiting Boston Celtics offense (ORtg: 119.9)"
+        ]
+      }
+    },
+    "53948b32ee634b31967dd050d56eef8a": {
+      "game_id": "53948b32ee634b31967dd050d56eef8a",
+      "sport": "basketball_nba",
+      "sport_display": "NBA",
+      "home_team": "Detroit Pistons",
+      "away_team": "Indiana Pacers",
+      "game_time": "2026-01-18T00:40:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:43:46",
+      "spreads": {
+        "-12.5": {
+          "spread": -12.5,
+          "favored_team": "Detroit Pistons",
           "bookmakers": [
             {
               "bookmaker": "draftkings",
@@ -54,53 +164,66 @@
           ]
         }
       },
-      "documented_at": "2026-01-13T16:41:43.355868",
-      "documented_at_readable": "2026-01-13 16:41:43",
-      "projection": {
-        "projected_total": 231.6,
-        "confidence": "high",
-        "justification": [
-          "Fast pace matchup (avg: 102.8)",
-          "Miami Heat averages 114.1 PPG",
-          "Phoenix Suns averages 112.0 PPG",
-          "Miami Heat allows 116.7 PPG",
-          "Phoenix Suns allows 111.3 PPG",
-          "Miami Heat defensive rating: 110.9",
-          "Phoenix Suns defensive rating: 110.8"
-        ]
-      }
-    },
-    "bed2aa3c325290237960f892f5a097a6": {
-      "game_id": "bed2aa3c325290237960f892f5a097a6",
-      "sport": "basketball_nba",
-      "sport_display": "NBA",
-      "home_team": "Houston Rockets",
-      "away_team": "Chicago Bulls",
-      "game_time": "2026-01-14T01:10:00Z",
-      "first_seen": "2026-01-13T16:41:43.355868",
-      "first_seen_readable": "2026-01-13 16:41:46",
-      "spreads": {
-        "-12.5": {
-          "spread": -12.5,
-          "favored_team": "Houston Rockets",
+      "totals": {
+        "227.5": {
+          "total": 227.5,
           "bookmakers": [
             {
               "bookmaker": "draftkings",
               "bookmaker_name": "DraftKings"
             },
             {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
               "bookmaker": "betmgm",
               "bookmaker_name": "BetMGM"
             }
           ]
-        },
-        "-13.0": {
-          "spread": -13.0,
-          "favored_team": "Houston Rockets",
+        }
+      },
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:43:46",
+      "projection": {
+        "projected_total": 226.7,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 101.5)",
+          "Detroit Pistons averages 114.8 PPG",
+          "Indiana Pacers averages 110.0 PPG",
+          "Detroit Pistons allows 110.0 PPG",
+          "Indiana Pacers allows 118.5 PPG",
+          "Detroit Pistons defensive rating: 108.8",
+          "Indiana Pacers defensive rating: 116.2"
+        ]
+      }
+    },
+    "5dd9d109817aa5065517eda2d22abd47": {
+      "game_id": "5dd9d109817aa5065517eda2d22abd47",
+      "sport": "basketball_nba",
+      "sport_display": "NBA",
+      "home_team": "New York Knicks",
+      "away_team": "Phoenix Suns",
+      "game_time": "2026-01-18T00:40:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:44:43",
+      "spreads": {
+        "-3.5": {
+          "spread": -3.5,
+          "favored_team": "New York Knicks",
           "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
             {
               "bookmaker": "fanduel",
               "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
             }
           ]
         }
@@ -114,6 +237,57 @@
               "bookmaker_name": "DraftKings"
             },
             {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        },
+        "224.5": {
+          "total": 224.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:44:43",
+      "projection": {
+        "projected_total": 224.8,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 100.1)",
+          "New York Knicks averages 115.4 PPG",
+          "Phoenix Suns averages 112.0 PPG",
+          "New York Knicks allows 115.1 PPG",
+          "Phoenix Suns allows 111.6 PPG",
+          "New York Knicks defensive rating: 115.4",
+          "Phoenix Suns defensive rating: 111.0",
+          "Phoenix Suns strong defense (DRtg: 111.0) limiting New York Knicks offense (ORtg: 117.9)"
+        ]
+      }
+    },
+    "a21e077af636c4ec9627a98ea87abea6": {
+      "game_id": "a21e077af636c4ec9627a98ea87abea6",
+      "sport": "basketball_nba",
+      "sport_display": "NBA",
+      "home_team": "Miami Heat",
+      "away_team": "Oklahoma City Thunder",
+      "game_time": "2026-01-18T01:10:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:44:46",
+      "spreads": {
+        "10.5": {
+          "spread": 10.5,
+          "favored_team": "Oklahoma City Thunder",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
               "bookmaker": "fanduel",
               "bookmaker_name": "FanDuel"
             },
@@ -124,34 +298,213 @@
           ]
         }
       },
-      "documented_at": "2026-01-13T16:41:43.355868",
-      "documented_at_readable": "2026-01-13 16:41:46",
+      "totals": {
+        "233.5": {
+          "total": 233.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
+        },
+        "234.5": {
+          "total": 234.5,
+          "bookmakers": [
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:44:46",
       "projection": {
-        "projected_total": 230.4,
+        "projected_total": 226.5,
         "confidence": "high",
         "justification": [
-          "Average pace (avg: 100.9)",
-          "Houston Rockets averages 115.0 PPG",
-          "Chicago Bulls averages 115.0 PPG",
-          "Houston Rockets allows 110.1 PPG",
-          "Chicago Bulls allows 120.8 PPG",
-          "Houston Rockets defensive rating: 112.4",
-          "Chicago Bulls defensive rating: 116.4"
+          "Fast pace matchup (avg: 103.4)",
+          "Miami Heat averages 114.4 PPG",
+          "Oklahoma City Thunder averages 116.0 PPG",
+          "Miami Heat allows 116.8 PPG",
+          "Oklahoma City Thunder allows 106.0 PPG",
+          "Miami Heat defensive rating: 111.3",
+          "Oklahoma City Thunder defensive rating: 104.1",
+          "Miami Heat strong defense (DRtg: 111.3) limiting Oklahoma City Thunder offense (ORtg: 115.8)",
+          "Oklahoma City Thunder strong defense (DRtg: 104.1) limiting Miami Heat offense (ORtg: 111.7)"
         ]
       }
     },
-    "a13039a9d53bb199d840fbfcf12288e3": {
-      "game_id": "a13039a9d53bb199d840fbfcf12288e3",
+    "ec4374304055d759d9e735b24be94cdb": {
+      "game_id": "ec4374304055d759d9e735b24be94cdb",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "New Orleans Pelicans",
-      "away_team": "Denver Nuggets",
-      "game_time": "2026-01-14T01:10:00Z",
-      "first_seen": "2026-01-13T16:46:39.831754",
-      "first_seen_readable": "2026-01-13 16:46:39",
+      "home_team": "San Antonio Spurs",
+      "away_team": "Minnesota Timberwolves",
+      "game_time": "2026-01-18T01:10:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:44:51",
       "spreads": {
-        "1.5": {
-          "spread": 1.5,
+        "-6.5": {
+          "spread": -6.5,
+          "favored_team": "San Antonio Spurs",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        },
+        "-6.0": {
+          "spread": -6.0,
+          "favored_team": "San Antonio Spurs",
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
+        }
+      },
+      "totals": {
+        "228.5": {
+          "total": 228.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        },
+        "229.5": {
+          "total": 229.5,
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:44:51",
+      "projection": {
+        "projected_total": 222.3,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 101.4)",
+          "San Antonio Spurs averages 112.8 PPG",
+          "Minnesota Timberwolves averages 117.2 PPG",
+          "San Antonio Spurs allows 110.7 PPG",
+          "Minnesota Timberwolves allows 113.0 PPG",
+          "San Antonio Spurs defensive rating: 109.6",
+          "Minnesota Timberwolves defensive rating: 110.9",
+          "San Antonio Spurs strong defense (DRtg: 109.6) limiting Minnesota Timberwolves offense (ORtg: 116.2)",
+          "Minnesota Timberwolves strong defense (DRtg: 110.9) limiting San Antonio Spurs offense (ORtg: 114.5)"
+        ]
+      }
+    },
+    "1b253261c5a0c36cc77a7e3f3ec0813f": {
+      "game_id": "1b253261c5a0c36cc77a7e3f3ec0813f",
+      "sport": "basketball_nba",
+      "sport_display": "NBA",
+      "home_team": "Golden State Warriors",
+      "away_team": "Charlotte Hornets",
+      "game_time": "2026-01-18T01:40:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:46:19",
+      "spreads": {
+        "-7.5": {
+          "spread": -7.5,
+          "favored_team": "Golden State Warriors",
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        },
+        "-7.0": {
+          "spread": -7.0,
+          "favored_team": "Golden State Warriors",
+          "bookmakers": [
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
+        }
+      },
+      "totals": {
+        "234.5": {
+          "total": 234.5,
+          "bookmakers": [
+            {
+              "bookmaker": "draftkings",
+              "bookmaker_name": "DraftKings"
+            },
+            {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            }
+          ]
+        },
+        "233.5": {
+          "total": 233.5,
+          "bookmakers": [
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
+        }
+      },
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:46:19",
+      "projection": {
+        "projected_total": 223.2,
+        "confidence": "high",
+        "justification": [
+          "Average pace (avg: 100.3)",
+          "Golden State Warriors averages 110.8 PPG",
+          "Charlotte Hornets averages 114.3 PPG",
+          "Golden State Warriors allows 111.6 PPG",
+          "Charlotte Hornets allows 114.2 PPG",
+          "Golden State Warriors defensive rating: 110.8",
+          "Charlotte Hornets defensive rating: 114.4",
+          "Golden State Warriors strong defense (DRtg: 110.8) limiting Charlotte Hornets offense (ORtg: 116.4)"
+        ]
+      }
+    },
+    "dfe75b541b9fdfe1d8b2e6208a62b89f": {
+      "game_id": "dfe75b541b9fdfe1d8b2e6208a62b89f",
+      "sport": "basketball_nba",
+      "sport_display": "NBA",
+      "home_team": "Denver Nuggets",
+      "away_team": "Washington Wizards",
+      "game_time": "2026-01-18T02:10:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:46:58",
+      "spreads": {
+        "-12.5": {
+          "spread": -12.5,
           "favored_team": "Denver Nuggets",
           "bookmakers": [
             {
@@ -178,216 +531,137 @@
               "bookmaker_name": "DraftKings"
             },
             {
+              "bookmaker": "fanduel",
+              "bookmaker_name": "FanDuel"
+            },
+            {
               "bookmaker": "betmgm",
               "bookmaker_name": "BetMGM"
             }
           ]
-        },
-        "233.5": {
-          "total": 233.5,
-          "bookmakers": [
-            {
-              "bookmaker": "fanduel",
-              "bookmaker_name": "FanDuel"
-            }
-          ]
         }
       },
-      "documented_at": "2026-01-13T16:46:39.831754",
-      "documented_at_readable": "2026-01-13 16:46:39",
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:46:58",
       "projection": {
-        "projected_total": 236.0,
+        "projected_total": 235.1,
         "confidence": "high",
         "justification": [
-          "Average pace (avg: 101.3)",
-          "New Orleans Pelicans averages 112.0 PPG",
-          "Denver Nuggets averages 119.1 PPG",
-          "New Orleans Pelicans allows 120.9 PPG",
-          "Denver Nuggets allows 115.3 PPG",
-          "New Orleans Pelicans defensive rating: 117.7",
+          "Average pace (avg: 101.1)",
+          "Denver Nuggets averages 119.2 PPG",
+          "Washington Wizards averages 109.3 PPG",
+          "Denver Nuggets allows 115.2 PPG",
+          "Washington Wizards allows 121.9 PPG",
           "Denver Nuggets defensive rating: 115.5",
-          "Denver Nuggets weak defense (DRtg: 115.5) vulnerable to New Orleans Pelicans strong offense (ORtg: 110.1)"
+          "Washington Wizards defensive rating: 118.9",
+          "Denver Nuggets weak defense (DRtg: 115.5) vulnerable to Washington Wizards strong offense (ORtg: 108.0)"
         ]
       }
     },
-    "e7bdcaa4eb0827e34ee88b6f7f4cfbf7": {
-      "game_id": "e7bdcaa4eb0827e34ee88b6f7f4cfbf7",
+    "c40f627c22f80050fd8efec135704313": {
+      "game_id": "c40f627c22f80050fd8efec135704313",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "Milwaukee Bucks",
-      "away_team": "Minnesota Timberwolves",
-      "game_time": "2026-01-14T01:10:00Z",
-      "first_seen": "2026-01-13T16:46:39.831754",
-      "first_seen_readable": "2026-01-13 16:46:45",
+      "home_team": "Portland Trail Blazers",
+      "away_team": "Los Angeles Lakers",
+      "game_time": "2026-01-18T03:10:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:47:38",
       "spreads": {
         "-3.5": {
           "spread": -3.5,
-          "favored_team": "Milwaukee Bucks",
+          "favored_team": "Portland Trail Blazers",
           "bookmakers": [
             {
               "bookmaker": "draftkings",
               "bookmaker_name": "DraftKings"
             },
             {
-              "bookmaker": "betmgm",
-              "bookmaker_name": "BetMGM"
-            }
-          ]
-        },
-        "-3.0": {
-          "spread": -3.0,
-          "favored_team": "Milwaukee Bucks",
-          "bookmakers": [
-            {
               "bookmaker": "fanduel",
               "bookmaker_name": "FanDuel"
+            },
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
             }
           ]
         }
       },
       "totals": {
-        "229.5": {
-          "total": 229.5,
+        "223.5": {
+          "total": 223.5,
           "bookmakers": [
             {
               "bookmaker": "draftkings",
               "bookmaker_name": "DraftKings"
             },
             {
-              "bookmaker": "betmgm",
-              "bookmaker_name": "BetMGM"
-            }
-          ]
-        },
-        "228.5": {
-          "total": 228.5,
-          "bookmakers": [
-            {
               "bookmaker": "fanduel",
               "bookmaker_name": "FanDuel"
             }
           ]
+        },
+        "224.5": {
+          "total": 224.5,
+          "bookmakers": [
+            {
+              "bookmaker": "betmgm",
+              "bookmaker_name": "BetMGM"
+            }
+          ]
         }
       },
-      "documented_at": "2026-01-13T16:46:39.831754",
-      "documented_at_readable": "2026-01-13 16:46:45",
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:47:38",
       "projection": {
-        "projected_total": 227.6,
+        "projected_total": 230.6,
         "confidence": "high",
         "justification": [
-          "Average pace (avg: 100.7)",
-          "Milwaukee Bucks averages 110.3 PPG",
-          "Minnesota Timberwolves averages 117.0 PPG",
-          "Milwaukee Bucks allows 114.7 PPG",
-          "Minnesota Timberwolves allows 113.2 PPG",
-          "Milwaukee Bucks defensive rating: 115.2",
-          "Minnesota Timberwolves defensive rating: 111.0"
+          "Average pace (avg: 101.1)",
+          "Portland Trail Blazers averages 113.6 PPG",
+          "Los Angeles Lakers averages 111.0 PPG",
+          "Portland Trail Blazers allows 117.0 PPG",
+          "Los Angeles Lakers allows 115.1 PPG",
+          "Portland Trail Blazers defensive rating: 114.0",
+          "Los Angeles Lakers defensive rating: 115.5",
+          "Los Angeles Lakers weak defense (DRtg: 115.5) vulnerable to Portland Trail Blazers strong offense (ORtg: 112.3)"
         ]
       }
     },
-    "a7a281e6b58fc8dcb4460426708635f0": {
-      "game_id": "a7a281e6b58fc8dcb4460426708635f0",
+    "d149b0e5ad9dd363c76d6308dea81c74": {
+      "game_id": "d149b0e5ad9dd363c76d6308dea81c74",
       "sport": "basketball_nba",
       "sport_display": "NBA",
-      "home_team": "Oklahoma City Thunder",
-      "away_team": "San Antonio Spurs",
-      "game_time": "2026-01-14T01:10:00Z",
-      "first_seen": "2026-01-13T16:46:39.831754",
-      "first_seen_readable": "2026-01-13 16:47:24",
+      "home_team": "Memphis Grizzlies",
+      "away_team": "Orlando Magic",
+      "game_time": "2026-01-18T17:10:00Z",
+      "first_seen": "2026-01-17T09:43:37.773894",
+      "first_seen_readable": "2026-01-17 09:48:17",
       "spreads": {
-        "-8.5": {
-          "spread": -8.5,
-          "favored_team": "Oklahoma City Thunder",
+        "5.5": {
+          "spread": 5.5,
+          "favored_team": "Orlando Magic",
           "bookmakers": [
             {
               "bookmaker": "draftkings",
               "bookmaker_name": "DraftKings"
-            },
-            {
-              "bookmaker": "fanduel",
-              "bookmaker_name": "FanDuel"
-            },
-            {
-              "bookmaker": "betmgm",
-              "bookmaker_name": "BetMGM"
-            }
-          ]
-        }
-      },
-      "totals": {
-        "230.5": {
-          "total": 230.5,
-          "bookmakers": [
-            {
-              "bookmaker": "draftkings",
-              "bookmaker_name": "DraftKings"
-            },
-            {
-              "bookmaker": "betmgm",
-              "bookmaker_name": "BetMGM"
             }
           ]
         },
-        "229.5": {
-          "total": 229.5,
+        "5.0": {
+          "spread": 5.0,
+          "favored_team": "Orlando Magic",
           "bookmakers": [
             {
               "bookmaker": "fanduel",
               "bookmaker_name": "FanDuel"
-            }
-          ]
-        }
-      },
-      "documented_at": "2026-01-13T16:46:39.831754",
-      "documented_at_readable": "2026-01-13 16:47:24",
-      "projection": {
-        "projected_total": 218.6,
-        "confidence": "high",
-        "justification": [
-          "Average pace (avg: 101.6)",
-          "Oklahoma City Thunder averages 116.0 PPG",
-          "San Antonio Spurs averages 113.0 PPG",
-          "Oklahoma City Thunder allows 106.4 PPG",
-          "San Antonio Spurs allows 110.6 PPG",
-          "Oklahoma City Thunder defensive rating: 104.3",
-          "San Antonio Spurs defensive rating: 109.4",
-          "Oklahoma City Thunder strong defense (DRtg: 104.3) limiting San Antonio Spurs offense (ORtg: 114.6)",
-          "San Antonio Spurs strong defense (DRtg: 109.4) limiting Oklahoma City Thunder offense (ORtg: 115.7)"
-        ]
-      }
-    },
-    "c7c297ef2929312f940160908cc98da1": {
-      "game_id": "c7c297ef2929312f940160908cc98da1",
-      "sport": "basketball_nba",
-      "sport_display": "NBA",
-      "home_team": "Los Angeles Lakers",
-      "away_team": "Atlanta Hawks",
-      "game_time": "2026-01-14T03:40:00Z",
-      "first_seen": "2026-01-13T17:01:03.196913",
-      "first_seen_readable": "2026-01-13 17:01:08",
-      "spreads": {
-        "2.5": {
-          "spread": 2.5,
-          "favored_team": "Atlanta Hawks",
-          "bookmakers": [
-            {
-              "bookmaker": "draftkings",
-              "bookmaker_name": "DraftKings"
-            },
-            {
-              "bookmaker": "fanduel",
-              "bookmaker_name": "FanDuel"
-            },
-            {
-              "bookmaker": "betmgm",
-              "bookmaker_name": "BetMGM"
             }
           ]
         }
       },
       "totals": {
-        "231.5": {
-          "total": 231.5,
+        "227.5": {
+          "total": 227.5,
           "bookmakers": [
             {
               "bookmaker": "draftkings",
@@ -396,98 +670,30 @@
             {
               "bookmaker": "fanduel",
               "bookmaker_name": "FanDuel"
-            },
-            {
-              "bookmaker": "betmgm",
-              "bookmaker_name": "BetMGM"
             }
           ]
         }
       },
-      "documented_at": "2026-01-13T17:01:03.196913",
-      "documented_at_readable": "2026-01-13 17:01:08",
+      "documented_at": "2026-01-17T09:43:37.773894",
+      "documented_at_readable": "2026-01-17 09:48:17",
       "projection": {
-        "projected_total": 229.1,
+        "projected_total": 226.0,
         "confidence": "high",
         "justification": [
           "Average pace (avg: 101.5)",
-          "Los Angeles Lakers averages 110.2 PPG",
-          "Atlanta Hawks averages 116.1 PPG",
-          "Los Angeles Lakers allows 114.6 PPG",
-          "Atlanta Hawks allows 117.2 PPG",
-          "Los Angeles Lakers defensive rating: 115.0",
-          "Atlanta Hawks defensive rating: 113.5"
-        ]
-      }
-    },
-    "8a94b39d3b7b34471f2dc96fa6f46b59": {
-      "game_id": "8a94b39d3b7b34471f2dc96fa6f46b59",
-      "sport": "basketball_nba",
-      "sport_display": "NBA",
-      "home_team": "Golden State Warriors",
-      "away_team": "Portland Trail Blazers",
-      "game_time": "2026-01-14T04:10:00Z",
-      "first_seen": "2026-01-13T17:01:03.196913",
-      "first_seen_readable": "2026-01-13 17:02:25",
-      "spreads": {
-        "-10.5": {
-          "spread": -10.5,
-          "favored_team": "Golden State Warriors",
-          "bookmakers": [
-            {
-              "bookmaker": "draftkings",
-              "bookmaker_name": "DraftKings"
-            },
-            {
-              "bookmaker": "fanduel",
-              "bookmaker_name": "FanDuel"
-            },
-            {
-              "bookmaker": "betmgm",
-              "bookmaker_name": "BetMGM"
-            }
-          ]
-        }
-      },
-      "totals": {
-        "226.5": {
-          "total": 226.5,
-          "bookmakers": [
-            {
-              "bookmaker": "draftkings",
-              "bookmaker_name": "DraftKings"
-            },
-            {
-              "bookmaker": "fanduel",
-              "bookmaker_name": "FanDuel"
-            },
-            {
-              "bookmaker": "betmgm",
-              "bookmaker_name": "BetMGM"
-            }
-          ]
-        }
-      },
-      "documented_at": "2026-01-13T17:01:03.196913",
-      "documented_at_readable": "2026-01-13 17:02:25",
-      "projection": {
-        "projected_total": 226.7,
-        "confidence": "high",
-        "justification": [
-          "Average pace (avg: 101.7)",
-          "Golden State Warriors averages 110.3 PPG",
-          "Portland Trail Blazers averages 113.9 PPG",
-          "Golden State Warriors allows 111.9 PPG",
-          "Portland Trail Blazers allows 117.2 PPG",
-          "Golden State Warriors defensive rating: 111.0",
-          "Portland Trail Blazers defensive rating: 114.3"
+          "Memphis Grizzlies averages 111.2 PPG",
+          "Orlando Magic averages 112.3 PPG",
+          "Memphis Grizzlies allows 114.9 PPG",
+          "Orlando Magic allows 113.6 PPG",
+          "Memphis Grizzlies defensive rating: 112.6",
+          "Orlando Magic defensive rating: 112.4"
         ]
       }
     }
   },
   "player_props": {},
-  "current_date": "2026-01-13",
-  "last_updated": "2026-01-13T17:01:03.196913",
-  "total_games": 7,
+  "current_date": "2026-01-17",
+  "last_updated": "2026-01-17T09:43:37.773894",
+  "total_games": 10,
   "total_props": 0
 }

@@ -1,0 +1,15 @@
+{
+  "example-cordless-roller-home-depot": {
+    "url": "https://www.homedepot.com/custom-blinds/Configurator/Draft?draftProductId=722389",
+    "note": "This is an example entry. The tool will create entries like this automatically."
+  },
+  "motorization-solar-home-depot": {
+    "url": "https://www.homedepot.com/custom-blinds/Configurator/Draft?draftProductId=722389"
+  },
+  "large-cassette-solar-home-depot": {
+    "url": "https://www.homedepot.com/custom-blinds/Configurator/Draft?draftProductId=722389"
+  },
+  "medium-cassette-solar-home-depot": {
+    "url": "https://www.homedepot.com/custom-blinds/Configurator/Draft?draftProductId=722389"
+  }
+}

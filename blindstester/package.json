@@ -1,0 +1,31 @@
+{
+  "name": "blindstester",
+  "version": "1.0.0",
+  "description": "CLI tool to test Home Depot blinds configurator max height constraints",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js",
+    "test:headless": "node index.js --headless",
+    "test:all": "node index.js --no-focus-only",
+    "focus": "node show-focus.js",
+    "clean-results": "node delete-results.js",
+    "create-config": "node create-config.js",
+    "verify-ocr": "node verify-ocr.js",
+    "cli": "node cli.js"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "playwright": "^1.40.0",
+    "tesseract.js": "^7.0.0"
+  }
+}
