@@ -26,6 +26,64 @@ const CONFIG = {
   defaultAppIds: [451, 206, 209]
 };
 CONFIG.sessionFilePath = path.join(CONFIG.outputDir, 'offer-activation-session.json');
+CONFIG.testedMerchantsFilePath = path.join(CONFIG.outputDir, 'offer-activation-tested-merchants.json');
+
+/**
+ * Load set of merchant IDs that have been tested for an app (persisted across runs).
+ * @param {number} appId
+ * @returns {Set<number>} Set of merchant IDs
+ */
+function loadTestedMerchants(appId) {
+  try {
+    if (!fs.existsSync(CONFIG.testedMerchantsFilePath)) return new Set();
+    const raw = fs.readFileSync(CONFIG.testedMerchantsFilePath, 'utf8');
+    const data = JSON.parse(raw);
+    const ids = data[String(appId)];
+    if (!Array.isArray(ids)) return new Set();
+    return new Set(ids.map(Number));
+  } catch {
+    return new Set();
+  }
+}
+
+/**
+ * Persist tested merchants by app. Merges new IDs into existing data.
+ * @param {number} appId
+ * @param {number[]} merchantIds
+ */
+function markMerchantsAsTested(appId, merchantIds) {
+  try {
+    if (!fs.existsSync(CONFIG.outputDir)) {
+      fs.mkdirSync(CONFIG.outputDir, { recursive: true });
+    }
+    let data = {};
+    if (fs.existsSync(CONFIG.testedMerchantsFilePath)) {
+      try {
+        data = JSON.parse(fs.readFileSync(CONFIG.testedMerchantsFilePath, 'utf8'));
+      } catch (_) {}
+    }
+    const key = String(appId);
+    const existing = Array.isArray(data[key]) ? data[key] : [];
+    const merged = new Set([...existing, ...merchantIds.map(Number)]);
+    data[key] = [...merged];
+    fs.writeFileSync(CONFIG.testedMerchantsFilePath, JSON.stringify(data, null, 2));
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+/**
+ * Shuffle array randomly (Fisher–Yates).
+ */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 /**
  * Load saved device/session (deviceId, trackingCode, shoppingTripCode).
@@ -618,10 +676,14 @@ async function fetchMerchantData(appId) {
 }
 
 /**
- * Generate the activation URL for a merchant (same link the extension would open on "Activate Offer").
- * Returns the wild.link activation URL so we test the full redirect chain, not just the merchant site.
+ * Generate the activation URL for a merchant (same process as single-link: resolve domain with active-domains, then build).
+ * When activeDomains is provided, uses the same campaign resolution as testWildlinkActivation.
+ * @param {object} merchant - Merchant object with URL or Domain
+ * @param {number} appId - App ID (used as campaignId fallback when domain not in feed)
+ * @param {object} session - { deviceId, trackingCode, shoppingTripCode }
+ * @param {Array} [activeDomains] - Optional. If provided, resolve domain to get campaignId (same as single-link testing).
  */
-function generateWildlinkUrl(merchant, appId, session = {}) {
+function generateWildlinkUrl(merchant, appId, session = {}, activeDomains = null) {
   let merchantSiteUrl = null;
   if (merchant.URL) {
     merchantSiteUrl = merchant.URL.startsWith('http') ? merchant.URL : `https://${merchant.URL}`;
@@ -629,19 +691,28 @@ function generateWildlinkUrl(merchant, appId, session = {}) {
     merchantSiteUrl = `https://${merchant.Domain.replace(/^www\./, '')}`;
   }
   if (!merchantSiteUrl) return null;
-  return buildWildlinkActivationUrl(merchantSiteUrl, appId, session);
+  let campaignId = appId;
+  if (activeDomains && activeDomains.length > 0) {
+    const resolved = resolveDomainWithActiveDomains(merchantSiteUrl, activeDomains);
+    if (resolved) campaignId = resolved.campaignId;
+  }
+  return buildActivationUrlLikeExtension(merchantSiteUrl, campaignId, {
+    deviceId: session.deviceId || '0',
+    trackingCode: session.trackingCode || '',
+    shoppingTripCode: session.shoppingTripCode || ''
+  });
 }
 
 /**
- * Test offer activation for a single merchant
+ * Test offer activation for a single merchant (same process as single-link: resolve with active-domains when activeDomains provided).
  */
-async function testMerchantActivation(merchant, appId, testUrl = null, session = {}) {
+async function testMerchantActivation(merchant, appId, testUrl = null, session = {}, activeDomains = null) {
   const merchantName = merchant.Name || `Merchant ID ${merchant.ID}`;
   const merchantId = merchant.ID;
   const merchantDomain = merchant.Domain || extractDomain(merchant.URL) || 'unknown';
   
-  // Use provided test URL or generate one (with optional session for wild.link)
-  const url = testUrl || generateWildlinkUrl(merchant, appId, session);
+  // Use provided test URL or generate one (with session + optional activeDomains for same process as single-link)
+  const url = testUrl || generateWildlinkUrl(merchant, appId, session, activeDomains);
   
   if (!url) {
     return {
@@ -1330,18 +1401,66 @@ async function runOfferActivationTest() {
             console.log(chalk.red('No merchants found'));
             break;
           }
-          const testable = merchants.filter(m => m.URL || m.Domain).slice(0, config.limit);
-          console.log(chalk.blue(`Testing ${testable.length} merchants...\n`));
+          const allTestable = merchants.filter(m => m.URL || m.Domain);
+          const testedSet = loadTestedMerchants(config.appId);
+          const alreadyTestedInList = allTestable.filter(m => testedSet.has(Number(m.ID)));
+          let toTest = allTestable;
+          if (alreadyTestedInList.length > 0) {
+            console.log(chalk.yellow(`  ${alreadyTestedInList.length} of ${allTestable.length} merchants were already tested.`));
+            const action = await new Promise((resolve) => {
+              const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+              rl.question(chalk.cyan('Skip them, test them again, or cancel? (skip / again / cancel): '), (answer) => {
+                rl.close();
+                const a = (answer && answer.trim().toLowerCase()) || '';
+                if (a === 'skip' || a === 's') resolve('skip');
+                else if (a === 'again' || a === 'a') resolve('again');
+                else resolve('cancel');
+              });
+            });
+            if (action === 'cancel') {
+              console.log(chalk.gray('  Batch cancelled.'));
+              break;
+            }
+            if (action === 'skip') {
+              toTest = allTestable.filter(m => !testedSet.has(Number(m.ID)));
+              if (toTest.length === 0) {
+                console.log(chalk.yellow('  No untested merchants left.'));
+                break;
+              }
+              console.log(chalk.gray(`  Testing ${Math.min(config.limit, toTest.length)} untested merchants (random order).`));
+            } else {
+              console.log(chalk.gray(`  Testing ${Math.min(config.limit, toTest.length)} merchants (random order).`));
+            }
+          } else {
+            console.log(chalk.gray(`  Testing ${Math.min(config.limit, toTest.length)} merchants (random order).`));
+          }
+          // Random order, then take up to limit
+          toTest = shuffleArray(toTest).slice(0, config.limit);
+          // Same process as single-link: fetch active domains so we resolve each merchant to the correct campaignId
+          let activeDomains = [];
+          try {
+            activeDomains = await fetchActiveDomains(config.appId);
+            if (activeDomains.length > 0) {
+              console.log(chalk.gray(`  Using active-domain feed for campaign resolution (${activeDomains.length} domains).`));
+            }
+          } catch (_) {
+            console.log(chalk.gray('  Active-domain feed unavailable; using App ID as campaign for all merchants.'));
+          }
+          console.log(chalk.blue(`\nTesting ${toTest.length} merchants...\n`));
           const session = {
             deviceId: config.deviceId || '',
             trackingCode: config.trackingCode || '',
             shoppingTripCode: config.shoppingTripCode || ''
           };
           const results = [];
-          for (const merchant of testable) {
-            const result = await testMerchantActivation(merchant, config.appId, null, session);
+          for (const merchant of toTest) {
+            const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
             results.push(result);
             await new Promise(r => setTimeout(r, 500));
+          }
+          const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
+          if (merchantIds.length > 0) {
+            markMerchantsAsTested(config.appId, merchantIds);
           }
           printResultsSummary(results);
           const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
