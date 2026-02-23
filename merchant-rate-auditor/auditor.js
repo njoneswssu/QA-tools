@@ -6,12 +6,22 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
+// Import offer activation module
+const offerActivation = require('./offer-activation-auditor');
+
 /**
  * Merchant Rate Auditor
  * 
- * Audits Wildlink merchant rate JSON feeds for problematic rates:
- * - Rates with "ShareASale commission" in the name
- * - Rates with hex code-like values instead of actual commission amounts
+ * A comprehensive testing tool for Wildlink merchants:
+ * 
+ * 1. Merchant Rate Audit - Audits merchant rate JSON feeds for problematic rates:
+ *    - Rates with "ShareASale commission" in the name
+ *    - Rates with hex code-like values instead of actual commission amounts
+ * 
+ * 2. Offer Activation Testing - Tests if merchant offers work properly:
+ *    - Follows redirect chains from wild.link URLs
+ *    - Detects error pages (expired offers, offer not found, etc.)
+ *    - Identifies merchants with broken activation flows
  */
 
 // Configuration
@@ -1002,7 +1012,32 @@ function promptForAppIds() {
 }
 
 /**
- * Show main menu
+ * Show main menu - Top level to choose test type
+ */
+function showTopLevelMenu() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  
+  return new Promise((resolve) => {
+    console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════════════════════╗'));
+    console.log(chalk.bold.cyan('║               🔍 MERCHANT TESTING TOOL                                       ║'));
+    console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════════════════════╝\n'));
+    console.log(chalk.yellow('What do you want to test?\n'));
+    console.log(chalk.white('  1) ') + chalk.bold('Merchant Rate Audit') + chalk.gray(' - Check for problematic rates in feeds'));
+    console.log(chalk.white('  2) ') + chalk.bold('Offer Activation Testing') + chalk.gray(' - Test if offers work when activated'));
+    console.log(chalk.white('  3) ') + chalk.bold('Exit') + '\n');
+    
+    rl.question(chalk.cyan('Choice (1-3): '), (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
+}
+
+/**
+ * Show merchant rate audit menu
  */
 function showMainMenu() {
   const rl = readline.createInterface({
@@ -1011,19 +1046,111 @@ function showMainMenu() {
   });
   
   return new Promise((resolve) => {
-    console.log(chalk.bold.cyan('\n🔍 Merchant Rate Auditor\n'));
+    console.log(chalk.bold.cyan('\n📊 Merchant Rate Audit\n'));
     console.log(chalk.yellow('What would you like to do?'));
     console.log(chalk.gray('  1) Run new audit'));
     console.log(chalk.gray('  2) List previous audits'));
     console.log(chalk.gray('  3) Lookup audits by App ID'));
     console.log(chalk.gray('  4) Clear all audit results'));
-    console.log(chalk.gray('  5) Exit\n'));
+    console.log(chalk.gray('  5) Back to main menu\n'));
     
     rl.question(chalk.cyan('Choice (1-5): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
   });
+}
+
+/**
+ * Run merchant rate audit menu loop
+ */
+async function runMerchantRateAuditMenu() {
+  while (true) {
+    const choice = await showMainMenu();
+    
+    switch (choice) {
+      case '1':
+        // Run new audit
+        const appIdsToAudit = await promptForAppIds();
+        console.log(chalk.cyan(`\nAuditing App IDs: ${appIdsToAudit.join(', ')}\n`));
+        
+        const results = [];
+        for (const appId of appIdsToAudit) {
+          const result = await auditAppId(appId);
+          results.push(result);
+        }
+        
+        const report = generateReport(results);
+        printResults(report);
+        await saveReport(report, false); // false = show CSV prompt
+        break;
+        
+      case '2':
+        // List previous audits
+        const audits = listPreviousAudits();
+        displayAuditList(audits);
+        break;
+        
+      case '3':
+        // Lookup by App ID
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+        
+        await new Promise((resolve) => {
+          rl.question(chalk.cyan('Enter App ID(s) to lookup (comma or space separated): '), (answer) => {
+            rl.close();
+            
+            const lookupAppIds = answer
+              .split(/[,\s]+/)
+              .map(id => id.trim())
+              .filter(id => id.length > 0)
+              .map(id => parseInt(id))
+              .filter(id => !isNaN(id) && id > 0);
+            
+            if (lookupAppIds.length === 0) {
+              console.log(chalk.red('❌ No valid App IDs provided.'));
+              resolve();
+              return;
+            }
+            
+            const matchingAudits = lookupAuditsByAppId(lookupAppIds);
+            displayLookupResults(matchingAudits, lookupAppIds);
+            resolve();
+          });
+        });
+        break;
+        
+      case '4':
+        // Clear all results
+        const clearRl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+        
+        await new Promise((resolve) => {
+          clearRl.question(chalk.yellow('⚠️  Are you sure you want to delete all audit results? (yes/no): '), (answer) => {
+            clearRl.close();
+            if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
+              clearAllResults();
+            } else {
+              console.log(chalk.gray('Cancelled.'));
+            }
+            resolve();
+          });
+        });
+        break;
+        
+      case '5':
+        // Back to main menu
+        return;
+        
+      default:
+        console.log(chalk.red('❌ Invalid choice.'));
+        break;
+    }
+  }
 }
 
 /**
@@ -1086,13 +1213,54 @@ async function main() {
     return;
   }
   
-  // Check if app IDs were provided as command line arguments
-  const cmdLineAppIds = args.map(id => parseInt(id)).filter(id => !isNaN(id) && id > 0);
+  // Check for offer activation test mode
+  if (args.includes('--offer') || args.includes('--activation') || args.includes('-o')) {
+    await offerActivation.runOfferActivationTest();
+    return;
+  }
+  
+  // Check for direct URL test
+  if (args.includes('--test-url') || args.includes('-u')) {
+    const urlIndex = args.findIndex(arg => arg === '--test-url' || arg === '-u');
+    const url = args[urlIndex + 1];
+    
+    if (!url) {
+      console.log(chalk.red('❌ Please provide a URL to test.'));
+      console.log(chalk.gray('Example: node auditor.js --test-url https://wild.link/e?c=...'));
+      process.exit(1);
+    }
+    
+    const result = await offerActivation.testWildlinkActivation(url);
+    offerActivation.printRedirectChain(result);
+    return;
+  }
+  
+  // Check for direct domain test
+  if (args.includes('--test-domain') || args.includes('-d')) {
+    const domainIndex = args.findIndex(arg => arg === '--test-domain' || arg === '-d');
+    const domain = args[domainIndex + 1];
+    
+    if (!domain) {
+      console.log(chalk.red('❌ Please provide a domain to test.'));
+      console.log(chalk.gray('Example: node auditor.js --test-domain bobore.com'));
+      process.exit(1);
+    }
+    
+    const result = await offerActivation.testDomain(domain);
+    offerActivation.printRedirectChain(result);
+    return;
+  }
+  
+  // Check if app IDs were provided as command line arguments (for merchant rate audit)
+  const cmdLineAppIds = args
+    .filter(arg => !arg.startsWith('-'))
+    .map(id => parseInt(id))
+    .filter(id => !isNaN(id) && id > 0);
   
   if (cmdLineAppIds.length > 0) {
-    // Use command line arguments if provided
+    // Use command line arguments if provided - run merchant rate audit
     const appIdsToAudit = cmdLineAppIds;
-    console.log(chalk.bold.cyan('\n🔍 Merchant Rate Auditor'));
+    console.log(chalk.bold.cyan('\n📊 Merchant Rate Auditor'));
     console.log(chalk.cyan(`Auditing App IDs: ${appIdsToAudit.join(', ')}\n`));
     
     // Audit each app ID
@@ -1113,91 +1281,30 @@ async function main() {
     const hasIssues = report.summary.totalIssues > 0;
     process.exit(hasIssues ? 1 : 0);
   } else {
-    // Show interactive menu
-    const choice = await showMainMenu();
-    
-    switch (choice) {
-      case '1':
-        // Run new audit
-        const appIdsToAudit = await promptForAppIds();
-        console.log(chalk.cyan(`\nAuditing App IDs: ${appIdsToAudit.join(', ')}\n`));
-        
-        const results = [];
-        for (const appId of appIdsToAudit) {
-          const result = await auditAppId(appId);
-          results.push(result);
-        }
-        
-        const report = generateReport(results);
-        printResults(report);
-        await saveReport(report, false); // false = show CSV prompt
-        
-        const hasIssues = report.summary.totalIssues > 0;
-        process.exit(hasIssues ? 1 : 0);
-        break;
-        
-      case '2':
-        // List previous audits
-        const audits = listPreviousAudits();
-        displayAuditList(audits);
-        break;
-        
-      case '3':
-        // Lookup by App ID
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout
-        });
-        
-        return new Promise((resolve) => {
-          rl.question(chalk.cyan('Enter App ID(s) to lookup (comma or space separated): '), (answer) => {
-            rl.close();
-            
-            const lookupAppIds = answer
-              .split(/[,\s]+/)
-              .map(id => id.trim())
-              .filter(id => id.length > 0)
-              .map(id => parseInt(id))
-              .filter(id => !isNaN(id) && id > 0);
-            
-            if (lookupAppIds.length === 0) {
-              console.log(chalk.red('❌ No valid App IDs provided.'));
-              resolve();
-              return;
-            }
-            
-            const matchingAudits = lookupAuditsByAppId(lookupAppIds);
-            displayLookupResults(matchingAudits, lookupAppIds);
-            resolve();
-          });
-        });
-        
-      case '4':
-        // Clear all results
-        const clearRl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout
-        });
-        
-        return new Promise((resolve) => {
-          clearRl.question(chalk.yellow('⚠️  Are you sure you want to delete all audit results? (yes/no): '), (answer) => {
-            clearRl.close();
-            if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
-              clearAllResults();
-            } else {
-              console.log(chalk.gray('Cancelled.'));
-            }
-            resolve();
-          });
-        });
-        
-      case '5':
-        console.log(chalk.gray('Goodbye!'));
-        break;
-        
-      default:
-        console.log(chalk.red('❌ Invalid choice.'));
-        break;
+    // Show interactive top-level menu
+    while (true) {
+      const choice = await showTopLevelMenu();
+      
+      switch (choice) {
+        case '1':
+          // Merchant Rate Audit
+          await runMerchantRateAuditMenu();
+          break;
+          
+        case '2':
+          // Offer Activation Testing
+          await offerActivation.runOfferActivationTest();
+          break;
+          
+        case '3':
+          console.log(chalk.gray('\nGoodbye! 👋\n'));
+          process.exit(0);
+          break;
+          
+        default:
+          console.log(chalk.red('❌ Invalid choice. Please enter 1, 2, or 3.'));
+          break;
+      }
     }
   }
 }
@@ -1211,6 +1318,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  // Merchant Rate Audit functions
   auditAppId,
   validateRate,
   isHexCode,
@@ -1218,6 +1326,8 @@ module.exports = {
   containsCommission,
   isInvalidRateName,
   isProductLikeName,
-  containsPercentageInName
+  containsPercentageInName,
+  // Offer Activation functions (re-exported from module)
+  ...offerActivation
 };
 

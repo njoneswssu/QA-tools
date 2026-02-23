@@ -1,9 +1,13 @@
-# Merchant Rate Auditor
+# Merchant Testing Tool
 
-A Node.js application that audits Wildlink merchant rate JSON feeds for problematic rates.
+A comprehensive Node.js application for testing Wildlink merchants. Includes two main testing modes:
+
+1. **Merchant Rate Audit** - Audits merchant rate JSON feeds for problematic rates
+2. **Offer Activation Testing** - Tests if merchant offers work when activated (detects broken/expired offers)
 
 ## Features
 
+### Merchant Rate Audit
 - ✅ **Interactive Mode**: Prompts you to enter App IDs (or use command-line arguments)
 - ✅ Fetches merchant rate data from Wildlink JSON feeds
 - ✅ Detects rates with "ShareASale commission" in the name
@@ -12,6 +16,13 @@ A Node.js application that audits Wildlink merchant rate JSON feeds for problema
 - ✅ Detects invalid/nonsensical rate names
 - ✅ Generates detailed audit reports
 - ✅ Saves results to JSON files
+
+### Offer Activation Testing
+- 🔗 **Redirect Chain Analysis**: Follows full redirect chains from wild.link/affiliate URLs
+- 🔗 **Error Page Detection**: Identifies when offers land on error/expired pages
+- 🔗 **Visual Redirect Path**: Shows redirect chain like browser dev tools
+- 🔗 **Batch Testing**: Test multiple merchants from feeds at once
+- 🔗 **Export Results**: Save failed activations to JSON/CSV
 
 ## Installation
 
@@ -41,11 +52,34 @@ node auditor.js
 
 ### Command-Line Mode
 
-#### Run Audit
+#### Run Merchant Rate Audit
 
 ```bash
 node auditor.js 451 206 209
 node auditor.js 451
+```
+
+#### Test Offer Activation (URL)
+
+```bash
+# Test a wild.link or affiliate URL
+node auditor.js --test-url "https://wild.link/e?c=101920&d=37588627..."
+node auditor.js -u "https://www.jdoqocy.com/click-100815616-14504623"
+```
+
+#### Test Offer Activation (Domain)
+
+```bash
+# Test a merchant domain directly
+node auditor.js --test-domain bobore.com
+node auditor.js -d amazon.com
+```
+
+#### Open Offer Activation Menu
+
+```bash
+node auditor.js --offer
+node auditor.js -o
 ```
 
 #### List Previous Audits
@@ -92,6 +126,78 @@ node auditor.js 451 206 209
 # Use npm script
 npm run audit 451 206
 ```
+
+---
+
+## Offer Activation Testing
+
+The Offer Activation Testing feature simulates what happens when a user tries to activate an offer through wild.link or other affiliate tracking URLs. It follows the full redirect chain and detects when offers fail.
+
+### What It Detects
+
+#### Error URL Patterns
+- `expired.jsp` - CJ expired offer page
+- `qksrv.net/media/offers/` - CJ "offer not found" page
+- `members.cj.com/expired` - CJ expired links
+- Various error pages on Rakuten, Impact, Pepperjam, etc.
+
+#### Error Content Patterns
+- "offer not found"
+- "offer has expired"
+- "link is no longer available"
+- "campaign has ended"
+- "merchant is not available"
+
+### Example Output
+
+```
+🔗 Testing Wild.link activation...
+   URL: https://www.jdoqocy.com/click-100815616-14504623
+
+📊 REDIRECT PATH
+────────────────────────────────────────────────────────────────────────────────
+  ↓ https://www.jdoqocy.com/click-100815616-14504623
+     302: Found
+     → Redirect to: https://cj.dotomi.com/...
+
+  ↓ https://cj.dotomi.com/...
+     302: Found
+     → Redirect to: https://www.emjcd.com/...
+
+  ↓ https://www.emjcd.com/...
+     302: Found
+     → Redirect to: http://members.cj.com/expired.jsp...
+
+  ↓ http://members.cj.com/expired.jsp...
+     301: Moved permanently
+     → Redirect to: https://members.cj.com/expired.jsp...
+
+  ↓ https://members.cj.com/expired.jsp...
+     302: Found
+     → Redirect to: http://www.qksrv.net/media/offers/...
+
+  ✓ http://www.qksrv.net/media/offers/...
+     200: OK
+
+────────────────────────────────────────────────────────────────────────────────
+❌ Activation failed
+   Issues found:
+   • [ERROR_URL] Final URL indicates an error
+   • [ERROR_CONTENT] Page content indicates offer is not found or expired
+   • [NETWORK_ERROR_PAGE] Landed on affiliate network page instead of merchant
+```
+
+### Interactive Menu Options
+
+When you select "Offer Activation Testing" from the main menu:
+
+1. **Test a specific URL** - Enter any wild.link, CJ, or affiliate URL
+2. **Test a specific domain** - Enter a merchant domain like "bobore.com"
+3. **Test merchants from feed** - Batch test merchants from the JSON feed
+
+---
+
+## Merchant Rate Audit
 
 ## What It Detects
 
