@@ -367,24 +367,6 @@ function validateRate(rate, merchantId, merchantCategories = null) {
     });
   }
   
-  // Check for product-like names (e.g., "gummies returning", "gummies new")
-  // Skip this check if:
-  // 1. Rate is 0 (zero rates with product-like names are OK)
-  // 2. Rate name matches any of the merchant categories (e.g., "Dishwashers" for a dishwasher merchant)
-  if (!isZero && rate.Name && isProductLikeName(rate.Name)) {
-    // Check if rate name matches merchant categories before flagging
-    const matchesCategory = merchantCategories && rateMatchesMerchantCategory(rate.Name, merchantCategories);
-    
-    if (!matchesCategory) {
-      issues.push({
-        type: 'product_like_name',
-        severity: 'high',
-        message: `Rate name looks like a product name instead of a rate description: "${rate.Name}"`,
-        rate: rate
-      });
-    }
-  }
-  
   // Check for percentage values in rate name (e.g., "30%", "5%")
   if (rate.Name && containsPercentageInName(rate.Name)) {
     issues.push({
@@ -1660,9 +1642,7 @@ module.exports = {
   isInvalidRateName,
   containsPercentageInName,
   // Offer Activation functions (re-exported from module)
-  ...offerActivation
-  isProductLikeName,
-  containsPercentageInName,
+  ...offerActivation,
   isZeroRate,
   isExactlyOnlinePurchase,
   containsUnderscore,
