@@ -495,6 +495,15 @@ function analyzeRedirectChain(redirects, finalContent = '', options = {}) {
     });
   }
 
+  // If the redirect chain ended at 404 (e.g. affiliate or merchant URL returned Not Found), flag the merchant
+  if (finalRedirect.statusCode === 404) {
+    issues.push({
+      type: 'redirect_404',
+      severity: 'high',
+      message: `Redirect chain ended at 404 Not Found: ${finalUrl}`
+    });
+  }
+
   // Check if final URL indicates an error (unless we landed back on the merchant)
   if (!redirectedBackToMerchant && isErrorUrl(finalUrl)) {
     issues.push({
