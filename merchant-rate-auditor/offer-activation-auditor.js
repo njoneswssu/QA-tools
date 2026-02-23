@@ -923,15 +923,21 @@ async function testWildlinkActivation(inputLink, options = {}) {
 }
 
 /**
- * Print redirect chain in a visual format (like the screenshot)
+ * Print redirect chain in a visual format (like the screenshot).
+ * @param {object} result - Result object with redirectChain, success, issues, etc.
+ * @param {object} [options] - { batchMode: true } to skip title (caller prints merchant header).
  */
-function printRedirectChain(result) {
-  console.log(chalk.bold.cyan('\n📊 REDIRECT PATH'));
-  console.log(chalk.gray('  (Same path as when the extension\'s "Activate Offer" is clicked)'));
+function printRedirectChain(result, options = {}) {
+  const batchMode = !!options.batchMode;
+  if (!batchMode) {
+    console.log(chalk.bold.cyan('\n📊 REDIRECT PATH'));
+    console.log(chalk.gray('  (Same path as when the extension\'s "Activate Offer" is clicked)'));
+  }
   console.log(chalk.gray('─'.repeat(80)));
   
   if (!result.redirectChain || result.redirectChain.length === 0) {
     console.log(chalk.red('  No redirect data available'));
+    if (!batchMode) console.log(chalk.gray('─'.repeat(80)));
     return;
   }
   
@@ -967,16 +973,18 @@ function printRedirectChain(result) {
   
   console.log(chalk.gray('─'.repeat(80)));
   
-  // Summary: success = redirected back to the original website
-  if (result.success) {
-    console.log(chalk.green(`✅ Activation OK — redirected back to the original website (${result.finalDomain || 'merchant site'})`));
-  } else {
-    console.log(chalk.red(`❌ Activation failed — did not redirect back to the original website`));
-    if (result.issues && result.issues.length > 0) {
-      console.log(chalk.red('   Issues found:'));
-      result.issues.forEach(issue => {
-        console.log(chalk.red(`   • [${issue.type.toUpperCase()}] ${issue.message}`));
-      });
+  // Summary: success = redirected back to the original website (skip in batchMode; summary is at top)
+  if (!batchMode) {
+    if (result.success) {
+      console.log(chalk.green(`✅ Activation OK — redirected back to the original website (${result.finalDomain || 'merchant site'})`));
+    } else {
+      console.log(chalk.red(`❌ Activation failed — did not redirect back to the original website`));
+      if (result.issues && result.issues.length > 0) {
+        console.log(chalk.red('   Issues found:'));
+        result.issues.forEach(issue => {
+          console.log(chalk.red(`   • [${issue.type.toUpperCase()}] ${issue.message}`));
+        });
+      }
     }
   }
 }
@@ -1022,6 +1030,13 @@ function printResultsSummary(results) {
     });
   }
   
+  // Show redirect path for each merchant (same format as single-link testing)
+  console.log(chalk.bold.cyan('\n📊 REDIRECT PATHS (per merchant)'));
+  results.forEach((r, i) => {
+    console.log(chalk.bold.cyan(`\n  ${i + 1}. ${r.merchantName || 'Merchant'} (${r.merchantDomain || '?'})`));
+    printRedirectChain(r, { batchMode: true });
+  });
+  
   console.log('\n' + chalk.bold.cyan('='.repeat(80)) + '\n');
 }
 
@@ -1063,27 +1078,22 @@ function exportResults(results, filename = null) {
 }
 
 /**
- * Export failed results to CSV
+ * Export all results to CSV with redirect path for each merchant (where they went).
  */
-function exportFailedToCSV(results, filename = null) {
-  const failed = results.filter(r => !r.success);
-  
-  if (failed.length === 0) {
-    console.log(chalk.yellow('⚠️  No failed activations to export'));
+function exportResultsToCSV(results, filename = null) {
+  if (!results || results.length === 0) {
+    console.log(chalk.yellow('⚠️  No results to export'));
     return null;
   }
-  
+
   if (!fs.existsSync(CONFIG.outputDir)) {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
   }
-  
+
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const fname = filename || `offer-activation-issues-${timestamp}.csv`;
+  const fname = filename || `offer-activation-results-${timestamp}.csv`;
   const filepath = path.join(CONFIG.outputDir, fname);
-  
-  // CSV header
-  const headers = ['Merchant Name', 'Merchant ID', 'Domain', 'Test URL', 'Final URL', 'Issue Type', 'Issue Message', 'Redirect Count'];
-  
+
   const escapeCSV = (value) => {
     if (value === null || value === undefined) return '';
     const str = String(value);
@@ -1092,39 +1102,98 @@ function exportFailedToCSV(results, filename = null) {
     }
     return str;
   };
-  
+
+  // Build redirect path string: URL1 (200) → URL2 (307) → URL3 (200)
+  const redirectPathFor = (r) => {
+    if (!r.redirectChain || r.redirectChain.length === 0) return r.finalUrl || '';
+    return r.redirectChain
+      .map((hop) => `${hop.url} (${hop.statusCode} ${hop.statusText || ''})`.trim())
+      .join(' → ');
+  };
+
+  const headers = [
+    'Merchant Name',
+    'Merchant ID',
+    'Domain',
+    'Success',
+    'Test URL',
+    'Final URL',
+    'Redirect Path',
+    'Redirect Count',
+    'Issue Type',
+    'Issue Message'
+  ];
+
   const csvRows = [
     headers.map(escapeCSV).join(','),
-    ...failed.flatMap(r => {
-      if (r.issues && r.issues.length > 0) {
-        return r.issues.map(issue => [
-          escapeCSV(r.merchantName),
-          escapeCSV(r.merchantId),
-          escapeCSV(r.merchantDomain),
-          escapeCSV(r.testUrl),
-          escapeCSV(r.finalUrl),
-          escapeCSV(issue.type),
-          escapeCSV(issue.message),
-          escapeCSV(r.redirectCount)
-        ].join(','));
-      }
-      return [[
+    ...results.flatMap((r) => {
+      const redirectPath = redirectPathFor(r);
+      const issues = (r.issues && r.issues.length > 0)
+        ? r.issues
+        : (r.error ? [{ type: 'error', message: r.error }] : [{ type: '', message: '' }]);
+      return issues.map((issue) => [
         escapeCSV(r.merchantName),
         escapeCSV(r.merchantId),
         escapeCSV(r.merchantDomain),
+        escapeCSV(r.success ? 'Yes' : 'No'),
         escapeCSV(r.testUrl),
         escapeCSV(r.finalUrl),
-        escapeCSV(r.error ? 'error' : 'unknown'),
-        escapeCSV(r.error || 'Unknown error'),
-        escapeCSV(r.redirectCount)
-      ].join(',')];
+        escapeCSV(redirectPath),
+        escapeCSV(r.redirectCount),
+        escapeCSV(issue.type),
+        escapeCSV(issue.message)
+      ].join(','));
     })
   ];
-  
+
   fs.writeFileSync(filepath, csvRows.join('\n'));
-  console.log(chalk.green(`📊 CSV export saved to: ${filepath}`));
-  
+  console.log(chalk.green(`📊 Results CSV saved to: ${filepath}`));
+
   return filepath;
+}
+
+/**
+ * Delete all offer activation result files in the output folder (JSON, CSV, session, tested merchants).
+ */
+async function deleteAllOfferActivationResults() {
+  if (!fs.existsSync(CONFIG.outputDir)) {
+    console.log(chalk.gray('No results folder found.'));
+    return;
+  }
+
+  const files = fs.readdirSync(CONFIG.outputDir);
+  const toDelete = files.filter((f) => {
+    const lower = f.toLowerCase();
+    return (
+      f.startsWith('offer-activation-') && (lower.endsWith('.json') || lower.endsWith('.csv')) ||
+      f === 'offer-activation-session.json' ||
+      f === 'offer-activation-tested-merchants.json'
+    );
+  });
+
+  if (toDelete.length === 0) {
+    console.log(chalk.gray('No offer activation results to delete.'));
+    return;
+  }
+
+  console.log(chalk.yellow(`Found ${toDelete.length} file(s):`));
+  toDelete.forEach((f) => console.log(chalk.gray(`  ${f}`)));
+  const confirm = await askYesNo('\nDelete all these results? (yes/no): ');
+  if (!confirm) {
+    console.log(chalk.gray('Cancelled.'));
+    return;
+  }
+
+  let deleted = 0;
+  for (const f of toDelete) {
+    try {
+      fs.unlinkSync(path.join(CONFIG.outputDir, f));
+      deleted++;
+    } catch (err) {
+      console.log(chalk.red(`  Could not delete ${f}: ${err.message}`));
+    }
+  }
+  console.log(chalk.green(`Deleted ${deleted} file(s).`));
 }
 
 /**
@@ -1142,9 +1211,10 @@ async function showOfferActivationMenu() {
     console.log(chalk.gray('  1) Test a merchant link (simulate offer activation from the link)'));
     console.log(chalk.gray('  2) Test merchants from feed (batch)'));
     console.log(chalk.gray('  3) Back to main menu'));
-    console.log(chalk.gray('  4) Exit\n'));
+    console.log(chalk.gray('  4) Exit'));
+    console.log(chalk.gray('  5) Delete all results\n'));
     
-    rl.question(chalk.cyan('Choice (1-4): '), (answer) => {
+    rl.question(chalk.cyan('Choice (1-5): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
@@ -1345,8 +1415,8 @@ async function runOfferActivationTest() {
     }
     if (hasBatch) {
       exportResults(unsavedBatchResults);
-      const doCsv = await askYesNo('Export failed to CSV? (yes/no): ');
-      if (doCsv) exportFailedToCSV(unsavedBatchResults);
+      const doCsv = await askYesNo('Export results to CSV? (yes/no): ');
+      if (doCsv) exportResultsToCSV(unsavedBatchResults);
       unsavedBatchResults = null;
     }
   }
@@ -1478,10 +1548,10 @@ async function runOfferActivationTest() {
               if (answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')) {
                 exportResults(results);
                 unsavedBatchResults = null;
-                rl.question(chalk.cyan('Export failed to CSV? (yes/no): '), (csvAnswer) => {
+                rl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
                   rl.close();
                   if (csvAnswer && (csvAnswer.toLowerCase() === 'yes' || csvAnswer.toLowerCase() === 'y')) {
-                    exportFailedToCSV(results);
+                    exportResultsToCSV(results);
                   }
                   resolve();
                 });
@@ -1505,8 +1575,12 @@ async function runOfferActivationTest() {
         console.log(chalk.gray('\nGoodbye! 👋\n'));
         process.exit(0);
 
+      case '5':
+        await deleteAllOfferActivationResults();
+        break;
+
       default:
-        console.log(chalk.red('Invalid choice. Enter 1-4.'));
+        console.log(chalk.red('Invalid choice. Enter 1-5.'));
     }
   }
 }
@@ -1522,7 +1596,7 @@ module.exports = {
   printRedirectChain,
   printResultsSummary,
   exportResults,
-  exportFailedToCSV,
+  exportResultsToCSV,
   runOfferActivationTest,
   showOfferActivationMenu,
   fetchMerchantData,

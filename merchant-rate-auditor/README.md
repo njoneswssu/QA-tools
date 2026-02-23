@@ -43,12 +43,19 @@ npm start
 node auditor.js
 ```
 
-**Menu Options:**
+**Main menu (What do you want to test?):**
+1. Merchant Rate Audit
+2. Offer Activation Testing
+3. Lookup results (view by merchant name, date, or App ID)
+4. Exit
+
+**Merchant Rate Audit submenu:**
 1. Run new audit
 2. List previous audits
 3. Lookup audits by App ID
-4. Clear all audit results
-5. Exit
+4. Clear merchant rate results (only merchant rate files)
+5. Back to main menu
+6. Exit
 
 ### Command-Line Mode
 
@@ -227,26 +234,7 @@ This helps identify rates that may have incorrect descriptions or placeholder te
 - Name: `"Non-Commissionable Transactions"` ⚠️
 - Content: `"This is a commission rate..."` ⚠️
 
-### 3. Product-Like Rate Names
-Rates with names that look like product names, location names, or other non-rate descriptions instead of rate descriptions.
-
-**Examples:**
-- Name: `"gummies returning"` ❌
-- Name: `"gummies new"` ❌
-- Name: `"Artificial christmas tree"` ❌
-- Name: `"chicago"` ❌
-- Name: `"shoes"` ❌
-- Name: `"vitamins"` ❌
-
-**Not flagged (valid rate names):**
-- Name: `"Online Purchase"` ✅
-- Name: `"B2B Transaction"` ✅
-- Name: `"Returning Customer"` ✅
-- Name: `"New Customer Purchase"` ✅
-
-These should be descriptive rate names like `"Online Purchase"` or `"Returning Customer"`, not product names, locations, or simple nouns.
-
-### 4. Percentage in Rate Name
+### 3. Percentage in Rate Name
 Rates that contain percentage values in the name field (should be in the Amount field instead).
 
 **Examples:**
@@ -258,7 +246,7 @@ Rates that contain percentage values in the name field (should be in the Amount 
 
 **Note:** ALL percentages in rate names are flagged. The percentage value should be in the Amount field, and the name should only describe what the rate is for (e.g., `"Online Purchase"`, `"Cashback"`, `"Bonus"`).
 
-### 5. Invalid Rate Names
+### 4. Invalid Rate Names
 Rates with names that don't make sense for merchant rates, such as:
 - Generic placeholders: `"commission"`, `"default"`, `"test"`, `"placeholder"`
 - Empty or whitespace-only names
@@ -271,7 +259,7 @@ Rates with names that don't make sense for merchant rates, such as:
 - Name: `"12345"` ❌
 - Name: `""` (empty) ❌
 
-### 6. Hex Code Commission Rates
+### 5. Hex Code Commission Rates
 Rates where the amount or name field contains a hex code value instead of a valid commission rate.
 
 **Examples:**

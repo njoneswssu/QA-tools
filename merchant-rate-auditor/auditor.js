@@ -129,123 +129,6 @@ function containsCommission(value) {
 }
 
 /**
- * Check if a rate name looks like a product name, location name, or other non-rate description
- * Examples: "gummies returning", "Artificial christmas tree", "chicago", etc.
- */
-function isProductLikeName(name) {
-  if (!name || typeof name !== 'string') return false;
-  
-  const trimmed = name.trim();
-  const lowerTrimmed = trimmed.toLowerCase();
-  
-  // Product names that shouldn't be in rate names
-  const productNames = [
-    'gummies', 'gummy',
-    'vitamins', 'vitamin',
-    'supplements', 'supplement',
-    'pills', 'pill',
-    'capsules', 'capsule',
-    'tablets', 'tablet',
-    'drops', 'drop',
-    'sprays', 'spray',
-    'creams', 'cream',
-    'lotions', 'lotion',
-    'oils', 'oil',
-    'serums', 'serum',
-    'artificial', 'christmas', 'tree', 'trees',
-    'shoes', 'shoe',
-    'clothing', 'clothes',
-    'electronics', 'electronic',
-    'furniture', 'furnishings',
-    'appliances', 'appliance',
-    'toys', 'toy',
-    'books', 'book',
-    'games', 'game'
-  ];
-  
-  // Common location/city names (common US cities)
-  const locationNames = [
-    'chicago', 'new york', 'los angeles', 'houston', 'phoenix', 'philadelphia',
-    'san antonio', 'san diego', 'dallas', 'san jose', 'austin', 'jacksonville',
-    'san francisco', 'indianapolis', 'columbus', 'fort worth', 'charlotte',
-    'seattle', 'denver', 'washington', 'boston', 'el paso', 'detroit',
-    'nashville', 'portland', 'oklahoma city', 'las vegas', 'memphis',
-    'louisville', 'baltimore', 'milwaukee', 'albuquerque', 'tucson',
-    'fresno', 'sacramento', 'kansas city', 'mesa', 'atlanta', 'omaha',
-    'raleigh', 'miami', 'long beach', 'virginia beach', 'oakland',
-    'minneapolis', 'tulsa', 'cleveland', 'wichita', 'arlington',
-    'london', 'paris', 'tokyo', 'sydney', 'toronto', 'mexico city',
-    'miami', 'boston', 'seattle', 'portland'
-  ];
-  
-  // Check if name is just a location name
-  if (locationNames.includes(lowerTrimmed)) {
-    return true;
-  }
-  
-  // Check if name starts with a product name
-  const startsWithProduct = productNames.some(product => {
-    const regex = new RegExp(`^${product}\\s+`, 'i');
-    return regex.test(lowerTrimmed);
-  });
-  
-  if (startsWithProduct) {
-    // If it starts with a product name, check if it's followed by rate-like words
-    const rateLikeWords = ['returning', 'new', 'first', 'repeat', 'recurring', 'subscription', 'sale', 'purchase', 'transaction', 'order'];
-    const hasRateLikeWord = rateLikeWords.some(word => {
-      const regex = new RegExp(`\\b${word}\\b`, 'i');
-      return regex.test(lowerTrimmed);
-    });
-    
-    // If it has a product name but also has rate-like context, it might be valid
-    // But if it's just "product + returning/new", it's likely wrong
-    if (hasRateLikeWord) {
-      return true; // Flag it as product-like
-    }
-    
-    // If it's just a product name or product + adjective (like "Artificial christmas tree")
-    // and doesn't have clear rate context, flag it
-    if (!hasRateLikeWord && trimmed.split(/\s+/).length <= 4) {
-      // Check if it contains product-related words
-      const hasProductWords = productNames.some(product => {
-        return lowerTrimmed.includes(product);
-      });
-      if (hasProductWords) {
-        return true;
-      }
-    }
-  }
-  
-  // Check for pattern: product + returning/new (e.g., "gummies returning")
-  const productWithStatus = /\b(gummies?|vitamins?|supplements?|pills?|capsules?|tablets?)\s+(returning|new|first|repeat)\b/i;
-  if (productWithStatus.test(lowerTrimmed)) {
-    return true;
-  }
-  
-  // Check for product descriptions that look like product names (e.g., "Artificial christmas tree")
-  // These typically don't contain rate-related words
-  const rateRelatedWords = ['purchase', 'sale', 'transaction', 'order', 'signup', 'subscription', 'recurring', 'returning', 'new', 'first', 'online', 'b2b', 'b2c', 'coupon', 'verified', 'payroll', 'referral', 'affiliate'];
-  const hasRateRelatedWord = rateRelatedWords.some(word => {
-    const regex = new RegExp(`\\b${word}\\b`, 'i');
-    return regex.test(lowerTrimmed);
-  });
-  
-  // If it doesn't have any rate-related words and looks like a product description, flag it
-  if (!hasRateRelatedWord) {
-    // Check if it contains product-related terms
-    const hasProductTerms = productNames.some(product => lowerTrimmed.includes(product));
-    // Check if it's a simple noun phrase (like "Artificial christmas tree" or "chicago")
-    const isSimpleNounPhrase = /^[A-Z][a-z]+(\s+[a-z]+)*$/.test(trimmed) && trimmed.split(/\s+/).length <= 4;
-    
-    if (hasProductTerms || (isSimpleNounPhrase && trimmed.split(/\s+/).length <= 3)) {
-      return true;
-    }
-  }
-  
-  return false;
-}
-
-/**
  * Check if a rate name contains a percentage value (like "30%", "5%", etc.)
  * Flags ALL percentages because the percentage should be in the Amount field, not the name.
  * The name should describe what the rate is for (e.g., "Online Purchase"), not include the percentage.
@@ -337,16 +220,6 @@ function validateRate(rate, merchantId) {
       type: 'commission_in_default_lead',
       severity: 'medium',
       message: `Rate default lead contains "commission": "${rate.DefaultLead}"`,
-      rate: rate
-    });
-  }
-  
-  // Check for product-like names (e.g., "gummies returning", "gummies new")
-  if (rate.Name && isProductLikeName(rate.Name)) {
-    issues.push({
-      type: 'product_like_name',
-      severity: 'high',
-      message: `Rate name looks like a product name instead of a rate description: "${rate.Name}"`,
       rate: rate
     });
   }
@@ -788,21 +661,84 @@ async function saveReport(report, skipCSVPrompt = false) {
 }
 
 /**
- * Clear all audit results
+ * Clear only merchant rate audit results (audit-report-*, merchant-issues-*).
+ */
+function clearMerchantRateResults() {
+  if (!fs.existsSync(CONFIG.outputDir)) {
+    console.log(chalk.yellow('⚠️  No audit results directory found. Nothing to clear.'));
+    return false;
+  }
+  const files = fs.readdirSync(CONFIG.outputDir);
+  const toDelete = files.filter(
+    (f) =>
+      (f.startsWith('audit-report-') && f.endsWith('.json')) ||
+      (f.startsWith('merchant-issues-') && (f.endsWith('.json') || f.endsWith('.csv')))
+  );
+  if (toDelete.length === 0) {
+    console.log(chalk.yellow('⚠️  No merchant rate audit results to clear.'));
+    return false;
+  }
+  let deleted = 0;
+  for (const file of toDelete) {
+    try {
+      fs.unlinkSync(path.join(CONFIG.outputDir, file));
+      deleted++;
+    } catch (error) {
+      console.warn(chalk.yellow(`⚠️  Could not delete ${file}: ${error.message}`));
+    }
+  }
+  console.log(chalk.green(`✅ Cleared ${deleted} merchant rate result file(s).`));
+  return true;
+}
+
+/**
+ * Clear only offer activation results (offer-activation-*, session, tested-merchants).
+ */
+function clearOfferActivationResults() {
+  if (!fs.existsSync(CONFIG.outputDir)) {
+    console.log(chalk.yellow('⚠️  No audit results directory found. Nothing to clear.'));
+    return false;
+  }
+  const files = fs.readdirSync(CONFIG.outputDir);
+  const toDelete = files.filter((f) => {
+    const lower = f.toLowerCase();
+    return (
+      (f.startsWith('offer-activation-') && (lower.endsWith('.json') || lower.endsWith('.csv'))) ||
+      f === 'offer-activation-session.json' ||
+      f === 'offer-activation-tested-merchants.json'
+    );
+  });
+  if (toDelete.length === 0) {
+    console.log(chalk.yellow('⚠️  No offer activation results to clear.'));
+    return false;
+  }
+  let deleted = 0;
+  for (const file of toDelete) {
+    try {
+      fs.unlinkSync(path.join(CONFIG.outputDir, file));
+      deleted++;
+    } catch (error) {
+      console.warn(chalk.yellow(`⚠️  Could not delete ${file}: ${error.message}`));
+    }
+  }
+  console.log(chalk.green(`✅ Cleared ${deleted} offer activation result file(s).`));
+  return true;
+}
+
+/**
+ * Clear all audit results (merchant rate + offer activation).
  */
 function clearAllResults() {
   if (!fs.existsSync(CONFIG.outputDir)) {
     console.log(chalk.yellow('⚠️  No audit results directory found. Nothing to clear.'));
     return false;
   }
-  
   try {
     const files = fs.readdirSync(CONFIG.outputDir);
     if (files.length === 0) {
       console.log(chalk.yellow('⚠️  No audit results found. Nothing to clear.'));
       return false;
     }
-    
     let deletedCount = 0;
     for (const file of files) {
       const filepath = path.join(CONFIG.outputDir, file);
@@ -813,7 +749,6 @@ function clearAllResults() {
         console.warn(chalk.yellow(`⚠️  Could not delete ${file}: ${error.message}`));
       }
     }
-    
     console.log(chalk.green(`✅ Cleared ${deletedCount} audit result file(s).`));
     return true;
   } catch (error) {
@@ -977,6 +912,166 @@ function displayLookupResults(matchingAudits, appIds) {
 }
 
 /**
+ * Parse date from result filename (merchant-issues-2026-02-23T16-03-27-480Z.json or offer-activation-...).
+ */
+function parseDateFromResultFilename(filename) {
+  const match = filename.match(/(\d{4})-(\d{2})-(\d{2})T\d{2}-\d{2}-\d{2}-\d+Z/);
+  if (!match) return null;
+  const d = new Date(`${match[1]}-${match[2]}-${match[3]}`);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/**
+ * Load all result files (merchant rate + offer activation) for lookup.
+ */
+function loadAllResultFiles() {
+  const entries = [];
+  if (!fs.existsSync(CONFIG.outputDir)) return entries;
+  const files = fs.readdirSync(CONFIG.outputDir);
+  for (const file of files) {
+    const filepath = path.join(CONFIG.outputDir, file);
+    const date = parseDateFromResultFilename(file);
+    if (file.startsWith('merchant-issues-') && file.endsWith('.json')) {
+      try {
+        const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+        const appIds = [...new Set((data.merchants || []).map(m => m.appId).filter(Boolean))];
+        const merchants = (data.merchants || []).map(m => ({
+          name: m.merchantName,
+          id: m.merchantId,
+          appId: m.appId,
+          issueType: m.issueType,
+          reason: m.reason
+        }));
+        entries.push({
+          type: 'merchant_rate',
+          filename: file,
+          filepath,
+          date: date || new Date(data.exportDate || 0),
+          exportDate: data.exportDate,
+          appIds,
+          totalIssues: data.totalIssues,
+          merchants
+        });
+      } catch (_) {}
+    } else if (file.startsWith('offer-activation-') && file.endsWith('.json') && !file.includes('session') && !file.includes('tested-merchants')) {
+      try {
+        const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+        const results = data.results || [];
+        const merchants = results.map(r => ({
+          name: r.merchantName,
+          id: r.merchantId,
+          domain: r.merchantDomain,
+          success: r.success,
+          finalUrl: r.finalUrl
+        }));
+        const appIds = [];
+        entries.push({
+          type: 'offer_activation',
+          filename: file,
+          filepath,
+          date: date || new Date(data.exportDate || 0),
+          exportDate: data.exportDate,
+          appIds,
+          totalTested: data.totalTested,
+          successful: data.successful,
+          failed: data.failed,
+          merchants
+        });
+      } catch (_) {}
+    }
+  }
+  return entries.sort((a, b) => b.date - a.date);
+}
+
+/**
+ * Ask a single question; returns trimmed answer.
+ */
+function askQuestion(question) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(chalk.cyan(question), (answer) => {
+      rl.close();
+      resolve((answer || '').trim());
+    });
+  });
+}
+
+/**
+ * Lookup results by merchant, date, or App ID. Interactive menu.
+ */
+async function runLookupMenu() {
+  const entries = loadAllResultFiles();
+  if (entries.length === 0) {
+    console.log(chalk.yellow('\n⚠️  No result files found in audit-results.'));
+    return;
+  }
+
+  console.log(chalk.bold.cyan('\n🔍 Lookup Results\n'));
+  console.log(chalk.gray('Filter by any combination (leave blank to skip).\n'));
+
+  const appIdInput = await askQuestion('App ID(s), comma or space separated (or press Enter to skip): ');
+  const dateInput = await askQuestion('Date (YYYY-MM-DD) or range (YYYY-MM-DD to YYYY-MM-DD) (or press Enter to skip): ');
+  const merchantInput = await askQuestion('Merchant name (partial match) (or press Enter to skip): ');
+
+  let filterAppIds = [];
+  if (appIdInput) {
+    filterAppIds = appIdInput.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
+  }
+  let dateFrom = null;
+  let dateTo = null;
+  if (dateInput) {
+    const rangeMatch = dateInput.match(/^(\d{4}-\d{2}-\d{2})\s*(?:to|-)\s*(\d{4}-\d{2}-\d{2})$/i);
+    if (rangeMatch) {
+      dateFrom = new Date(rangeMatch[1]);
+      dateTo = new Date(rangeMatch[2]);
+    } else {
+      const single = dateInput.match(/^\d{4}-\d{2}-\d{2}$/);
+      if (single) {
+        dateFrom = new Date(dateInput);
+        dateTo = new Date(dateInput);
+        dateTo.setHours(23, 59, 59, 999);
+      }
+    }
+  }
+  const merchantLower = merchantInput ? merchantInput.toLowerCase() : '';
+
+  const matches = entries.filter((e) => {
+    const dateOk = !dateFrom || (e.date >= dateFrom && e.date <= dateTo);
+    const appIdOk = filterAppIds.length === 0 || e.appIds.some(id => filterAppIds.includes(id));
+    const merchantOk = !merchantLower || e.merchants.some(m => (m.name || '').toLowerCase().includes(merchantLower));
+    return dateOk && appIdOk && merchantOk;
+  });
+
+  if (matches.length === 0) {
+    console.log(chalk.yellow('\n⚠️  No results match your filters.'));
+    return;
+  }
+
+  console.log(chalk.bold.cyan(`\n📋 Matching results (${matches.length} file(s))\n`));
+  console.log(chalk.gray('─'.repeat(100)));
+  matches.forEach((e, i) => {
+    const typeLabel = e.type === 'merchant_rate' ? 'Merchant Rate' : 'Offer Activation';
+    const dateStr = e.date.toLocaleString();
+    console.log(chalk.bold(`\n${i + 1}. [${typeLabel}] ${dateStr}`));
+    console.log(`   File: ${chalk.gray(e.filename)}`);
+    if (e.type === 'merchant_rate') {
+      console.log(`   App IDs: ${chalk.cyan((e.appIds || []).join(', ') || 'N/A')} | Issues: ${chalk.yellow(e.totalIssues || 0)} | Merchants: ${(e.merchants || []).length}`);
+    } else {
+      console.log(`   Tested: ${e.totalTested || 0} | OK: ${chalk.green(e.successful || 0)} | Failed: ${chalk.red(e.failed || 0)}`);
+    }
+    if (merchantLower && e.merchants) {
+      const matching = e.merchants.filter(m => (m.name || '').toLowerCase().includes(merchantLower));
+      if (matching.length > 0 && matching.length <= 15) {
+        console.log(chalk.gray('   Matching merchants: ' + matching.map(m => m.name).join(', ')));
+      } else if (matching.length > 15) {
+        console.log(chalk.gray(`   Matching merchants: ${matching.length} (e.g. ${matching.slice(0, 3).map(m => m.name).join(', ')}...)`));
+      }
+    }
+  });
+  console.log(chalk.gray('\n' + '─'.repeat(100)));
+}
+
+/**
  * Prompt user for app IDs interactively
  */
 function promptForAppIds() {
@@ -1027,9 +1122,10 @@ function showTopLevelMenu() {
     console.log(chalk.yellow('What do you want to test?\n'));
     console.log(chalk.white('  1) ') + chalk.bold('Merchant Rate Audit') + chalk.gray(' - Check for problematic rates in feeds'));
     console.log(chalk.white('  2) ') + chalk.bold('Offer Activation Testing') + chalk.gray(' - Test if offers work when activated'));
-    console.log(chalk.white('  3) ') + chalk.bold('Exit') + '\n');
+    console.log(chalk.white('  3) ') + chalk.bold('Lookup results') + chalk.gray(' - View results by merchant, date, or App ID'));
+    console.log(chalk.white('  4) ') + chalk.bold('Exit') + '\n');
     
-    rl.question(chalk.cyan('Choice (1-3): '), (answer) => {
+    rl.question(chalk.cyan('Choice (1-4): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
@@ -1051,10 +1147,11 @@ function showMainMenu() {
     console.log(chalk.gray('  1) Run new audit'));
     console.log(chalk.gray('  2) List previous audits'));
     console.log(chalk.gray('  3) Lookup audits by App ID'));
-    console.log(chalk.gray('  4) Clear all audit results'));
-    console.log(chalk.gray('  5) Back to main menu\n'));
+    console.log(chalk.gray('  4) Clear merchant rate results'));
+    console.log(chalk.gray('  5) Back to main menu'));
+    console.log(chalk.gray('  6) Exit\n'));
     
-    rl.question(chalk.cyan('Choice (1-5): '), (answer) => {
+    rl.question(chalk.cyan('Choice (1-6): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
@@ -1123,17 +1220,16 @@ async function runMerchantRateAuditMenu() {
         break;
         
       case '4':
-        // Clear all results
-        const clearRl = readline.createInterface({
+        // Clear merchant rate results only
+        const clearRateRl = readline.createInterface({
           input: process.stdin,
           output: process.stdout
         });
-        
         await new Promise((resolve) => {
-          clearRl.question(chalk.yellow('⚠️  Are you sure you want to delete all audit results? (yes/no): '), (answer) => {
-            clearRl.close();
+          clearRateRl.question(chalk.yellow('⚠️  Delete all merchant rate audit results? (yes/no): '), (answer) => {
+            clearRateRl.close();
             if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
-              clearAllResults();
+              clearMerchantRateResults();
             } else {
               console.log(chalk.gray('Cancelled.'));
             }
@@ -1146,8 +1242,12 @@ async function runMerchantRateAuditMenu() {
         // Back to main menu
         return;
         
+      case '6':
+        console.log(chalk.gray('\nGoodbye! 👋\n'));
+        process.exit(0);
+        
       default:
-        console.log(chalk.red('❌ Invalid choice.'));
+        console.log(chalk.red('❌ Invalid choice. Enter 1-6.'));
         break;
     }
   }
@@ -1297,12 +1397,17 @@ async function main() {
           break;
           
         case '3':
+          // Lookup results by merchant, date, app ID
+          await runLookupMenu();
+          break;
+          
+        case '4':
           console.log(chalk.gray('\nGoodbye! 👋\n'));
           process.exit(0);
           break;
           
         default:
-          console.log(chalk.red('❌ Invalid choice. Please enter 1, 2, or 3.'));
+          console.log(chalk.red('❌ Invalid choice. Please enter 1-4.'));
           break;
       }
     }
@@ -1325,7 +1430,6 @@ module.exports = {
   containsShareASale,
   containsCommission,
   isInvalidRateName,
-  isProductLikeName,
   containsPercentageInName,
   // Offer Activation functions (re-exported from module)
   ...offerActivation

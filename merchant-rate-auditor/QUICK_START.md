@@ -18,12 +18,15 @@ npm start
 node auditor.js
 ```
 
-**Menu Options:**
+**Main menu:** 1 Merchant Rate Audit | 2 Offer Activation Testing | 3 Lookup results (by merchant, date, App ID) | 4 Exit
+
+**Merchant Rate Audit submenu:**
 1. Run new audit
 2. List previous audits
 3. Lookup audits by App ID
-4. Clear all audit results
-5. Exit
+4. Clear merchant rate results
+5. Back to main menu
+6. Exit
 
 ### Command-Line Mode
 
@@ -57,19 +60,15 @@ node auditor.js --clear
    - Example: `"RP Commission 8.0 Regular"` ⚠️
    - Example: `"Non-Commissionable Transactions"` ⚠️
 
-3. **Product-Like Names**: Names that look like products, locations, or other non-rate descriptions
-   - Examples: `"gummies returning"`, `"Artificial christmas tree"`, `"chicago"`, `"shoes"`
-   - These should be descriptive like `"Online Purchase"` or `"Returning Customer"`
-
-4. **Percentage in Name**: Rate names containing percentage values
+3. **Percentage in Name**: Rate names containing percentage values
    - Examples: `"30%"`, `"5% commission"`, `"Online Purchase 5%"`
    - Percentages should be in the Amount field, not the name
 
-5. **Invalid Rate Names**: Names that don't make sense for merchant rates
+4. **Invalid Rate Names**: Names that don't make sense for merchant rates
    - Examples: `"commission"`, `"test"`, `"placeholder"`, empty names
    - These should be descriptive like `"Online Purchase"` or `"B2B Transaction"`
 
-6. **Hex Code Rates**: Rates where the amount or name field contains a hex code value
+5. **Hex Code Rates**: Rates where the amount or name field contains a hex code value
    - Examples: `"FF0000"`, `"#ABCDEF"`, `"0x123456"`
    - These should be numeric values like `"5.0"` or `"10.5"`
 
