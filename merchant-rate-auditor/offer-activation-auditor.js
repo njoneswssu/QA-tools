@@ -584,21 +584,35 @@ async function followRedirects(url, headers = {}) {
     ...headers
   };
   
+  const RETRY_429_MAX = 3;
+  const RETRY_429_DELAYS_MS = [30000, 60000, 120000]; // 30s, 1m, 2m
+
   while (redirectCount < CONFIG.maxRedirects) {
     try {
-      const response = await axios({
-        method: 'GET',
-        url: currentUrl,
-        maxRedirects: 0, // Handle redirects manually
-        validateStatus: () => true, // Accept all status codes
-        timeout: CONFIG.requestTimeout,
-        headers: defaultHeaders,
-        responseType: 'text'
-      });
-      
+      let response;
+      for (let attempt = 0; attempt <= RETRY_429_MAX; attempt++) {
+        response = await axios({
+          method: 'GET',
+          url: currentUrl,
+          maxRedirects: 0,
+          validateStatus: () => true,
+          timeout: CONFIG.requestTimeout,
+          headers: defaultHeaders,
+          responseType: 'text'
+        });
+        if (response.status !== 429) break;
+        if (attempt < RETRY_429_MAX) {
+          const waitMs = RETRY_429_DELAYS_MS[attempt] || 60000;
+          if (typeof process !== 'undefined' && process.stdout && process.stdout.write) {
+            console.log(chalk.yellow(`   Rate limited (429). Waiting ${waitMs / 1000}s before retry (${attempt + 1}/${RETRY_429_MAX})...`));
+          }
+          await new Promise(r => setTimeout(r, waitMs));
+        }
+      }
+
       const statusCode = response.status;
       const statusText = response.statusText || getStatusText(statusCode);
-      
+
       redirectChain.push(new RedirectEntry(
         currentUrl,
         statusCode,
@@ -608,17 +622,14 @@ async function followRedirects(url, headers = {}) {
           contentType: response.headers['content-type']
         }
       ));
-      
-      // Check if it's a redirect
+
       if (statusCode >= 300 && statusCode < 400 && response.headers.location) {
-        // Resolve relative URLs
         const nextUrl = new URL(response.headers.location, currentUrl).href;
         currentUrl = nextUrl;
         redirectCount++;
       } else {
-        // Final destination reached
         if (typeof response.data === 'string') {
-          finalContent = response.data.substring(0, 50000); // Limit content size
+          finalContent = response.data.substring(0, 50000);
         }
         break;
       }
@@ -632,7 +643,7 @@ async function followRedirects(url, headers = {}) {
       break;
     }
   }
-  
+
   return { redirectChain, finalContent };
 }
 
@@ -1197,6 +1208,85 @@ async function deleteAllOfferActivationResults() {
 }
 
 /**
+ * Run offer activation batch for a single App ID (no prompts). Used by combined full audit.
+ * @param {number} appId
+ * @param {{ limit: number, session: { deviceId, trackingCode, shoppingTripCode }, skipAlreadyTested: boolean }} options
+ * @returns {Promise<Array>} results
+ */
+async function runBatchForOneAppId(appId, options = {}) {
+  const { limit = 10, session = {}, skipAlreadyTested = true } = options;
+  const merchants = await fetchMerchantData(appId);
+  if (merchants.length === 0) return [];
+  const allTestable = merchants.filter(m => m.URL || m.Domain);
+  const testedSet = loadTestedMerchants(appId);
+  let toTest = allTestable;
+  if (skipAlreadyTested && testedSet.size > 0) {
+    toTest = allTestable.filter(m => !testedSet.has(Number(m.ID)));
+  }
+  toTest = shuffleArray(toTest).slice(0, limit);
+  if (toTest.length === 0) return [];
+  let activeDomains = [];
+  try {
+    activeDomains = await fetchActiveDomains(appId);
+  } catch (_) {}
+  const sessionObj = {
+    deviceId: session.deviceId || '',
+    trackingCode: session.trackingCode || '',
+    shoppingTripCode: session.shoppingTripCode || ''
+  };
+  const results = [];
+  for (const merchant of toTest) {
+    const result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
+    results.push(result);
+    await new Promise(r => setTimeout(r, 2500));
+  }
+  const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
+  if (merchantIds.length > 0) markMerchantsAsTested(appId, merchantIds);
+  return results;
+}
+
+/**
+ * Run offer activation batch for multiple App IDs. Gets session once (saved or prompt), then runs batch per app.
+ * Used by combined full audit from main menu.
+ * @param {number[]} appIds
+ * @param {{ limit?: number }} options
+ * @returns {Promise<{ results: Array, byAppId: Object }>}
+ */
+async function runOfferActivationBatchForAppIds(appIds, options = {}) {
+  const limit = options.limit || 10;
+  let session = { deviceId: '', trackingCode: '', shoppingTripCode: '' };
+  const saved = loadSavedSession();
+  if (saved && (saved.deviceId || saved.trackingCode || saved.shoppingTripCode)) {
+    const useSaved = await askYesNo('Use saved device/tracking for offer activation batch? (yes/no): ');
+    if (useSaved) {
+      session = { deviceId: saved.deviceId || '', trackingCode: saved.trackingCode || '', shoppingTripCode: saved.shoppingTripCode || '' };
+      console.log(chalk.gray('  Using saved session.'));
+    }
+  }
+  if (!session.deviceId && !session.trackingCode && !session.shoppingTripCode) {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const d = await new Promise(r => rl.question(chalk.cyan('Device ID (optional): '), r));
+    const tc = await new Promise(r => rl.question(chalk.cyan('Tracking code (optional): '), r));
+    const sc = await new Promise(r => rl.question(chalk.cyan('Shopping trip (optional): '), r));
+    rl.close();
+    session = { deviceId: (d && d.trim()) || '', trackingCode: (tc && tc.trim()) || '', shoppingTripCode: (sc && sc.trim()) || '' };
+    if (session.deviceId || session.trackingCode || session.shoppingTripCode) {
+      const saveIt = await askYesNo('Save this device/session for next time? (yes/no): ');
+      if (saveIt) saveSession(session.deviceId, session.trackingCode, session.shoppingTripCode);
+    }
+  }
+  const allResults = [];
+  const byAppId = {};
+  for (const appId of appIds) {
+    console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (up to ${limit} merchants)...`));
+    const results = await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true });
+    byAppId[appId] = results;
+    allResults.push(...results);
+  }
+  return { results: allResults, byAppId };
+}
+
+/**
  * Interactive menu for offer activation testing
  */
 async function showOfferActivationMenu() {
@@ -1535,7 +1625,7 @@ async function runOfferActivationTest() {
           for (const merchant of toTest) {
             const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
             results.push(result);
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 2500));
           }
           const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
           if (merchantIds.length > 0) {
@@ -1598,6 +1688,8 @@ module.exports = {
   exportResults,
   exportResultsToCSV,
   runOfferActivationTest,
+  runOfferActivationBatchForAppIds,
+  runBatchForOneAppId,
   showOfferActivationMenu,
   fetchMerchantData,
   fetchActiveDomains,

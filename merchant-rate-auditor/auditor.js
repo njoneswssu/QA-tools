@@ -1317,6 +1317,72 @@ function promptForAppIds() {
 }
 
 /**
+ * Run full audit: merchant rate audit for App IDs, then optionally offer activation batch for same App IDs.
+ */
+async function runFullAudit() {
+  const appIds = await promptForAppIds();
+  if (!appIds || appIds.length === 0) return;
+  console.log(chalk.cyan(`\nAuditing App IDs: ${appIds.join(', ')}\n`));
+
+  // 1. Merchant rate audit
+  console.log(chalk.bold.cyan('——— Part 1: Merchant Rate Audit ———\n'));
+  const results = [];
+  for (const appId of appIds) {
+    const result = await auditAppId(appId);
+    results.push(result);
+  }
+  const report = generateReport(results);
+  printResults(report);
+  await saveReport(report, false);
+
+  // 2. Offer activation batch (optional)
+  console.log(chalk.bold.cyan('\n——— Part 2: Offer Activation ———\n'));
+  const runOffer = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Run offer activation for these App IDs? (yes/no): '), (answer) => {
+      rl.close();
+      resolve(!!(answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')));
+    });
+  });
+  if (!runOffer) {
+    console.log(chalk.gray('Skipping offer activation.'));
+    return;
+  }
+  const limitAnswer = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Max merchants per App ID (default 10): '), (a) => {
+      rl.close();
+      resolve((a && a.trim()) || '10');
+    });
+  });
+  const limit = parseInt(limitAnswer, 10) || 10;
+  const { results: activationResults } = await offerActivation.runOfferActivationBatchForAppIds(appIds, { limit });
+  if (activationResults.length > 0) {
+    offerActivation.printResultsSummary(activationResults);
+    const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    await new Promise((resolve) => {
+      saveRl.question(chalk.cyan('Save offer activation results? (yes/no): '), (answer) => {
+        if (answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')) {
+          offerActivation.exportResults(activationResults);
+          saveRl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
+            saveRl.close();
+            if (csvAnswer && (csvAnswer.toLowerCase() === 'yes' || csvAnswer.toLowerCase() === 'y')) {
+              offerActivation.exportResultsToCSV(activationResults);
+            }
+            resolve();
+          });
+        } else {
+          saveRl.close();
+          resolve();
+        }
+      });
+    });
+  } else {
+    console.log(chalk.yellow('No offer activation results to save.'));
+  }
+}
+
+/**
  * Show main menu - Top level to choose test type
  */
 function showTopLevelMenu() {
@@ -1333,9 +1399,10 @@ function showTopLevelMenu() {
     console.log(chalk.white('  1) ') + chalk.bold('Merchant Rate Audit') + chalk.gray(' - Check for problematic rates in feeds'));
     console.log(chalk.white('  2) ') + chalk.bold('Offer Activation Testing') + chalk.gray(' - Test if offers work when activated'));
     console.log(chalk.white('  3) ') + chalk.bold('Lookup results') + chalk.gray(' - View results by merchant, date, or App ID'));
-    console.log(chalk.white('  4) ') + chalk.bold('Exit') + '\n');
+    console.log(chalk.white('  4) ') + chalk.bold('Run full audit') + chalk.gray(' - Merchant rate + offer activation in one run'));
+    console.log(chalk.white('  5) ') + chalk.bold('Exit') + '\n');
     
-    rl.question(chalk.cyan('Choice (1-4): '), (answer) => {
+    rl.question(chalk.cyan('Choice (1-5): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
@@ -1612,12 +1679,17 @@ async function main() {
           break;
           
         case '4':
+          // Run full audit: merchant rate + offer activation
+          await runFullAudit();
+          break;
+          
+        case '5':
           console.log(chalk.gray('\nGoodbye! 👋\n'));
           process.exit(0);
           break;
           
         default:
-          console.log(chalk.red('❌ Invalid choice. Please enter 1-4.'));
+          console.log(chalk.red('❌ Invalid choice. Please enter 1-5.'));
           break;
       }
     }
