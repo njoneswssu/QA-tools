@@ -1356,17 +1356,24 @@ async function runFullAudit() {
     });
   });
   const limit = parseInt(limitAnswer, 10) || 10;
-  const { results: activationResults } = await offerActivation.runOfferActivationBatchForAppIds(appIds, { limit });
+  const { results: activationResults, byAppId } = await offerActivation.runOfferActivationBatchForAppIds(appIds, { limit });
   if (activationResults.length > 0) {
     offerActivation.printResultsSummary(activationResults);
     const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
     await new Promise((resolve) => {
       saveRl.question(chalk.cyan('Save offer activation results? (yes/no): '), (answer) => {
-        if (answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')) {
+        const isYes = answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y');
+        if (isYes) {
           offerActivation.exportResults(activationResults);
+          if (byAppId) {
+            for (const [appIdStr, list] of Object.entries(byAppId)) {
+              const ids = (list || []).map(r => r.merchantId).filter(id => id != null);
+              if (ids.length > 0) offerActivation.markMerchantsAsTested(Number(appIdStr), ids);
+            }
+          }
           saveRl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
             saveRl.close();
-            if (csvAnswer && (csvAnswer.toLowerCase() === 'yes' || csvAnswer.toLowerCase() === 'y')) {
+            if (csvAnswer && (csvAnswer.toLowerCase().trim() === 'yes' || csvAnswer.toLowerCase().trim() === 'y')) {
               offerActivation.exportResultsToCSV(activationResults);
             }
             resolve();

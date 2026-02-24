@@ -23,7 +23,11 @@ const CONFIG = {
   sessionFilePath: null, // set at runtime: offer-activation-session.json next to outputDir
   requestTimeout: 30000,
   maxRedirects: 15,
-  defaultAppIds: [451, 206, 209]
+  defaultAppIds: [451, 206, 209],
+  /** Delay in ms between each redirect hop (wild.link → affiliate → merchant) to avoid 429 rate limits */
+  delayBetweenRedirectHopsMs: 2000,
+  /** Delay in ms between testing each merchant in batch */
+  delayBetweenMerchantsMs: 2500
 };
 CONFIG.sessionFilePath = path.join(CONFIG.outputDir, 'offer-activation-session.json');
 CONFIG.testedMerchantsFilePath = path.join(CONFIG.outputDir, 'offer-activation-tested-merchants.json');
@@ -504,6 +508,15 @@ function analyzeRedirectChain(redirects, finalContent = '', options = {}) {
     });
   }
 
+  // If the chain ended at 429 after retries, flag for retest
+  if (finalRedirect.statusCode === 429) {
+    issues.push({
+      type: 'rate_limited_429',
+      severity: 'high',
+      message: 'Rate limited (429) after retries — retest this merchant later.'
+    });
+  }
+
   // Check if final URL indicates an error (unless we landed back on the merchant)
   if (!redirectedBackToMerchant && isErrorUrl(finalUrl)) {
     issues.push({
@@ -584,13 +597,15 @@ async function followRedirects(url, headers = {}) {
     ...headers
   };
   
-  const RETRY_429_MAX = 3;
-  const RETRY_429_DELAYS_MS = [30000, 60000, 120000]; // 30s, 1m, 2m
+  const RETRY_429_BASE_MS = 30000;
+  const RETRY_429_MAX_MS = 300000;
+  const RETRY_429_MAX_ATTEMPTS = 4;
 
   while (redirectCount < CONFIG.maxRedirects) {
     try {
       let response;
-      for (let attempt = 0; attempt <= RETRY_429_MAX; attempt++) {
+      let attempt = 0;
+      for (;;) {
         response = await axios({
           method: 'GET',
           url: currentUrl,
@@ -601,13 +616,19 @@ async function followRedirects(url, headers = {}) {
           responseType: 'text'
         });
         if (response.status !== 429) break;
-        if (attempt < RETRY_429_MAX) {
-          const waitMs = RETRY_429_DELAYS_MS[attempt] || 60000;
-          if (typeof process !== 'undefined' && process.stdout && process.stdout.write) {
-            console.log(chalk.yellow(`   Rate limited (429). Waiting ${waitMs / 1000}s before retry (${attempt + 1}/${RETRY_429_MAX})...`));
-          }
-          await new Promise(r => setTimeout(r, waitMs));
+        if (attempt >= RETRY_429_MAX_ATTEMPTS) break;
+        let waitMs = RETRY_429_BASE_MS * Math.pow(1.5, attempt);
+        if (waitMs > RETRY_429_MAX_MS) waitMs = RETRY_429_MAX_MS;
+        const retryAfter = response.headers && response.headers['retry-after'];
+        if (retryAfter) {
+          const sec = parseInt(retryAfter, 10);
+          if (!isNaN(sec) && sec > 0) waitMs = Math.min(sec * 1000, RETRY_429_MAX_MS);
         }
+        if (typeof process !== 'undefined' && process.stdout && process.stdout.write) {
+          console.log(chalk.yellow(`   Rate limited (429). Waiting ${Math.round(waitMs / 1000)}s before retry (attempt ${attempt + 1})...`));
+        }
+        await new Promise(r => setTimeout(r, waitMs));
+        attempt++;
       }
 
       const statusCode = response.status;
@@ -627,6 +648,9 @@ async function followRedirects(url, headers = {}) {
         const nextUrl = new URL(response.headers.location, currentUrl).href;
         currentUrl = nextUrl;
         redirectCount++;
+        if (CONFIG.delayBetweenRedirectHopsMs > 0) {
+          await new Promise(r => setTimeout(r, CONFIG.delayBetweenRedirectHopsMs));
+        }
       } else {
         if (typeof response.data === 'string') {
           finalContent = response.data.substring(0, 50000);
@@ -1238,10 +1262,8 @@ async function runBatchForOneAppId(appId, options = {}) {
   for (const merchant of toTest) {
     const result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
     results.push(result);
-    await new Promise(r => setTimeout(r, 2500));
+    await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
   }
-  const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
-  if (merchantIds.length > 0) markMerchantsAsTested(appId, merchantIds);
   return results;
 }
 
@@ -1562,6 +1584,7 @@ async function runOfferActivationTest() {
       }
 
       case '2': {
+        unsavedBatchResults = null;
         const config = await promptForBatchConfig();
         if (config) {
           console.log(chalk.blue(`\n🚀 Starting batch test for App ID ${config.appId}...`));
@@ -1622,32 +1645,67 @@ async function runOfferActivationTest() {
             shoppingTripCode: config.shoppingTripCode || ''
           };
           const results = [];
+          let paused = false;
+          const wasRaw = process.stdin.isTTY && process.stdin.isRaw;
+          const useKeypress = process.stdin.isTTY;
+          const pauseRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+          pauseRl.on('line', (line) => {
+            if ((line || '').trim().toLowerCase() === 'p') paused = true;
+          });
+          if (useKeypress) {
+            readline.emitKeypressEvents(process.stdin);
+            if (!process.stdin.isRaw) process.stdin.setRawMode(true);
+            process.stdin.resume();
+            process.stdin.setEncoding('utf8');
+            process.stdin.on('keypress', (_str, key) => {
+              if (key && (key.name === 'p' || key.name === 'P')) paused = true;
+            });
+          }
+          console.log(chalk.gray('  (Press P to pause, or type p + Enter. Then Enter to resume.)\n'));
           for (const merchant of toTest) {
+            if (paused) {
+              if (useKeypress) process.stdin.setRawMode(false);
+              console.log(chalk.yellow('\n  ⏸ Paused. Press Enter to resume.'));
+              await new Promise((resolve) => {
+                const resumeRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+                resumeRl.question('', () => {
+                  resumeRl.close();
+                  if (useKeypress && !wasRaw) process.stdin.setRawMode(true);
+                  resolve();
+                });
+              });
+              console.log(chalk.gray('  Resuming...\n'));
+            }
             const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
             results.push(result);
-            await new Promise(r => setTimeout(r, 2500));
+            await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
           }
-          const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
-          if (merchantIds.length > 0) {
-            markMerchantsAsTested(config.appId, merchantIds);
+          if (useKeypress) {
+            process.stdin.removeAllListeners('keypress');
+            if (!wasRaw) process.stdin.setRawMode(false);
           }
+          pauseRl.removeAllListeners('line');
+          pauseRl.close();
           printResultsSummary(results);
           const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
           await new Promise((resolve) => {
             rl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
-              if (answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')) {
+              const isYes = answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y');
+              if (isYes) {
                 exportResults(results);
                 unsavedBatchResults = null;
+                const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
+                if (merchantIds.length > 0) markMerchantsAsTested(config.appId, merchantIds);
                 rl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
                   rl.close();
-                  if (csvAnswer && (csvAnswer.toLowerCase() === 'yes' || csvAnswer.toLowerCase() === 'y')) {
+                  if (csvAnswer && (csvAnswer.toLowerCase().trim() === 'yes' || csvAnswer.toLowerCase().trim() === 'y')) {
                     exportResultsToCSV(results);
                   }
                   resolve();
                 });
               } else {
+                unsavedBatchResults = null;
                 rl.close();
-                unsavedBatchResults = results;
                 resolve();
               }
             });
@@ -1690,6 +1748,7 @@ module.exports = {
   runOfferActivationTest,
   runOfferActivationBatchForAppIds,
   runBatchForOneAppId,
+  markMerchantsAsTested,
   showOfferActivationMenu,
   fetchMerchantData,
   fetchActiveDomains,
