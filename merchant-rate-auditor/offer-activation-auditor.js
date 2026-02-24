@@ -1646,11 +1646,14 @@ async function runOfferActivationTest() {
           };
           const results = [];
           let paused = false;
+          let stopRequested = false;
           const wasRaw = process.stdin.isTTY && process.stdin.isRaw;
           const useKeypress = process.stdin.isTTY;
           const pauseRl = readline.createInterface({ input: process.stdin, output: process.stdout });
           pauseRl.on('line', (line) => {
-            if ((line || '').trim().toLowerCase() === 'p') paused = true;
+            const t = (line || '').trim().toLowerCase();
+            if (t === 'p') paused = true;
+            else if (t === 's') stopRequested = true;
           });
           if (useKeypress) {
             readline.emitKeypressEvents(process.stdin);
@@ -1659,21 +1662,33 @@ async function runOfferActivationTest() {
             process.stdin.setEncoding('utf8');
             process.stdin.on('keypress', (_str, key) => {
               if (key && (key.name === 'p' || key.name === 'P')) paused = true;
+              else if (key && (key.name === 's' || key.name === 'S')) stopRequested = true;
             });
           }
-          console.log(chalk.gray('  (Press P to pause, or type p + Enter. Then Enter to resume.)\n'));
+          console.log(chalk.gray('  (Press P to pause, S to stop early. When paused, press Enter to resume.)\n'));
           for (const merchant of toTest) {
+            if (stopRequested) {
+              console.log(chalk.yellow('\n  ⏹ Stopping test early.\n'));
+              break;
+            }
             if (paused) {
               if (useKeypress) process.stdin.setRawMode(false);
-              console.log(chalk.yellow('\n  ⏸ Paused. Press Enter to resume.'));
+              console.log(chalk.yellow('\n  ⏸ Paused. Press Enter to resume, or type s + Enter to stop and save.'));
               await new Promise((resolve) => {
                 const resumeRl = readline.createInterface({ input: process.stdin, output: process.stdout });
-                resumeRl.question('', () => {
+                resumeRl.question('', (line) => {
                   resumeRl.close();
+                  const input = (line || '').trim().toLowerCase();
+                  if (input === 's') stopRequested = true;
+                  paused = false;
                   if (useKeypress && !wasRaw) process.stdin.setRawMode(true);
                   resolve();
                 });
               });
+              if (stopRequested) {
+                console.log(chalk.yellow('\n  ⏹ Stopping test early.\n'));
+                break;
+              }
               console.log(chalk.gray('  Resuming...\n'));
             }
             const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
