@@ -1025,6 +1025,20 @@ function printRedirectChain(result, options = {}) {
 }
 
 /**
+ * Print only the test stats (total, successful, failed, success rate). Used at top and bottom of results.
+ */
+function printTestStats(results) {
+  const successful = results.filter(r => r.success);
+  const failed = results.filter(r => !r.success);
+  const rate = results.length ? ((successful.length / results.length) * 100).toFixed(1) : '0.0';
+  console.log(chalk.bold('Summary:'));
+  console.log(`  Total tested: ${results.length}`);
+  console.log(`  Successful: ${chalk.green(successful.length)}`);
+  console.log(`  Failed: ${chalk.red(failed.length)}`);
+  console.log(`  Success rate: ${rate}%\n`);
+}
+
+/**
  * Print results summary
  */
 function printResultsSummary(results) {
@@ -1035,11 +1049,7 @@ function printResultsSummary(results) {
   const successful = results.filter(r => r.success);
   const failed = results.filter(r => !r.success);
   
-  console.log(chalk.bold('Summary:'));
-  console.log(`  Total tested: ${results.length}`);
-  console.log(`  Successful: ${chalk.green(successful.length)}`);
-  console.log(`  Failed: ${chalk.red(failed.length)}`);
-  console.log(`  Success rate: ${((successful.length / results.length) * 100).toFixed(1)}%`);
+  printTestStats(results);
   
   if (failed.length > 0) {
     console.log(chalk.bold.red('\n⚠️  Failed Activations:'));
@@ -1072,7 +1082,18 @@ function printResultsSummary(results) {
     printRedirectChain(r, { batchMode: true });
   });
   
-  console.log('\n' + chalk.bold.cyan('='.repeat(80)) + '\n');
+  console.log(chalk.bold.cyan('\n' + '─'.repeat(80)));
+  printTestStats(results);
+  if (failed.length > 0) {
+    console.log(chalk.bold.red('Failed at bottom of report:'));
+    failed.forEach((result, index) => {
+      console.log(chalk.red(`  ${index + 1}. ${result.merchantName || result.testUrl}`) +
+        (result.merchantDomain ? chalk.gray(` (${result.merchantDomain})`) : ''));
+      if (result.error) console.log(chalk.gray(`     ${result.error}`));
+    });
+    console.log('');
+  }
+  console.log(chalk.bold.cyan('='.repeat(80)) + '\n');
 }
 
 /**
@@ -1665,8 +1686,12 @@ async function runOfferActivationTest() {
               else if (key && (key.name === 's' || key.name === 'S')) stopRequested = true;
             });
           }
+          // Progress increment: every 5 for ≤10 merchants; +5 for each additional 10 merchants (11–20 → 10, 21–30 → 15, etc.)
+          const totalToTest = toTest.length;
+          const progressIncrement = 5 + 5 * Math.floor((totalToTest - 1) / 10);
           console.log(chalk.gray('  (Press P to pause, S to stop early. When paused, press Enter to resume.)\n'));
-          for (const merchant of toTest) {
+          for (let idx = 0; idx < toTest.length; idx++) {
+            const merchant = toTest[idx];
             if (stopRequested) {
               console.log(chalk.yellow('\n  ⏹ Stopping test early.\n'));
               break;
@@ -1693,6 +1718,12 @@ async function runOfferActivationTest() {
             }
             const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
             results.push(result);
+            const done = results.length;
+            if (done % progressIncrement === 0 || done === totalToTest) {
+              const ok = results.filter(r => r.success).length;
+              const fail = done - ok;
+              console.log(chalk.blue(`  Progress: ${done}/${totalToTest} — ${chalk.green(ok)} OK, ${fail > 0 ? chalk.red(fail) : fail} failed`));
+            }
             await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
           }
           if (useKeypress) {
