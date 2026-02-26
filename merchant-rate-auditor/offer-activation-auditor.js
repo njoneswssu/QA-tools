@@ -1117,6 +1117,7 @@ function exportResults(results, filename = null) {
       merchantName: r.merchantName,
       merchantId: r.merchantId,
       merchantDomain: r.merchantDomain,
+      appId: r.appId,
       testUrl: r.testUrl,
       success: r.success,
       finalUrl: r.finalUrl,
@@ -1282,7 +1283,7 @@ async function runBatchForOneAppId(appId, options = {}) {
   const results = [];
   for (const merchant of toTest) {
     const result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
-    results.push(result);
+    results.push({ ...result, appId });
     await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
   }
   return results;
@@ -1717,7 +1718,7 @@ async function runOfferActivationTest() {
               console.log(chalk.gray('  Resuming...\n'));
             }
             const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
-            results.push(result);
+            results.push({ ...result, appId: config.appId });
             const done = results.length;
             if (done % progressIncrement === 0 || done === totalToTest) {
               const ok = results.filter(r => r.success).length;

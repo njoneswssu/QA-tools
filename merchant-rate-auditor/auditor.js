@@ -1385,6 +1385,38 @@ function displayOfferActivationTestedForAppIds(appIds) {
       const dateStr = latest.date && latest.date.toLocaleString ? latest.date.toLocaleString() : latest.filename;
       console.log(chalk.gray(`      Latest run (${dateStr}): ${latest.totalTested} tested, ${chalk.green(latest.successful)} OK, ${latest.failed > 0 ? chalk.red(latest.failed) : latest.failed} failed`));
     }
+    const offerEntries = loadAllResultFiles().filter(e => e.type === 'offer_activation');
+    for (const appId of appIds) {
+      const failedByMerchantId = new Map();
+      for (const e of offerEntries) {
+        for (const m of e.merchants || []) {
+          if ((m.appId === appId || m.appId === Number(appId)) && !m.success) {
+            const key = m.id != null ? String(m.id) : (m.name || '') + (m.domain || '');
+            if (!failedByMerchantId.has(key)) {
+              failedByMerchantId.set(key, {
+                name: m.name,
+                id: m.id,
+                domain: m.domain,
+                error: m.error,
+                issues: m.issues,
+                file: e.filename,
+                date: e.date
+              });
+            }
+          }
+        }
+      }
+      const failedForApp = [...failedByMerchantId.values()];
+      if (failedForApp.length > 0) {
+        console.log(chalk.bold.red(`\n   Offer activation failures for App ID ${chalk.cyan(appId)}:`));
+        failedForApp.forEach((f, i) => {
+          console.log(chalk.red(`      ${i + 1}. ${f.name || f.id} (${f.domain || ''})`));
+          if (f.error) console.log(chalk.gray(`         ${f.error}`));
+          (f.issues || []).forEach(iss => console.log(chalk.yellow(`         • ${iss.message || iss.type}`)));
+          console.log(chalk.gray(`         From: ${f.file}`));
+        });
+      }
+    }
   } else {
     console.log(chalk.gray('\n   No offer-activation result files found (save results after a batch to see details).'));
   }
@@ -1425,12 +1457,13 @@ function loadAllResultFiles() {
       try {
         const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
         const results = data.results || [];
+        const appIdsFromFile = [...new Set(results.map(r => r.appId).filter(Boolean))];
         entries.push({
           type: 'offer_activation',
           filename: file,
           filepath,
           date: parseDate(file),
-          appIds: [],
+          appIds: appIdsFromFile,
           totalTested: data.totalTested,
           successful: data.successful,
           failed: data.failed,
@@ -1438,6 +1471,7 @@ function loadAllResultFiles() {
             name: r.merchantName,
             id: r.merchantId,
             domain: r.merchantDomain,
+            appId: r.appId,
             success: r.success,
             issues: r.issues,
             error: r.error
@@ -1555,6 +1589,16 @@ async function runLookupMenu() {
   if (which === '2') {
     const name = await ask('Merchant name (partial match): ');
     rl.close();
+    const trimmed = (name || '').trim();
+    if (/^\d+$/.test(trimmed)) {
+      console.log(chalk.yellow(`\n   You entered a number. To see results for App ID ${trimmed} (including offer activation failures), using App ID lookup.\n`));
+      const asAppId = parseInt(trimmed, 10);
+      if (!isNaN(asAppId) && asAppId > 0) {
+        displayLookupResults([asAppId]);
+        displayOfferActivationTestedForAppIds([asAppId]);
+        return;
+      }
+    }
     lookupByMerchantName(name);
     return;
   }
