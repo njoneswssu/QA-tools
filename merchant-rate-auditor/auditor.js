@@ -765,18 +765,21 @@ async function auditAppId(appId, options = {}) {
  * Generate a detailed report
  */
 function generateReport(results) {
+  const totalMerchants = results.reduce((sum, r) => sum + r.totalMerchants, 0);
+  const merchantsWithIssues = results.reduce((sum, r) => sum + (r.issues || []).length, 0);
   const report = {
     summary: {
       totalAppIds: results.length,
       successfulAppIds: results.filter(r => r.success).length,
-      totalMerchants: results.reduce((sum, r) => sum + r.totalMerchants, 0),
+      totalMerchants,
+      merchantsWithNoIssues: totalMerchants - merchantsWithIssues,
+      merchantsWithIssues,
       totalRates: results.reduce((sum, r) => sum + r.totalRates, 0),
-      totalIssues: results.reduce((sum, r) => sum + r.issues.length, 0),
+      totalIssues: results.reduce((sum, r) => sum + (r.issues || []).length, 0),
       timestamp: new Date().toISOString()
     },
     results: results
   };
-  
   return report;
 }
 
@@ -790,12 +793,12 @@ function printResults(report) {
   
   const { summary, results } = report;
   
-  // Summary
+  // Summary (merchant-level counts so numbers match total tested)
   console.log(chalk.bold('Summary:'));
   console.log(`  Total App IDs audited: ${summary.totalAppIds}`);
-  console.log(`  Successful: ${chalk.green(summary.successfulAppIds)}`);
-  console.log(`  Failed: ${chalk.red(summary.totalAppIds - summary.successfulAppIds)}`);
-  console.log(`  Total Merchants: ${summary.totalMerchants}`);
+  console.log(`  Total Merchants tested: ${summary.totalMerchants}`);
+  console.log(`  Merchants with no rate issues: ${chalk.green(summary.merchantsWithNoIssues)}`);
+  console.log(`  Merchants with rate issues: ${chalk.yellow(summary.merchantsWithIssues)}`);
   console.log(`  Total Rates: ${summary.totalRates}`);
   console.log(`  Total Issues Found: ${chalk.yellow(summary.totalIssues)}`);
   console.log(`  Timestamp: ${summary.timestamp}\n`);
@@ -809,8 +812,12 @@ function printResults(report) {
     
     console.log(chalk.bold(`\n📱 App ID ${result.appId}:`));
     console.log(`  Merchants: ${result.totalMerchants}`);
+    if (result.allMerchants && result.allMerchants.length > 0) {
+      const names = result.allMerchants.map((m) => `${m.merchantName || 'ID ' + m.merchantId} (ID ${m.merchantId})`).join(', ');
+      console.log(chalk.gray(`  Selected: ${names}`));
+    }
     console.log(`  Rates: ${result.totalRates}`);
-    console.log(`  Issues: ${chalk.yellow(result.issues.length)}`);
+    console.log(`  Issues: ${chalk.yellow((result.issues || []).length)}`);
     
     if (result.issues.length > 0) {
       console.log(chalk.yellow('\n  Issues found:'));
@@ -910,6 +917,36 @@ function generateSimplifiedExport(report) {
     rateAmount: item.example.rateAmount,
     count: item.count
   }));
+}
+
+/**
+ * Build full list of rate-audited merchants for combined CSV: includes every tested merchant,
+ * with "No issues" row for merchants that had no rate issues.
+ */
+function buildRateMerchantsForCombinedReport(report) {
+  const issueRows = generateSimplifiedExport(report);
+  const hasIssuesKey = new Set(issueRows.map((m) => `${m.merchantId}-${m.appId}`));
+  const allRows = [...issueRows];
+  for (const result of report.results || []) {
+    if (!result.success || !result.allMerchants) continue;
+    for (const m of result.allMerchants) {
+      const key = `${m.merchantId}-${result.appId}`;
+      if (hasIssuesKey.has(key)) continue;
+      allRows.push({
+        merchantName: m.merchantName || `Merchant ID ${m.merchantId}`,
+        merchantId: m.merchantId,
+        merchantCategory: '',
+        appId: result.appId,
+        issueType: 'None',
+        severity: '',
+        reason: 'No issues',
+        rateName: '',
+        rateAmount: '',
+        count: 0
+      });
+    }
+  }
+  return allRows;
 }
 
 /**
@@ -1971,7 +2008,7 @@ async function runFullAudit() {
   if (saveAnswer) {
     const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const outDir = CONFIG.outputDir;
-    const rateMerchants = generateSimplifiedExport(report);
+    const rateMerchants = buildRateMerchantsForCombinedReport(report);
     const combined = {
       exportDate: new Date().toISOString(),
       merchantRate: {
