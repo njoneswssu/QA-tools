@@ -23,7 +23,11 @@ const CONFIG = {
   sessionFilePath: null, // set at runtime: offer-activation-session.json next to outputDir
   requestTimeout: 30000,
   maxRedirects: 15,
-  defaultAppIds: [451, 206, 209]
+  defaultAppIds: [451, 206, 209],
+  /** Delay in ms between each redirect hop (wild.link → affiliate → merchant) to avoid 429 rate limits */
+  delayBetweenRedirectHopsMs: 2000,
+  /** Delay in ms between testing each merchant in batch */
+  delayBetweenMerchantsMs: 2500
 };
 CONFIG.sessionFilePath = path.join(CONFIG.outputDir, 'offer-activation-session.json');
 CONFIG.testedMerchantsFilePath = path.join(CONFIG.outputDir, 'offer-activation-tested-merchants.json');
@@ -504,6 +508,15 @@ function analyzeRedirectChain(redirects, finalContent = '', options = {}) {
     });
   }
 
+  // If the chain ended at 429 after retries, flag for retest
+  if (finalRedirect.statusCode === 429) {
+    issues.push({
+      type: 'rate_limited_429',
+      severity: 'high',
+      message: 'Rate limited (429) after retries — retest this merchant later.'
+    });
+  }
+
   // Check if final URL indicates an error (unless we landed back on the merchant)
   if (!redirectedBackToMerchant && isErrorUrl(finalUrl)) {
     issues.push({
@@ -584,21 +597,43 @@ async function followRedirects(url, headers = {}) {
     ...headers
   };
   
+  const RETRY_429_BASE_MS = 30000;
+  const RETRY_429_MAX_MS = 300000;
+  const RETRY_429_MAX_ATTEMPTS = 4;
+
   while (redirectCount < CONFIG.maxRedirects) {
     try {
-      const response = await axios({
-        method: 'GET',
-        url: currentUrl,
-        maxRedirects: 0, // Handle redirects manually
-        validateStatus: () => true, // Accept all status codes
-        timeout: CONFIG.requestTimeout,
-        headers: defaultHeaders,
-        responseType: 'text'
-      });
-      
+      let response;
+      let attempt = 0;
+      for (;;) {
+        response = await axios({
+          method: 'GET',
+          url: currentUrl,
+          maxRedirects: 0,
+          validateStatus: () => true,
+          timeout: CONFIG.requestTimeout,
+          headers: defaultHeaders,
+          responseType: 'text'
+        });
+        if (response.status !== 429) break;
+        if (attempt >= RETRY_429_MAX_ATTEMPTS) break;
+        let waitMs = RETRY_429_BASE_MS * Math.pow(1.5, attempt);
+        if (waitMs > RETRY_429_MAX_MS) waitMs = RETRY_429_MAX_MS;
+        const retryAfter = response.headers && response.headers['retry-after'];
+        if (retryAfter) {
+          const sec = parseInt(retryAfter, 10);
+          if (!isNaN(sec) && sec > 0) waitMs = Math.min(sec * 1000, RETRY_429_MAX_MS);
+        }
+        if (typeof process !== 'undefined' && process.stdout && process.stdout.write) {
+          console.log(chalk.yellow(`   Rate limited (429). Waiting ${Math.round(waitMs / 1000)}s before retry (attempt ${attempt + 1})...`));
+        }
+        await new Promise(r => setTimeout(r, waitMs));
+        attempt++;
+      }
+
       const statusCode = response.status;
       const statusText = response.statusText || getStatusText(statusCode);
-      
+
       redirectChain.push(new RedirectEntry(
         currentUrl,
         statusCode,
@@ -608,17 +643,17 @@ async function followRedirects(url, headers = {}) {
           contentType: response.headers['content-type']
         }
       ));
-      
-      // Check if it's a redirect
+
       if (statusCode >= 300 && statusCode < 400 && response.headers.location) {
-        // Resolve relative URLs
         const nextUrl = new URL(response.headers.location, currentUrl).href;
         currentUrl = nextUrl;
         redirectCount++;
+        if (CONFIG.delayBetweenRedirectHopsMs > 0) {
+          await new Promise(r => setTimeout(r, CONFIG.delayBetweenRedirectHopsMs));
+        }
       } else {
-        // Final destination reached
         if (typeof response.data === 'string') {
-          finalContent = response.data.substring(0, 50000); // Limit content size
+          finalContent = response.data.substring(0, 50000);
         }
         break;
       }
@@ -632,7 +667,7 @@ async function followRedirects(url, headers = {}) {
       break;
     }
   }
-  
+
   return { redirectChain, finalContent };
 }
 
@@ -990,6 +1025,20 @@ function printRedirectChain(result, options = {}) {
 }
 
 /**
+ * Print only the test stats (total, successful, failed, success rate). Used at top and bottom of results.
+ */
+function printTestStats(results) {
+  const successful = results.filter(r => r.success);
+  const failed = results.filter(r => !r.success);
+  const rate = results.length ? ((successful.length / results.length) * 100).toFixed(1) : '0.0';
+  console.log(chalk.bold('Summary:'));
+  console.log(`  Total tested: ${results.length}`);
+  console.log(`  Successful: ${chalk.green(successful.length)}`);
+  console.log(`  Failed: ${chalk.red(failed.length)}`);
+  console.log(`  Success rate: ${rate}%\n`);
+}
+
+/**
  * Print results summary
  */
 function printResultsSummary(results) {
@@ -1000,11 +1049,7 @@ function printResultsSummary(results) {
   const successful = results.filter(r => r.success);
   const failed = results.filter(r => !r.success);
   
-  console.log(chalk.bold('Summary:'));
-  console.log(`  Total tested: ${results.length}`);
-  console.log(`  Successful: ${chalk.green(successful.length)}`);
-  console.log(`  Failed: ${chalk.red(failed.length)}`);
-  console.log(`  Success rate: ${((successful.length / results.length) * 100).toFixed(1)}%`);
+  printTestStats(results);
   
   if (failed.length > 0) {
     console.log(chalk.bold.red('\n⚠️  Failed Activations:'));
@@ -1037,7 +1082,18 @@ function printResultsSummary(results) {
     printRedirectChain(r, { batchMode: true });
   });
   
-  console.log('\n' + chalk.bold.cyan('='.repeat(80)) + '\n');
+  console.log(chalk.bold.cyan('\n' + '─'.repeat(80)));
+  printTestStats(results);
+  if (failed.length > 0) {
+    console.log(chalk.bold.red('Failed at bottom of report:'));
+    failed.forEach((result, index) => {
+      console.log(chalk.red(`  ${index + 1}. ${result.merchantName || result.testUrl}`) +
+        (result.merchantDomain ? chalk.gray(` (${result.merchantDomain})`) : ''));
+      if (result.error) console.log(chalk.gray(`     ${result.error}`));
+    });
+    console.log('');
+  }
+  console.log(chalk.bold.cyan('='.repeat(80)) + '\n');
 }
 
 /**
@@ -1194,6 +1250,83 @@ async function deleteAllOfferActivationResults() {
     }
   }
   console.log(chalk.green(`Deleted ${deleted} file(s).`));
+}
+
+/**
+ * Run offer activation batch for a single App ID (no prompts). Used by combined full audit.
+ * @param {number} appId
+ * @param {{ limit: number, session: { deviceId, trackingCode, shoppingTripCode }, skipAlreadyTested: boolean }} options
+ * @returns {Promise<Array>} results
+ */
+async function runBatchForOneAppId(appId, options = {}) {
+  const { limit = 10, session = {}, skipAlreadyTested = true } = options;
+  const merchants = await fetchMerchantData(appId);
+  if (merchants.length === 0) return [];
+  const allTestable = merchants.filter(m => m.URL || m.Domain);
+  const testedSet = loadTestedMerchants(appId);
+  let toTest = allTestable;
+  if (skipAlreadyTested && testedSet.size > 0) {
+    toTest = allTestable.filter(m => !testedSet.has(Number(m.ID)));
+  }
+  toTest = shuffleArray(toTest).slice(0, limit);
+  if (toTest.length === 0) return [];
+  let activeDomains = [];
+  try {
+    activeDomains = await fetchActiveDomains(appId);
+  } catch (_) {}
+  const sessionObj = {
+    deviceId: session.deviceId || '',
+    trackingCode: session.trackingCode || '',
+    shoppingTripCode: session.shoppingTripCode || ''
+  };
+  const results = [];
+  for (const merchant of toTest) {
+    const result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
+    results.push(result);
+    await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
+  }
+  return results;
+}
+
+/**
+ * Run offer activation batch for multiple App IDs. Gets session once (saved or prompt), then runs batch per app.
+ * Used by combined full audit from main menu.
+ * @param {number[]} appIds
+ * @param {{ limit?: number }} options
+ * @returns {Promise<{ results: Array, byAppId: Object }>}
+ */
+async function runOfferActivationBatchForAppIds(appIds, options = {}) {
+  const limit = options.limit || 10;
+  let session = { deviceId: '', trackingCode: '', shoppingTripCode: '' };
+  const saved = loadSavedSession();
+  if (saved && (saved.deviceId || saved.trackingCode || saved.shoppingTripCode)) {
+    const useSaved = await askYesNo('Use saved device/tracking for offer activation batch? (yes/no): ');
+    if (useSaved) {
+      session = { deviceId: saved.deviceId || '', trackingCode: saved.trackingCode || '', shoppingTripCode: saved.shoppingTripCode || '' };
+      console.log(chalk.gray('  Using saved session.'));
+    }
+  }
+  if (!session.deviceId && !session.trackingCode && !session.shoppingTripCode) {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const d = await new Promise(r => rl.question(chalk.cyan('Device ID (optional): '), r));
+    const tc = await new Promise(r => rl.question(chalk.cyan('Tracking code (optional): '), r));
+    const sc = await new Promise(r => rl.question(chalk.cyan('Shopping trip (optional): '), r));
+    rl.close();
+    session = { deviceId: (d && d.trim()) || '', trackingCode: (tc && tc.trim()) || '', shoppingTripCode: (sc && sc.trim()) || '' };
+    if (session.deviceId || session.trackingCode || session.shoppingTripCode) {
+      const saveIt = await askYesNo('Save this device/session for next time? (yes/no): ');
+      if (saveIt) saveSession(session.deviceId, session.trackingCode, session.shoppingTripCode);
+    }
+  }
+  const allResults = [];
+  const byAppId = {};
+  for (const appId of appIds) {
+    console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (up to ${limit} merchants)...`));
+    const results = await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true });
+    byAppId[appId] = results;
+    allResults.push(...results);
+  }
+  return { results: allResults, byAppId };
 }
 
 /**
@@ -1472,6 +1605,7 @@ async function runOfferActivationTest() {
       }
 
       case '2': {
+        unsavedBatchResults = null;
         const config = await promptForBatchConfig();
         if (config) {
           console.log(chalk.blue(`\n🚀 Starting batch test for App ID ${config.appId}...`));
@@ -1532,32 +1666,92 @@ async function runOfferActivationTest() {
             shoppingTripCode: config.shoppingTripCode || ''
           };
           const results = [];
-          for (const merchant of toTest) {
+          let paused = false;
+          let stopRequested = false;
+          const wasRaw = process.stdin.isTTY && process.stdin.isRaw;
+          const useKeypress = process.stdin.isTTY;
+          const pauseRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+          pauseRl.on('line', (line) => {
+            const t = (line || '').trim().toLowerCase();
+            if (t === 'p') paused = true;
+            else if (t === 's') stopRequested = true;
+          });
+          if (useKeypress) {
+            readline.emitKeypressEvents(process.stdin);
+            if (!process.stdin.isRaw) process.stdin.setRawMode(true);
+            process.stdin.resume();
+            process.stdin.setEncoding('utf8');
+            process.stdin.on('keypress', (_str, key) => {
+              if (key && (key.name === 'p' || key.name === 'P')) paused = true;
+              else if (key && (key.name === 's' || key.name === 'S')) stopRequested = true;
+            });
+          }
+          // Progress increment: every 5 for ≤10 merchants; +5 for each additional 10 merchants (11–20 → 10, 21–30 → 15, etc.)
+          const totalToTest = toTest.length;
+          const progressIncrement = 5 + 5 * Math.floor((totalToTest - 1) / 10);
+          console.log(chalk.gray('  (Press P to pause, S to stop early. When paused, press Enter to resume.)\n'));
+          for (let idx = 0; idx < toTest.length; idx++) {
+            const merchant = toTest[idx];
+            if (stopRequested) {
+              console.log(chalk.yellow('\n  ⏹ Stopping test early.\n'));
+              break;
+            }
+            if (paused) {
+              if (useKeypress) process.stdin.setRawMode(false);
+              console.log(chalk.yellow('\n  ⏸ Paused. Press Enter to resume, or type s + Enter to stop and save.'));
+              await new Promise((resolve) => {
+                const resumeRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+                resumeRl.question('', (line) => {
+                  resumeRl.close();
+                  const input = (line || '').trim().toLowerCase();
+                  if (input === 's') stopRequested = true;
+                  paused = false;
+                  if (useKeypress && !wasRaw) process.stdin.setRawMode(true);
+                  resolve();
+                });
+              });
+              if (stopRequested) {
+                console.log(chalk.yellow('\n  ⏹ Stopping test early.\n'));
+                break;
+              }
+              console.log(chalk.gray('  Resuming...\n'));
+            }
             const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
             results.push(result);
-            await new Promise(r => setTimeout(r, 500));
+            const done = results.length;
+            if (done % progressIncrement === 0 || done === totalToTest) {
+              const ok = results.filter(r => r.success).length;
+              const fail = done - ok;
+              console.log(chalk.blue(`  Progress: ${done}/${totalToTest} — ${chalk.green(ok)} OK, ${fail > 0 ? chalk.red(fail) : fail} failed`));
+            }
+            await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
           }
-          const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
-          if (merchantIds.length > 0) {
-            markMerchantsAsTested(config.appId, merchantIds);
+          if (useKeypress) {
+            process.stdin.removeAllListeners('keypress');
+            if (!wasRaw) process.stdin.setRawMode(false);
           }
+          pauseRl.removeAllListeners('line');
+          pauseRl.close();
           printResultsSummary(results);
           const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
           await new Promise((resolve) => {
             rl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
-              if (answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')) {
+              const isYes = answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y');
+              if (isYes) {
                 exportResults(results);
                 unsavedBatchResults = null;
+                const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
+                if (merchantIds.length > 0) markMerchantsAsTested(config.appId, merchantIds);
                 rl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
                   rl.close();
-                  if (csvAnswer && (csvAnswer.toLowerCase() === 'yes' || csvAnswer.toLowerCase() === 'y')) {
+                  if (csvAnswer && (csvAnswer.toLowerCase().trim() === 'yes' || csvAnswer.toLowerCase().trim() === 'y')) {
                     exportResultsToCSV(results);
                   }
                   resolve();
                 });
               } else {
+                unsavedBatchResults = null;
                 rl.close();
-                unsavedBatchResults = results;
                 resolve();
               }
             });
@@ -1598,6 +1792,9 @@ module.exports = {
   exportResults,
   exportResultsToCSV,
   runOfferActivationTest,
+  runOfferActivationBatchForAppIds,
+  runBatchForOneAppId,
+  markMerchantsAsTested,
   showOfferActivationMenu,
   fetchMerchantData,
   fetchActiveDomains,

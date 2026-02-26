@@ -5,23 +5,11 @@ const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-
-// Import offer activation module
 const offerActivation = require('./offer-activation-auditor');
 
 /**
  * Merchant Rate Auditor
  * 
- * A comprehensive testing tool for Wildlink merchants:
- * 
- * 1. Merchant Rate Audit - Audits merchant rate JSON feeds for problematic rates:
- *    - Rates with "ShareASale commission" in the name
- *    - Rates with hex code-like values instead of actual commission amounts
- * 
- * 2. Offer Activation Testing - Tests if merchant offers work properly:
- *    - Follows redirect chains from wild.link URLs
- *    - Detects error pages (expired offers, offer not found, etc.)
- *    - Identifies merchants with broken activation flows
  * Audits Wildlink merchant rate JSON feeds for problematic rates:
  * - Rates with "ShareASale commission" in the name
  * - Rates with hex code-like values instead of actual commission amounts
@@ -138,6 +126,123 @@ function containsShareASale(name) {
 function containsCommission(value) {
   if (!value || typeof value !== 'string') return false;
   return /commission/i.test(value);
+}
+
+/**
+ * Check if a rate name looks like a product name, location name, or other non-rate description
+ * Examples: "gummies returning", "Artificial christmas tree", "chicago", etc.
+ */
+function isProductLikeName(name) {
+  if (!name || typeof name !== 'string') return false;
+  
+  const trimmed = name.trim();
+  const lowerTrimmed = trimmed.toLowerCase();
+  
+  // Product names that shouldn't be in rate names
+  const productNames = [
+    'gummies', 'gummy',
+    'vitamins', 'vitamin',
+    'supplements', 'supplement',
+    'pills', 'pill',
+    'capsules', 'capsule',
+    'tablets', 'tablet',
+    'drops', 'drop',
+    'sprays', 'spray',
+    'creams', 'cream',
+    'lotions', 'lotion',
+    'oils', 'oil',
+    'serums', 'serum',
+    'artificial', 'christmas', 'tree', 'trees',
+    'shoes', 'shoe',
+    'clothing', 'clothes',
+    'electronics', 'electronic',
+    'furniture', 'furnishings',
+    'appliances', 'appliance',
+    'toys', 'toy',
+    'books', 'book',
+    'games', 'game'
+  ];
+  
+  // Common location/city names (common US cities)
+  const locationNames = [
+    'chicago', 'new york', 'los angeles', 'houston', 'phoenix', 'philadelphia',
+    'san antonio', 'san diego', 'dallas', 'san jose', 'austin', 'jacksonville',
+    'san francisco', 'indianapolis', 'columbus', 'fort worth', 'charlotte',
+    'seattle', 'denver', 'washington', 'boston', 'el paso', 'detroit',
+    'nashville', 'portland', 'oklahoma city', 'las vegas', 'memphis',
+    'louisville', 'baltimore', 'milwaukee', 'albuquerque', 'tucson',
+    'fresno', 'sacramento', 'kansas city', 'mesa', 'atlanta', 'omaha',
+    'raleigh', 'miami', 'long beach', 'virginia beach', 'oakland',
+    'minneapolis', 'tulsa', 'cleveland', 'wichita', 'arlington',
+    'london', 'paris', 'tokyo', 'sydney', 'toronto', 'mexico city',
+    'miami', 'boston', 'seattle', 'portland'
+  ];
+  
+  // Check if name is just a location name
+  if (locationNames.includes(lowerTrimmed)) {
+    return true;
+  }
+  
+  // Check if name starts with a product name
+  const startsWithProduct = productNames.some(product => {
+    const regex = new RegExp(`^${product}\\s+`, 'i');
+    return regex.test(lowerTrimmed);
+  });
+  
+  if (startsWithProduct) {
+    // If it starts with a product name, check if it's followed by rate-like words
+    const rateLikeWords = ['returning', 'new', 'first', 'repeat', 'recurring', 'subscription', 'sale', 'purchase', 'transaction', 'order'];
+    const hasRateLikeWord = rateLikeWords.some(word => {
+      const regex = new RegExp(`\\b${word}\\b`, 'i');
+      return regex.test(lowerTrimmed);
+    });
+    
+    // If it has a product name but also has rate-like context, it might be valid
+    // But if it's just "product + returning/new", it's likely wrong
+    if (hasRateLikeWord) {
+      return true; // Flag it as product-like
+    }
+    
+    // If it's just a product name or product + adjective (like "Artificial christmas tree")
+    // and doesn't have clear rate context, flag it
+    if (!hasRateLikeWord && trimmed.split(/\s+/).length <= 4) {
+      // Check if it contains product-related words
+      const hasProductWords = productNames.some(product => {
+        return lowerTrimmed.includes(product);
+      });
+      if (hasProductWords) {
+        return true;
+      }
+    }
+  }
+  
+  // Check for pattern: product + returning/new (e.g., "gummies returning")
+  const productWithStatus = /\b(gummies?|vitamins?|supplements?|pills?|capsules?|tablets?)\s+(returning|new|first|repeat)\b/i;
+  if (productWithStatus.test(lowerTrimmed)) {
+    return true;
+  }
+  
+  // Check for product descriptions that look like product names (e.g., "Artificial christmas tree")
+  // These typically don't contain rate-related words
+  const rateRelatedWords = ['purchase', 'sale', 'transaction', 'order', 'signup', 'subscription', 'recurring', 'returning', 'new', 'first', 'online', 'b2b', 'b2c', 'coupon', 'verified', 'payroll', 'referral', 'affiliate'];
+  const hasRateRelatedWord = rateRelatedWords.some(word => {
+    const regex = new RegExp(`\\b${word}\\b`, 'i');
+    return regex.test(lowerTrimmed);
+  });
+  
+  // If it doesn't have any rate-related words and looks like a product description, flag it
+  if (!hasRateRelatedWord) {
+    // Check if it contains product-related terms
+    const hasProductTerms = productNames.some(product => lowerTrimmed.includes(product));
+    // Check if it's a simple noun phrase (like "Artificial christmas tree" or "chicago")
+    const isSimpleNounPhrase = /^[A-Z][a-z]+(\s+[a-z]+)*$/.test(trimmed) && trimmed.split(/\s+/).length <= 4;
+    
+    if (hasProductTerms || (isSimpleNounPhrase && trimmed.split(/\s+/).length <= 3)) {
+      return true;
+    }
+  }
+  
+  return false;
 }
 
 /**
@@ -415,6 +520,25 @@ function validateRate(rate, merchantId, merchantCategories = null) {
     });
   }
   
+  // Flag rates with "API" in the name
+  if (rate.Name && /api/i.test(rate.Name)) {
+    issues.push({
+      type: 'api_in_name',
+      severity: 'medium',
+      message: `Rate name contains "API": "${rate.Name}"`,
+      rate: rate
+    });
+  }
+  
+  if (rate.Name && /wildfire/i.test(rate.Name)) {
+    issues.push({
+      type: 'wildfire_in_name',
+      severity: 'medium',
+      message: `Rate name contains "Wildfire": "${rate.Name}"`,
+      rate: rate
+    });
+  }
+  
   // NEW RULE: Flag rates with "in app" or "iOS in-app" patterns
   if (rate.Name && containsInAppRate(rate.Name)) {
     issues.push({
@@ -575,11 +699,13 @@ async function auditAppId(appId) {
       totalMerchants: 0,
       totalRates: 0,
       issues: [],
+      allMerchants: [],
       error: 'Failed to fetch data'
     };
   }
   
   const issues = [];
+  const allMerchants = [];
   let totalMerchants = 0;
   let totalRates = 0;
   
@@ -593,6 +719,7 @@ async function auditAppId(appId) {
     // Get merchant info from the map
     const merchantInfo = merchantMap[merchantId];
     const merchantName = merchantInfo?.name || `Merchant ID ${merchantId}`;
+    allMerchants.push({ merchantId, merchantName });
     const merchantCategories = merchantInfo?.categories || [];
     
     // Format categories for display (join with comma)
@@ -621,6 +748,7 @@ async function auditAppId(appId) {
     totalMerchants,
     totalRates,
     issues,
+    allMerchants,
     timestamp: new Date().toISOString()
   };
 }
@@ -777,6 +905,105 @@ function generateSimplifiedExport(report) {
 }
 
 /**
+ * Write one CSV file with a single header row. Both merchant rate and offer activation
+ * rows use the same columns; unused columns are left empty. Filter/sort by "Source" to separate.
+ */
+function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) {
+  const escapeCSV = (value) => {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+  const redirectPathFor = (r) => {
+    if (!r.redirectChain || r.redirectChain.length === 0) return r.finalUrl || '';
+    return r.redirectChain
+      .map((hop) => `${hop.url} (${hop.statusCode} ${hop.statusText || ''})`.trim())
+      .join(' → ');
+  };
+  const headers = [
+    'Source',
+    'Merchant Name',
+    'Merchant ID',
+    'App ID',
+    'Merchant Category',
+    'Domain',
+    'Success',
+    'Issue Type',
+    'Severity',
+    'Reason or Message',
+    'Rate Name',
+    'Rate Amount',
+    'Count',
+    'Test URL',
+    'Final URL',
+    'Redirect Path',
+    'Redirect Count'
+  ];
+  const rows = [];
+  for (const m of rateMerchants || []) {
+    rows.push([
+      'Merchant Rate',
+      m.merchantName ?? '',
+      m.merchantId ?? '',
+      m.appId ?? '',
+      m.merchantCategory ?? '',
+      '',
+      '',
+      m.issueType ?? '',
+      m.severity ?? '',
+      m.reason ?? '',
+      m.rateName ?? '',
+      m.rateAmount ?? '',
+      m.count ?? '',
+      '',
+      '',
+      '',
+      ''
+    ]);
+  }
+  for (const r of activationResults || []) {
+    const redirectPath = redirectPathFor(r);
+    const issues = (r.issues && r.issues.length > 0)
+      ? r.issues
+      : (r.error ? [{ type: 'error', message: r.error }] : [{ type: '', message: '' }]);
+    for (const issue of issues) {
+      rows.push([
+        'Offer Activation',
+        r.merchantName ?? '',
+        r.merchantId ?? '',
+        '',
+        '',
+        r.merchantDomain ?? '',
+        r.success ? 'Yes' : 'No',
+        issue.type ?? '',
+        '',
+        issue.message ?? '',
+        '',
+        '',
+        '',
+        r.testUrl ?? '',
+        r.finalUrl ?? '',
+        redirectPath,
+        r.redirectCount ?? ''
+      ]);
+    }
+  }
+  if (rows.length === 0) {
+    console.log(chalk.yellow('⚠️  No data for combined CSV.'));
+    return;
+  }
+  const csvContent = [
+    headers.map(escapeCSV).join(','),
+    ...rows.map(row => row.map(escapeCSV).join(','))
+  ].join('\n');
+  fs.writeFileSync(filepath, csvContent);
+  console.log(chalk.green(`📊 Full report CSV saved to: ${filepath}`));
+}
+
+/**
  * Export simplified data to CSV
  */
 function exportToCSV(exportData, filepath) {
@@ -812,20 +1039,22 @@ function exportToCSV(exportData, filepath) {
 }
 
 /**
- * Export simplified data to JSON
+ * Export simplified data to JSON. Includes total audited and all audited merchants for lookup.
  */
-function exportToJSON(exportData, filepath) {
-  if (exportData.length === 0) {
+function exportToJSON(exportData, filepath, report = null) {
+  const merchantsWithIssues = [...new Set((exportData || []).map(m => `${m.merchantId}-${m.appId}`))].length;
+  const exportObject = {
+    exportDate: new Date().toISOString(),
+    totalIssues: (exportData || []).length,
+    totalMerchantsAudited: report ? report.summary.totalMerchants : null,
+    merchantsWithIssues: exportData.length > 0 ? merchantsWithIssues : 0,
+    merchants: exportData || [],
+    allAuditedMerchants: report ? report.results.flatMap(r => r.allMerchants || []) : []
+  };
+  if (exportData.length === 0 && !report) {
     console.log(chalk.yellow('⚠️  No data to export'));
     return;
   }
-  
-  const exportObject = {
-    exportDate: new Date().toISOString(),
-    totalIssues: exportData.length,
-    merchants: exportData
-  };
-  
   fs.writeFileSync(filepath, JSON.stringify(exportObject, null, 2));
   console.log(chalk.green(`📄 JSON export saved to: ${filepath}`));
 }
@@ -859,114 +1088,44 @@ async function saveReport(report, skipCSVPrompt = false) {
   
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   
-  // Generate and save only the merchant issues JSON export
+  // Generate and save the merchant issues JSON export (includes all audited merchants for lookup)
   const exportData = generateSimplifiedExport(report);
   
+  const jsonFilename = `merchant-issues-${timestamp}.json`;
+  const jsonFilepath = path.join(CONFIG.outputDir, jsonFilename);
+  exportToJSON(exportData, jsonFilepath, report);
+  
   if (exportData.length > 0) {
-    // JSON export
-    const jsonFilename = `merchant-issues-${timestamp}.json`;
-    const jsonFilepath = path.join(CONFIG.outputDir, jsonFilename);
-    exportToJSON(exportData, jsonFilepath);
-    
-    // Ask if user wants CSV export (unless running non-interactively)
     let wantsCSV = false;
     if (!skipCSVPrompt && process.stdin.isTTY) {
       wantsCSV = await promptForCSVExport();
     }
-    
     if (wantsCSV) {
       const csvFilename = `merchant-issues-${timestamp}.csv`;
       const csvFilepath = path.join(CONFIG.outputDir, csvFilename);
       exportToCSV(exportData, csvFilepath);
       return { json: jsonFilepath, csv: csvFilepath };
     }
-    
-    return { json: jsonFilepath, csv: null };
-  } else {
-    console.log(chalk.yellow('\n⚠️  No issues found, no file saved.'));
-    return null;
   }
+  return { json: jsonFilepath, csv: null };
 }
 
 /**
- * Clear only merchant rate audit results (audit-report-*, merchant-issues-*).
- */
-function clearMerchantRateResults() {
-  if (!fs.existsSync(CONFIG.outputDir)) {
-    console.log(chalk.yellow('⚠️  No audit results directory found. Nothing to clear.'));
-    return false;
-  }
-  const files = fs.readdirSync(CONFIG.outputDir);
-  const toDelete = files.filter(
-    (f) =>
-      (f.startsWith('audit-report-') && f.endsWith('.json')) ||
-      (f.startsWith('merchant-issues-') && (f.endsWith('.json') || f.endsWith('.csv')))
-  );
-  if (toDelete.length === 0) {
-    console.log(chalk.yellow('⚠️  No merchant rate audit results to clear.'));
-    return false;
-  }
-  let deleted = 0;
-  for (const file of toDelete) {
-    try {
-      fs.unlinkSync(path.join(CONFIG.outputDir, file));
-      deleted++;
-    } catch (error) {
-      console.warn(chalk.yellow(`⚠️  Could not delete ${file}: ${error.message}`));
-    }
-  }
-  console.log(chalk.green(`✅ Cleared ${deleted} merchant rate result file(s).`));
-  return true;
-}
-
-/**
- * Clear only offer activation results (offer-activation-*, session, tested-merchants).
- */
-function clearOfferActivationResults() {
-  if (!fs.existsSync(CONFIG.outputDir)) {
-    console.log(chalk.yellow('⚠️  No audit results directory found. Nothing to clear.'));
-    return false;
-  }
-  const files = fs.readdirSync(CONFIG.outputDir);
-  const toDelete = files.filter((f) => {
-    const lower = f.toLowerCase();
-    return (
-      (f.startsWith('offer-activation-') && (lower.endsWith('.json') || lower.endsWith('.csv'))) ||
-      f === 'offer-activation-session.json' ||
-      f === 'offer-activation-tested-merchants.json'
-    );
-  });
-  if (toDelete.length === 0) {
-    console.log(chalk.yellow('⚠️  No offer activation results to clear.'));
-    return false;
-  }
-  let deleted = 0;
-  for (const file of toDelete) {
-    try {
-      fs.unlinkSync(path.join(CONFIG.outputDir, file));
-      deleted++;
-    } catch (error) {
-      console.warn(chalk.yellow(`⚠️  Could not delete ${file}: ${error.message}`));
-    }
-  }
-  console.log(chalk.green(`✅ Cleared ${deleted} offer activation result file(s).`));
-  return true;
-}
-
-/**
- * Clear all audit results (merchant rate + offer activation).
+ * Clear all audit results
  */
 function clearAllResults() {
   if (!fs.existsSync(CONFIG.outputDir)) {
     console.log(chalk.yellow('⚠️  No audit results directory found. Nothing to clear.'));
     return false;
   }
+  
   try {
     const files = fs.readdirSync(CONFIG.outputDir);
     if (files.length === 0) {
       console.log(chalk.yellow('⚠️  No audit results found. Nothing to clear.'));
       return false;
     }
+    
     let deletedCount = 0;
     for (const file of files) {
       const filepath = path.join(CONFIG.outputDir, file);
@@ -977,6 +1136,7 @@ function clearAllResults() {
         console.warn(chalk.yellow(`⚠️  Could not delete ${file}: ${error.message}`));
       }
     }
+    
     console.log(chalk.green(`✅ Cleared ${deletedCount} audit result file(s).`));
     return true;
   } catch (error) {
@@ -1023,17 +1183,20 @@ function listPreviousAudits() {
         
         try {
           const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-          // Extract unique app IDs from merchants array
           const appIds = [...new Set(data.merchants?.map(m => m.appId) || [])];
+          const totalIssues = data.totalIssues ?? data.merchants?.length ?? 0;
+          const merchantsWithIssues = data.merchantsWithIssues ?? data.merchants?.length ?? 0;
+          const totalMerchantsAudited = data.totalMerchantsAudited ?? null;
           return {
             filename: file,
             filepath: filepath,
             timestamp: timestamp,
             date: date,
             appIds: appIds,
-            totalIssues: data.totalIssues || 0,
-            totalMerchants: data.merchants?.length || 0,
-            totalRates: 0, // Not available in simplified export
+            totalIssues,
+            merchantsWithIssues,
+            totalMerchantsAudited,
+            totalRates: 0,
             size: stats.size
           };
         } catch (error) {
@@ -1044,7 +1207,9 @@ function listPreviousAudits() {
             date: date,
             appIds: [],
             totalIssues: 0,
-            totalMerchants: 0,
+            merchantsWithIssues: 0,
+            totalMerchantsAudited: null,
+            totalRates: 0,
             totalRates: 0,
             size: stats.size,
             error: 'Could not parse file'
@@ -1079,7 +1244,11 @@ function displayAuditList(audits) {
     console.log(chalk.bold(`\n${index + 1}. ${dateStr}`));
     console.log(`   App IDs: ${chalk.cyan(appIdsStr)}`);
     const ratesInfo = audit.totalRates > 0 ? ` | Rates: ${audit.totalRates}` : '';
-    console.log(`   Issues: ${chalk.yellow(audit.totalIssues)} | Merchants: ${audit.totalMerchants}${ratesInfo}`);
+    const mwi = audit.merchantsWithIssues ?? audit.totalIssues;
+    const auditedStr = audit.totalMerchantsAudited != null
+      ? ` | Merchants with issues: ${mwi} | Total audited: ${audit.totalMerchantsAudited}`
+      : ` | Merchants with issues: ${mwi}`;
+    console.log(`   Issues: ${chalk.yellow(audit.totalIssues)}${auditedStr}${ratesInfo}`);
     console.log(`   File: ${chalk.gray(audit.filename)}`);
     if (audit.error) {
       console.log(chalk.red(`   ⚠️  ${audit.error}`));
@@ -1087,6 +1256,21 @@ function displayAuditList(audits) {
   });
   
   console.log(chalk.gray('\n' + '─'.repeat(100)));
+}
+
+/**
+ * Load offer-activation tested merchant IDs by app ID (from offer-activation-tested-merchants.json).
+ * @returns {{ [appId: string]: number[] }}
+ */
+function loadOfferActivationTestedMerchants() {
+  const filepath = path.join(CONFIG.outputDir, 'offer-activation-tested-merchants.json');
+  try {
+    if (!fs.existsSync(filepath)) return {};
+    const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+    return data && typeof data === 'object' ? data : {};
+  } catch (_) {
+    return {};
+  }
 }
 
 /**
@@ -1126,12 +1310,16 @@ function displayLookupResults(matchingAudits, appIds) {
   matchingAudits.forEach((audit, index) => {
     const dateStr = audit.date.toLocaleString();
     const matchingAppIds = audit.appIds.filter(id => appIds.includes(id));
+    const mwi = audit.merchantsWithIssues ?? audit.totalIssues;
+    const auditedStr = audit.totalMerchantsAudited != null
+      ? ` | Merchants with issues: ${mwi} | Total audited: ${audit.totalMerchantsAudited}`
+      : ` | Merchants with issues: ${mwi}`;
     
     console.log(chalk.bold(`\n${index + 1}. ${dateStr}`));
     console.log(`   Matching App IDs: ${chalk.cyan(matchingAppIds.join(', '))}`);
     console.log(`   All App IDs in audit: ${chalk.gray(audit.appIds.join(', '))}`);
     const ratesInfo = audit.totalRates > 0 ? ` | Rates: ${audit.totalRates}` : '';
-    console.log(`   Issues: ${chalk.yellow(audit.totalIssues)} | Merchants: ${audit.totalMerchants}${ratesInfo}`);
+    console.log(`   Issues: ${chalk.yellow(audit.totalIssues)}${auditedStr}${ratesInfo}`);
     console.log(`   File: ${chalk.gray(audit.filename)}`);
     console.log(`   Full path: ${chalk.gray(audit.filepath)}`);
   });
@@ -1140,70 +1328,120 @@ function displayLookupResults(matchingAudits, appIds) {
 }
 
 /**
- * Parse date from result filename (merchant-issues-2026-02-23T16-03-27-480Z.json or offer-activation-...).
+ * Load offer-activation result files (individual runs, not combined) for summary stats.
  */
-function parseDateFromResultFilename(filename) {
-  const match = filename.match(/(\d{4})-(\d{2})-(\d{2})T\d{2}-\d{2}-\d{2}-\d+Z/);
-  if (!match) return null;
-  const d = new Date(`${match[1]}-${match[2]}-${match[3]}`);
-  return isNaN(d.getTime()) ? null : d;
+function loadOfferActivationResultSummary() {
+  const entries = [];
+  if (!fs.existsSync(CONFIG.outputDir)) return entries;
+  const files = fs.readdirSync(CONFIG.outputDir);
+  const parseDate = (file) => {
+    const m = file.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})/);
+    if (!m) return new Date(0);
+    return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`);
+  };
+  for (const file of files) {
+    if (!file.startsWith('offer-activation-') || !file.endsWith('.json') || file.includes('session') || file.includes('tested-merchants') || file.includes('combined')) continue;
+    const filepath = path.join(CONFIG.outputDir, file);
+    try {
+      const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+      entries.push({
+        filename: file,
+        date: parseDate(file),
+        totalTested: data.totalTested ?? (data.results || []).length,
+        successful: data.successful ?? (data.results || []).filter(r => r.success).length,
+        failed: data.failed ?? (data.results || []).filter(r => !r.success).length
+      });
+    } catch (_) {}
+  }
+  return entries.sort((a, b) => b.date - a.date);
 }
 
 /**
- * Load all result files (merchant rate + offer activation) for lookup.
+ * Print offer-activation tested count and result details for given app IDs.
+ */
+function displayOfferActivationTestedForAppIds(appIds) {
+  const tested = loadOfferActivationTestedMerchants();
+  const resultRuns = loadOfferActivationResultSummary();
+  if (!appIds || appIds.length === 0) return;
+  console.log(chalk.bold.cyan('\n📋 Offer activation — tested list & results\n'));
+  for (const appId of appIds) {
+    const ids = tested[String(appId)];
+    const count = Array.isArray(ids) ? ids.length : 0;
+    if (count > 0) {
+      console.log(`   App ID ${chalk.cyan(appId)}: ${chalk.green(count)} unique merchant(s) in tested list`);
+      console.log(chalk.gray(`      (cumulative — only grows when you save batch results)`));
+    } else {
+      console.log(`   App ID ${chalk.cyan(appId)}: ${chalk.gray('no merchants in tested list yet')}`);
+    }
+  }
+  if (resultRuns.length > 0) {
+    const totalTested = resultRuns.reduce((s, r) => s + (r.totalTested || 0), 0);
+    const totalOk = resultRuns.reduce((s, r) => s + (r.successful || 0), 0);
+    const totalFail = resultRuns.reduce((s, r) => s + (r.failed || 0), 0);
+    console.log(chalk.bold.cyan('\n   From saved result files:'));
+    console.log(chalk.gray(`      ${resultRuns.length} run(s) — total tested: ${totalTested}, OK: ${chalk.green(totalOk)}, failed: ${totalFail > 0 ? chalk.red(totalFail) : totalFail}`));
+    const latest = resultRuns[0];
+    if (latest) {
+      const dateStr = latest.date && latest.date.toLocaleString ? latest.date.toLocaleString() : latest.filename;
+      console.log(chalk.gray(`      Latest run (${dateStr}): ${latest.totalTested} tested, ${chalk.green(latest.successful)} OK, ${latest.failed > 0 ? chalk.red(latest.failed) : latest.failed} failed`));
+    }
+  } else {
+    console.log(chalk.gray('\n   No offer-activation result files found (save results after a batch to see details).'));
+  }
+  console.log(chalk.gray('\n' + '─'.repeat(100)) + '\n');
+}
+
+/**
+ * Load all result files (merchant rate + offer activation) for lookup by merchant name.
  */
 function loadAllResultFiles() {
   const entries = [];
   if (!fs.existsSync(CONFIG.outputDir)) return entries;
   const files = fs.readdirSync(CONFIG.outputDir);
+  const parseDate = (file) => {
+    const m = file.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})/);
+    if (!m) return new Date(0);
+    return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`);
+  };
   for (const file of files) {
     const filepath = path.join(CONFIG.outputDir, file);
-    const date = parseDateFromResultFilename(file);
     if (file.startsWith('merchant-issues-') && file.endsWith('.json')) {
       try {
         const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
         const appIds = [...new Set((data.merchants || []).map(m => m.appId).filter(Boolean))];
-        const merchants = (data.merchants || []).map(m => ({
-          name: m.merchantName,
-          id: m.merchantId,
-          appId: m.appId,
-          issueType: m.issueType,
-          reason: m.reason
-        }));
         entries.push({
           type: 'merchant_rate',
           filename: file,
           filepath,
-          date: date || new Date(data.exportDate || 0),
-          exportDate: data.exportDate,
+          date: parseDate(file),
           appIds,
           totalIssues: data.totalIssues,
-          merchants
+          totalMerchantsAudited: data.totalMerchantsAudited ?? null,
+          merchants: data.merchants || [],
+          allAuditedMerchants: data.allAuditedMerchants || []
         });
       } catch (_) {}
     } else if (file.startsWith('offer-activation-') && file.endsWith('.json') && !file.includes('session') && !file.includes('tested-merchants')) {
       try {
         const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
         const results = data.results || [];
-        const merchants = results.map(r => ({
-          name: r.merchantName,
-          id: r.merchantId,
-          domain: r.merchantDomain,
-          success: r.success,
-          finalUrl: r.finalUrl
-        }));
-        const appIds = [];
         entries.push({
           type: 'offer_activation',
           filename: file,
           filepath,
-          date: date || new Date(data.exportDate || 0),
-          exportDate: data.exportDate,
-          appIds,
+          date: parseDate(file),
+          appIds: [],
           totalTested: data.totalTested,
           successful: data.successful,
           failed: data.failed,
-          merchants
+          merchants: results.map(r => ({
+            name: r.merchantName,
+            id: r.merchantId,
+            domain: r.merchantDomain,
+            success: r.success,
+            issues: r.issues,
+            error: r.error
+          }))
         });
       } catch (_) {}
     }
@@ -1212,91 +1450,348 @@ function loadAllResultFiles() {
 }
 
 /**
- * Ask a single question; returns trimmed answer.
+ * Lookup by merchant name: show merchant rate errors, activation issues, and when tested (even if no issues).
  */
-function askQuestion(question) {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  return new Promise((resolve) => {
-    rl.question(chalk.cyan(question), (answer) => {
-      rl.close();
-      resolve((answer || '').trim());
+function lookupByMerchantName(merchantQuery) {
+  const entries = loadAllResultFiles();
+  const q = (merchantQuery || '').toLowerCase().trim();
+  if (!q) {
+    console.log(chalk.yellow('No merchant name entered.'));
+    return;
+  }
+  const rateIssues = [];
+  const activationIssues = [];
+  const testedNoIssues = [];
+  const testedActivationOk = [];
+  for (const e of entries) {
+    if (e.type === 'merchant_rate') {
+      const hasIssues = (e.merchants || []).some(m => (m.merchantName || '').toLowerCase().includes(q));
+      const inAudited = (e.allAuditedMerchants || []).some(m => (m.merchantName || '').toLowerCase().includes(q));
+      if (hasIssues) {
+        for (const m of e.merchants || []) {
+          if ((m.merchantName || '').toLowerCase().includes(q)) {
+            rateIssues.push({
+              merchantName: m.merchantName,
+              merchantId: m.merchantId,
+              appId: m.appId,
+              issueType: m.issueType,
+              reason: m.reason,
+              file: e.filename
+            });
+          }
+        }
+      }
+      if (inAudited && !hasIssues) {
+        testedNoIssues.push({ date: e.date, filename: e.filename });
+      }
+    }
+    if (e.type === 'offer_activation' && e.merchants) {
+      for (const m of e.merchants) {
+        if ((m.name || '').toLowerCase().includes(q)) {
+          if (!m.success) {
+            activationIssues.push({
+              merchantName: m.name,
+              merchantId: m.id,
+              domain: m.domain,
+              issues: m.issues,
+              error: m.error,
+              file: e.filename
+            });
+          } else {
+            testedActivationOk.push({ date: e.date, filename: e.filename });
+          }
+        }
+      }
+    }
+  }
+  console.log(chalk.bold.cyan(`\n🔍 Merchant lookup: "${merchantQuery}"\n`));
+  console.log(chalk.gray('─'.repeat(100)));
+  if (rateIssues.length > 0) {
+    console.log(chalk.bold.red('\n⚠️  Merchant rate issues:'));
+    rateIssues.forEach((r, i) => {
+      console.log(chalk.red(`  ${i + 1}. ${r.merchantName} (ID ${r.merchantId}, App ${r.appId})`));
+      console.log(chalk.gray(`     ${r.reason}`));
+      console.log(chalk.gray(`     From: ${r.file}`));
     });
-  });
+  } else {
+    console.log(chalk.green('\n✅ No merchant rate issues found for this merchant.'));
+  }
+  if (testedNoIssues.length > 0) {
+    console.log(chalk.bold.cyan('\n📋 Merchant rate – tested (no issues):'));
+    testedNoIssues.forEach((t, i) => {
+      const dateStr = t.date && t.date.toLocaleString ? t.date.toLocaleString() : t.filename;
+      console.log(chalk.gray(`  ${i + 1}. ${dateStr} — ${t.filename}`));
+    });
+  }
+  if (activationIssues.length > 0) {
+    console.log(chalk.bold.red('\n⚠️  Offer activation issues:'));
+    activationIssues.forEach((a, i) => {
+      console.log(chalk.red(`  ${i + 1}. ${a.merchantName} (${a.domain || a.merchantId})`));
+      if (a.error) console.log(chalk.gray(`     ${a.error}`));
+      (a.issues || []).forEach(iss => console.log(chalk.yellow(`     • ${iss.message || iss.type}`)));
+      console.log(chalk.gray(`     From: ${a.file}`));
+    });
+  } else {
+    console.log(chalk.green('\n✅ No offer activation failures found for this merchant.'));
+  }
+  if (testedActivationOk.length > 0) {
+    console.log(chalk.bold.cyan('\n📋 Offer activation – tested (OK):'));
+    testedActivationOk.forEach((t, i) => {
+      const dateStr = t.date && t.date.toLocaleString ? t.date.toLocaleString() : t.filename;
+      console.log(chalk.gray(`  ${i + 1}. ${dateStr} — ${t.filename}`));
+    });
+  }
+  console.log(chalk.gray('\n' + '─'.repeat(100)) + '\n');
 }
 
 /**
- * Lookup results by merchant, date, or App ID. Interactive menu.
+ * Run lookup menu: by App ID (with offer-activation tested info) or by merchant name.
  */
 async function runLookupMenu() {
-  const entries = loadAllResultFiles();
-  if (entries.length === 0) {
-    console.log(chalk.yellow('\n⚠️  No result files found in audit-results.'));
-    return;
-  }
-
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q) => new Promise((res) => rl.question(chalk.cyan(q), (a) => res((a || '').trim())));
   console.log(chalk.bold.cyan('\n🔍 Lookup Results\n'));
-  console.log(chalk.gray('Filter by any combination (leave blank to skip).\n'));
-
-  const appIdInput = await askQuestion('App ID(s), comma or space separated (or press Enter to skip): ');
-  const dateInput = await askQuestion('Date (YYYY-MM-DD) or range (YYYY-MM-DD to YYYY-MM-DD) (or press Enter to skip): ');
-  const merchantInput = await askQuestion('Merchant name (partial match) (or press Enter to skip): ');
-
-  let filterAppIds = [];
-  if (appIdInput) {
-    filterAppIds = appIdInput.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
-  }
-  let dateFrom = null;
-  let dateTo = null;
-  if (dateInput) {
-    const rangeMatch = dateInput.match(/^(\d{4}-\d{2}-\d{2})\s*(?:to|-)\s*(\d{4}-\d{2}-\d{2})$/i);
-    if (rangeMatch) {
-      dateFrom = new Date(rangeMatch[1]);
-      dateTo = new Date(rangeMatch[2]);
-    } else {
-      const single = dateInput.match(/^\d{4}-\d{2}-\d{2}$/);
-      if (single) {
-        dateFrom = new Date(dateInput);
-        dateTo = new Date(dateInput);
-        dateTo.setHours(23, 59, 59, 999);
-      }
-    }
-  }
-  const merchantLower = merchantInput ? merchantInput.toLowerCase() : '';
-
-  const matches = entries.filter((e) => {
-    const dateOk = !dateFrom || (e.date >= dateFrom && e.date <= dateTo);
-    const appIdOk = filterAppIds.length === 0 || e.appIds.some(id => filterAppIds.includes(id));
-    const merchantOk = !merchantLower || e.merchants.some(m => (m.name || '').toLowerCase().includes(merchantLower));
-    return dateOk && appIdOk && merchantOk;
-  });
-
-  if (matches.length === 0) {
-    console.log(chalk.yellow('\n⚠️  No results match your filters.'));
+  const which = await ask('Lookup by: 1) App ID  2) Merchant name (1 or 2): ');
+  if (which === '2') {
+    const name = await ask('Merchant name (partial match): ');
+    rl.close();
+    lookupByMerchantName(name);
     return;
   }
+  if (which !== '1') {
+    rl.close();
+    return;
+  }
+  const appIdStr = await ask('App ID(s), comma or space separated: ');
+  rl.close();
+  const lookupAppIds = appIdStr.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
+  if (lookupAppIds.length === 0) {
+    console.log(chalk.red('No valid App IDs provided.'));
+    return;
+  }
+  const matchingAudits = lookupAuditsByAppId(lookupAppIds);
+  displayLookupResults(matchingAudits, lookupAppIds);
+  displayOfferActivationTestedForAppIds(lookupAppIds);
+}
 
-  console.log(chalk.bold.cyan(`\n📋 Matching results (${matches.length} file(s))\n`));
-  console.log(chalk.gray('─'.repeat(100)));
-  matches.forEach((e, i) => {
-    const typeLabel = e.type === 'merchant_rate' ? 'Merchant Rate' : 'Offer Activation';
-    const dateStr = e.date.toLocaleString();
-    console.log(chalk.bold(`\n${i + 1}. [${typeLabel}] ${dateStr}`));
-    console.log(`   File: ${chalk.gray(e.filename)}`);
-    if (e.type === 'merchant_rate') {
-      console.log(`   App IDs: ${chalk.cyan((e.appIds || []).join(', ') || 'N/A')} | Issues: ${chalk.yellow(e.totalIssues || 0)} | Merchants: ${(e.merchants || []).length}`);
-    } else {
-      console.log(`   Tested: ${e.totalTested || 0} | OK: ${chalk.green(e.successful || 0)} | Failed: ${chalk.red(e.failed || 0)}`);
+/**
+ * File manager: combine offer activation, merchant rate, or both into one file (JSON + CSV).
+ */
+async function runFileManagerMenu() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q) => new Promise((res) => rl.question(chalk.cyan(q), (a) => res((a || '').trim())));
+  console.log(chalk.bold.cyan('\n📁 File Manager\n'));
+  const choice = await ask('Combine: 1) Offer activation results  2) Merchant rate results  3) Both into one comprehensive report  4) Back to main menu (1/2/3/4): ');
+  rl.close();
+  if (choice === '4') {
+    return;
+  }
+  const outDir = CONFIG.outputDir;
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  if (choice === '1') {
+    const entries = loadAllResultFiles().filter(e => e.type === 'offer_activation');
+    if (entries.length === 0) {
+      console.log(chalk.yellow('No offer activation result files found.'));
+      return;
     }
-    if (merchantLower && e.merchants) {
-      const matching = e.merchants.filter(m => (m.name || '').toLowerCase().includes(merchantLower));
-      if (matching.length > 0 && matching.length <= 15) {
-        console.log(chalk.gray('   Matching merchants: ' + matching.map(m => m.name).join(', ')));
-      } else if (matching.length > 15) {
-        console.log(chalk.gray(`   Matching merchants: ${matching.length} (e.g. ${matching.slice(0, 3).map(m => m.name).join(', ')}...)`));
+    const allResults = [];
+    for (const e of entries) {
+      try {
+        const data = JSON.parse(fs.readFileSync(e.filepath, 'utf8'));
+        (data.results || []).forEach(r => allResults.push(r));
+      } catch (_) {}
+    }
+    const out = {
+      exportDate: new Date().toISOString(),
+      totalTested: allResults.length,
+      successful: allResults.filter(r => r.success).length,
+      failed: allResults.filter(r => !r.success).length,
+      results: allResults
+    };
+    const fJson = path.join(outDir, `offer-activation-combined-${ts}.json`);
+    fs.writeFileSync(fJson, JSON.stringify(out, null, 2));
+    console.log(chalk.green(`Combined ${entries.length} file(s) → ${fJson}`));
+    if (allResults.length > 0) {
+      offerActivation.exportResultsToCSV(allResults, `offer-activation-combined-${ts}.csv`);
+    }
+    return;
+  }
+  if (choice === '2') {
+    const files = fs.readdirSync(outDir).filter(f => f.startsWith('merchant-issues-') && f.endsWith('.json'));
+    if (files.length === 0) {
+      console.log(chalk.yellow('No merchant rate result files found.'));
+      return;
+    }
+    const merchantMap = new Map();
+    const appIdSet = new Set();
+    for (const file of files) {
+      try {
+        const data = JSON.parse(fs.readFileSync(path.join(outDir, file), 'utf8'));
+        (data.merchants || []).forEach(m => {
+          appIdSet.add(m.appId);
+          const key = `${m.merchantId}-${m.appId}-${m.issueType}-${(m.rateName || m.reason || '').toString().slice(0, 200)}`;
+          if (merchantMap.has(key)) {
+            const existing = merchantMap.get(key);
+            existing.count = (existing.count || 0) + (m.count || 1);
+          } else {
+            merchantMap.set(key, { ...m });
+          }
+        });
+      } catch (_) {}
+    }
+    const allMerchants = Array.from(merchantMap.values());
+    const totalIssues = allMerchants.reduce((s, m) => s + (m.count || 0), 0);
+    const out = {
+      exportDate: new Date().toISOString(),
+      totalIssues,
+      merchants: allMerchants,
+      appIds: [...appIdSet]
+    };
+    const fJson = path.join(outDir, `merchant-rate-combined-${ts}.json`);
+    fs.writeFileSync(fJson, JSON.stringify(out, null, 2));
+    console.log(chalk.green(`Combined ${files.length} file(s) → ${fJson}`));
+    if (allMerchants.length > 0) {
+      const fCsv = path.join(outDir, `merchant-rate-combined-${ts}.csv`);
+      exportToCSV(allMerchants, fCsv);
+    }
+    return;
+  }
+  if (choice === '3') {
+    const entries = loadAllResultFiles();
+    const rateMerchantMap = new Map();
+    const appIdSet = new Set();
+    let totalRateIssues = 0;
+    const activationResults = [];
+    for (const e of entries) {
+      if (e.type === 'merchant_rate') {
+        (e.merchants || []).forEach(m => {
+          appIdSet.add(m.appId);
+          const key = `${m.merchantId}-${m.appId}-${m.issueType}-${(m.rateName || m.reason || '').toString().slice(0, 200)}`;
+          if (rateMerchantMap.has(key)) {
+            const existing = rateMerchantMap.get(key);
+            existing.count = (existing.count || 0) + (m.count || 1);
+          } else {
+            rateMerchantMap.set(key, { ...m });
+          }
+        });
+        totalRateIssues += e.totalIssues || 0;
+      } else if (e.type === 'offer_activation') {
+        try {
+          const data = JSON.parse(fs.readFileSync(e.filepath, 'utf8'));
+          (data.results || []).forEach(r => activationResults.push(r));
+        } catch (_) {}
       }
     }
+    const rateMerchants = Array.from(rateMerchantMap.values());
+    const out = {
+      exportDate: new Date().toISOString(),
+      merchantRate: {
+        totalIssues: rateMerchants.reduce((s, m) => s + (m.count || 0), 0),
+        merchants: rateMerchants,
+        appIds: [...appIdSet]
+      },
+      offerActivation: {
+        totalTested: activationResults.length,
+        successful: activationResults.filter(r => r.success).length,
+        failed: activationResults.filter(r => !r.success).length,
+        results: activationResults
+      }
+    };
+    const fJson = path.join(outDir, `full-report-combined-${ts}.json`);
+    fs.writeFileSync(fJson, JSON.stringify(out, null, 2));
+    console.log(chalk.green(`Combined report → ${fJson}`));
+    const fCsv = path.join(outDir, `full-report-combined-${ts}.csv`);
+    writeFullReportCombinedCSV(rateMerchants, activationResults, fCsv);
+    return;
+  }
+  console.log(chalk.gray('Cancelled.'));
+}
+
+/**
+ * Run full audit: merchant rate then offer activation; at end show merchants with both failures as "multiple issues".
+ */
+async function runFullAudit() {
+  const appIds = await promptForAppIds();
+  if (!appIds || appIds.length === 0) return;
+  console.log(chalk.cyan(`\nAuditing App IDs: ${appIds.join(', ')}\n`));
+  console.log(chalk.bold.cyan('——— Part 1: Merchant Rate Audit ———\n'));
+  const results = [];
+  for (const appId of appIds) {
+    const result = await auditAppId(appId);
+    results.push(result);
+  }
+  const report = generateReport(results);
+  printResults(report);
+  await saveReport(report, false);
+  console.log(chalk.bold.cyan('\n——— Part 2: Offer Activation ———\n'));
+  const runOffer = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Run offer activation for these App IDs? (yes/no): '), (answer) => {
+      rl.close();
+      resolve(!!(answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')));
+    });
   });
-  console.log(chalk.gray('\n' + '─'.repeat(100)));
+  if (!runOffer) {
+    console.log(chalk.gray('Skipping offer activation.'));
+    return;
+  }
+  const limitAnswer = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Max merchants per App ID (default 10): '), (a) => {
+      rl.close();
+      resolve((a && a.trim()) || '10');
+    });
+  });
+  const limit = parseInt(limitAnswer, 10) || 10;
+  const { results: activationResults, byAppId } = await offerActivation.runOfferActivationBatchForAppIds(appIds, { limit });
+  if (activationResults.length > 0) {
+    const rateIssueByMerchant = new Map();
+    (report.results || []).forEach(appResult => {
+      (appResult.issues || []).forEach(issueGroup => {
+        if (issueGroup.merchantId) rateIssueByMerchant.set(String(issueGroup.merchantId), issueGroup);
+      });
+    });
+    const failedActivationIds = new Set(activationResults.filter(r => !r.success).map(r => String(r.merchantId)));
+    const multipleIssues = activationResults.filter(r => !r.success && rateIssueByMerchant.has(String(r.merchantId)));
+    if (multipleIssues.length > 0) {
+      console.log(chalk.bold.red('\n⚠️  Merchants with MULTIPLE ISSUES (rate + activation failure):\n'));
+      multipleIssues.forEach((m, i) => {
+        const rateInfo = rateIssueByMerchant.get(String(m.merchantId));
+        console.log(chalk.red(`  ${i + 1}. ${m.merchantName || m.merchantId} (ID ${m.merchantId})`));
+        if (rateInfo) console.log(chalk.yellow(`     Rate issues: ${(rateInfo.issues || []).length} issue(s)`));
+        console.log(chalk.yellow(`     Activation: failed`));
+        if (m.error) console.log(chalk.gray(`     ${m.error}`));
+      });
+      console.log(chalk.gray('─'.repeat(100)) + '\n');
+    }
+    offerActivation.printResultsSummary(activationResults);
+    const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    await new Promise((resolve) => {
+      saveRl.question(chalk.cyan('Save offer activation results? (yes/no): '), (answer) => {
+        const isYes = answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y');
+        if (isYes) {
+          offerActivation.exportResults(activationResults);
+          if (byAppId) {
+            for (const [appIdStr, list] of Object.entries(byAppId)) {
+              const ids = (list || []).map(r => r.merchantId).filter(id => id != null);
+              if (ids.length > 0) offerActivation.markMerchantsAsTested(Number(appIdStr), ids);
+            }
+          }
+          saveRl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
+            saveRl.close();
+            if (csvAnswer && (csvAnswer.toLowerCase().trim() === 'yes' || csvAnswer.toLowerCase().trim() === 'y')) {
+              offerActivation.exportResultsToCSV(activationResults);
+            }
+            resolve();
+          });
+        } else {
+          saveRl.close();
+          resolve();
+        }
+      });
+    });
+  }
 }
 
 /**
@@ -1335,25 +1830,25 @@ function promptForAppIds() {
 }
 
 /**
- * Show main menu - Top level to choose test type
+ * Show top-level menu (first screen)
  */
 function showTopLevelMenu() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
-  
   return new Promise((resolve) => {
     console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════════════════════╗'));
     console.log(chalk.bold.cyan('║               🔍 MERCHANT TESTING TOOL                                       ║'));
     console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════════════════════╝\n'));
-    console.log(chalk.yellow('What do you want to test?\n'));
+    console.log(chalk.yellow('What do you want to do?\n'));
+    console.log(chalk.white('  0) ') + chalk.bold('File manager') + chalk.gray(' - Combine offer activation / merchant rate / or both into one report'));
     console.log(chalk.white('  1) ') + chalk.bold('Merchant Rate Audit') + chalk.gray(' - Check for problematic rates in feeds'));
     console.log(chalk.white('  2) ') + chalk.bold('Offer Activation Testing') + chalk.gray(' - Test if offers work when activated'));
-    console.log(chalk.white('  3) ') + chalk.bold('Lookup results') + chalk.gray(' - View results by merchant, date, or App ID'));
-    console.log(chalk.white('  4) ') + chalk.bold('Exit') + '\n');
-    
-    rl.question(chalk.cyan('Choice (1-4): '), (answer) => {
+    console.log(chalk.white('  3) ') + chalk.bold('Lookup results') + chalk.gray(' - By App ID (shows what\'s tested) or by merchant name'));
+    console.log(chalk.white('  4) ') + chalk.bold('Run full audit') + chalk.gray(' - Merchant rate + offer activation in one run'));
+    console.log(chalk.white('  5) ') + chalk.bold('Exit') + '\n');
+    rl.question(chalk.cyan('Choice (0-5): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
@@ -1361,7 +1856,7 @@ function showTopLevelMenu() {
 }
 
 /**
- * Show merchant rate audit menu
+ * Show main menu (Merchant Rate Audit submenu)
  */
 function showMainMenu() {
   const rl = readline.createInterface({
@@ -1375,7 +1870,7 @@ function showMainMenu() {
     console.log(chalk.gray('  1) Run new audit'));
     console.log(chalk.gray('  2) List previous audits'));
     console.log(chalk.gray('  3) Lookup audits by App ID'));
-    console.log(chalk.gray('  4) Clear merchant rate results'));
+    console.log(chalk.gray('  4) Clear all audit results'));
     console.log(chalk.gray('  5) Back to main menu'));
     console.log(chalk.gray('  6) Exit\n'));
     
@@ -1384,101 +1879,6 @@ function showMainMenu() {
       resolve(answer.trim());
     });
   });
-}
-
-/**
- * Run merchant rate audit menu loop
- */
-async function runMerchantRateAuditMenu() {
-  while (true) {
-    const choice = await showMainMenu();
-    
-    switch (choice) {
-      case '1':
-        // Run new audit
-        const appIdsToAudit = await promptForAppIds();
-        console.log(chalk.cyan(`\nAuditing App IDs: ${appIdsToAudit.join(', ')}\n`));
-        
-        const results = [];
-        for (const appId of appIdsToAudit) {
-          const result = await auditAppId(appId);
-          results.push(result);
-        }
-        
-        const report = generateReport(results);
-        printResults(report);
-        await saveReport(report, false); // false = show CSV prompt
-        break;
-        
-      case '2':
-        // List previous audits
-        const audits = listPreviousAudits();
-        displayAuditList(audits);
-        break;
-        
-      case '3':
-        // Lookup by App ID
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout
-        });
-        
-        await new Promise((resolve) => {
-          rl.question(chalk.cyan('Enter App ID(s) to lookup (comma or space separated): '), (answer) => {
-            rl.close();
-            
-            const lookupAppIds = answer
-              .split(/[,\s]+/)
-              .map(id => id.trim())
-              .filter(id => id.length > 0)
-              .map(id => parseInt(id))
-              .filter(id => !isNaN(id) && id > 0);
-            
-            if (lookupAppIds.length === 0) {
-              console.log(chalk.red('❌ No valid App IDs provided.'));
-              resolve();
-              return;
-            }
-            
-            const matchingAudits = lookupAuditsByAppId(lookupAppIds);
-            displayLookupResults(matchingAudits, lookupAppIds);
-            resolve();
-          });
-        });
-        break;
-        
-      case '4':
-        // Clear merchant rate results only
-        const clearRateRl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout
-        });
-        await new Promise((resolve) => {
-          clearRateRl.question(chalk.yellow('⚠️  Delete all merchant rate audit results? (yes/no): '), (answer) => {
-            clearRateRl.close();
-            if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
-              clearMerchantRateResults();
-            } else {
-              console.log(chalk.gray('Cancelled.'));
-            }
-            resolve();
-          });
-        });
-        break;
-        
-      case '5':
-        // Back to main menu
-        return;
-        
-      case '6':
-        console.log(chalk.gray('\nGoodbye! 👋\n'));
-        process.exit(0);
-        
-      default:
-        console.log(chalk.red('❌ Invalid choice. Enter 1-6.'));
-        break;
-    }
-  }
 }
 
 /**
@@ -1541,54 +1941,13 @@ async function main() {
     return;
   }
   
-  // Check for offer activation test mode
-  if (args.includes('--offer') || args.includes('--activation') || args.includes('-o')) {
-    await offerActivation.runOfferActivationTest();
-    return;
-  }
-  
-  // Check for direct URL test
-  if (args.includes('--test-url') || args.includes('-u')) {
-    const urlIndex = args.findIndex(arg => arg === '--test-url' || arg === '-u');
-    const url = args[urlIndex + 1];
-    
-    if (!url) {
-      console.log(chalk.red('❌ Please provide a URL to test.'));
-      console.log(chalk.gray('Example: node auditor.js --test-url https://wild.link/e?c=...'));
-      process.exit(1);
-    }
-    
-    const result = await offerActivation.testWildlinkActivation(url);
-    offerActivation.printRedirectChain(result);
-    return;
-  }
-  
-  // Check for direct domain test
-  if (args.includes('--test-domain') || args.includes('-d')) {
-    const domainIndex = args.findIndex(arg => arg === '--test-domain' || arg === '-d');
-    const domain = args[domainIndex + 1];
-    
-    if (!domain) {
-      console.log(chalk.red('❌ Please provide a domain to test.'));
-      console.log(chalk.gray('Example: node auditor.js --test-domain bobore.com'));
-      process.exit(1);
-    }
-    
-    const result = await offerActivation.testDomain(domain);
-    offerActivation.printRedirectChain(result);
-    return;
-  }
-  
-  // Check if app IDs were provided as command line arguments (for merchant rate audit)
-  const cmdLineAppIds = args
-    .filter(arg => !arg.startsWith('-'))
-    .map(id => parseInt(id))
-    .filter(id => !isNaN(id) && id > 0);
+  // Check if app IDs were provided as command line arguments
+  const cmdLineAppIds = args.map(id => parseInt(id)).filter(id => !isNaN(id) && id > 0);
   
   if (cmdLineAppIds.length > 0) {
-    // Use command line arguments if provided - run merchant rate audit
+    // Use command line arguments if provided
     const appIdsToAudit = cmdLineAppIds;
-    console.log(chalk.bold.cyan('\n📊 Merchant Rate Auditor'));
+    console.log(chalk.bold.cyan('\n🔍 Merchant Rate Auditor'));
     console.log(chalk.cyan(`Auditing App IDs: ${appIdsToAudit.join(', ')}\n`));
     
     // Audit each app ID
@@ -1612,32 +1971,86 @@ async function main() {
     // Show interactive top-level menu
     while (true) {
       const choice = await showTopLevelMenu();
-      
       switch (choice) {
+        case '0':
+          await runFileManagerMenu();
+          break;
         case '1':
-          // Merchant Rate Audit
           await runMerchantRateAuditMenu();
           break;
-          
         case '2':
-          // Offer Activation Testing
           await offerActivation.runOfferActivationTest();
           break;
-          
         case '3':
-          // Lookup results by merchant, date, app ID
           await runLookupMenu();
           break;
-          
         case '4':
+          await runFullAudit();
+          break;
+        case '5':
           console.log(chalk.gray('\nGoodbye! 👋\n'));
           process.exit(0);
-          break;
-          
         default:
-          console.log(chalk.red('❌ Invalid choice. Please enter 1-4.'));
+          console.log(chalk.red('❌ Invalid choice. Please enter 0-5.'));
           break;
       }
+    }
+  }
+}
+
+/**
+ * Merchant rate audit submenu loop (from top-level option 1).
+ */
+async function runMerchantRateAuditMenu() {
+  while (true) {
+    const choice = await showMainMenu();
+    switch (choice) {
+      case '1': {
+        const appIdsToAudit = await promptForAppIds();
+        console.log(chalk.cyan(`\nAuditing App IDs: ${appIdsToAudit.join(', ')}\n`));
+        const results = [];
+        for (const appId of appIdsToAudit) {
+          const result = await auditAppId(appId);
+          results.push(result);
+        }
+        const report = generateReport(results);
+        printResults(report);
+        await saveReport(report, false);
+        break;
+      }
+      case '2':
+        displayAuditList(listPreviousAudits());
+        break;
+      case '3': {
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const answer = await new Promise((res) => rl.question(chalk.cyan('Enter App ID(s) to lookup (comma or space separated): '), res));
+        rl.close();
+        const lookupAppIds = answer.split(/[,\s]+/).map(id => parseInt(id.trim(), 10)).filter(n => !isNaN(n) && n > 0);
+        if (lookupAppIds.length > 0) {
+          const matchingAudits = lookupAuditsByAppId(lookupAppIds);
+          displayLookupResults(matchingAudits, lookupAppIds);
+          displayOfferActivationTestedForAppIds(lookupAppIds);
+        } else {
+          console.log(chalk.red('❌ No valid App IDs provided.'));
+        }
+        break;
+      }
+      case '4': {
+        const clearRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const ans = await new Promise((res) => clearRl.question(chalk.yellow('⚠️  Are you sure you want to delete all audit results? (yes/no): '), res));
+        clearRl.close();
+        if (ans && (ans.toLowerCase() === 'yes' || ans.toLowerCase() === 'y')) clearAllResults();
+        else console.log(chalk.gray('Cancelled.'));
+        break;
+      }
+      case '5':
+        return; // Back to main menu
+      case '6':
+        console.log(chalk.gray('\nGoodbye! 👋\n'));
+        process.exit(0);
+      default:
+        console.log(chalk.red('❌ Invalid choice.'));
+        break;
     }
   }
 }
@@ -1651,16 +2064,12 @@ if (require.main === module) {
 }
 
 module.exports = {
-  // Merchant Rate Audit functions
   auditAppId,
   validateRate,
   isHexCode,
   containsShareASale,
   containsCommission,
   isInvalidRateName,
-  containsPercentageInName,
-  // Offer Activation functions (re-exported from module)
-  ...offerActivation
   isProductLikeName,
   containsPercentageInName,
   isZeroRate,
