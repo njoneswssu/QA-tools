@@ -32,6 +32,48 @@ const CONFIG = {
 CONFIG.sessionFilePath = path.join(CONFIG.outputDir, 'offer-activation-session.json');
 CONFIG.testedMerchantsFilePath = path.join(CONFIG.outputDir, 'offer-activation-tested-merchants.json');
 
+/** Used by SIGINT handler to save partial results when user presses Ctrl+C. */
+let _interruptSaveRef = null;
+let _interruptSaveAppId = null;
+
+function saveInterruptedResults() {
+  if (!_interruptSaveRef || _interruptSaveRef.length === 0) return;
+  const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const out = {
+    interrupted: true,
+    exportDate: new Date().toISOString(),
+    totalTested: _interruptSaveRef.length,
+    successful: _interruptSaveRef.filter(r => r.success).length,
+    failed: _interruptSaveRef.filter(r => !r.success).length,
+    results: _interruptSaveRef,
+    appId: _interruptSaveAppId
+  };
+  if (!fs.existsSync(CONFIG.outputDir)) fs.mkdirSync(CONFIG.outputDir, { recursive: true });
+  const jsonPath = path.join(CONFIG.outputDir, `offer-activation-interrupted-${ts}.json`);
+  fs.writeFileSync(jsonPath, JSON.stringify(out, null, 2));
+  console.log(chalk.yellow('\n⚠️  Interrupted. Partial results saved to ' + jsonPath));
+  try {
+    exportResultsToCSV(_interruptSaveRef, `offer-activation-interrupted-${ts}.csv`);
+  } catch (_) {}
+  _interruptSaveRef = null;
+  _interruptSaveAppId = null;
+}
+
+function setInterruptSave(resultsRef, appId) {
+  _interruptSaveRef = resultsRef;
+  _interruptSaveAppId = appId;
+}
+
+function clearInterruptSave() {
+  _interruptSaveRef = null;
+  _interruptSaveAppId = null;
+}
+
+process.on('SIGINT', () => {
+  saveInterruptedResults();
+  process.exit(130);
+});
+
 /**
  * Load set of merchant IDs that have been tested for an app (persisted across runs).
  * @param {number} appId
@@ -1291,6 +1333,7 @@ async function runBatchForOneAppId(appId, options = {}) {
   const results = [];
   const totalToTest = toTest.length;
   const progressEvery = 10;
+  setInterruptSave(results, appId);
   for (let idx = 0; idx < toTest.length; idx++) {
     const merchant = toTest[idx];
     const result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
@@ -1303,6 +1346,7 @@ async function runBatchForOneAppId(appId, options = {}) {
     }
     await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
   }
+  clearInterruptSave();
   return results;
 }
 
@@ -1726,6 +1770,7 @@ async function runOfferActivationTest() {
             shoppingTripCode: config.shoppingTripCode || ''
           };
           const results = [];
+          setInterruptSave(results, config.appId);
           let paused = false;
           let stopRequested = false;
           const wasRaw = process.stdin.isTTY && process.stdin.isRaw;
@@ -1792,6 +1837,7 @@ async function runOfferActivationTest() {
           }
           pauseRl.removeAllListeners('line');
           pauseRl.close();
+          clearInterruptSave();
           printResultsSummary(results);
           await promptAndMarkFalseNegatives(results);
           const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
