@@ -7,6 +7,11 @@ const path = require('path');
 const readline = require('readline');
 const offerActivation = require('./offer-activation-auditor');
 
+let BigQuery = null;
+try {
+  BigQuery = require('@google-cloud/bigquery').BigQuery;
+} catch (_) {}
+
 /**
  * Merchant Rate Auditor
  * 
@@ -14,9 +19,6 @@ const offerActivation = require('./offer-activation-auditor');
  * - Rates with "ShareASale commission" in the name
  * - Rates with hex code-like values instead of actual commission amounts
  * - Zero rates with EXACTLY "online purchase" as the name (flagged)
- * - Zero rates with product-like names (NOT flagged - these are OK)
- * - Product-like rate names that DON'T match merchant category (flagged)
- * - Product-like rate names that DO match merchant category (NOT flagged - these are OK)
  * - Rates with underscores in the name
  * - Rates with "in app" or "iOS in-app" patterns
  * 
@@ -28,7 +30,8 @@ const offerActivation = require('./offer-activation-auditor');
 const CONFIG = {
   baseUrl: 'https://www.wildlink.me/data',
   outputDir: './audit-results',
-  defaultAppIds: [451, 206, 209] // Default app IDs to audit if none provided
+  defaultAppIds: [451, 206, 209], // Default app IDs to audit if none provided
+  bigQueryProjectId: 'wildfire-1000'
 };
 
 // Hex code pattern: matches strings that look like hex codes
@@ -472,24 +475,6 @@ function validateRate(rate, merchantId, merchantCategories = null) {
     });
   }
   
-  // Check for product-like names (e.g., "gummies returning", "gummies new")
-  // Skip this check if:
-  // 1. Rate is 0 (zero rates with product-like names are OK)
-  // 2. Rate name matches any of the merchant categories (e.g., "Dishwashers" for a dishwasher merchant)
-  if (!isZero && rate.Name && isProductLikeName(rate.Name)) {
-    // Check if rate name matches merchant categories before flagging
-    const matchesCategory = merchantCategories && rateMatchesMerchantCategory(rate.Name, merchantCategories);
-    
-    if (!matchesCategory) {
-      issues.push({
-        type: 'product_like_name',
-        severity: 'high',
-        message: `Rate name looks like a product name instead of a rate description: "${rate.Name}"`,
-        rate: rate
-      });
-    }
-  }
-  
   // Check for percentage values in rate name (e.g., "30%", "5%")
   if (rate.Name && containsPercentageInName(rate.Name)) {
     issues.push({
@@ -920,10 +905,88 @@ function generateSimplifiedExport(report) {
 }
 
 /**
+ * Load commission data from a CSV file (e.g. BigQuery export with merchant_id, Total_Commissions).
+ * Returns Map<merchantIdString, number>.
+ */
+function loadCommissionDataFromCSV(filepath) {
+  const map = new Map();
+  if (!filepath || !fs.existsSync(filepath)) return map;
+  try {
+    const content = fs.readFileSync(filepath, 'utf8');
+    const lines = content.split(/\r?\n/).filter((l) => l.trim());
+    if (lines.length < 2) return map;
+    const header = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, ''));
+    const midx = header.findIndex((h) => /merchant_id/i.test(h));
+    const cidx = header.findIndex((h) => /total_commission|commission_amount|commission/i.test(h));
+    if (midx < 0 || cidx < 0) return map;
+    for (let i = 1; i < lines.length; i++) {
+      const parts = lines[i].split(',').map((p) => p.trim().replace(/^"|"$/g, ''));
+      const merchantId = parts[midx];
+      const commission = parseFloat(parts[cidx]);
+      if (merchantId && !isNaN(commission)) map.set(String(merchantId), commission);
+    }
+  } catch (_) {}
+  return map;
+}
+
+/**
+ * Collect all unique merchant IDs from a rate audit report (from allMerchants and issues).
+ */
+function collectMerchantIdsFromReport(report) {
+  const ids = new Set();
+  for (const result of report.results || []) {
+    if (!result.success) continue;
+    for (const m of result.allMerchants || []) {
+      if (m.merchantId != null) ids.add(Number(m.merchantId));
+    }
+    for (const issueGroup of result.issues || []) {
+      if (issueGroup.merchantId != null) ids.add(Number(issueGroup.merchantId));
+    }
+  }
+  return [...ids];
+}
+
+/**
+ * Run BigQuery to fetch Total_Commissions per merchant_id for the given IDs.
+ * Query matches: wildfire-1000.stephsandbox.commission_detail_view_2 + firepublic.merchant.
+ * Returns Map<merchantIdString, number>. Returns empty map if BigQuery unavailable or query fails.
+ */
+async function fetchCommissionFromBigQuery(merchantIds) {
+  if (!BigQuery || !merchantIds || merchantIds.length === 0) return new Map();
+  const ids = merchantIds.map(Number).filter((n) => !isNaN(n) && n > 0);
+  if (ids.length === 0) return new Map();
+  const inList = ids.join(', ');
+  const query = `
+    SELECT m.name, c.merchant_id, sum(c.commission_amount) as Total_Commissions
+    FROM \`wildfire-1000.stephsandbox.commission_detail_view_2\` c
+    JOIN \`wildfire-1000.firepublic.merchant\` m ON c.merchant_id = m.ID
+    WHERE c.merchant_id IN (${inList})
+    GROUP BY c.merchant_id, m.name
+    ORDER BY sum(c.commission_amount) DESC
+  `;
+  try {
+    const bigquery = new BigQuery({ projectId: CONFIG.bigQueryProjectId });
+    const [rows] = await bigquery.query({ query });
+    const map = new Map();
+    for (const row of rows || []) {
+      const id = row.merchant_id != null ? String(row.merchant_id) : null;
+      const commission = row.Total_Commissions != null ? Number(row.Total_Commissions) : NaN;
+      if (id && !isNaN(commission)) map.set(id, commission);
+    }
+    return map;
+  } catch (err) {
+    console.log(chalk.yellow('⚠️  BigQuery failed: ' + (err.message || err)));
+    return new Map();
+  }
+}
+
+/**
  * Build full list of rate-audited merchants for combined CSV: includes every tested merchant,
  * with "No issues" row for merchants that had no rate issues.
+ * @param {Object} report
+ * @param {Set<string>} [rateFalseNegativeKeys] - Set of "merchantId-appId-issueType" to mark as false negative.
  */
-function buildRateMerchantsForCombinedReport(report) {
+function buildRateMerchantsForCombinedReport(report, rateFalseNegativeKeys = null) {
   const issueRows = generateSimplifiedExport(report);
   const hasIssuesKey = new Set(issueRows.map((m) => `${m.merchantId}-${m.appId}`));
   const allRows = [...issueRows];
@@ -946,7 +1009,51 @@ function buildRateMerchantsForCombinedReport(report) {
       });
     }
   }
+  if (rateFalseNegativeKeys && rateFalseNegativeKeys.size > 0) {
+    allRows.forEach((row) => {
+      const key = `${row.merchantId}-${row.appId}-${row.issueType || ''}`;
+      row.falseNegative = rateFalseNegativeKeys.has(key);
+    });
+  } else {
+    allRows.forEach((row) => { row.falseNegative = false; });
+  }
   return allRows;
+}
+
+/**
+ * Prompt to mark rate issues as false negatives (numbered list). Returns Set of "merchantId-appId-issueType" keys.
+ */
+async function promptAndMarkRateFalseNegatives(report) {
+  const issueRows = generateSimplifiedExport(report);
+  if (issueRows.length === 0) return new Set();
+  const wantMark = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Mark any rate issues as false negatives? (yes/no): '), (a) => {
+      rl.close();
+      resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
+    });
+  });
+  if (!wantMark) return new Set();
+  console.log(chalk.yellow('\nRate issues:\n'));
+  issueRows.forEach((r, i) => {
+    console.log(chalk.gray(`  ${i + 1}. ${r.merchantName || r.merchantId} (ID ${r.merchantId}) — ${r.issueType}: ${(r.reason || '').toString().slice(0, 50)}...`));
+  });
+  console.log('');
+  const answer = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Enter the numbers of issues that were false negatives (e.g. 1, 3, 5): '), (a) => {
+      rl.close();
+      resolve((a && a.trim()) || '');
+    });
+  });
+  const numbers = answer.split(/[,\s]+/).map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n) && n >= 1 && n <= issueRows.length);
+  const keySet = new Set();
+  numbers.forEach((n) => {
+    const row = issueRows[n - 1];
+    keySet.add(`${row.merchantId}-${row.appId}-${row.issueType || ''}`);
+  });
+  if (keySet.size > 0) console.log(chalk.green(`Marked ${keySet.size} rate issue(s) as false negatives.\n`));
+  return keySet;
 }
 
 /**
@@ -969,30 +1076,34 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
       .join(' → ');
   };
   const sections = [];
-  // --- Sheet 1: Merchant Rate ---
+  // --- Sheet 1: Merchant Rate (sorted by commission desc, then count desc) ---
   const rateHeaders = [
     'Merchant Name',
     'Merchant ID',
     'App ID',
     'Merchant Category',
+    'Commission',
     'Issue Type',
     'Severity',
     'Reason or Message',
     'Rate Name',
     'Rate Amount',
-    'Count'
+    'Count',
+    'False Negative'
   ];
   const rateRows = (rateMerchants || []).map((m) => [
     m.merchantName ?? '',
     m.merchantId ?? '',
     m.appId ?? '',
     m.merchantCategory ?? '',
+    m.commission !== undefined && m.commission !== null && m.commission !== '' ? m.commission : '',
     m.issueType ?? '',
     m.severity ?? '',
     m.reason ?? '',
     m.rateName ?? '',
     m.rateAmount ?? '',
-    m.count ?? ''
+    m.count ?? '',
+    m.falseNegative ? 'Yes' : ''
   ]);
   sections.push([
     '[Merchant Rate]',
@@ -1052,38 +1163,66 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
 }
 
 /**
- * Export simplified data to CSV
+ * Export simplified data to CSV (legacy: Merchant Name + Reason only).
  */
 function exportToCSV(exportData, filepath) {
   if (exportData.length === 0) {
     console.log(chalk.yellow('⚠️  No data to export'));
     return;
   }
-  
-  // CSV header - simplified to just Merchant Name and Reason
-  const headers = ['Merchant Name', 'Reason'];
-  
-  // Escape CSV values (handle quotes and commas)
   const escapeCSV = (value) => {
     if (value === null || value === undefined) return '';
     const str = String(value);
-    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) return `"${str.replace(/"/g, '""')}"`;
     return str;
   };
-  
-  // Build CSV content with just merchant name and reason
+  const headers = ['Merchant Name', 'Reason'];
   const csvRows = [
     headers.map(escapeCSV).join(','),
-    ...exportData.map(row => [
-      escapeCSV(row.merchantName),
-      escapeCSV(row.reason)
-    ].join(','))
+    ...exportData.map(row => [escapeCSV(row.merchantName), escapeCSV(row.reason)].join(','))
   ];
-  
   fs.writeFileSync(filepath, csvRows.join('\n'));
   console.log(chalk.green(`📊 CSV export saved to: ${filepath}`));
+}
+
+/**
+ * Write merchant rate table to CSV (full columns including Commission and False Negative).
+ */
+function writeMerchantRateCSV(rateMerchants, filepath) {
+  if (!rateMerchants || rateMerchants.length === 0) {
+    console.log(chalk.yellow('⚠️  No data to export'));
+    return;
+  }
+  const escapeCSV = (value) => {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) return `"${str.replace(/"/g, '""')}"`;
+    return str;
+  };
+  const headers = [
+    'Merchant Name', 'Merchant ID', 'App ID', 'Merchant Category', 'Commission',
+    'Issue Type', 'Severity', 'Reason or Message', 'Rate Name', 'Rate Amount', 'Count', 'False Negative'
+  ];
+  const rows = rateMerchants.map((m) => [
+    m.merchantName ?? '',
+    m.merchantId ?? '',
+    m.appId ?? '',
+    m.merchantCategory ?? '',
+    m.commission !== undefined && m.commission !== null && m.commission !== '' ? m.commission : '',
+    m.issueType ?? '',
+    m.severity ?? '',
+    m.reason ?? '',
+    m.rateName ?? '',
+    m.rateAmount ?? '',
+    m.count ?? '',
+    m.falseNegative ? 'Yes' : ''
+  ]);
+  const content = [
+    headers.map(escapeCSV).join(','),
+    ...rows.map((row) => row.map(escapeCSV).join(','))
+  ].join('\n');
+  fs.writeFileSync(filepath, content);
+  console.log(chalk.green(`📊 Merchant rate CSV saved to: ${filepath}`));
 }
 
 /**
@@ -1126,24 +1265,43 @@ function promptForCSVExport() {
 }
 
 /**
- * Save report to file
+ * Save report to file. Optionally fetches commission from BigQuery; CSV includes Commission column and full table.
  */
 async function saveReport(report, skipCSVPrompt = false) {
-  // Ensure output directory exists
   if (!fs.existsSync(CONFIG.outputDir)) {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
   }
-  
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  
-  // Generate and save the merchant issues JSON export (includes all audited merchants for lookup)
   const exportData = generateSimplifiedExport(report);
-  
   const jsonFilename = `merchant-issues-${timestamp}.json`;
   const jsonFilepath = path.join(CONFIG.outputDir, jsonFilename);
   exportToJSON(exportData, jsonFilepath, report);
-  
-  if (exportData.length > 0) {
+
+  let rateMerchants = buildRateMerchantsForCombinedReport(report, new Set());
+  const merchantIds = collectMerchantIdsFromReport(report);
+  if (merchantIds.length > 0 && process.stdin.isTTY) {
+    const useBq = await new Promise((resolve) => {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      rl.question(chalk.cyan('Fetch commission data from BigQuery? (yes/no): '), (a) => {
+        rl.close();
+        resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
+      });
+    });
+    if (useBq) {
+      console.log(chalk.blue('Running BigQuery for commission data...'));
+      const commissionMap = await fetchCommissionFromBigQuery(merchantIds);
+      rateMerchants.forEach((m) => { m.commission = commissionMap.get(String(m.merchantId)); });
+    }
+  }
+  rateMerchants.sort((a, b) => {
+    const ca = a.commission != null && a.commission !== '' ? Number(a.commission) : -Infinity;
+    const cb = b.commission != null && b.commission !== '' ? Number(b.commission) : -Infinity;
+    if (cb !== ca) return cb - ca;
+    return (b.count || 0) - (a.count || 0);
+  });
+
+  const issuesOnly = rateMerchants.filter((m) => m.issueType !== 'None');
+  if (issuesOnly.length > 0) {
     let wantsCSV = false;
     if (!skipCSVPrompt && process.stdin.isTTY) {
       wantsCSV = await promptForCSVExport();
@@ -1151,7 +1309,7 @@ async function saveReport(report, skipCSVPrompt = false) {
     if (wantsCSV) {
       const csvFilename = `merchant-issues-${timestamp}.csv`;
       const csvFilepath = path.join(CONFIG.outputDir, csvFilename);
-      exportToCSV(exportData, csvFilepath);
+      writeMerchantRateCSV(issuesOnly, csvFilepath);
       return { json: jsonFilepath, csv: csvFilepath };
     }
   }
@@ -1958,6 +2116,10 @@ async function runFullAudit() {
   }
   const report = generateReport(results);
   printResults(report);
+  let rateFalseNegativeKeys = new Set();
+  if (report.summary && report.summary.totalIssues > 0) {
+    rateFalseNegativeKeys = await promptAndMarkRateFalseNegatives(report);
+  }
   // Do NOT save Part 1 here; save combined at the end.
   console.log(chalk.bold.cyan('\n——— Part 2: Offer Activation ———\n'));
   const runOffer = await new Promise((resolve) => {
@@ -2008,7 +2170,39 @@ async function runFullAudit() {
   if (saveAnswer) {
     const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const outDir = CONFIG.outputDir;
-    const rateMerchants = buildRateMerchantsForCombinedReport(report);
+    const merchantIds = collectMerchantIdsFromReport(report);
+    let commissionMap = new Map();
+    const useBq = await new Promise((resolve) => {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      rl.question(chalk.cyan('Fetch commission data from BigQuery? (yes/no): '), (a) => {
+        rl.close();
+        resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
+      });
+    });
+    if (useBq && merchantIds.length > 0) {
+      console.log(chalk.blue('Running BigQuery for commission data...'));
+      commissionMap = await fetchCommissionFromBigQuery(merchantIds);
+    }
+    if (commissionMap.size === 0) {
+      const commissionPathAnswer = await new Promise((resolve) => {
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        rl.question(chalk.cyan('Path to commission data CSV (optional): '), (a) => {
+          rl.close();
+          resolve((a && a.trim()) || '');
+        });
+      });
+      commissionMap = loadCommissionDataFromCSV(commissionPathAnswer.trim());
+    }
+    let rateMerchants = buildRateMerchantsForCombinedReport(report, rateFalseNegativeKeys);
+    rateMerchants.forEach((m) => {
+      m.commission = commissionMap.get(String(m.merchantId));
+    });
+    rateMerchants.sort((a, b) => {
+      const ca = a.commission != null && a.commission !== '' ? Number(a.commission) : -Infinity;
+      const cb = b.commission != null && b.commission !== '' ? Number(b.commission) : -Infinity;
+      if (cb !== ca) return cb - ca;
+      return (b.count || 0) - (a.count || 0);
+    });
     const combined = {
       exportDate: new Date().toISOString(),
       merchantRate: {
@@ -2323,7 +2517,6 @@ module.exports = {
   containsShareASale,
   containsCommission,
   isInvalidRateName,
-  isProductLikeName,
   containsPercentageInName,
   isZeroRate,
   isExactlyOnlinePurchase,
