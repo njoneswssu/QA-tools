@@ -1215,6 +1215,7 @@ function exportResultsToCSV(results, filename = null) {
     'Merchant ID',
     'Domain',
     'Success',
+    'False Negative',
     'Test URL',
     'Final URL',
     'Redirect Path',
@@ -1237,6 +1238,7 @@ function exportResultsToCSV(results, filename = null) {
         escapeCSV(r.merchantId),
         escapeCSV(r.merchantDomain),
         escapeCSV(r.success ? 'Yes' : 'No'),
+        escapeCSV(r.falseNegative ? 'Yes' : ''),
         escapeCSV(r.testUrl),
         escapeCSV(r.finalUrl),
         escapeCSV(redirectPath),
@@ -1451,23 +1453,23 @@ async function promptAndMarkFalseNegatives(activationResults) {
   if (!wantMark) return;
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const answer = await new Promise((resolve) => {
-    rl.question(chalk.cyan('Enter merchant IDs that were false negatives (comma-separated): '), (a) => {
+    rl.question(chalk.cyan('Enter the numbers of merchants that were false negatives (e.g. 1, 3, 5): '), (a) => {
       rl.close();
       resolve((a && a.trim()) || '');
     });
   });
-  const ids = answer.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
-  if (ids.length === 0) return;
-  const idSet = new Set(ids);
+  const numbers = answer.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n >= 1 && n <= failed.length);
+  if (numbers.length === 0) return;
+  const indexSet = new Set(numbers);
   let marked = 0;
-  for (const r of activationResults) {
-    if (!r.success && idSet.has(Number(r.merchantId))) {
+  failed.forEach((r, i) => {
+    if (indexSet.has(i + 1)) {
       r.success = true;
       r.error = 'User tested (false negative)';
       r.falseNegative = true;
       marked++;
     }
-  }
+  });
   console.log(chalk.green(`Marked ${marked} merchant(s) as false negatives.\n`));
 }
 
