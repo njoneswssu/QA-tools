@@ -1183,12 +1183,14 @@ function exportResultsToCSV(results, filename = null) {
 
   const csvRows = [
     headers.map(escapeCSV).join(','),
-    ...results.flatMap((r) => {
+    ...results.map((r) => {
       const redirectPath = redirectPathFor(r);
       const issues = (r.issues && r.issues.length > 0)
         ? r.issues
         : (r.error ? [{ type: 'error', message: r.error }] : [{ type: '', message: '' }]);
-      return issues.map((issue) => [
+      const issueTypes = issues.map((i) => i.type ?? '').filter(Boolean).join('; ') || (r.error ? 'error' : '');
+      const issueMessages = issues.map((i) => i.message ?? '').filter(Boolean).join('; ') || (r.error ? r.error : '');
+      return [
         escapeCSV(r.merchantName),
         escapeCSV(r.merchantId),
         escapeCSV(r.merchantDomain),
@@ -1197,9 +1199,9 @@ function exportResultsToCSV(results, filename = null) {
         escapeCSV(r.finalUrl),
         escapeCSV(redirectPath),
         escapeCSV(r.redirectCount),
-        escapeCSV(issue.type),
-        escapeCSV(issue.message)
-      ].join(','));
+        escapeCSV(issueTypes),
+        escapeCSV(issueMessages)
+      ].join(',');
     })
   ];
 
