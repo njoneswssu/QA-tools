@@ -524,8 +524,8 @@ function validateRate(rate, merchantId, merchantCategories = null) {
     });
   }
   
-  // NEW RULE: Flag rates with "in app" or "iOS in-app" patterns
-  if (rate.Name && containsInAppRate(rate.Name)) {
+  // Flag rates with "in app" or "iOS in-app" patterns (skip if rate amount is 0)
+  if (rate.Name && containsInAppRate(rate.Name) && !isZeroRate(rate)) {
     issues.push({
       type: 'in_app_rate',
       severity: 'high',
@@ -1084,7 +1084,6 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
     'Merchant Category',
     'Commission',
     'Issue Type',
-    'Severity',
     'Reason or Message',
     'Rate Name',
     'Rate Amount',
@@ -1098,7 +1097,6 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
     m.merchantCategory ?? '',
     m.commission !== undefined && m.commission !== null && m.commission !== '' ? m.commission : '',
     m.issueType ?? '',
-    m.severity ?? '',
     m.reason ?? '',
     m.rateName ?? '',
     m.rateAmount ?? '',
@@ -1201,7 +1199,7 @@ function writeMerchantRateCSV(rateMerchants, filepath) {
   };
   const headers = [
     'Merchant Name', 'Merchant ID', 'App ID', 'Merchant Category', 'Commission',
-    'Issue Type', 'Severity', 'Reason or Message', 'Rate Name', 'Rate Amount', 'Count', 'False Negative'
+    'Issue Type', 'Reason or Message', 'Rate Name', 'Rate Amount', 'Count', 'False Negative'
   ];
   const rows = rateMerchants.map((m) => [
     m.merchantName ?? '',
@@ -1210,7 +1208,6 @@ function writeMerchantRateCSV(rateMerchants, filepath) {
     m.merchantCategory ?? '',
     m.commission !== undefined && m.commission !== null && m.commission !== '' ? m.commission : '',
     m.issueType ?? '',
-    m.severity ?? '',
     m.reason ?? '',
     m.rateName ?? '',
     m.rateAmount ?? '',
@@ -2120,6 +2117,21 @@ async function runFullAudit() {
   if (report.summary && report.summary.totalIssues > 0) {
     rateFalseNegativeKeys = await promptAndMarkRateFalseNegatives(report);
   }
+  let fullAuditCommissionMap = new Map();
+  const merchantIdsForBq = collectMerchantIdsFromReport(report);
+  if (merchantIdsForBq.length > 0 && process.stdin.isTTY) {
+    const useBq = await new Promise((resolve) => {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      rl.question(chalk.cyan('Fetch commission data from BigQuery? (yes/no): '), (a) => {
+        rl.close();
+        resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
+      });
+    });
+    if (useBq) {
+      console.log(chalk.blue('Running BigQuery for commission data...'));
+      fullAuditCommissionMap = await fetchCommissionFromBigQuery(merchantIdsForBq);
+    }
+  }
   // Do NOT save Part 1 here; save combined at the end.
   console.log(chalk.bold.cyan('\n——— Part 2: Offer Activation ———\n'));
   const runOffer = await new Promise((resolve) => {
@@ -2170,19 +2182,7 @@ async function runFullAudit() {
   if (saveAnswer) {
     const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const outDir = CONFIG.outputDir;
-    const merchantIds = collectMerchantIdsFromReport(report);
-    let commissionMap = new Map();
-    const useBq = await new Promise((resolve) => {
-      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-      rl.question(chalk.cyan('Fetch commission data from BigQuery? (yes/no): '), (a) => {
-        rl.close();
-        resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-      });
-    });
-    if (useBq && merchantIds.length > 0) {
-      console.log(chalk.blue('Running BigQuery for commission data...'));
-      commissionMap = await fetchCommissionFromBigQuery(merchantIds);
-    }
+    let commissionMap = fullAuditCommissionMap;
     if (commissionMap.size === 0) {
       const commissionPathAnswer = await new Promise((resolve) => {
         const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
