@@ -18,7 +18,7 @@ npm start
 node auditor.js
 ```
 
-**Main menu:** 1 Merchant Rate Audit | 2 Offer Activation Testing | 3 Lookup results (by merchant, date, App ID) | 4 Exit
+**Main menu:** 0 File manager | 1 Merchant Rate Audit | 2 Offer Activation Testing | 3 Lookup results | 4 Run full audit | 5 Exit
 
 **Merchant Rate Audit submenu:**
 1. Run new audit

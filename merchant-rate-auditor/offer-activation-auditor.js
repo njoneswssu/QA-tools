@@ -1287,9 +1287,18 @@ async function runBatchForOneAppId(appId, options = {}) {
     shoppingTripCode: session.shoppingTripCode || ''
   };
   const results = [];
-  for (const merchant of toTest) {
+  const totalToTest = toTest.length;
+  const progressEvery = 10;
+  for (let idx = 0; idx < toTest.length; idx++) {
+    const merchant = toTest[idx];
     const result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
     results.push({ ...result, appId });
+    const done = results.length;
+    if (done % progressEvery === 0 || done === totalToTest) {
+      const ok = results.filter(r => r.success).length;
+      const fail = done - ok;
+      console.log(chalk.blue(`  Progress: ${done}/${totalToTest} — ${chalk.green(ok)} OK, ${fail > 0 ? chalk.red(fail) : fail} failed`));
+    }
     await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
   }
   return results;
@@ -1376,6 +1385,44 @@ function askYesNo(question) {
       resolve(!!(answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')));
     });
   });
+}
+
+/**
+ * If there are failed activation results, offer to mark some as false negatives (user tested and they passed).
+ * Modifies activationResults in place: sets success = true, error = 'User tested (false negative)', falseNegative = true.
+ * @param {Array} activationResults - Array of { success, merchantId, merchantName, error, ... }
+ * @returns {Promise<void>}
+ */
+async function promptAndMarkFalseNegatives(activationResults) {
+  const failed = (activationResults || []).filter(r => !r.success);
+  if (failed.length === 0) return;
+  console.log(chalk.yellow('\nFailed merchants:\n'));
+  failed.forEach((r, i) => {
+    console.log(chalk.gray(`  ${i + 1}. ID ${r.merchantId} — ${r.merchantName || '(no name)'}`));
+  });
+  console.log('');
+  const wantMark = await askYesNo('Would you like to mark any of these as false negatives? (yes/no): ');
+  if (!wantMark) return;
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const answer = await new Promise((resolve) => {
+    rl.question(chalk.cyan('Enter merchant IDs that were false negatives (comma-separated): '), (a) => {
+      rl.close();
+      resolve((a && a.trim()) || '');
+    });
+  });
+  const ids = answer.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
+  if (ids.length === 0) return;
+  const idSet = new Set(ids);
+  let marked = 0;
+  for (const r of activationResults) {
+    if (!r.success && idSet.has(Number(r.merchantId))) {
+      r.success = true;
+      r.error = 'User tested (false negative)';
+      r.falseNegative = true;
+      marked++;
+    }
+  }
+  console.log(chalk.green(`Marked ${marked} merchant(s) as false negatives.\n`));
 }
 
 /**
@@ -1697,9 +1744,9 @@ async function runOfferActivationTest() {
               else if (key && (key.name === 's' || key.name === 'S')) stopRequested = true;
             });
           }
-          // Progress increment: every 5 for ≤10 merchants; +5 for each additional 10 merchants (11–20 → 10, 21–30 → 15, etc.)
+          // Progress update every 10 merchants (e.g. 200 merchants → updates at 10, 20, 30, … 200)
           const totalToTest = toTest.length;
-          const progressIncrement = 5 + 5 * Math.floor((totalToTest - 1) / 10);
+          const progressEvery = 10;
           console.log(chalk.gray('  (Press P to pause, S to stop early. When paused, press Enter to resume.)\n'));
           for (let idx = 0; idx < toTest.length; idx++) {
             const merchant = toTest[idx];
@@ -1730,7 +1777,7 @@ async function runOfferActivationTest() {
             const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
             results.push({ ...result, appId: config.appId });
             const done = results.length;
-            if (done % progressIncrement === 0 || done === totalToTest) {
+            if (done % progressEvery === 0 || done === totalToTest) {
               const ok = results.filter(r => r.success).length;
               const fail = done - ok;
               console.log(chalk.blue(`  Progress: ${done}/${totalToTest} — ${chalk.green(ok)} OK, ${fail > 0 ? chalk.red(fail) : fail} failed`));
@@ -1744,6 +1791,7 @@ async function runOfferActivationTest() {
           pauseRl.removeAllListeners('line');
           pauseRl.close();
           printResultsSummary(results);
+          await promptAndMarkFalseNegatives(results);
           const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
           await new Promise((resolve) => {
             rl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
@@ -1806,6 +1854,7 @@ module.exports = {
   runOfferActivationBatchForAppIds,
   runBatchForOneAppId,
   markMerchantsAsTested,
+  promptAndMarkFalseNegatives,
   showOfferActivationMenu,
   fetchMerchantData,
   fetchActiveDomains,

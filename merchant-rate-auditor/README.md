@@ -1,9 +1,10 @@
 # Merchant Testing Tool
 
-A comprehensive Node.js application for testing Wildlink merchants. Includes two main testing modes:
+A comprehensive Node.js application for testing Wildlink merchants. Includes two main testing modes plus a combined full audit:
 
 1. **Merchant Rate Audit** - Audits merchant rate JSON feeds for problematic rates
 2. **Offer Activation Testing** - Tests if merchant offers work when activated (detects broken/expired offers)
+3. **Run Full Audit** - Runs merchant rate audit and offer activation in one flow, using the same set of merchants, and saves a single combined report
 
 ## Features
 
@@ -22,7 +23,20 @@ A comprehensive Node.js application for testing Wildlink merchants. Includes two
 - 🔗 **Error Page Detection**: Identifies when offers land on error/expired pages
 - 🔗 **Visual Redirect Path**: Shows redirect chain like browser dev tools
 - 🔗 **Batch Testing**: Test multiple merchants from feeds at once
+- 🔗 **Progress Updates**: Progress every 10 merchants (e.g. 10, 20, 30 … up to total)
+- 🔗 **False Negatives**: After tests with failures, you can mark specific merchants as false negatives (user-tested and passed); results are updated and you can save
 - 🔗 **Export Results**: Save failed activations to JSON/CSV
+
+### Run Full Audit (Main menu option 4)
+- 📋 **Single flow**: Part 1 = Merchant rate audit; Part 2 = Offer activation (optional) on the **same** merchants
+- 📋 **App IDs**: Enter one or more App IDs (comma- or space-separated)
+- 📋 **Max merchants**: "Max merchants to test per App ID (blank = all)" — leave blank to test every merchant, or enter a number to limit per app (e.g. 50)
+- 📋 **Specific merchants**: "Or test only these merchant IDs (comma-separated, leave blank to use max/all)" — restrict the run to specific merchant IDs across all selected apps
+- 📋 **No save after Part 1**: Rate audit results are not saved until the end; only one combined save is offered
+- 📋 **Part 2 question**: After Part 1 you are asked "Run offer activation for these App IDs? (yes/no)"
+- 📋 **Combined output**: At the end you can save **one combined JSON** and **one combined CSV** (rate + activation) with filenames like `full-audit-combined-{timestamp}.json` and `.csv`
+- 📋 **Mark as tested**: Option to mark merchants as tested for offer activation (for skip-next-time logic)
+- 📋 **False negatives**: If any offer activation tests failed, you can mark specific merchants as false negatives (user tested) before saving
 
 ## Installation
 
@@ -43,11 +57,13 @@ npm start
 node auditor.js
 ```
 
-**Main menu (What do you want to test?):**
-1. Merchant Rate Audit
-2. Offer Activation Testing
-3. Lookup results (view by merchant name, date, or App ID)
-4. Exit
+**Main menu (What do you want to do?):**
+0. File manager — Combine offer activation / merchant rate / or both into one report
+1. Merchant Rate Audit — Check for problematic rates in feeds
+2. Offer Activation Testing — Test if offers work when activated
+3. Lookup results — By App ID (shows what's tested) or by merchant name
+4. Run full audit — Merchant rate + offer activation in one run (same merchants, combined save)
+5. Exit
 
 **Merchant Rate Audit submenu:**
 1. Run new audit
@@ -200,7 +216,27 @@ When you select "Offer Activation Testing" from the main menu:
 
 1. **Test a specific URL** - Enter any wild.link, CJ, or affiliate URL
 2. **Test a specific domain** - Enter a merchant domain like "bobore.com"
-3. **Test merchants from feed** - Batch test merchants from the JSON feed
+3. **Test merchants from feed** - Batch test merchants from the JSON feed (with progress every 10 merchants; P to pause, S to stop)
+
+### Progress and False Negatives (Offer Activation)
+
+- **Progress**: During batch or full-audit offer activation, progress is printed every 10 merchants (e.g. `Progress: 20/200 — 18 OK, 2 failed`).
+- **False negatives**: When there are failed activations, you are asked: "Would you like to mark any of these as false negatives? (yes/no)". If yes, you enter **merchant IDs** (comma-separated) that you manually verified as working. Those results are updated to success with reason "User tested (false negative)". You can then save results (combined JSON/CSV in full audit, or offer activation JSON/CSV in batch).
+
+---
+
+## Run Full Audit (Main Menu Option 4)
+
+Run full audit combines **Part 1: Merchant Rate Audit** and **Part 2: Offer Activation** in one run, using the **same** set of merchants for both.
+
+1. **App IDs** — Enter comma- or space-separated App IDs.
+2. **Max merchants per App ID** — Blank = test all merchants; or enter a number (e.g. 200) to limit per app (random subset).
+3. **Specific merchant IDs (optional)** — Comma-separated merchant IDs to test *only* those merchants across the selected apps. Leave blank to use max/all from step 2.
+4. **Part 1** runs (rate audit for that set). Results are printed but **not** saved yet.
+5. **Part 2** — You are asked: "Run offer activation for these App IDs? (yes/no)". If yes, the same merchants are tested for offer activation (progress every 10).
+6. **Multiple issues** — Merchants that failed both rate audit and offer activation are listed.
+7. **False negatives** — If any activation tests failed, you can mark specific merchant IDs as false negatives (user tested); results are updated before save.
+8. **Save** — One prompt: "Save full audit results (combined JSON + CSV)? (yes/no)". If yes, one `full-audit-combined-{timestamp}.json` and one `.csv` are written (rate + activation in one file). Option to mark merchants as tested for offer activation follows.
 
 ---
 

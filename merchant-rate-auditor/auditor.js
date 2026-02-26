@@ -1786,7 +1786,20 @@ async function runFullAudit() {
     });
   });
   const maxMerchants = maxMerchantsAnswer === '' ? null : (parseInt(maxMerchantsAnswer, 10) || null);
-  if (maxMerchants != null) {
+  const specificIdsAnswer = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Or test only these merchant IDs (comma-separated, leave blank to use max/all): '), (a) => {
+      rl.close();
+      resolve((a && a.trim()) || '');
+    });
+  });
+  const specificMerchantIds = specificIdsAnswer === ''
+    ? null
+    : specificIdsAnswer.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
+  const useSpecificMerchants = specificMerchantIds && specificMerchantIds.length > 0;
+  if (useSpecificMerchants) {
+    console.log(chalk.gray(`Testing only merchant IDs: ${specificMerchantIds.join(', ')}\n`));
+  } else if (maxMerchants != null) {
     console.log(chalk.gray(`Limiting to ${maxMerchants} merchants per App ID.\n`));
   } else {
     console.log(chalk.gray('No limit; testing all merchants per App ID.\n'));
@@ -1794,11 +1807,16 @@ async function runFullAudit() {
   console.log(chalk.cyan(`Auditing App IDs: ${appIds.join(', ')}\n`));
   console.log(chalk.bold.cyan('——— Part 1: Merchant Rate Audit ———\n'));
   const merchantsByAppId = {};
+  const idSet = useSpecificMerchants ? new Set(specificMerchantIds.map(String)) : null;
   for (const appId of appIds) {
     const raw = await offerActivation.fetchMerchantData(appId);
-    const withUrl = (raw || []).filter(m => m.URL || m.Domain);
-    const list = maxMerchants != null ? shuffleArray(withUrl).slice(0, maxMerchants) : withUrl;
-    merchantsByAppId[appId] = list;
+    let withUrl = (raw || []).filter(m => m.URL || m.Domain);
+    if (idSet) {
+      withUrl = withUrl.filter(m => idSet.has(String(m.ID)));
+    } else if (maxMerchants != null) {
+      withUrl = shuffleArray(withUrl).slice(0, maxMerchants);
+    }
+    merchantsByAppId[appId] = withUrl;
   }
   const results = [];
   for (const appId of appIds) {
@@ -1846,6 +1864,7 @@ async function runFullAudit() {
       console.log(chalk.gray('─'.repeat(100)) + '\n');
     }
     offerActivation.printResultsSummary(activationResults);
+    await offerActivation.promptAndMarkFalseNegatives(activationResults);
   }
   const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const saveAnswer = await new Promise((resolve) => {
