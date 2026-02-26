@@ -699,11 +699,13 @@ async function auditAppId(appId) {
       totalMerchants: 0,
       totalRates: 0,
       issues: [],
+      allMerchants: [],
       error: 'Failed to fetch data'
     };
   }
   
   const issues = [];
+  const allMerchants = [];
   let totalMerchants = 0;
   let totalRates = 0;
   
@@ -717,6 +719,7 @@ async function auditAppId(appId) {
     // Get merchant info from the map
     const merchantInfo = merchantMap[merchantId];
     const merchantName = merchantInfo?.name || `Merchant ID ${merchantId}`;
+    allMerchants.push({ merchantId, merchantName });
     const merchantCategories = merchantInfo?.categories || [];
     
     // Format categories for display (join with comma)
@@ -745,6 +748,7 @@ async function auditAppId(appId) {
     totalMerchants,
     totalRates,
     issues,
+    allMerchants,
     timestamp: new Date().toISOString()
   };
 }
@@ -901,6 +905,105 @@ function generateSimplifiedExport(report) {
 }
 
 /**
+ * Write one CSV file with a single header row. Both merchant rate and offer activation
+ * rows use the same columns; unused columns are left empty. Filter/sort by "Source" to separate.
+ */
+function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) {
+  const escapeCSV = (value) => {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+  const redirectPathFor = (r) => {
+    if (!r.redirectChain || r.redirectChain.length === 0) return r.finalUrl || '';
+    return r.redirectChain
+      .map((hop) => `${hop.url} (${hop.statusCode} ${hop.statusText || ''})`.trim())
+      .join(' → ');
+  };
+  const headers = [
+    'Source',
+    'Merchant Name',
+    'Merchant ID',
+    'App ID',
+    'Merchant Category',
+    'Domain',
+    'Success',
+    'Issue Type',
+    'Severity',
+    'Reason or Message',
+    'Rate Name',
+    'Rate Amount',
+    'Count',
+    'Test URL',
+    'Final URL',
+    'Redirect Path',
+    'Redirect Count'
+  ];
+  const rows = [];
+  for (const m of rateMerchants || []) {
+    rows.push([
+      'Merchant Rate',
+      m.merchantName ?? '',
+      m.merchantId ?? '',
+      m.appId ?? '',
+      m.merchantCategory ?? '',
+      '',
+      '',
+      m.issueType ?? '',
+      m.severity ?? '',
+      m.reason ?? '',
+      m.rateName ?? '',
+      m.rateAmount ?? '',
+      m.count ?? '',
+      '',
+      '',
+      '',
+      ''
+    ]);
+  }
+  for (const r of activationResults || []) {
+    const redirectPath = redirectPathFor(r);
+    const issues = (r.issues && r.issues.length > 0)
+      ? r.issues
+      : (r.error ? [{ type: 'error', message: r.error }] : [{ type: '', message: '' }]);
+    for (const issue of issues) {
+      rows.push([
+        'Offer Activation',
+        r.merchantName ?? '',
+        r.merchantId ?? '',
+        '',
+        '',
+        r.merchantDomain ?? '',
+        r.success ? 'Yes' : 'No',
+        issue.type ?? '',
+        '',
+        issue.message ?? '',
+        '',
+        '',
+        '',
+        r.testUrl ?? '',
+        r.finalUrl ?? '',
+        redirectPath,
+        r.redirectCount ?? ''
+      ]);
+    }
+  }
+  if (rows.length === 0) {
+    console.log(chalk.yellow('⚠️  No data for combined CSV.'));
+    return;
+  }
+  const csvContent = [
+    headers.map(escapeCSV).join(','),
+    ...rows.map(row => row.map(escapeCSV).join(','))
+  ].join('\n');
+  fs.writeFileSync(filepath, csvContent);
+  console.log(chalk.green(`📊 Full report CSV saved to: ${filepath}`));
+}
+
+/**
  * Export simplified data to CSV
  */
 function exportToCSV(exportData, filepath) {
@@ -936,20 +1039,22 @@ function exportToCSV(exportData, filepath) {
 }
 
 /**
- * Export simplified data to JSON
+ * Export simplified data to JSON. Includes total audited and all audited merchants for lookup.
  */
-function exportToJSON(exportData, filepath) {
-  if (exportData.length === 0) {
+function exportToJSON(exportData, filepath, report = null) {
+  const merchantsWithIssues = [...new Set((exportData || []).map(m => `${m.merchantId}-${m.appId}`))].length;
+  const exportObject = {
+    exportDate: new Date().toISOString(),
+    totalIssues: (exportData || []).length,
+    totalMerchantsAudited: report ? report.summary.totalMerchants : null,
+    merchantsWithIssues: exportData.length > 0 ? merchantsWithIssues : 0,
+    merchants: exportData || [],
+    allAuditedMerchants: report ? report.results.flatMap(r => r.allMerchants || []) : []
+  };
+  if (exportData.length === 0 && !report) {
     console.log(chalk.yellow('⚠️  No data to export'));
     return;
   }
-  
-  const exportObject = {
-    exportDate: new Date().toISOString(),
-    totalIssues: exportData.length,
-    merchants: exportData
-  };
-  
   fs.writeFileSync(filepath, JSON.stringify(exportObject, null, 2));
   console.log(chalk.green(`📄 JSON export saved to: ${filepath}`));
 }
@@ -983,33 +1088,26 @@ async function saveReport(report, skipCSVPrompt = false) {
   
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   
-  // Generate and save only the merchant issues JSON export
+  // Generate and save the merchant issues JSON export (includes all audited merchants for lookup)
   const exportData = generateSimplifiedExport(report);
   
+  const jsonFilename = `merchant-issues-${timestamp}.json`;
+  const jsonFilepath = path.join(CONFIG.outputDir, jsonFilename);
+  exportToJSON(exportData, jsonFilepath, report);
+  
   if (exportData.length > 0) {
-    // JSON export
-    const jsonFilename = `merchant-issues-${timestamp}.json`;
-    const jsonFilepath = path.join(CONFIG.outputDir, jsonFilename);
-    exportToJSON(exportData, jsonFilepath);
-    
-    // Ask if user wants CSV export (unless running non-interactively)
     let wantsCSV = false;
     if (!skipCSVPrompt && process.stdin.isTTY) {
       wantsCSV = await promptForCSVExport();
     }
-    
     if (wantsCSV) {
       const csvFilename = `merchant-issues-${timestamp}.csv`;
       const csvFilepath = path.join(CONFIG.outputDir, csvFilename);
       exportToCSV(exportData, csvFilepath);
       return { json: jsonFilepath, csv: csvFilepath };
     }
-    
-    return { json: jsonFilepath, csv: null };
-  } else {
-    console.log(chalk.yellow('\n⚠️  No issues found, no file saved.'));
-    return null;
   }
+  return { json: jsonFilepath, csv: null };
 }
 
 /**
@@ -1085,17 +1183,20 @@ function listPreviousAudits() {
         
         try {
           const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-          // Extract unique app IDs from merchants array
           const appIds = [...new Set(data.merchants?.map(m => m.appId) || [])];
+          const totalIssues = data.totalIssues ?? data.merchants?.length ?? 0;
+          const merchantsWithIssues = data.merchantsWithIssues ?? data.merchants?.length ?? 0;
+          const totalMerchantsAudited = data.totalMerchantsAudited ?? null;
           return {
             filename: file,
             filepath: filepath,
             timestamp: timestamp,
             date: date,
             appIds: appIds,
-            totalIssues: data.totalIssues || 0,
-            totalMerchants: data.merchants?.length || 0,
-            totalRates: 0, // Not available in simplified export
+            totalIssues,
+            merchantsWithIssues,
+            totalMerchantsAudited,
+            totalRates: 0,
             size: stats.size
           };
         } catch (error) {
@@ -1106,7 +1207,9 @@ function listPreviousAudits() {
             date: date,
             appIds: [],
             totalIssues: 0,
-            totalMerchants: 0,
+            merchantsWithIssues: 0,
+            totalMerchantsAudited: null,
+            totalRates: 0,
             totalRates: 0,
             size: stats.size,
             error: 'Could not parse file'
@@ -1141,7 +1244,11 @@ function displayAuditList(audits) {
     console.log(chalk.bold(`\n${index + 1}. ${dateStr}`));
     console.log(`   App IDs: ${chalk.cyan(appIdsStr)}`);
     const ratesInfo = audit.totalRates > 0 ? ` | Rates: ${audit.totalRates}` : '';
-    console.log(`   Issues: ${chalk.yellow(audit.totalIssues)} | Merchants: ${audit.totalMerchants}${ratesInfo}`);
+    const mwi = audit.merchantsWithIssues ?? audit.totalIssues;
+    const auditedStr = audit.totalMerchantsAudited != null
+      ? ` | Merchants with issues: ${mwi} | Total audited: ${audit.totalMerchantsAudited}`
+      : ` | Merchants with issues: ${mwi}`;
+    console.log(`   Issues: ${chalk.yellow(audit.totalIssues)}${auditedStr}${ratesInfo}`);
     console.log(`   File: ${chalk.gray(audit.filename)}`);
     if (audit.error) {
       console.log(chalk.red(`   ⚠️  ${audit.error}`));
@@ -1203,12 +1310,16 @@ function displayLookupResults(matchingAudits, appIds) {
   matchingAudits.forEach((audit, index) => {
     const dateStr = audit.date.toLocaleString();
     const matchingAppIds = audit.appIds.filter(id => appIds.includes(id));
+    const mwi = audit.merchantsWithIssues ?? audit.totalIssues;
+    const auditedStr = audit.totalMerchantsAudited != null
+      ? ` | Merchants with issues: ${mwi} | Total audited: ${audit.totalMerchantsAudited}`
+      : ` | Merchants with issues: ${mwi}`;
     
     console.log(chalk.bold(`\n${index + 1}. ${dateStr}`));
     console.log(`   Matching App IDs: ${chalk.cyan(matchingAppIds.join(', '))}`);
     console.log(`   All App IDs in audit: ${chalk.gray(audit.appIds.join(', '))}`);
     const ratesInfo = audit.totalRates > 0 ? ` | Rates: ${audit.totalRates}` : '';
-    console.log(`   Issues: ${chalk.yellow(audit.totalIssues)} | Merchants: ${audit.totalMerchants}${ratesInfo}`);
+    console.log(`   Issues: ${chalk.yellow(audit.totalIssues)}${auditedStr}${ratesInfo}`);
     console.log(`   File: ${chalk.gray(audit.filename)}`);
     console.log(`   Full path: ${chalk.gray(audit.filepath)}`);
   });
@@ -1217,22 +1328,67 @@ function displayLookupResults(matchingAudits, appIds) {
 }
 
 /**
- * Print offer-activation tested merchants count for given app IDs.
+ * Load offer-activation result files (individual runs, not combined) for summary stats.
+ */
+function loadOfferActivationResultSummary() {
+  const entries = [];
+  if (!fs.existsSync(CONFIG.outputDir)) return entries;
+  const files = fs.readdirSync(CONFIG.outputDir);
+  const parseDate = (file) => {
+    const m = file.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})/);
+    if (!m) return new Date(0);
+    return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`);
+  };
+  for (const file of files) {
+    if (!file.startsWith('offer-activation-') || !file.endsWith('.json') || file.includes('session') || file.includes('tested-merchants') || file.includes('combined')) continue;
+    const filepath = path.join(CONFIG.outputDir, file);
+    try {
+      const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+      entries.push({
+        filename: file,
+        date: parseDate(file),
+        totalTested: data.totalTested ?? (data.results || []).length,
+        successful: data.successful ?? (data.results || []).filter(r => r.success).length,
+        failed: data.failed ?? (data.results || []).filter(r => !r.success).length
+      });
+    } catch (_) {}
+  }
+  return entries.sort((a, b) => b.date - a.date);
+}
+
+/**
+ * Print offer-activation tested count and result details for given app IDs.
  */
 function displayOfferActivationTestedForAppIds(appIds) {
   const tested = loadOfferActivationTestedMerchants();
+  const resultRuns = loadOfferActivationResultSummary();
   if (!appIds || appIds.length === 0) return;
-  console.log(chalk.bold.cyan('\n📋 Offer activation tested for this/these App ID(s):\n'));
+  console.log(chalk.bold.cyan('\n📋 Offer activation — tested list & results\n'));
   for (const appId of appIds) {
     const ids = tested[String(appId)];
     const count = Array.isArray(ids) ? ids.length : 0;
     if (count > 0) {
-      console.log(`   App ID ${chalk.cyan(appId)}: ${chalk.green(count)} merchant(s) tested`);
+      console.log(`   App ID ${chalk.cyan(appId)}: ${chalk.green(count)} unique merchant(s) in tested list`);
+      console.log(chalk.gray(`      (cumulative — only grows when you save batch results)`));
     } else {
-      console.log(`   App ID ${chalk.cyan(appId)}: ${chalk.gray('none tested yet')}`);
+      console.log(`   App ID ${chalk.cyan(appId)}: ${chalk.gray('no merchants in tested list yet')}`);
     }
   }
-  console.log(chalk.gray('─'.repeat(100)) + '\n');
+  if (resultRuns.length > 0) {
+    const totalTested = resultRuns.reduce((s, r) => s + (r.totalTested || 0), 0);
+    const totalOk = resultRuns.reduce((s, r) => s + (r.successful || 0), 0);
+    const totalFail = resultRuns.reduce((s, r) => s + (r.failed || 0), 0);
+    console.log(chalk.bold.cyan('\n   From saved result files:'));
+    console.log(chalk.gray(`      ${resultRuns.length} run(s) — total tested: ${totalTested}, OK: ${chalk.green(totalOk)}, failed: ${totalFail > 0 ? chalk.red(totalFail) : totalFail}`));
+    const latest = resultRuns[0];
+    if (latest) {
+      const dateStr = latest.date && latest.date.toLocaleString ? latest.date.toLocaleString() : latest.filename;
+      console.log(chalk.gray(`      Latest run (${dateStr}): ${latest.totalTested} tested, ${chalk.green(latest.successful)} OK, ${latest.failed > 0 ? chalk.red(latest.failed) : latest.failed} failed`));
+    }
+  } else {
+    console.log(chalk.gray('\n   No offer-activation result files found (save results after a batch to see details).'));
+  }
+  console.log(chalk.gray('\n' + '─'.repeat(100)) + '\n');
 }
 
 /**
@@ -1260,7 +1416,9 @@ function loadAllResultFiles() {
           date: parseDate(file),
           appIds,
           totalIssues: data.totalIssues,
-          merchants: data.merchants || []
+          totalMerchantsAudited: data.totalMerchantsAudited ?? null,
+          merchants: data.merchants || [],
+          allAuditedMerchants: data.allAuditedMerchants || []
         });
       } catch (_) {}
     } else if (file.startsWith('offer-activation-') && file.endsWith('.json') && !file.includes('session') && !file.includes('tested-merchants')) {
@@ -1292,7 +1450,7 @@ function loadAllResultFiles() {
 }
 
 /**
- * Lookup by merchant name: show merchant rate errors and activation issues for that merchant.
+ * Lookup by merchant name: show merchant rate errors, activation issues, and when tested (even if no issues).
  */
 function lookupByMerchantName(merchantQuery) {
   const entries = loadAllResultFiles();
@@ -1303,19 +1461,28 @@ function lookupByMerchantName(merchantQuery) {
   }
   const rateIssues = [];
   const activationIssues = [];
+  const testedNoIssues = [];
+  const testedActivationOk = [];
   for (const e of entries) {
-    if (e.type === 'merchant_rate' && e.merchants) {
-      for (const m of e.merchants) {
-        if ((m.merchantName || '').toLowerCase().includes(q)) {
-          rateIssues.push({
-            merchantName: m.merchantName,
-            merchantId: m.merchantId,
-            appId: m.appId,
-            issueType: m.issueType,
-            reason: m.reason,
-            file: e.filename
-          });
+    if (e.type === 'merchant_rate') {
+      const hasIssues = (e.merchants || []).some(m => (m.merchantName || '').toLowerCase().includes(q));
+      const inAudited = (e.allAuditedMerchants || []).some(m => (m.merchantName || '').toLowerCase().includes(q));
+      if (hasIssues) {
+        for (const m of e.merchants || []) {
+          if ((m.merchantName || '').toLowerCase().includes(q)) {
+            rateIssues.push({
+              merchantName: m.merchantName,
+              merchantId: m.merchantId,
+              appId: m.appId,
+              issueType: m.issueType,
+              reason: m.reason,
+              file: e.filename
+            });
+          }
         }
+      }
+      if (inAudited && !hasIssues) {
+        testedNoIssues.push({ date: e.date, filename: e.filename });
       }
     }
     if (e.type === 'offer_activation' && e.merchants) {
@@ -1330,6 +1497,8 @@ function lookupByMerchantName(merchantQuery) {
               error: m.error,
               file: e.filename
             });
+          } else {
+            testedActivationOk.push({ date: e.date, filename: e.filename });
           }
         }
       }
@@ -1347,6 +1516,13 @@ function lookupByMerchantName(merchantQuery) {
   } else {
     console.log(chalk.green('\n✅ No merchant rate issues found for this merchant.'));
   }
+  if (testedNoIssues.length > 0) {
+    console.log(chalk.bold.cyan('\n📋 Merchant rate – tested (no issues):'));
+    testedNoIssues.forEach((t, i) => {
+      const dateStr = t.date && t.date.toLocaleString ? t.date.toLocaleString() : t.filename;
+      console.log(chalk.gray(`  ${i + 1}. ${dateStr} — ${t.filename}`));
+    });
+  }
   if (activationIssues.length > 0) {
     console.log(chalk.bold.red('\n⚠️  Offer activation issues:'));
     activationIssues.forEach((a, i) => {
@@ -1357,6 +1533,13 @@ function lookupByMerchantName(merchantQuery) {
     });
   } else {
     console.log(chalk.green('\n✅ No offer activation failures found for this merchant.'));
+  }
+  if (testedActivationOk.length > 0) {
+    console.log(chalk.bold.cyan('\n📋 Offer activation – tested (OK):'));
+    testedActivationOk.forEach((t, i) => {
+      const dateStr = t.date && t.date.toLocaleString ? t.date.toLocaleString() : t.filename;
+      console.log(chalk.gray(`  ${i + 1}. ${dateStr} — ${t.filename}`));
+    });
   }
   console.log(chalk.gray('\n' + '─'.repeat(100)) + '\n');
 }
@@ -1440,16 +1623,25 @@ async function runFileManagerMenu() {
       console.log(chalk.yellow('No merchant rate result files found.'));
       return;
     }
-    const allMerchants = [];
-    let totalIssues = 0;
+    const merchantMap = new Map();
     const appIdSet = new Set();
     for (const file of files) {
       try {
         const data = JSON.parse(fs.readFileSync(path.join(outDir, file), 'utf8'));
-        (data.merchants || []).forEach(m => { allMerchants.push(m); appIdSet.add(m.appId); });
-        totalIssues += data.totalIssues || 0;
+        (data.merchants || []).forEach(m => {
+          appIdSet.add(m.appId);
+          const key = `${m.merchantId}-${m.appId}-${m.issueType}-${(m.rateName || m.reason || '').toString().slice(0, 200)}`;
+          if (merchantMap.has(key)) {
+            const existing = merchantMap.get(key);
+            existing.count = (existing.count || 0) + (m.count || 1);
+          } else {
+            merchantMap.set(key, { ...m });
+          }
+        });
       } catch (_) {}
     }
+    const allMerchants = Array.from(merchantMap.values());
+    const totalIssues = allMerchants.reduce((s, m) => s + (m.count || 0), 0);
     const out = {
       exportDate: new Date().toISOString(),
       totalIssues,
@@ -1467,13 +1659,22 @@ async function runFileManagerMenu() {
   }
   if (choice === '3') {
     const entries = loadAllResultFiles();
-    const rateMerchants = [];
+    const rateMerchantMap = new Map();
     const appIdSet = new Set();
     let totalRateIssues = 0;
     const activationResults = [];
     for (const e of entries) {
       if (e.type === 'merchant_rate') {
-        (e.merchants || []).forEach(m => { rateMerchants.push(m); appIdSet.add(m.appId); });
+        (e.merchants || []).forEach(m => {
+          appIdSet.add(m.appId);
+          const key = `${m.merchantId}-${m.appId}-${m.issueType}-${(m.rateName || m.reason || '').toString().slice(0, 200)}`;
+          if (rateMerchantMap.has(key)) {
+            const existing = rateMerchantMap.get(key);
+            existing.count = (existing.count || 0) + (m.count || 1);
+          } else {
+            rateMerchantMap.set(key, { ...m });
+          }
+        });
         totalRateIssues += e.totalIssues || 0;
       } else if (e.type === 'offer_activation') {
         try {
@@ -1482,10 +1683,11 @@ async function runFileManagerMenu() {
         } catch (_) {}
       }
     }
+    const rateMerchants = Array.from(rateMerchantMap.values());
     const out = {
       exportDate: new Date().toISOString(),
       merchantRate: {
-        totalIssues: totalRateIssues,
+        totalIssues: rateMerchants.reduce((s, m) => s + (m.count || 0), 0),
         merchants: rateMerchants,
         appIds: [...appIdSet]
       },
@@ -1499,13 +1701,8 @@ async function runFileManagerMenu() {
     const fJson = path.join(outDir, `full-report-combined-${ts}.json`);
     fs.writeFileSync(fJson, JSON.stringify(out, null, 2));
     console.log(chalk.green(`Combined report → ${fJson}`));
-    if (rateMerchants.length > 0) {
-      const fCsvRate = path.join(outDir, `full-report-merchant-rate-${ts}.csv`);
-      exportToCSV(rateMerchants, fCsvRate);
-    }
-    if (activationResults.length > 0) {
-      offerActivation.exportResultsToCSV(activationResults, `full-report-offer-activation-${ts}.csv`);
-    }
+    const fCsv = path.join(outDir, `full-report-combined-${ts}.csv`);
+    writeFullReportCombinedCSV(rateMerchants, activationResults, fCsv);
     return;
   }
   console.log(chalk.gray('Cancelled.'));
