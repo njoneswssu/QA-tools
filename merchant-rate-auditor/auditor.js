@@ -1058,7 +1058,7 @@ async function promptAndMarkRateFalseNegatives(report) {
 
 /**
  * Write one CSV file with two separate sections (tables): Merchant Rate then Offer Activation.
- * Each section has its own header row so the file acts like two sheets in one CSV.
+ * Also writes a second CSV with a single table that has one header row containing ALL columns from both.
  */
 function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) {
   const escapeCSV = (value) => {
@@ -1075,8 +1075,6 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
       .map((hop) => `${hop.url} (${hop.statusCode} ${hop.statusText || ''})`.trim())
       .join(' → ');
   };
-  const sections = [];
-  // --- Sheet 1: Merchant Rate (sorted by commission desc, then count desc) ---
   const rateHeaders = [
     'Merchant Name',
     'Merchant ID',
@@ -1090,25 +1088,6 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
     'Count',
     'False Negative'
   ];
-  const rateRows = (rateMerchants || []).map((m) => [
-    m.merchantName ?? '',
-    m.merchantId ?? '',
-    m.appId ?? '',
-    m.merchantCategory ?? '',
-    m.commission !== undefined && m.commission !== null && m.commission !== '' ? m.commission : '',
-    m.issueType ?? '',
-    m.reason ?? '',
-    m.rateName ?? '',
-    m.rateAmount ?? '',
-    m.count ?? '',
-    m.falseNegative ? 'Yes' : ''
-  ]);
-  sections.push([
-    '[Merchant Rate]',
-    rateHeaders.map(escapeCSV).join(','),
-    ...rateRows.map((row) => row.map(escapeCSV).join(','))
-  ].join('\n'));
-  // --- Sheet 2: Offer Activation ---
   const activationHeaders = [
     'Merchant Name',
     'Merchant ID',
@@ -1123,6 +1102,19 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
     'Issue Type',
     'Issue Message'
   ];
+  const rateRows = (rateMerchants || []).map((m) => [
+    m.merchantName ?? '',
+    m.merchantId ?? '',
+    m.appId ?? '',
+    m.merchantCategory ?? '',
+    m.commission !== undefined && m.commission !== null && m.commission !== '' ? m.commission : '',
+    m.issueType ?? '',
+    m.reason ?? '',
+    m.rateName ?? '',
+    m.rateAmount ?? '',
+    m.count ?? '',
+    m.falseNegative ? 'Yes' : ''
+  ]);
   const activationRows = [];
   for (const r of activationResults || []) {
     const redirectPath = redirectPathFor(r);
@@ -1146,18 +1138,46 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
       issueMessages
     ]);
   }
-  sections.push([
-    '[Offer Activation]',
-    activationHeaders.map(escapeCSV).join(','),
-    ...activationRows.map((row) => row.map(escapeCSV).join(','))
-  ].join('\n'));
-  const csvContent = sections.join('\n\n');
   if (rateRows.length === 0 && activationRows.length === 0) {
-    console.log(chalk.yellow('⚠️  No data for combined CSV.'));
+    console.log(chalk.yellow('⚠️  No data for combined report.'));
     return;
   }
-  fs.writeFileSync(filepath, csvContent);
-  console.log(chalk.green(`📊 Full report CSV saved to: ${filepath}`));
+
+  const xlsxOnly = filepath.toLowerCase().endsWith('.xlsx');
+  if (!xlsxOnly) {
+    const sections = [
+      [
+        '[Merchant Rate]',
+        rateHeaders.map(escapeCSV).join(','),
+        ...rateRows.map((row) => row.map(escapeCSV).join(','))
+      ].join('\n'),
+      [
+        '[Offer Activation]',
+        activationHeaders.map(escapeCSV).join(','),
+        ...activationRows.map((row) => row.map(escapeCSV).join(','))
+      ].join('\n')
+    ];
+    const csvContent = sections.join('\n\n');
+    fs.writeFileSync(filepath, csvContent);
+    console.log(chalk.green(`📊 Full report CSV saved to: ${filepath}`));
+  }
+
+  try {
+    const XLSX = require('xlsx');
+    const dateStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const wb = XLSX.utils.book_new();
+    const rateAoa = [rateHeaders, ...rateRows];
+    const activationAoa = [activationHeaders, ...activationRows];
+    const wsRate = XLSX.utils.aoa_to_sheet(rateAoa);
+    const wsActivation = XLSX.utils.aoa_to_sheet(activationAoa);
+    XLSX.utils.book_append_sheet(wb, wsActivation, `Offer Activation ${dateStr}`);
+    XLSX.utils.book_append_sheet(wb, wsRate, `Merchant Rate ${dateStr}`);
+    const xlsxPath = xlsxOnly ? filepath : filepath.replace(/\.csv$/i, '.xlsx');
+    XLSX.writeFile(wb, xlsxPath);
+    console.log(chalk.green(`📊 Full report XLSX (2 sheets) saved to: ${xlsxPath}`));
+  } catch (e) {
+    console.log(chalk.yellow('⚠️  Could not write XLSX (xlsx package required): ' + (e.message || e)));
+  }
 }
 
 /**
@@ -1270,9 +1290,6 @@ async function saveReport(report, skipCSVPrompt = false) {
   }
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const exportData = generateSimplifiedExport(report);
-  const jsonFilename = `merchant-issues-${timestamp}.json`;
-  const jsonFilepath = path.join(CONFIG.outputDir, jsonFilename);
-  exportToJSON(exportData, jsonFilepath, report);
 
   let rateMerchants = buildRateMerchantsForCombinedReport(report, new Set());
   const merchantIds = collectMerchantIdsFromReport(report);
@@ -1307,10 +1324,10 @@ async function saveReport(report, skipCSVPrompt = false) {
       const csvFilename = `merchant-issues-${timestamp}.csv`;
       const csvFilepath = path.join(CONFIG.outputDir, csvFilename);
       writeMerchantRateCSV(issuesOnly, csvFilepath);
-      return { json: jsonFilepath, csv: csvFilepath };
+      return { csv: csvFilepath };
     }
   }
-  return { json: jsonFilepath, csv: null };
+  return { csv: null };
 }
 
 /**
@@ -1929,23 +1946,14 @@ async function runFileManagerMenu() {
         (data.results || []).forEach(r => allResults.push(r));
       } catch (_) {}
     }
-    const out = {
-      exportDate: new Date().toISOString(),
-      totalTested: allResults.length,
-      successful: allResults.filter(r => r.success).length,
-      failed: allResults.filter(r => !r.success).length,
-      results: allResults
-    };
-    const fJson = path.join(outDir, `offer-activation-combined-${ts}.json`);
-    fs.writeFileSync(fJson, JSON.stringify(out, null, 2));
-    console.log(chalk.green(`Combined ${entries.length} file(s) → ${fJson}`));
     if (allResults.length > 0) {
       offerActivation.exportResultsToCSV(allResults, `offer-activation-combined-${ts}.csv`);
+      console.log(chalk.green(`Combined ${entries.length} file(s) → offer-activation-combined-${ts}.csv`));
     }
     return;
   }
   if (choice === '2') {
-    const files = fs.readdirSync(outDir).filter(f => f.startsWith('merchant-issues-') && f.endsWith('.json'));
+    const files = fs.readdirSync(outDir).filter(f => f.startsWith('merchant-issues-') && (f.endsWith('.csv') || f.endsWith('.json')));
     if (files.length === 0) {
       console.log(chalk.yellow('No merchant rate result files found.'));
       return;
@@ -1954,7 +1962,8 @@ async function runFileManagerMenu() {
     const appIdSet = new Set();
     for (const file of files) {
       try {
-        const data = JSON.parse(fs.readFileSync(path.join(outDir, file), 'utf8'));
+        const filepath = path.join(outDir, file);
+        const data = file.endsWith('.csv') ? parseMerchantIssuesCSV(filepath) : JSON.parse(fs.readFileSync(filepath, 'utf8'));
         (data.merchants || []).forEach(m => {
           appIdSet.add(m.appId);
           const key = `${m.merchantId}-${m.appId}-${m.issueType}-${(m.rateName || m.reason || '').toString().slice(0, 200)}`;
@@ -1968,19 +1977,10 @@ async function runFileManagerMenu() {
       } catch (_) {}
     }
     const allMerchants = Array.from(merchantMap.values());
-    const totalIssues = allMerchants.reduce((s, m) => s + (m.count || 0), 0);
-    const out = {
-      exportDate: new Date().toISOString(),
-      totalIssues,
-      merchants: allMerchants,
-      appIds: [...appIdSet]
-    };
-    const fJson = path.join(outDir, `merchant-rate-combined-${ts}.json`);
-    fs.writeFileSync(fJson, JSON.stringify(out, null, 2));
-    console.log(chalk.green(`Combined ${files.length} file(s) → ${fJson}`));
     if (allMerchants.length > 0) {
       const fCsv = path.join(outDir, `merchant-rate-combined-${ts}.csv`);
       exportToCSV(allMerchants, fCsv);
+      console.log(chalk.green(`Combined ${files.length} file(s) → ${fCsv}`));
     }
     return;
   }
@@ -2003,33 +2003,28 @@ async function runFileManagerMenu() {
           }
         });
         totalRateIssues += e.totalIssues || 0;
-      } else if (e.type === 'offer_activation') {
-        try {
-          const data = JSON.parse(fs.readFileSync(e.filepath, 'utf8'));
-          (data.results || []).forEach(r => activationResults.push(r));
-        } catch (_) {}
+      } else if (e.type === 'offer_activation' && (e.merchants || []).length > 0) {
+        (e.merchants || []).forEach((m) => {
+          activationResults.push({
+            merchantName: m.merchantName || m.name,
+            merchantId: m.merchantId ?? m.id,
+            appId: m.appId,
+            merchantDomain: m.merchantDomain || m.domain,
+            success: m.success,
+            falseNegative: m.falseNegative,
+            testUrl: m.testUrl,
+            finalUrl: m.finalUrl,
+            redirectCount: m.redirectCount,
+            issues: m.issues,
+            error: m.error
+          });
+        });
       }
     }
     const rateMerchants = Array.from(rateMerchantMap.values());
-    const out = {
-      exportDate: new Date().toISOString(),
-      merchantRate: {
-        totalIssues: rateMerchants.reduce((s, m) => s + (m.count || 0), 0),
-        merchants: rateMerchants,
-        appIds: [...appIdSet]
-      },
-      offerActivation: {
-        totalTested: activationResults.length,
-        successful: activationResults.filter(r => r.success).length,
-        failed: activationResults.filter(r => !r.success).length,
-        results: activationResults
-      }
-    };
-    const fJson = path.join(outDir, `full-report-combined-${ts}.json`);
-    fs.writeFileSync(fJson, JSON.stringify(out, null, 2));
-    console.log(chalk.green(`Combined report → ${fJson}`));
     const fCsv = path.join(outDir, `full-report-combined-${ts}.csv`);
     writeFullReportCombinedCSV(rateMerchants, activationResults, fCsv);
+    console.log(chalk.green(`Combined report → ${fCsv} (+ XLSX)`));
     return;
   }
   console.log(chalk.gray('Cancelled.'));
@@ -2048,11 +2043,17 @@ function shuffleArray(arr) {
 /**
  * Run full audit: merchant rate then offer activation; at end show merchants with both failures as "multiple issues".
  * Prompts for App IDs, then max merchants per App ID (blank = all). Same merchant set is used for Part 1 and Part 2.
- * Does not save Part 1 alone; saves one combined JSON + CSV at the end if user confirms.
+ * Does not save Part 1 alone; saves one combined Excel (XLSX) at the end if user confirms.
  */
 async function runFullAudit() {
   const appIds = await promptForAppIds();
   if (!appIds || appIds.length === 0) return;
+  console.log(chalk.cyan('Merchants already tested (offer activation) per App ID:'));
+  for (const appId of appIds) {
+    const testedSet = offerActivation.loadTestedMerchants(appId);
+    console.log(chalk.cyan(`  App ID ${appId}: ${testedSet.size} merchant(s) already tested`));
+  }
+  console.log('');
   const specificNamesAnswer = await new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     rl.question(chalk.cyan('Are you testing specific merchant names? (yes/no): '), (a) => {
@@ -2105,6 +2106,51 @@ async function runFullAudit() {
     }
     merchantsByAppId[appId] = withUrl;
   }
+  console.log(chalk.cyan('Merchants to test per App ID:'));
+  for (const appId of appIds) {
+    const n = (merchantsByAppId[appId] || []).length;
+    console.log(chalk.cyan(`  App ID ${appId}: ${n} merchant(s)`));
+  }
+  let totalToTest = 0;
+  let alreadyTestedInList = 0;
+  for (const appId of appIds) {
+    const list = merchantsByAppId[appId] || [];
+    totalToTest += list.length;
+    const testedSet = offerActivation.loadTestedMerchants(appId);
+    list.forEach((m) => { if (testedSet.has(Number(m.ID))) alreadyTestedInList++; });
+  }
+  if (alreadyTestedInList > 0 && totalToTest > 0 && process.stdin.isTTY) {
+    console.log(chalk.yellow(`\n  ${alreadyTestedInList} of ${totalToTest} merchants were already tested (offer activation).`));
+    const action = await new Promise((resolve) => {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      rl.question(chalk.cyan('Skip them, test them again, or cancel? (skip / again / cancel): '), (answer) => {
+        rl.close();
+        const a = (answer && answer.trim().toLowerCase()) || '';
+        if (a === 'skip' || a === 's') resolve('skip');
+        else if (a === 'again' || a === 'a') resolve('again');
+        else resolve('cancel');
+      });
+    });
+    if (action === 'cancel') {
+      console.log(chalk.gray('Full audit cancelled.\n'));
+      return;
+    }
+    if (action === 'skip') {
+      for (const appId of appIds) {
+        const testedSet = offerActivation.loadTestedMerchants(appId);
+        merchantsByAppId[appId] = (merchantsByAppId[appId] || []).filter((m) => !testedSet.has(Number(m.ID)));
+      }
+      const newTotal = appIds.reduce((sum, appId) => sum + (merchantsByAppId[appId] || []).length, 0);
+      if (newTotal === 0) {
+        console.log(chalk.yellow('No untested merchants left. Full audit cancelled.\n'));
+        return;
+      }
+      console.log(chalk.gray(`  Testing ${newTotal} untested merchant(s) only.\n`));
+    } else {
+      console.log(chalk.gray('  Testing all selected merchants again.\n'));
+    }
+  }
+  console.log('');
   const results = [];
   for (const appId of appIds) {
     const merchantIds = (merchantsByAppId[appId] || []).map(m => m.ID);
@@ -2174,7 +2220,7 @@ async function runFullAudit() {
   }
   const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const saveAnswer = await new Promise((resolve) => {
-    saveRl.question(chalk.cyan('Save full audit results (combined JSON + CSV)? (yes/no): '), (answer) => {
+    saveRl.question(chalk.cyan('Save full audit results (Excel)? (yes/no): '), (answer) => {
       saveRl.close();
       resolve(!!(answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y')));
     });
@@ -2203,26 +2249,9 @@ async function runFullAudit() {
       if (cb !== ca) return cb - ca;
       return (b.count || 0) - (a.count || 0);
     });
-    const combined = {
-      exportDate: new Date().toISOString(),
-      merchantRate: {
-        totalIssues: rateMerchants.reduce((s, m) => s + (m.count || 0), 0),
-        merchants: rateMerchants,
-        appIds: [...new Set(rateMerchants.map(m => m.appId))]
-      },
-      offerActivation: {
-        totalTested: activationResults.length,
-        successful: activationResults.filter(r => r.success).length,
-        failed: activationResults.filter(r => !r.success).length,
-        results: activationResults
-      }
-    };
-    const fJson = path.join(outDir, `full-audit-combined-${ts}.json`);
-    fs.writeFileSync(fJson, JSON.stringify(combined, null, 2));
-    console.log(chalk.green(`Combined JSON → ${fJson}`));
-    const fCsv = path.join(outDir, `full-audit-combined-${ts}.csv`);
-    writeFullReportCombinedCSV(rateMerchants, activationResults, fCsv);
-    console.log(chalk.green(`Combined CSV  → ${fCsv}`));
+    const fXlsx = path.join(outDir, `full-audit-combined-${ts}.xlsx`);
+    writeFullReportCombinedCSV(rateMerchants, activationResults, fXlsx);
+    console.log(chalk.green(`Full audit report → ${fXlsx}`));
     if (activationResults.length > 0) {
       const markAnswer = await new Promise((resolve) => {
         const rl = readline.createInterface({ input: process.stdin, output: process.stdout });

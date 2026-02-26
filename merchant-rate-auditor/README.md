@@ -16,7 +16,7 @@ A comprehensive Node.js application for testing Wildlink merchants. Includes two
 - ✅ Identifies hex code values that shouldn't be commission rates
 - ✅ Detects invalid/nonsensical rate names
 - ✅ Generates detailed audit reports
-- ✅ Saves results to JSON files
+- ✅ Saves results to CSV (optional prompt after audit)
 
 ### Offer Activation Testing
 - 🔗 **Redirect Chain Analysis**: Follows full redirect chains from wild.link/affiliate URLs
@@ -25,7 +25,7 @@ A comprehensive Node.js application for testing Wildlink merchants. Includes two
 - 🔗 **Batch Testing**: Test multiple merchants from feeds at once
 - 🔗 **Progress Updates**: Progress every 10 merchants (e.g. 10, 20, 30 … up to total)
 - 🔗 **False Negatives**: After tests with failures, you can mark specific merchants as false negatives (user-tested and passed); results are updated and you can save
-- 🔗 **Export Results**: Save failed activations to JSON/CSV
+- 🔗 **Export Results**: Save results to CSV
 
 ### Run Full Audit (Main menu option 4)
 - 📋 **Single flow**: Part 1 = Merchant rate audit; Part 2 = Offer activation (optional) on the **same** merchants
@@ -34,7 +34,7 @@ A comprehensive Node.js application for testing Wildlink merchants. Includes two
 - 📋 **Specific merchants**: "Or test only these merchant IDs (comma-separated, leave blank to use max/all)" — restrict the run to specific merchant IDs across all selected apps
 - 📋 **No save after Part 1**: Rate audit results are not saved until the end; only one combined save is offered
 - 📋 **Part 2 question**: After Part 1 you are asked "Run offer activation for these App IDs? (yes/no)"
-- 📋 **Combined output**: At the end you can save **one combined JSON** and **one combined CSV** (rate + activation) with filenames like `full-audit-combined-{timestamp}.json` and `.csv`
+- 📋 **Combined output**: At the end you can save **one Excel file (XLSX)** with two sheets (Merchant Rate + Offer Activation, with date in sheet names), e.g. `full-audit-combined-{timestamp}.xlsx`
 - 📋 **Mark as tested**: Option to mark merchants as tested for offer activation (for skip-next-time logic)
 - 📋 **False negatives**: If any offer activation tests failed, you can mark specific merchants as false negatives (user tested) before saving
 
@@ -221,7 +221,7 @@ When you select "Offer Activation Testing" from the main menu:
 ### Progress and False Negatives (Offer Activation)
 
 - **Progress**: During batch or full-audit offer activation, progress is printed every 10 merchants (e.g. `Progress: 20/200 — 18 OK, 2 failed`).
-- **False negatives**: When there are failed activations, you are asked: "Would you like to mark any of these as false negatives? (yes/no)". If yes, you enter **merchant IDs** (comma-separated) that you manually verified as working. Those results are updated to success with reason "User tested (false negative)". You can then save results (combined JSON/CSV in full audit, or offer activation JSON/CSV in batch).
+- **False negatives**: When there are failed activations, you are asked: "Would you like to mark any of these as false negatives? (yes/no)". If yes, you enter **merchant IDs** (comma-separated) that you manually verified as working. Those results are updated to success with reason "User tested (false negative)". You can then save results (Excel in full audit, or offer activation CSV in batch).
 
 ---
 
@@ -236,7 +236,7 @@ Run full audit combines **Part 1: Merchant Rate Audit** and **Part 2: Offer Acti
 5. **Part 2** — You are asked: "Run offer activation for these App IDs? (yes/no)". If yes, the same merchants are tested for offer activation (progress every 10).
 6. **Multiple issues** — Merchants that failed both rate audit and offer activation are listed.
 7. **False negatives** — If any activation tests failed, you can mark specific merchant IDs as false negatives (user tested); results are updated before save.
-8. **Save** — One prompt: "Save full audit results (combined JSON + CSV)? (yes/no)". If yes, one `full-audit-combined-{timestamp}.json` and one `.csv` are written (rate + activation in one file). Option to mark merchants as tested for offer activation follows.
+8. **Save** — One prompt: "Save full audit results (Excel)? (yes/no)". If yes, one `full-audit-combined-{timestamp}.xlsx` is written (two sheets: Merchant Rate and Offer Activation, with date in sheet names). Option to mark merchants as tested for offer activation follows.
 
 ---
 
@@ -308,37 +308,14 @@ Rates where the amount or name field contains a hex code value instead of a vali
 The auditor generates:
 
 1. **Console Output**: Real-time progress and a formatted report
-2. **Merchant Issues JSON**: Saved to `audit-results/merchant-issues-[timestamp].json` (merchant names and flag reasons)
-3. **Optional CSV Export**: After the audit completes, you'll be prompted if you want to also export as CSV
+2. **Merchant Issues CSV** (optional): After the audit completes, you're prompted to export. If yes, saved to `audit-results/merchant-issues-[timestamp].csv` with columns: Merchant Name, Merchant ID, App ID, Merchant Category, Commission, Issue Type, Reason or Message, Rate Name, Rate Amount, Count, False Negative
 
-**Note:** The CSV export is optional and only generated if you answer "yes" when prompted. The JSON file is always created.
+**Note:** No JSON files are written. CSV export is optional and only generated if you answer "yes" when prompted.
 
 ### Report Structure
 
-#### Merchant Issues JSON (`merchant-issues-[timestamp].json`)
-Easy-to-read format with merchant names and flag reasons (one example per merchant per issue type):
-
-```json
-{
-  "exportDate": "2025-01-15T10:30:00.000Z",
-  "totalIssues": 319,
-  "merchants": [
-    {
-      "merchantName": "RAVPower",
-      "merchantId": "6765",
-      "appId": 451,
-      "issueType": "commission_in_name",
-      "severity": "medium",
-      "reason": "Rate name contains \"commission\": \"RP Commission 8.0 Regular\"",
-      "rateName": "RP Commission 8.0 Regular",
-      "rateAmount": "3",
-      "count": 5
-    }
-  ]
-}
-```
-
-**Note:** The `count` field shows how many times this issue type appeared for this merchant. Only one example is shown per merchant per issue type.
+#### Merchant Issues CSV (`merchant-issues-[timestamp].csv`)
+Table format with one row per issue (merchant names, flag reasons, commission, etc.). The combine flow (File manager) can merge multiple merchant-issues CSV files; full audit saves Excel only (XLSX with two dated sheets).
 
 ## Features
 
@@ -350,9 +327,10 @@ Easy-to-read format with merchant names and flag reasons (one example per mercha
 
 ### Export Formats
 
-- **Full JSON Report**: Complete audit data with all rate details
-- **Simplified CSV**: Merchant names and flag reasons (one example per merchant per issue type)
-- **Simplified JSON**: Same as CSV but in JSON format
+- **Merchant Rate**: Optional CSV only (no JSON). Columns include Merchant Name, Merchant ID, App ID, Commission, Issue Type, Reason, Rate Name, Rate Amount, Count, False Negative.
+- **Offer Activation**: CSV only (batch and single-link saves).
+- **Full Audit**: Excel (XLSX) only — one file with two sheets (Merchant Rate and Offer Activation), sheet names include the date (e.g. "Merchant Rate 2026-02-26").
+- **File Manager (Combine)**: Combine offer-activation or merchant-rate results into CSV; option 3 (both) produces CSV + XLSX.
 
 ## Exit Codes
 

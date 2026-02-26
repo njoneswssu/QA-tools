@@ -39,21 +39,10 @@ let _interruptSaveAppId = null;
 function saveInterruptedResults() {
   if (!_interruptSaveRef || _interruptSaveRef.length === 0) return;
   const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const out = {
-    interrupted: true,
-    exportDate: new Date().toISOString(),
-    totalTested: _interruptSaveRef.length,
-    successful: _interruptSaveRef.filter(r => r.success).length,
-    failed: _interruptSaveRef.filter(r => !r.success).length,
-    results: _interruptSaveRef,
-    appId: _interruptSaveAppId
-  };
   if (!fs.existsSync(CONFIG.outputDir)) fs.mkdirSync(CONFIG.outputDir, { recursive: true });
-  const jsonPath = path.join(CONFIG.outputDir, `offer-activation-interrupted-${ts}.json`);
-  fs.writeFileSync(jsonPath, JSON.stringify(out, null, 2));
-  console.log(chalk.yellow('\n⚠️  Interrupted. Partial results saved to ' + jsonPath));
   try {
-    exportResultsToCSV(_interruptSaveRef, `offer-activation-interrupted-${ts}.csv`);
+    const csvPath = exportResultsToCSV(_interruptSaveRef, `offer-activation-interrupted-${ts}.csv`);
+    if (csvPath) console.log(chalk.yellow('\n⚠️  Interrupted. Partial results saved to ' + csvPath));
   } catch (_) {}
   _interruptSaveRef = null;
   _interruptSaveAppId = null;
@@ -1904,6 +1893,7 @@ module.exports = {
   runOfferActivationBatchForAppIds,
   runBatchForOneAppId,
   markMerchantsAsTested,
+  loadTestedMerchants,
   promptAndMarkFalseNegatives,
   showOfferActivationMenu,
   fetchMerchantData,

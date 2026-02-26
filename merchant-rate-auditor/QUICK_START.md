@@ -77,10 +77,9 @@ node auditor.js --clear
 The auditor generates:
 
 - **Console**: Real-time colored output with summary
-- **Merchant Issues JSON**: `audit-results/merchant-issues-[timestamp].json` (always created)
-- **Optional CSV**: `audit-results/merchant-issues-[timestamp].csv` (only if you answer "yes" when prompted)
+- **Merchant Issues CSV** (optional): `audit-results/merchant-issues-[timestamp].csv` — only if you answer "yes" when prompted. No JSON files are created.
 
-After each audit, you'll be asked if you want to export as CSV as well. The JSON file is always created automatically.
+**Full audit** saves one Excel file (XLSX) with two sheets (Merchant Rate + Offer Activation). **Offer activation** saves CSV only.
 
 ## Exit Codes
 
