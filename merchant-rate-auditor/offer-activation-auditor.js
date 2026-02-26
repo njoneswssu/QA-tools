@@ -1256,20 +1256,26 @@ async function deleteAllOfferActivationResults() {
 /**
  * Run offer activation batch for a single App ID (no prompts). Used by combined full audit.
  * @param {number} appId
- * @param {{ limit: number, session: { deviceId, trackingCode, shoppingTripCode }, skipAlreadyTested: boolean }} options
+ * @param {{ limit: number, session: object, skipAlreadyTested: boolean, merchants: Array }} options
+ *   - merchants: if provided, use this list instead of fetching (same merchants as rate audit).
  * @returns {Promise<Array>} results
  */
 async function runBatchForOneAppId(appId, options = {}) {
-  const { limit = 10, session = {}, skipAlreadyTested = true } = options;
-  const merchants = await fetchMerchantData(appId);
-  if (merchants.length === 0) return [];
-  const allTestable = merchants.filter(m => m.URL || m.Domain);
-  const testedSet = loadTestedMerchants(appId);
-  let toTest = allTestable;
-  if (skipAlreadyTested && testedSet.size > 0) {
-    toTest = allTestable.filter(m => !testedSet.has(Number(m.ID)));
+  const { limit = 10, session = {}, skipAlreadyTested = true, merchants: providedMerchants = null } = options;
+  let toTest;
+  if (providedMerchants && providedMerchants.length > 0) {
+    toTest = providedMerchants.filter(m => m.URL || m.Domain);
+  } else {
+    const merchants = await fetchMerchantData(appId);
+    if (merchants.length === 0) return [];
+    const allTestable = merchants.filter(m => m.URL || m.Domain);
+    const testedSet = loadTestedMerchants(appId);
+    let list = allTestable;
+    if (skipAlreadyTested && testedSet.size > 0) {
+      list = allTestable.filter(m => !testedSet.has(Number(m.ID)));
+    }
+    toTest = shuffleArray(list).slice(0, limit);
   }
-  toTest = shuffleArray(toTest).slice(0, limit);
   if (toTest.length === 0) return [];
   let activeDomains = [];
   try {
@@ -1293,11 +1299,11 @@ async function runBatchForOneAppId(appId, options = {}) {
  * Run offer activation batch for multiple App IDs. Gets session once (saved or prompt), then runs batch per app.
  * Used by combined full audit from main menu.
  * @param {number[]} appIds
- * @param {{ limit?: number }} options
+ * @param {{ limit?: number, merchantsByAppId?: Object }} options - merchantsByAppId[appId] = array of merchants (same set as rate audit).
  * @returns {Promise<{ results: Array, byAppId: Object }>}
  */
 async function runOfferActivationBatchForAppIds(appIds, options = {}) {
-  const limit = options.limit || 10;
+  const { limit = 10, merchantsByAppId = null } = options;
   let session = { deviceId: '', trackingCode: '', shoppingTripCode: '' };
   const saved = loadSavedSession();
   if (saved && (saved.deviceId || saved.trackingCode || saved.shoppingTripCode)) {
@@ -1322,8 +1328,12 @@ async function runOfferActivationBatchForAppIds(appIds, options = {}) {
   const allResults = [];
   const byAppId = {};
   for (const appId of appIds) {
-    console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (up to ${limit} merchants)...`));
-    const results = await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true });
+    const merchants = merchantsByAppId && merchantsByAppId[appId];
+    const count = merchants ? merchants.length : limit;
+    console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (${count} merchants)...`));
+    const results = merchants
+      ? await runBatchForOneAppId(appId, { session, merchants })
+      : await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true });
     byAppId[appId] = results;
     allResults.push(...results);
   }

@@ -678,9 +678,16 @@ async function fetchMerchantRates(appId) {
 }
 
 /**
- * Audit merchant rates for a specific app ID
+ * Audit merchant rates for a specific app ID.
+ * @param {number} appId
+ * @param {{ limitToMerchantIds?: (string|number)[] }} options - If set, only audit these merchant IDs (for full audit same-set).
  */
-async function auditAppId(appId) {
+async function auditAppId(appId, options = {}) {
+  const { limitToMerchantIds } = options;
+  const allowedIds = limitToMerchantIds && limitToMerchantIds.length > 0
+    ? new Set(limitToMerchantIds.map(id => String(id)))
+    : null;
+
   // Fetch merchant rates and merchant data (which includes categories)
   console.log(chalk.blue(`📡 Fetching data for App ID ${appId}...`));
   const [rateData, merchantMap] = await Promise.all([
@@ -712,6 +719,7 @@ async function auditAppId(appId) {
   // Iterate through all merchants (keys are merchant IDs)
   for (const [merchantId, rates] of Object.entries(rateData)) {
     if (!Array.isArray(rates)) continue;
+    if (allowedIds && !allowedIds.has(String(merchantId))) continue;
     
     totalMerchants++;
     totalRates += rates.length;
@@ -1752,22 +1760,55 @@ async function runFileManagerMenu() {
   console.log(chalk.gray('Cancelled.'));
 }
 
+/** Shuffle array in place and return it (Fisher–Yates). */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 /**
  * Run full audit: merchant rate then offer activation; at end show merchants with both failures as "multiple issues".
+ * Prompts for App IDs, then max merchants per App ID (blank = all). Same merchant set is used for Part 1 and Part 2.
+ * Does not save Part 1 alone; saves one combined JSON + CSV at the end if user confirms.
  */
 async function runFullAudit() {
   const appIds = await promptForAppIds();
   if (!appIds || appIds.length === 0) return;
-  console.log(chalk.cyan(`\nAuditing App IDs: ${appIds.join(', ')}\n`));
+  const maxMerchantsAnswer = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Max merchants to test per App ID (blank = all): '), (a) => {
+      rl.close();
+      resolve((a && a.trim()) || '');
+    });
+  });
+  const maxMerchants = maxMerchantsAnswer === '' ? null : (parseInt(maxMerchantsAnswer, 10) || null);
+  if (maxMerchants != null) {
+    console.log(chalk.gray(`Limiting to ${maxMerchants} merchants per App ID.\n`));
+  } else {
+    console.log(chalk.gray('No limit; testing all merchants per App ID.\n'));
+  }
+  console.log(chalk.cyan(`Auditing App IDs: ${appIds.join(', ')}\n`));
   console.log(chalk.bold.cyan('——— Part 1: Merchant Rate Audit ———\n'));
+  const merchantsByAppId = {};
+  for (const appId of appIds) {
+    const raw = await offerActivation.fetchMerchantData(appId);
+    const withUrl = (raw || []).filter(m => m.URL || m.Domain);
+    const list = maxMerchants != null ? shuffleArray(withUrl).slice(0, maxMerchants) : withUrl;
+    merchantsByAppId[appId] = list;
+  }
   const results = [];
   for (const appId of appIds) {
-    const result = await auditAppId(appId);
+    const merchantIds = (merchantsByAppId[appId] || []).map(m => m.ID);
+    const result = await auditAppId(appId, merchantIds.length > 0 ? { limitToMerchantIds: merchantIds } : {});
     results.push(result);
   }
   const report = generateReport(results);
   printResults(report);
-  await saveReport(report, false);
+  // Do NOT save Part 1 here; save combined at the end.
   console.log(chalk.bold.cyan('\n——— Part 2: Offer Activation ———\n'));
   const runOffer = await new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -1776,27 +1817,22 @@ async function runFullAudit() {
       resolve(!!(answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')));
     });
   });
-  if (!runOffer) {
+  let activationResults = [];
+  let byAppId = {};
+  if (runOffer) {
+    const batch = await offerActivation.runOfferActivationBatchForAppIds(appIds, { merchantsByAppId });
+    activationResults = batch.results || [];
+    byAppId = batch.byAppId || {};
+  } else {
     console.log(chalk.gray('Skipping offer activation.'));
-    return;
   }
-  const limitAnswer = await new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question(chalk.cyan('Max merchants per App ID (default 10): '), (a) => {
-      rl.close();
-      resolve((a && a.trim()) || '10');
+  const rateIssueByMerchant = new Map();
+  (report.results || []).forEach(appResult => {
+    (appResult.issues || []).forEach(issueGroup => {
+      if (issueGroup.merchantId) rateIssueByMerchant.set(String(issueGroup.merchantId), issueGroup);
     });
   });
-  const limit = parseInt(limitAnswer, 10) || 10;
-  const { results: activationResults, byAppId } = await offerActivation.runOfferActivationBatchForAppIds(appIds, { limit });
   if (activationResults.length > 0) {
-    const rateIssueByMerchant = new Map();
-    (report.results || []).forEach(appResult => {
-      (appResult.issues || []).forEach(issueGroup => {
-        if (issueGroup.merchantId) rateIssueByMerchant.set(String(issueGroup.merchantId), issueGroup);
-      });
-    });
-    const failedActivationIds = new Set(activationResults.filter(r => !r.success).map(r => String(r.merchantId)));
     const multipleIssues = activationResults.filter(r => !r.success && rateIssueByMerchant.has(String(r.merchantId)));
     if (multipleIssues.length > 0) {
       console.log(chalk.bold.red('\n⚠️  Merchants with MULTIPLE ISSUES (rate + activation failure):\n'));
@@ -1810,31 +1846,53 @@ async function runFullAudit() {
       console.log(chalk.gray('─'.repeat(100)) + '\n');
     }
     offerActivation.printResultsSummary(activationResults);
-    const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    await new Promise((resolve) => {
-      saveRl.question(chalk.cyan('Save offer activation results? (yes/no): '), (answer) => {
-        const isYes = answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y');
-        if (isYes) {
-          offerActivation.exportResults(activationResults);
-          if (byAppId) {
-            for (const [appIdStr, list] of Object.entries(byAppId)) {
-              const ids = (list || []).map(r => r.merchantId).filter(id => id != null);
-              if (ids.length > 0) offerActivation.markMerchantsAsTested(Number(appIdStr), ids);
-            }
-          }
-          saveRl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
-            saveRl.close();
-            if (csvAnswer && (csvAnswer.toLowerCase().trim() === 'yes' || csvAnswer.toLowerCase().trim() === 'y')) {
-              offerActivation.exportResultsToCSV(activationResults);
-            }
-            resolve();
-          });
-        } else {
-          saveRl.close();
-          resolve();
-        }
-      });
+  }
+  const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const saveAnswer = await new Promise((resolve) => {
+    saveRl.question(chalk.cyan('Save full audit results (combined JSON + CSV)? (yes/no): '), (answer) => {
+      saveRl.close();
+      resolve(!!(answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y')));
     });
+  });
+  if (saveAnswer) {
+    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const outDir = CONFIG.outputDir;
+    const rateMerchants = generateSimplifiedExport(report);
+    const combined = {
+      exportDate: new Date().toISOString(),
+      merchantRate: {
+        totalIssues: rateMerchants.reduce((s, m) => s + (m.count || 0), 0),
+        merchants: rateMerchants,
+        appIds: [...new Set(rateMerchants.map(m => m.appId))]
+      },
+      offerActivation: {
+        totalTested: activationResults.length,
+        successful: activationResults.filter(r => r.success).length,
+        failed: activationResults.filter(r => !r.success).length,
+        results: activationResults
+      }
+    };
+    const fJson = path.join(outDir, `full-audit-combined-${ts}.json`);
+    fs.writeFileSync(fJson, JSON.stringify(combined, null, 2));
+    console.log(chalk.green(`Combined JSON → ${fJson}`));
+    const fCsv = path.join(outDir, `full-audit-combined-${ts}.csv`);
+    writeFullReportCombinedCSV(rateMerchants, activationResults, fCsv);
+    console.log(chalk.green(`Combined CSV  → ${fCsv}`));
+    if (activationResults.length > 0) {
+      const markAnswer = await new Promise((resolve) => {
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        rl.question(chalk.cyan('Mark these merchants as tested for offer activation? (yes/no): '), (a) => {
+          rl.close();
+          resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
+        });
+      });
+      if (markAnswer && byAppId) {
+        for (const [appIdStr, list] of Object.entries(byAppId)) {
+          const ids = (list || []).map(r => r.merchantId).filter(id => id != null);
+          if (ids.length > 0) offerActivation.markMerchantsAsTested(Number(appIdStr), ids);
+        }
+      }
+    }
   }
 }
 
