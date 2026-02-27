@@ -1638,13 +1638,11 @@ async function runOfferActivationTest() {
     const save = await askYesNo('\nSave results before leaving? (yes/no): ');
     if (!save) return;
     if (hasLink) {
-      exportResults(unsavedLinkResults);
+      exportResultsToCSV(unsavedLinkResults);
       unsavedLinkResults = [];
     }
     if (hasBatch) {
-      exportResults(unsavedBatchResults);
-      const doCsv = await askYesNo('Export results to CSV? (yes/no): ');
-      if (doCsv) exportResultsToCSV(unsavedBatchResults);
+      exportResultsToCSV(unsavedBatchResults);
       unsavedBatchResults = null;
     }
   }
@@ -1686,7 +1684,7 @@ async function runOfferActivationTest() {
                 saveRl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
                   saveRl.close();
                   if (answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')) {
-                    exportResults(unsavedLinkResults);
+                    exportResultsToCSV(unsavedLinkResults);
                     unsavedLinkResults = [];
                   }
                   resolve();
@@ -1836,22 +1834,13 @@ async function runOfferActivationTest() {
             rl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
               const isYes = answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y');
               if (isYes) {
-                exportResults(results);
+                exportResultsToCSV(results);
                 unsavedBatchResults = null;
                 const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
                 if (merchantIds.length > 0) markMerchantsAsTested(config.appId, merchantIds);
-                rl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
-                  rl.close();
-                  if (csvAnswer && (csvAnswer.toLowerCase().trim() === 'yes' || csvAnswer.toLowerCase().trim() === 'y')) {
-                    exportResultsToCSV(results);
-                  }
-                  resolve();
-                });
-              } else {
-                unsavedBatchResults = null;
-                rl.close();
-                resolve();
               }
+              rl.close();
+              resolve();
             });
           });
         }

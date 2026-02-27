@@ -1379,16 +1379,13 @@ function listPreviousAudits() {
   try {
     const files = fs.readdirSync(CONFIG.outputDir);
     const auditFiles = files
-      .filter(file => file.startsWith('merchant-issues-') && file.endsWith('.json'))
+      .filter(file => file.startsWith('merchant-issues-') && (file.endsWith('.json') || file.endsWith('.csv')))
       .map(file => {
         const filepath = path.join(CONFIG.outputDir, file);
         const stats = fs.statSync(filepath);
-        const timestamp = file.match(/merchant-issues-(.+)\.json/)?.[1];
-        
-        // Parse timestamp: format is "2026-02-05T21-46-55-372Z"
+        const timestamp = file.match(/merchant-issues-(.+)\.(?:json|csv)/)?.[1];
         let date = new Date();
         if (timestamp) {
-          // Convert "2026-02-05T21-46-55-372Z" to ISO format "2026-02-05T21:46:55.372Z"
           const isoString = timestamp.replace(/(\d{4}-\d{2}-\d{2}T\d{2})-(\d{2})-(\d{2})-(\d+)Z/, 
             (match, datePart, hour, min, rest) => {
               const sec = rest.substring(0, 2);
@@ -1396,19 +1393,27 @@ function listPreviousAudits() {
               return `${datePart}${hour}:${min}:${sec}.${ms}Z`;
             });
           date = new Date(isoString);
-          if (isNaN(date.getTime())) {
-            date = stats.mtime; // Fallback to file modification time
-          }
+          if (isNaN(date.getTime())) date = stats.mtime;
         } else {
-          date = stats.mtime; // Fallback to file modification time
+          date = stats.mtime;
         }
-        
         try {
-          const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-          const appIds = [...new Set(data.merchants?.map(m => m.appId) || [])];
-          const totalIssues = data.totalIssues ?? data.merchants?.length ?? 0;
-          const merchantsWithIssues = data.merchantsWithIssues ?? data.merchants?.length ?? 0;
-          const totalMerchantsAudited = data.totalMerchantsAudited ?? null;
+          let appIds = [];
+          let totalIssues = 0;
+          let merchantsWithIssues = 0;
+          let totalMerchantsAudited = null;
+          if (file.endsWith('.csv')) {
+            const data = parseMerchantIssuesCSV(filepath);
+            appIds = [...new Set((data.merchants || []).map(m => m.appId).filter(Boolean))];
+            totalIssues = data.totalIssues;
+            merchantsWithIssues = (data.merchants || []).length;
+          } else {
+            const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+            appIds = [...new Set(data.merchants?.map(m => m.appId) || [])];
+            totalIssues = data.totalIssues ?? data.merchants?.length ?? 0;
+            merchantsWithIssues = data.merchantsWithIssues ?? data.merchants?.length ?? 0;
+            totalMerchantsAudited = data.totalMerchantsAudited ?? null;
+          }
           return {
             filename: file,
             filepath: filepath,
@@ -1431,7 +1436,6 @@ function listPreviousAudits() {
             totalIssues: 0,
             merchantsWithIssues: 0,
             totalMerchantsAudited: null,
-            totalRates: 0,
             totalRates: 0,
             size: stats.size,
             error: 'Could not parse file'
@@ -1562,17 +1566,28 @@ function loadOfferActivationResultSummary() {
     return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`);
   };
   for (const file of files) {
-    if (!file.startsWith('offer-activation-') || !file.endsWith('.json') || file.includes('session') || file.includes('tested-merchants') || file.includes('combined')) continue;
     const filepath = path.join(CONFIG.outputDir, file);
     try {
-      const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-      entries.push({
-        filename: file,
-        date: parseDate(file),
-        totalTested: data.totalTested ?? (data.results || []).length,
-        successful: data.successful ?? (data.results || []).filter(r => r.success).length,
-        failed: data.failed ?? (data.results || []).filter(r => !r.success).length
-      });
+      if (file.startsWith('offer-activation-results-') && file.endsWith('.csv')) {
+        const data = parseOfferActivationResultsCSV(filepath);
+        const results = data.results || [];
+        entries.push({
+          filename: file,
+          date: parseDate(file),
+          totalTested: results.length,
+          successful: results.filter(r => r.success).length,
+          failed: results.filter(r => !r.success).length
+        });
+      } else if (file.startsWith('offer-activation-') && file.endsWith('.json') && !file.includes('session') && !file.includes('tested-merchants') && !file.includes('combined')) {
+        const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+        entries.push({
+          filename: file,
+          date: parseDate(file),
+          totalTested: data.totalTested ?? (data.results || []).length,
+          successful: data.successful ?? (data.results || []).filter(r => r.success).length,
+          failed: data.failed ?? (data.results || []).filter(r => !r.success).length
+        });
+      }
     } catch (_) {}
   }
   return entries.sort((a, b) => b.date - a.date);
@@ -1659,7 +1674,23 @@ function loadAllResultFiles() {
   };
   for (const file of files) {
     const filepath = path.join(CONFIG.outputDir, file);
-    if (file.startsWith('merchant-issues-') && file.endsWith('.json')) {
+    if (file.startsWith('merchant-issues-') && file.endsWith('.csv')) {
+      try {
+        const data = parseMerchantIssuesCSV(filepath);
+        const appIds = [...new Set((data.merchants || []).map(m => m.appId).filter(Boolean))];
+        entries.push({
+          type: 'merchant_rate',
+          filename: file,
+          filepath,
+          date: parseDate(file),
+          appIds,
+          totalIssues: data.totalIssues,
+          totalMerchantsAudited: null,
+          merchants: data.merchants || [],
+          allAuditedMerchants: []
+        });
+      } catch (_) {}
+    } else if (file.startsWith('merchant-issues-') && file.endsWith('.json')) {
       try {
         const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
         const appIds = [...new Set((data.merchants || []).map(m => m.appId).filter(Boolean))];
@@ -1675,7 +1706,33 @@ function loadAllResultFiles() {
           allAuditedMerchants: data.allAuditedMerchants || []
         });
       } catch (_) {}
-    } else if (file.startsWith('offer-activation-') && file.endsWith('.json') && !file.includes('session') && !file.includes('tested-merchants')) {
+    } else if (file.startsWith('offer-activation-results-') && file.endsWith('.csv')) {
+      try {
+        const data = parseOfferActivationResultsCSV(filepath);
+        const results = data.results || [];
+        const appIdsFromFile = [...new Set(results.map(r => r.appId).filter(Boolean))];
+        entries.push({
+          type: 'offer_activation',
+          filename: file,
+          filepath,
+          date: parseDate(file),
+          appIds: appIdsFromFile,
+          merchants: results.map(r => ({
+            ...r,
+            appId: r.appId ?? null,
+            id: r.merchantId,
+            name: r.merchantName,
+            domain: r.merchantDomain,
+            success: r.success,
+            error: r.error,
+            issues: r.issues
+          })),
+          totalTested: results.length,
+          successful: results.filter(r => r.success).length,
+          failed: results.filter(r => !r.success).length
+        });
+      } catch (_) {}
+    } else if (file.startsWith('offer-activation-') && file.endsWith('.json') && !file.includes('session') && !file.includes('tested-merchants') && !file.includes('combined')) {
       try {
         const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
         const results = data.results || [];
@@ -1721,14 +1778,14 @@ function lookupByMerchantName(merchantQuery) {
   const testedActivationOk = [];
   for (const e of entries) {
     if (e.type === 'merchant_rate') {
-      const hasIssues = (e.merchants || []).some(m => (m.merchantName || '').toLowerCase().includes(q));
-      const inAudited = (e.allAuditedMerchants || []).some(m => (m.merchantName || '').toLowerCase().includes(q));
+      const hasIssues = (e.merchants || []).some(m => (m.merchantName || m.name || '').toLowerCase().includes(q));
+      const inAudited = (e.allAuditedMerchants || []).some(m => (m.merchantName || m.name || '').toLowerCase().includes(q));
       if (hasIssues) {
         for (const m of e.merchants || []) {
-          if ((m.merchantName || '').toLowerCase().includes(q)) {
+          if ((m.merchantName || m.name || '').toLowerCase().includes(q)) {
             rateIssues.push({
-              merchantName: m.merchantName,
-              merchantId: m.merchantId,
+              merchantName: m.merchantName || m.name,
+              merchantId: m.merchantId ?? m.id,
               appId: m.appId,
               issueType: m.issueType,
               reason: m.reason,
@@ -1743,12 +1800,13 @@ function lookupByMerchantName(merchantQuery) {
     }
     if (e.type === 'offer_activation' && e.merchants) {
       for (const m of e.merchants) {
-        if ((m.name || '').toLowerCase().includes(q)) {
+        const nameForMatch = (m.name || m.merchantName || '').toLowerCase();
+        if (nameForMatch && nameForMatch.includes(q)) {
           if (!m.success) {
             activationIssues.push({
-              merchantName: m.name,
-              merchantId: m.id,
-              domain: m.domain,
+              merchantName: m.name || m.merchantName,
+              merchantId: m.id ?? m.merchantId,
+              domain: m.domain || m.merchantDomain,
               issues: m.issues,
               error: m.error,
               file: e.filename
