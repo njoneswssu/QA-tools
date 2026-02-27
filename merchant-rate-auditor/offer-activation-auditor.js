@@ -32,6 +32,37 @@ const CONFIG = {
 CONFIG.sessionFilePath = path.join(CONFIG.outputDir, 'offer-activation-session.json');
 CONFIG.testedMerchantsFilePath = path.join(CONFIG.outputDir, 'offer-activation-tested-merchants.json');
 
+/** Used by SIGINT handler to save partial results when user presses Ctrl+C. */
+let _interruptSaveRef = null;
+let _interruptSaveAppId = null;
+
+function saveInterruptedResults() {
+  if (!_interruptSaveRef || _interruptSaveRef.length === 0) return;
+  const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  if (!fs.existsSync(CONFIG.outputDir)) fs.mkdirSync(CONFIG.outputDir, { recursive: true });
+  try {
+    const csvPath = exportResultsToCSV(_interruptSaveRef, `offer-activation-interrupted-${ts}.csv`);
+    if (csvPath) console.log(chalk.yellow('\n⚠️  Interrupted. Partial results saved to ' + csvPath));
+  } catch (_) {}
+  _interruptSaveRef = null;
+  _interruptSaveAppId = null;
+}
+
+function setInterruptSave(resultsRef, appId) {
+  _interruptSaveRef = resultsRef;
+  _interruptSaveAppId = appId;
+}
+
+function clearInterruptSave() {
+  _interruptSaveRef = null;
+  _interruptSaveAppId = null;
+}
+
+process.on('SIGINT', () => {
+  saveInterruptedResults();
+  process.exit(130);
+});
+
 /**
  * Load set of merchant IDs that have been tested for an app (persisted across runs).
  * @param {number} appId
@@ -1117,6 +1148,7 @@ function exportResults(results, filename = null) {
       merchantName: r.merchantName,
       merchantId: r.merchantId,
       merchantDomain: r.merchantDomain,
+      appId: r.appId,
       testUrl: r.testUrl,
       success: r.success,
       finalUrl: r.finalUrl,
@@ -1172,6 +1204,7 @@ function exportResultsToCSV(results, filename = null) {
     'Merchant ID',
     'Domain',
     'Success',
+    'False Negative',
     'Test URL',
     'Final URL',
     'Redirect Path',
@@ -1182,23 +1215,26 @@ function exportResultsToCSV(results, filename = null) {
 
   const csvRows = [
     headers.map(escapeCSV).join(','),
-    ...results.flatMap((r) => {
+    ...results.map((r) => {
       const redirectPath = redirectPathFor(r);
       const issues = (r.issues && r.issues.length > 0)
         ? r.issues
         : (r.error ? [{ type: 'error', message: r.error }] : [{ type: '', message: '' }]);
-      return issues.map((issue) => [
+      const issueTypes = issues.map((i) => i.type ?? '').filter(Boolean).join('; ') || (r.error ? 'error' : '');
+      const issueMessages = issues.map((i) => i.message ?? '').filter(Boolean).join('; ') || (r.error ? r.error : '');
+      return [
         escapeCSV(r.merchantName),
         escapeCSV(r.merchantId),
         escapeCSV(r.merchantDomain),
         escapeCSV(r.success ? 'Yes' : 'No'),
+        escapeCSV(r.falseNegative ? 'Yes' : ''),
         escapeCSV(r.testUrl),
         escapeCSV(r.finalUrl),
         escapeCSV(redirectPath),
         escapeCSV(r.redirectCount),
-        escapeCSV(issue.type),
-        escapeCSV(issue.message)
-      ].join(','));
+        escapeCSV(issueTypes),
+        escapeCSV(issueMessages)
+      ].join(',');
     })
   ];
 
@@ -1255,20 +1291,26 @@ async function deleteAllOfferActivationResults() {
 /**
  * Run offer activation batch for a single App ID (no prompts). Used by combined full audit.
  * @param {number} appId
- * @param {{ limit: number, session: { deviceId, trackingCode, shoppingTripCode }, skipAlreadyTested: boolean }} options
+ * @param {{ limit: number, session: object, skipAlreadyTested: boolean, merchants: Array }} options
+ *   - merchants: if provided, use this list instead of fetching (same merchants as rate audit).
  * @returns {Promise<Array>} results
  */
 async function runBatchForOneAppId(appId, options = {}) {
-  const { limit = 10, session = {}, skipAlreadyTested = true } = options;
-  const merchants = await fetchMerchantData(appId);
-  if (merchants.length === 0) return [];
-  const allTestable = merchants.filter(m => m.URL || m.Domain);
-  const testedSet = loadTestedMerchants(appId);
-  let toTest = allTestable;
-  if (skipAlreadyTested && testedSet.size > 0) {
-    toTest = allTestable.filter(m => !testedSet.has(Number(m.ID)));
+  const { limit = 10, session = {}, skipAlreadyTested = true, merchants: providedMerchants = null } = options;
+  let toTest;
+  if (providedMerchants && providedMerchants.length > 0) {
+    toTest = providedMerchants.filter(m => m.URL || m.Domain);
+  } else {
+    const merchants = await fetchMerchantData(appId);
+    if (merchants.length === 0) return [];
+    const allTestable = merchants.filter(m => m.URL || m.Domain);
+    const testedSet = loadTestedMerchants(appId);
+    let list = allTestable;
+    if (skipAlreadyTested && testedSet.size > 0) {
+      list = allTestable.filter(m => !testedSet.has(Number(m.ID)));
+    }
+    toTest = shuffleArray(list).slice(0, limit);
   }
-  toTest = shuffleArray(toTest).slice(0, limit);
   if (toTest.length === 0) return [];
   let activeDomains = [];
   try {
@@ -1280,11 +1322,22 @@ async function runBatchForOneAppId(appId, options = {}) {
     shoppingTripCode: session.shoppingTripCode || ''
   };
   const results = [];
-  for (const merchant of toTest) {
+  const totalToTest = toTest.length;
+  const progressEvery = 10;
+  setInterruptSave(results, appId);
+  for (let idx = 0; idx < toTest.length; idx++) {
+    const merchant = toTest[idx];
     const result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
-    results.push(result);
+    results.push({ ...result, appId });
+    const done = results.length;
+    if (done % progressEvery === 0 || done === totalToTest) {
+      const ok = results.filter(r => r.success).length;
+      const fail = done - ok;
+      console.log(chalk.blue(`  Progress: ${done}/${totalToTest} — ${chalk.green(ok)} OK, ${fail > 0 ? chalk.red(fail) : fail} failed`));
+    }
     await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
   }
+  clearInterruptSave();
   return results;
 }
 
@@ -1292,11 +1345,11 @@ async function runBatchForOneAppId(appId, options = {}) {
  * Run offer activation batch for multiple App IDs. Gets session once (saved or prompt), then runs batch per app.
  * Used by combined full audit from main menu.
  * @param {number[]} appIds
- * @param {{ limit?: number }} options
+ * @param {{ limit?: number, merchantsByAppId?: Object }} options - merchantsByAppId[appId] = array of merchants (same set as rate audit).
  * @returns {Promise<{ results: Array, byAppId: Object }>}
  */
 async function runOfferActivationBatchForAppIds(appIds, options = {}) {
-  const limit = options.limit || 10;
+  const { limit = 10, merchantsByAppId = null } = options;
   let session = { deviceId: '', trackingCode: '', shoppingTripCode: '' };
   const saved = loadSavedSession();
   if (saved && (saved.deviceId || saved.trackingCode || saved.shoppingTripCode)) {
@@ -1321,8 +1374,12 @@ async function runOfferActivationBatchForAppIds(appIds, options = {}) {
   const allResults = [];
   const byAppId = {};
   for (const appId of appIds) {
-    console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (up to ${limit} merchants)...`));
-    const results = await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true });
+    const merchants = merchantsByAppId && merchantsByAppId[appId];
+    const count = merchants ? merchants.length : limit;
+    console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (${count} merchants)...`));
+    const results = merchants
+      ? await runBatchForOneAppId(appId, { session, merchants })
+      : await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true });
     byAppId[appId] = results;
     allResults.push(...results);
   }
@@ -1365,6 +1422,44 @@ function askYesNo(question) {
       resolve(!!(answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')));
     });
   });
+}
+
+/**
+ * If there are failed activation results, offer to mark some as false negatives (user tested and they passed).
+ * Modifies activationResults in place: sets success = true, error = 'User tested (false negative)', falseNegative = true.
+ * @param {Array} activationResults - Array of { success, merchantId, merchantName, error, ... }
+ * @returns {Promise<void>}
+ */
+async function promptAndMarkFalseNegatives(activationResults) {
+  const failed = (activationResults || []).filter(r => !r.success);
+  if (failed.length === 0) return;
+  console.log(chalk.yellow('\nFailed merchants:\n'));
+  failed.forEach((r, i) => {
+    console.log(chalk.gray(`  ${i + 1}. ID ${r.merchantId} — ${r.merchantName || '(no name)'}`));
+  });
+  console.log('');
+  const wantMark = await askYesNo('Would you like to mark any of these as false negatives? (yes/no): ');
+  if (!wantMark) return;
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const answer = await new Promise((resolve) => {
+    rl.question(chalk.cyan('Enter the numbers of merchants that were false negatives (e.g. 1, 3, 5): '), (a) => {
+      rl.close();
+      resolve((a && a.trim()) || '');
+    });
+  });
+  const numbers = answer.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n >= 1 && n <= failed.length);
+  if (numbers.length === 0) return;
+  const indexSet = new Set(numbers);
+  let marked = 0;
+  failed.forEach((r, i) => {
+    if (indexSet.has(i + 1)) {
+      r.success = true;
+      r.error = 'User tested (false negative)';
+      r.falseNegative = true;
+      marked++;
+    }
+  });
+  console.log(chalk.green(`Marked ${marked} merchant(s) as false negatives.\n`));
 }
 
 /**
@@ -1543,13 +1638,11 @@ async function runOfferActivationTest() {
     const save = await askYesNo('\nSave results before leaving? (yes/no): ');
     if (!save) return;
     if (hasLink) {
-      exportResults(unsavedLinkResults);
+      exportResultsToCSV(unsavedLinkResults);
       unsavedLinkResults = [];
     }
     if (hasBatch) {
-      exportResults(unsavedBatchResults);
-      const doCsv = await askYesNo('Export results to CSV? (yes/no): ');
-      if (doCsv) exportResultsToCSV(unsavedBatchResults);
+      exportResultsToCSV(unsavedBatchResults);
       unsavedBatchResults = null;
     }
   }
@@ -1591,7 +1684,7 @@ async function runOfferActivationTest() {
                 saveRl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
                   saveRl.close();
                   if (answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')) {
-                    exportResults(unsavedLinkResults);
+                    exportResultsToCSV(unsavedLinkResults);
                     unsavedLinkResults = [];
                   }
                   resolve();
@@ -1666,6 +1759,7 @@ async function runOfferActivationTest() {
             shoppingTripCode: config.shoppingTripCode || ''
           };
           const results = [];
+          setInterruptSave(results, config.appId);
           let paused = false;
           let stopRequested = false;
           const wasRaw = process.stdin.isTTY && process.stdin.isRaw;
@@ -1686,9 +1780,9 @@ async function runOfferActivationTest() {
               else if (key && (key.name === 's' || key.name === 'S')) stopRequested = true;
             });
           }
-          // Progress increment: every 5 for ≤10 merchants; +5 for each additional 10 merchants (11–20 → 10, 21–30 → 15, etc.)
+          // Progress update every 10 merchants (e.g. 200 merchants → updates at 10, 20, 30, … 200)
           const totalToTest = toTest.length;
-          const progressIncrement = 5 + 5 * Math.floor((totalToTest - 1) / 10);
+          const progressEvery = 10;
           console.log(chalk.gray('  (Press P to pause, S to stop early. When paused, press Enter to resume.)\n'));
           for (let idx = 0; idx < toTest.length; idx++) {
             const merchant = toTest[idx];
@@ -1717,9 +1811,9 @@ async function runOfferActivationTest() {
               console.log(chalk.gray('  Resuming...\n'));
             }
             const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
-            results.push(result);
+            results.push({ ...result, appId: config.appId });
             const done = results.length;
-            if (done % progressIncrement === 0 || done === totalToTest) {
+            if (done % progressEvery === 0 || done === totalToTest) {
               const ok = results.filter(r => r.success).length;
               const fail = done - ok;
               console.log(chalk.blue(`  Progress: ${done}/${totalToTest} — ${chalk.green(ok)} OK, ${fail > 0 ? chalk.red(fail) : fail} failed`));
@@ -1732,28 +1826,21 @@ async function runOfferActivationTest() {
           }
           pauseRl.removeAllListeners('line');
           pauseRl.close();
+          clearInterruptSave();
           printResultsSummary(results);
+          await promptAndMarkFalseNegatives(results);
           const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
           await new Promise((resolve) => {
             rl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
               const isYes = answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y');
               if (isYes) {
-                exportResults(results);
+                exportResultsToCSV(results);
                 unsavedBatchResults = null;
                 const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
                 if (merchantIds.length > 0) markMerchantsAsTested(config.appId, merchantIds);
-                rl.question(chalk.cyan('Export results to CSV? (yes/no): '), (csvAnswer) => {
-                  rl.close();
-                  if (csvAnswer && (csvAnswer.toLowerCase().trim() === 'yes' || csvAnswer.toLowerCase().trim() === 'y')) {
-                    exportResultsToCSV(results);
-                  }
-                  resolve();
-                });
-              } else {
-                unsavedBatchResults = null;
-                rl.close();
-                resolve();
               }
+              rl.close();
+              resolve();
             });
           });
         }
@@ -1795,6 +1882,8 @@ module.exports = {
   runOfferActivationBatchForAppIds,
   runBatchForOneAppId,
   markMerchantsAsTested,
+  loadTestedMerchants,
+  promptAndMarkFalseNegatives,
   showOfferActivationMenu,
   fetchMerchantData,
   fetchActiveDomains,
