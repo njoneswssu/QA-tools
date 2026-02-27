@@ -1975,20 +1975,78 @@ async function deleteFilesByAppId(outDir) {
 }
 
 /**
- * File manager: combine offer activation, merchant rate, or both; or delete files by App ID.
+ * Delete all result files in the output directory (keeps session and tested-merchants).
+ */
+async function deleteAllResultFiles(outDir) {
+  if (!fs.existsSync(outDir)) {
+    console.log(chalk.gray('No audit results folder found.'));
+    return;
+  }
+  const files = fs.readdirSync(outDir).filter((f) => {
+    if (f.includes('session') || f.includes('tested-merchants')) return false;
+    const lower = f.toLowerCase();
+    if (lower.endsWith('.json') || lower.endsWith('.csv') || lower.endsWith('.xlsx')) {
+      return (
+        f.startsWith('merchant-issues-') ||
+        f.startsWith('offer-activation-results-') ||
+        f.startsWith('offer-activation-combined-') ||
+        f.startsWith('offer-activation-interrupted-') ||
+        f.startsWith('full-audit-combined-') ||
+        f.startsWith('full-report-combined-') ||
+        f.startsWith('merchant-rate-combined-') ||
+        (f.startsWith('offer-activation-') && (lower.endsWith('.json') || lower.endsWith('.csv')))
+      );
+    }
+    return false;
+  });
+  if (files.length === 0) {
+    console.log(chalk.gray('No result files to delete.'));
+    return;
+  }
+  console.log(chalk.yellow(`\nThis will delete ${files.length} result file(s). Session and tested-merchants list will be kept.\n`));
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const confirm = await new Promise((res) => {
+    rl.question(chalk.cyan('Delete all result files? (yes/no): '), (a) => {
+      rl.close();
+      res(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
+    });
+  });
+  if (!confirm) {
+    console.log(chalk.gray('Cancelled.'));
+    return;
+  }
+  let deleted = 0;
+  for (const f of files) {
+    try {
+      fs.unlinkSync(path.join(outDir, f));
+      console.log(chalk.green('  Deleted: ' + f));
+      deleted++;
+    } catch (e) {
+      console.log(chalk.red('  Failed to delete ' + f + ': ' + e.message));
+    }
+  }
+  console.log(chalk.green(`\nDeleted ${deleted} file(s).`));
+}
+
+/**
+ * File manager: combine offer activation, merchant rate, or both; delete by App ID; or delete all results.
  */
 async function runFileManagerMenu() {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const ask = (q) => new Promise((res) => rl.question(chalk.cyan(q), (a) => res((a || '').trim())));
   console.log(chalk.bold.cyan('\n📁 File Manager\n'));
-  const choice = await ask('1) Combine offer activation  2) Combine merchant rate  3) Both into one report  4) Delete files that contain an App ID  5) Back to main menu (1-5): ');
+  const choice = await ask('1) Combine offer activation  2) Combine merchant rate  3) Both into one report  4) Delete files that contain an App ID  5) Delete all results  6) Back to main menu (1-6): ');
   rl.close();
-  if (choice === '5') {
+  if (choice === '6') {
     return;
   }
   const outDir = CONFIG.outputDir;
   if (choice === '4') {
     await deleteFilesByAppId(outDir);
+    return;
+  }
+  if (choice === '5') {
+    await deleteAllResultFiles(outDir);
     return;
   }
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
@@ -2001,10 +2059,20 @@ async function runFileManagerMenu() {
     }
     const allResults = [];
     for (const e of entries) {
-      try {
-        const data = JSON.parse(fs.readFileSync(e.filepath, 'utf8'));
-        (data.results || []).forEach(r => allResults.push(r));
-      } catch (_) {}
+      (e.merchants || []).forEach((m) => {
+        allResults.push({
+          merchantName: m.merchantName || m.name,
+          merchantId: m.merchantId ?? m.id,
+          merchantDomain: m.merchantDomain || m.domain,
+          success: m.success,
+          falseNegative: m.falseNegative,
+          testUrl: m.testUrl,
+          finalUrl: m.finalUrl,
+          redirectCount: m.redirectCount,
+          issues: m.issues,
+          error: m.error
+        });
+      });
     }
     if (allResults.length > 0) {
       offerActivation.exportResultsToCSV(allResults, `offer-activation-combined-${ts}.csv`);
@@ -2101,13 +2169,16 @@ function shuffleArray(arr) {
 }
 
 /**
- * Prompt to mark failed activation merchants as "needs investigation". Only shown when there are still-failed merchants (after false negative marking).
+ * Prompt to mark failed activation merchants as "needs investigation". Always shown; if no failed merchants, shows a short message.
  * Sets needsInvestigation = true on selected results; used in full-audit Excel output.
  */
 async function promptAndMarkNeedsInvestigation(activationResults) {
   const failed = (activationResults || []).filter((r) => !r.success);
-  if (failed.length === 0) return;
   if (!process.stdin.isTTY) return;
+  if (failed.length === 0) {
+    console.log(chalk.gray('\nNo failed merchants to mark for further investigation.\n'));
+    return;
+  }
   console.log(chalk.yellow('\nFailed merchants (candidates for further investigation):\n'));
   failed.forEach((r, i) => {
     console.log(chalk.gray(`  ${i + 1}. ID ${r.merchantId} — ${r.merchantName || '(no name)'}`));
@@ -2342,6 +2413,7 @@ async function runFullAudit() {
       commissionMap = loadCommissionDataFromCSV(commissionPathAnswer.trim());
     }
     let rateMerchants = buildRateMerchantsForCombinedReport(report, rateFalseNegativeKeys);
+    rateMerchants = rateMerchants.filter((m) => m.issueType !== 'None');
     rateMerchants.forEach((m) => {
       m.commission = commissionMap.get(String(m.merchantId));
     });
@@ -2354,20 +2426,12 @@ async function runFullAudit() {
     const fXlsx = path.join(outDir, `full-audit-combined-${ts}.xlsx`);
     writeFullReportCombinedCSV(rateMerchants, activationResults, fXlsx);
     console.log(chalk.green(`Full audit report → ${fXlsx}`));
-    if (activationResults.length > 0) {
-      const markAnswer = await new Promise((resolve) => {
-        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        rl.question(chalk.cyan('Mark these merchants as tested for offer activation? (yes/no): '), (a) => {
-          rl.close();
-          resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-        });
-      });
-      if (markAnswer && byAppId) {
-        for (const [appIdStr, list] of Object.entries(byAppId)) {
-          const ids = (list || []).map(r => r.merchantId).filter(id => id != null);
-          if (ids.length > 0) offerActivation.markMerchantsAsTested(Number(appIdStr), ids);
-        }
+    if (activationResults.length > 0 && byAppId) {
+      for (const [appIdStr, list] of Object.entries(byAppId)) {
+        const ids = (list || []).map(r => r.merchantId).filter(id => id != null);
+        if (ids.length > 0) offerActivation.markMerchantsAsTested(Number(appIdStr), ids);
       }
+      console.log(chalk.gray('Merchants marked as tested for offer activation.\n'));
     }
   }
 }
