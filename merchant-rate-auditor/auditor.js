@@ -1095,6 +1095,7 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
     'Domain',
     'Success',
     'False Negative',
+    'Needs Investigation',
     'Test URL',
     'Final URL',
     'Redirect Path',
@@ -1130,6 +1131,7 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath) 
       r.merchantDomain ?? '',
       r.success ? 'Yes' : 'No',
       r.falseNegative ? 'Yes' : '',
+      r.needsInvestigation ? 'Yes' : '',
       r.testUrl ?? '',
       r.finalUrl ?? '',
       redirectPath,
@@ -2041,6 +2043,47 @@ function shuffleArray(arr) {
 }
 
 /**
+ * Prompt to mark failed activation merchants as "needs investigation". Only shown when there are still-failed merchants (after false negative marking).
+ * Sets needsInvestigation = true on selected results; used in full-audit Excel output.
+ */
+async function promptAndMarkNeedsInvestigation(activationResults) {
+  const failed = (activationResults || []).filter((r) => !r.success);
+  if (failed.length === 0) return;
+  if (!process.stdin.isTTY) return;
+  console.log(chalk.yellow('\nFailed merchants (candidates for further investigation):\n'));
+  failed.forEach((r, i) => {
+    console.log(chalk.gray(`  ${i + 1}. ID ${r.merchantId} — ${r.merchantName || '(no name)'}`));
+  });
+  console.log('');
+  const wantMark = await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(chalk.cyan('Mark any of these for further investigation? (yes/no): '), (a) => {
+      rl.close();
+      resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
+    });
+  });
+  if (!wantMark) return;
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const answer = await new Promise((resolve) => {
+    rl.question(chalk.cyan('Enter the numbers to mark (e.g. 1, 3, 5): '), (a) => {
+      rl.close();
+      resolve((a && a.trim()) || '');
+    });
+  });
+  const numbers = answer.split(/[,\s]+/).map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n) && n >= 1 && n <= failed.length);
+  if (numbers.length === 0) return;
+  const indexSet = new Set(numbers);
+  let marked = 0;
+  failed.forEach((r, i) => {
+    if (indexSet.has(i + 1)) {
+      r.needsInvestigation = true;
+      marked++;
+    }
+  });
+  console.log(chalk.green(`Marked ${marked} merchant(s) for further investigation.\n`));
+}
+
+/**
  * Run full audit: merchant rate then offer activation; at end show merchants with both failures as "multiple issues".
  * Prompts for App IDs, then max merchants per App ID (blank = all). Same merchant set is used for Part 1 and Part 2.
  * Does not save Part 1 alone; saves one combined Excel (XLSX) at the end if user confirms.
@@ -2217,6 +2260,7 @@ async function runFullAudit() {
     }
     offerActivation.printResultsSummary(activationResults);
     await offerActivation.promptAndMarkFalseNegatives(activationResults);
+    await promptAndMarkNeedsInvestigation(activationResults);
   }
   const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const saveAnswer = await new Promise((resolve) => {
