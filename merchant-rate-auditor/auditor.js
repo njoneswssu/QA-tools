@@ -981,6 +981,37 @@ async function fetchCommissionFromBigQuery(merchantIds) {
 }
 
 /**
+ * Fetch commission and merchant name from BigQuery for given merchant IDs.
+ * Returns Array<{ merchantId, merchantName, commission }> for display.
+ */
+async function fetchCommissionWithNamesFromBigQuery(merchantIds) {
+  if (!BigQuery || !merchantIds || merchantIds.length === 0) return [];
+  const ids = merchantIds.map(Number).filter((n) => !isNaN(n) && n > 0);
+  if (ids.length === 0) return [];
+  const inList = ids.join(', ');
+  const query = `
+    SELECT m.name, c.merchant_id, sum(c.commission_amount) as Total_Commissions
+    FROM \`wildfire-1000.stephsandbox.commission_detail_view_2\` c
+    JOIN \`wildfire-1000.firepublic.merchant\` m ON c.merchant_id = m.ID
+    WHERE c.merchant_id IN (${inList})
+    GROUP BY c.merchant_id, m.name
+    ORDER BY sum(c.commission_amount) DESC
+  `;
+  try {
+    const bigquery = new BigQuery({ projectId: CONFIG.bigQueryProjectId });
+    const [rows] = await bigquery.query({ query });
+    return (rows || []).map((row) => ({
+      merchantId: row.merchant_id != null ? String(row.merchant_id) : null,
+      merchantName: row.name != null ? String(row.name) : '',
+      commission: row.Total_Commissions != null ? Number(row.Total_Commissions) : NaN
+    })).filter((r) => r.merchantId && !isNaN(r.commission));
+  } catch (err) {
+    console.log(chalk.yellow('⚠️  BigQuery failed: ' + (err.message || err)));
+    return [];
+  }
+}
+
+/**
  * Build full list of rate-audited merchants for combined CSV: includes every tested merchant,
  * with "No issues" row for merchants that had no rate issues.
  * @param {Object} report
@@ -2472,6 +2503,121 @@ function promptForAppIds() {
 }
 
 /**
+ * Commissions menu: look up overall commission by merchant name or ID (CSV or BigQuery).
+ */
+async function runCommissionsMenu() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q) => new Promise((res) => rl.question(chalk.cyan(q), (a) => res((a || '').trim())));
+  console.log(chalk.bold.cyan('\n💰 Commission Lookup\n'));
+  const input = await ask('Merchant name or ID (partial match for name): ');
+  rl.close();
+  if (!input) {
+    console.log(chalk.yellow('No input entered.'));
+    return;
+  }
+  const isNumeric = /^[\d,\s]+$/.test(input);
+  let merchants = [];
+  if (isNumeric) {
+    const ids = input.split(/[,\s]+/).map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n) && n > 0);
+    if (ids.length === 0) {
+      console.log(chalk.yellow('No valid merchant ID(s) entered.'));
+      return;
+    }
+    merchants = ids.map((id) => ({ merchantId: String(id), merchantName: '' }));
+  } else {
+    const appIdStr = await new Promise((res) => {
+      const r = readline.createInterface({ input: process.stdin, output: process.stdout });
+      r.question(chalk.cyan('App ID(s) to search in (comma-separated): '), (a) => {
+        r.close();
+        res((a || '').trim());
+      });
+    });
+    const appIds = appIdStr.split(/[,\s]+/).map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n) && n > 0);
+    if (appIds.length === 0) {
+      console.log(chalk.yellow('No valid App ID(s).'));
+      return;
+    }
+    const q = input.toLowerCase();
+    const seen = new Set();
+    for (const appId of appIds) {
+      try {
+        const raw = await offerActivation.fetchMerchantData(appId);
+        (raw || []).forEach((m) => {
+          const name = (m.Name || '').trim();
+          if (name.toLowerCase().includes(q) && !seen.has(m.ID)) {
+            seen.add(m.ID);
+            merchants.push({ merchantId: String(m.ID), merchantName: name });
+          }
+        });
+      } catch (_) {}
+    }
+    if (merchants.length === 0) {
+      console.log(chalk.yellow(`No merchants found matching "${input}" in the given App ID(s).`));
+      return;
+    }
+  }
+  const sourceRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const source = await new Promise((res) => {
+    sourceRl.question(chalk.cyan('Get commission from: 1) CSV file path  2) BigQuery (1 or 2): '), (a) => {
+      sourceRl.close();
+      res((a || '').trim());
+    });
+  });
+  const merchantIds = merchants.map((m) => Number(m.merchantId)).filter((n) => !isNaN(n) && n > 0);
+  if (source === '2') {
+    console.log(chalk.blue('Fetching from BigQuery...'));
+    const rows = await fetchCommissionWithNamesFromBigQuery(merchantIds);
+    console.log(chalk.bold.cyan('\n📊 Commission results\n'));
+    console.log(chalk.gray('─'.repeat(60)));
+    if (rows.length === 0) {
+      console.log(chalk.yellow('No commission data found for these merchants.'));
+    } else {
+      rows.forEach((r, i) => {
+        const name = (r.merchantName || '').trim() || `(ID ${r.merchantId})`;
+        const comm = typeof r.commission === 'number' && !isNaN(r.commission) ? r.commission.toLocaleString() : '—';
+        console.log(chalk.white(`  ${i + 1}. ${name}`));
+        console.log(chalk.gray(`     Merchant ID: ${r.merchantId}  |  Total commission: ${comm}`));
+      });
+    }
+    console.log(chalk.gray('─'.repeat(60)) + '\n');
+    return;
+  }
+  if (source !== '1') {
+    console.log(chalk.yellow('Invalid choice.'));
+    return;
+  }
+  const pathRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const csvPath = await new Promise((res) => {
+    pathRl.question(chalk.cyan('Path to commission CSV: '), (a) => {
+      pathRl.close();
+      res((a || '').trim());
+    });
+  });
+  const commissionMap = loadCommissionDataFromCSV(csvPath);
+  if (commissionMap.size === 0 && csvPath) {
+    console.log(chalk.yellow('Could not load commission data from that file.'));
+    return;
+  }
+  if (commissionMap.size === 0) {
+    console.log(chalk.yellow('No CSV path provided or file empty.'));
+    return;
+  }
+  console.log(chalk.bold.cyan('\n📊 Commission results\n'));
+  console.log(chalk.gray('─'.repeat(60)));
+  let found = 0;
+  merchants.forEach((m, i) => {
+    const commission = commissionMap.get(m.merchantId);
+    const name = (m.merchantName || '').trim() || `(ID ${m.merchantId})`;
+    const commStr = commission != null && commission !== '' ? Number(commission).toLocaleString() : '—';
+    console.log(chalk.white(`  ${i + 1}. ${name}`));
+    console.log(chalk.gray(`     Merchant ID: ${m.merchantId}  |  Total commission: ${commStr}`));
+    if (commission != null && commission !== '') found++;
+  });
+  if (merchants.length > 0 && found === 0) console.log(chalk.yellow('  No commission data found for these merchant ID(s) in the CSV.'));
+  console.log(chalk.gray('─'.repeat(60)) + '\n');
+}
+
+/**
  * Show top-level menu (first screen)
  */
 function showTopLevelMenu() {
@@ -2489,8 +2635,9 @@ function showTopLevelMenu() {
     console.log(chalk.white('  2) ') + chalk.bold('Offer Activation Testing') + chalk.gray(' - Test if offers work when activated'));
     console.log(chalk.white('  3) ') + chalk.bold('Lookup results') + chalk.gray(' - By App ID (shows what\'s tested) or by merchant name'));
     console.log(chalk.white('  4) ') + chalk.bold('Run full audit') + chalk.gray(' - Merchant rate + offer activation in one run'));
-    console.log(chalk.white('  5) ') + chalk.bold('Exit') + '\n');
-    rl.question(chalk.cyan('Choice (0-5): '), (answer) => {
+    console.log(chalk.white('  5) ') + chalk.bold('Commissions') + chalk.gray(' - Look up overall commission by merchant name or ID'));
+    console.log(chalk.white('  6) ') + chalk.bold('Exit') + '\n');
+    rl.question(chalk.cyan('Choice (0-6): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
@@ -2630,10 +2777,13 @@ async function main() {
           await runFullAudit();
           break;
         case '5':
+          await runCommissionsMenu();
+          break;
+        case '6':
           console.log(chalk.gray('\nGoodbye! 👋\n'));
           process.exit(0);
         default:
-          console.log(chalk.red('❌ Invalid choice. Please enter 0-5.'));
+          console.log(chalk.red('❌ Invalid choice. Please enter 0-6.'));
           break;
       }
     }
