@@ -804,37 +804,70 @@ async function testMerchantActivation(merchant, appId, testUrl = null, session =
   const expectedMerchantDomain = (merchantDomain && merchantDomain !== 'unknown')
     ? merchantDomain
     : (extractDomain(merchant.URL) || merchant.Domain || null);
-  console.log(chalk.gray(`  Testing: ${merchantName} (${merchantDomain})...`));
-  
-  try {
-    const { redirectChain, finalContent } = await followRedirects(url);
-    const analysis = analyzeRedirectChain(redirectChain, finalContent, { expectedMerchantDomain });
-    
-    return {
-      merchantId,
-      merchantName,
-      merchantDomain,
-      testUrl: url,
-      success: !analysis.isError,
-      redirectedBackToMerchant: analysis.redirectedBackToMerchant,
-      redirectChain,
-      finalUrl: analysis.finalUrl,
-      finalDomain: analysis.finalDomain,
-      issues: analysis.issues,
-      redirectCount: redirectChain.length
-    };
-  } catch (error) {
-    return {
-      merchantId,
-      merchantName,
-      merchantDomain,
-      testUrl: url,
-      success: false,
-      error: error.message,
-      redirectChain: [],
-      issues: [{ type: 'request_error', severity: 'high', message: error.message }]
-    };
+  const maxAttempts = 3;
+  let lastResult = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    if (attempt > 1) console.log(chalk.gray(`  Retry ${attempt}/${maxAttempts}: ${merchantName} (${merchantDomain})...`));
+    else console.log(chalk.gray(`  Testing: ${merchantName} (${merchantDomain})...`));
+    try {
+      const { redirectChain, finalContent } = await followRedirects(url);
+      const analysis = analyzeRedirectChain(redirectChain, finalContent, { expectedMerchantDomain });
+      if (!analysis.isError) {
+        return {
+          merchantId,
+          merchantName,
+          merchantDomain,
+          testUrl: url,
+          success: true,
+          redirectedBackToMerchant: analysis.redirectedBackToMerchant,
+          redirectChain,
+          finalUrl: analysis.finalUrl,
+          finalDomain: analysis.finalDomain,
+          issues: analysis.issues,
+          redirectCount: redirectChain.length
+        };
+      }
+      lastResult = {
+        merchantId,
+        merchantName,
+        merchantDomain,
+        testUrl: url,
+        success: false,
+        redirectChain,
+        finalUrl: analysis.finalUrl,
+        finalDomain: analysis.finalDomain,
+        issues: analysis.issues,
+        redirectCount: redirectChain.length,
+        error: (analysis.issues && analysis.issues[0] && analysis.issues[0].message) || 'Activation failed'
+      };
+    } catch (error) {
+      lastResult = {
+        merchantId,
+        merchantName,
+        merchantDomain,
+        testUrl: url,
+        success: false,
+        error: error.message,
+        redirectChain: [],
+        issues: [{ type: 'request_error', severity: 'high', message: error.message }]
+      };
+    }
   }
+  const failedAfter = lastResult ? {
+    ...lastResult,
+    error: lastResult.error ? `Failed after ${maxAttempts} attempts: ${lastResult.error}` : `Failed after ${maxAttempts} attempts`,
+    issues: (lastResult.issues || []).concat({ type: 'max_retries', severity: 'high', message: `Offer activation failed after ${maxAttempts} attempts` })
+  } : {
+    merchantId,
+    merchantName,
+    merchantDomain,
+    testUrl: url,
+    success: false,
+    error: `Failed after ${maxAttempts} attempts`,
+    redirectChain: [],
+    issues: [{ type: 'max_retries', severity: 'high', message: `Offer activation failed after ${maxAttempts} attempts` }]
+  };
+  return failedAfter;
 }
 
 /**
@@ -1442,12 +1475,14 @@ async function promptAndMarkFalseNegatives(activationResults) {
   if (!wantMark) return;
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const answer = await new Promise((resolve) => {
-    rl.question(chalk.cyan('Enter the numbers of merchants that were false negatives (e.g. 1, 3, 5): '), (a) => {
+    rl.question(chalk.cyan('Enter the numbers of merchants that were false negatives (e.g. 1, 3, 5 or "all"): '), (a) => {
       rl.close();
       resolve((a && a.trim()) || '');
     });
   });
-  const numbers = answer.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n >= 1 && n <= failed.length);
+  const numbers = (answer.trim().toLowerCase() === 'all')
+    ? Array.from({ length: failed.length }, (_, i) => i + 1)
+    : answer.split(/[,\s]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n >= 1 && n <= failed.length);
   if (numbers.length === 0) return;
   const indexSet = new Set(numbers);
   let marked = 0;
