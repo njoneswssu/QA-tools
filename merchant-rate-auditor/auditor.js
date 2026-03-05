@@ -2547,6 +2547,34 @@ async function runFullAudit() {
     await offerActivation.promptAndMarkFalseNegatives(activationResults);
     await promptAndMarkNeedsInvestigation(activationResults);
   }
+  if (process.stdin.isTTY) {
+    const commissionChoice = await new Promise((resolve) => {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      rl.question(chalk.cyan('Add commission data for the report? (1=BigQuery, 2=CSV path, Enter=skip): '), (a) => {
+        rl.close();
+        resolve((a && a.trim()) || '');
+      });
+    });
+    const choice = commissionChoice.trim();
+    if (choice === '1') {
+      const ids = collectMerchantIdsFromReport(report);
+      (activationResults || []).forEach((r) => { if (r.merchantId != null) ids.push(r.merchantId); });
+      const uniqueIds = [...new Set(ids)];
+      if (uniqueIds.length > 0) {
+        console.log(chalk.blue('Running BigQuery for commission data...'));
+        fullAuditCommissionMap = await fetchCommissionFromBigQuery(uniqueIds);
+      }
+    } else if (choice === '2') {
+      const csvPathAnswer = await new Promise((resolve) => {
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        rl.question(chalk.cyan('Path to commission data CSV: '), (a) => {
+          rl.close();
+          resolve((a && a.trim()) || '');
+        });
+      });
+      if (csvPathAnswer) fullAuditCommissionMap = loadCommissionDataFromCSV(csvPathAnswer);
+    }
+  }
   const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const saveAnswer = await new Promise((resolve) => {
     saveRl.question(chalk.cyan('Save full audit results (Excel)? (yes/no): '), (answer) => {
@@ -2579,6 +2607,9 @@ async function runFullAudit() {
       if (cb !== ca) return cb - ca;
       return (b.count || 0) - (a.count || 0);
     });
+    const dateTested = new Date().toISOString().slice(0, 10);
+    rateMerchants.forEach((m) => { m.dateTested = m.dateTested || dateTested; });
+    activationResults.forEach((r) => { r.dateTested = r.dateTested || dateTested; });
     const fXlsx = path.join(outDir, `full-audit-combined-${ts}.xlsx`);
     writeFullReportCombinedCSV(rateMerchants, activationResults, fXlsx);
     console.log(chalk.green(`Full audit report → ${fXlsx}`));
