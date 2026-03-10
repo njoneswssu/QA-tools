@@ -1106,6 +1106,12 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
     }
     return str;
   };
+  const normalizeDateTested = (v) => {
+    if (v == null || v === '') return '';
+    const s = String(v).trim();
+    if (!s) return '';
+    return s.replace(/,/g, '; ');
+  };
   const redirectPathFor = (r) => {
     if (!r.redirectChain || r.redirectChain.length === 0) return r.finalUrl || '';
     return r.redirectChain
@@ -1146,7 +1152,7 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
     'Issue Message'
   ];
   const rateRows = rateWithIssues.map((m) => [
-    m.dateTested ?? '',
+    normalizeDateTested(m.dateTested),
     m.merchantName ?? '',
     m.merchantId ?? '',
     m.appId ?? '',
@@ -1168,7 +1174,7 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
     const issueTypes = issues.map((i) => i.type ?? '').filter(Boolean).join('; ') || (r.error ? 'error' : '');
     const issueMessages = issues.map((i) => i.message ?? '').filter(Boolean).join('; ') || (r.error ? r.error : '');
     activationRows.push([
-      r.dateTested ?? '',
+      normalizeDateTested(r.dateTested),
       r.merchantName ?? '',
       r.merchantId ?? '',
       r.appId ?? '',
@@ -2180,7 +2186,7 @@ async function runFileManagerMenu() {
   }
   if (choice === '3') {
     const entries = loadAllResultFiles();
-    const rateMerchantMap = new Map();
+    const rateMerchantsList = [];
     const appIdSet = new Set();
     const activationResults = [];
     const sourceDates = [...new Set(entries.map((e) => e.filename || e.date?.toISOString?.()?.slice(0, 10) || '').filter(Boolean))];
@@ -2189,15 +2195,8 @@ async function runFileManagerMenu() {
       if (e.type === 'merchant_rate') {
         (e.merchants || []).forEach(m => {
           appIdSet.add(m.appId);
-          const key = `${m.merchantId}-${m.appId}-${m.issueType}-${(m.rateName || m.reason || '').toString().slice(0, 200)}`;
           const d = dateLabel(e);
-          if (rateMerchantMap.has(key)) {
-            const existing = rateMerchantMap.get(key);
-            existing.count = (existing.count || 0) + (m.count || 1);
-            if (d) existing.dateTested = (existing.dateTested ? existing.dateTested + ', ' : '') + d;
-          } else {
-            rateMerchantMap.set(key, { ...m, dateTested: d });
-          }
+          rateMerchantsList.push({ ...m, dateTested: d });
         });
       } else if (e.type === 'offer_activation' && (e.merchants || []).length > 0) {
         const d = dateLabel(e);
@@ -2219,9 +2218,8 @@ async function runFileManagerMenu() {
         });
       }
     }
-    const rateMerchants = Array.from(rateMerchantMap.values());
     const fCsv = path.join(outDir, `full-report-combined-${ts}.csv`);
-    writeFullReportCombinedCSV(rateMerchants, activationResults, fCsv, { sourceDates });
+    writeFullReportCombinedCSV(rateMerchantsList, activationResults, fCsv, { sourceDates });
     console.log(chalk.green(`Combined report → ${fCsv} (+ XLSX)`));
     await askDeleteCombinedSources(entries.map((e) => e.filepath));
     return;
