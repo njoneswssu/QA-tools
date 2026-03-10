@@ -1108,9 +1108,17 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
   };
   const normalizeDateTested = (v) => {
     if (v == null || v === '') return '';
+    if (typeof v === 'object' && typeof v.toISOString === 'function') return v.toISOString().slice(0, 10);
     const s = String(v).trim();
     if (!s) return '';
-    return s.replace(/,/g, '; ');
+    if (s.includes(',')) return s.replace(/,/g, '; ');
+    const isoMatch = s.match(/\d{4}-\d{2}-\d{2}/);
+    if (isoMatch) return isoMatch[0];
+    return s;
+  };
+  const normalizeCell = (v) => {
+    if (v == null || v === '') return '';
+    return String(v).replace(/,/g, '; ');
   };
   const redirectPathFor = (r) => {
     if (!r.redirectChain || r.redirectChain.length === 0) return r.finalUrl || '';
@@ -1201,12 +1209,12 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
       [
         '[Merchant Rate]',
         rateHeaders.map(escapeCSV).join(','),
-        ...rateRows.map((row) => row.map(escapeCSV).join(','))
+        ...rateRows.map((row) => row.map((v) => escapeCSV(normalizeCell(v))).join(','))
       ].join('\n'),
       [
         '[Offer Activation]',
         activationHeaders.map(escapeCSV).join(','),
-        ...activationRows.map((row) => row.map(escapeCSV).join(','))
+        ...activationRows.map((row) => row.map((v) => escapeCSV(normalizeCell(v))).join(','))
       ].join('\n')
     ];
     const csvContent = sections.join('\n\n');
@@ -2366,14 +2374,90 @@ async function promptAndMarkNeedsInvestigation(activationResults) {
   console.log(chalk.green(`Marked ${marked} merchant(s) for further investigation.\n`));
 }
 
+let fullAuditRecoveryState = null;
+let fullAuditRecoveryListenersAttached = false;
+
+function writeFullAuditRecoveryFile() {
+  if (!fullAuditRecoveryState) return;
+  const state = fullAuditRecoveryState;
+  const hasReport = state.report && (state.report.results || []).length > 0;
+  const hasActivation = (state.activationResults || []).length > 0;
+  if (!hasReport && !hasActivation) return;
+  try {
+    const outDir = CONFIG.outputDir;
+    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const dateTested = new Date().toISOString().slice(0, 10);
+    let rateMerchants = [];
+    if (hasReport) {
+      rateMerchants = buildRateMerchantsForCombinedReport(state.report, state.rateFalseNegativeKeys || new Set());
+      rateMerchants = rateMerchants.filter((m) => m.issueType != null && String(m.issueType).trim() !== '' && String(m.issueType) !== 'None');
+      rateMerchants.forEach((m) => {
+        m.commission = (state.commissionMap && state.commissionMap.get) ? state.commissionMap.get(String(m.merchantId)) : undefined;
+        m.dateTested = m.dateTested || dateTested;
+      });
+      rateMerchants.sort((a, b) => {
+        const ca = a.commission != null && a.commission !== '' ? Number(a.commission) : -Infinity;
+        const cb = b.commission != null && b.commission !== '' ? Number(b.commission) : -Infinity;
+        if (cb !== ca) return cb - ca;
+        return (b.count || 0) - (a.count || 0);
+      });
+    }
+    const activationResults = (state.activationResults || []).map((r) => ({ ...r, dateTested: r.dateTested || dateTested }));
+    const baseName = `full-audit-recovery-${ts}`;
+    const fXlsx = path.join(outDir, `${baseName}.xlsx`);
+    writeFullReportCombinedCSV(rateMerchants, activationResults, fXlsx);
+    console.error(chalk.yellow(`\n⚠️  Full audit ended unexpectedly. Recovery file saved: ${fXlsx}\n`));
+  } catch (err) {
+    console.error(chalk.red('Failed to write recovery file: ' + (err && err.message ? err.message : String(err))));
+  }
+}
+
+function removeFullAuditRecoveryListeners() {
+  if (!fullAuditRecoveryListenersAttached) return;
+  fullAuditRecoveryListenersAttached = false;
+  process.removeListener('uncaughtException', fullAuditRecoveryOnExit);
+  process.removeListener('unhandledRejection', fullAuditRecoveryOnExit);
+  process.removeListener('SIGINT', fullAuditRecoveryOnSignal);
+  process.removeListener('SIGTERM', fullAuditRecoveryOnSignal);
+}
+
+function fullAuditRecoveryOnExit() {
+  writeFullAuditRecoveryFile();
+  removeFullAuditRecoveryListeners();
+  fullAuditRecoveryState = null;
+  process.exit(1);
+}
+
+function fullAuditRecoveryOnSignal() {
+  writeFullAuditRecoveryFile();
+  removeFullAuditRecoveryListeners();
+  fullAuditRecoveryState = null;
+  process.exit(130);
+}
+
 /**
  * Run full audit: merchant rate then offer activation; at end show merchants with both failures as "multiple issues".
  * Prompts for App IDs, then max merchants per App ID (blank = all). Same merchant set is used for Part 1 and Part 2.
  * Does not save Part 1 alone; saves one combined Excel (XLSX) at the end if user confirms.
+ * On abrupt exit (crash, SIGINT, SIGTERM), a recovery file is written to audit-results/full-audit-recovery-{timestamp}.xlsx.
  */
 async function runFullAudit() {
   const appIds = await promptForAppIds();
   if (!appIds || appIds.length === 0) return;
+
+  fullAuditRecoveryState = {
+    report: null,
+    activationResults: [],
+    rateFalseNegativeKeys: new Set(),
+    commissionMap: new Map()
+  };
+  if (!fullAuditRecoveryListenersAttached) {
+    fullAuditRecoveryListenersAttached = true;
+    process.on('uncaughtException', fullAuditRecoveryOnExit);
+    process.on('unhandledRejection', fullAuditRecoveryOnExit);
+    process.on('SIGINT', fullAuditRecoveryOnSignal);
+    process.on('SIGTERM', fullAuditRecoveryOnSignal);
+  }
   console.log(chalk.cyan('Merchants already tested (offer activation) per App ID:'));
   for (const appId of appIds) {
     const testedSet = offerActivation.loadTestedMerchants(appId);
@@ -2459,6 +2543,8 @@ async function runFullAudit() {
     });
     if (action === 'cancel') {
       console.log(chalk.gray('Full audit cancelled.\n'));
+      fullAuditRecoveryState = null;
+      removeFullAuditRecoveryListeners();
       return;
     }
     if (action === 'skip') {
@@ -2469,6 +2555,8 @@ async function runFullAudit() {
       const newTotal = appIds.reduce((sum, appId) => sum + (merchantsByAppId[appId] || []).length, 0);
       if (newTotal === 0) {
         console.log(chalk.yellow('No untested merchants left. Full audit cancelled.\n'));
+        fullAuditRecoveryState = null;
+        removeFullAuditRecoveryListeners();
         return;
       }
       console.log(chalk.gray(`  Testing ${newTotal} untested merchant(s) only.\n`));
@@ -2484,11 +2572,15 @@ async function runFullAudit() {
     results.push(result);
   }
   const report = generateReport(results);
+  if (fullAuditRecoveryState) {
+    fullAuditRecoveryState.report = report;
+  }
   printResults(report);
   let rateFalseNegativeKeys = new Set();
   if (report.summary && report.summary.totalIssues > 0) {
     rateFalseNegativeKeys = await promptAndMarkRateFalseNegatives(report);
   }
+  if (fullAuditRecoveryState) fullAuditRecoveryState.rateFalseNegativeKeys = rateFalseNegativeKeys;
   let fullAuditCommissionMap = new Map();
   const merchantIdsForBq = collectMerchantIdsFromReport(report);
   if (merchantIdsForBq.length > 0 && process.stdin.isTTY) {
@@ -2519,6 +2611,7 @@ async function runFullAudit() {
     const batch = await offerActivation.runOfferActivationBatchForAppIds(appIds, { merchantsByAppId });
     activationResults = batch.results || [];
     byAppId = batch.byAppId || {};
+    if (fullAuditRecoveryState) fullAuditRecoveryState.activationResults = activationResults;
   } else {
     console.log(chalk.gray('Skipping offer activation.'));
   }
@@ -2572,6 +2665,7 @@ async function runFullAudit() {
       });
       if (csvPathAnswer) fullAuditCommissionMap = loadCommissionDataFromCSV(csvPathAnswer);
     }
+    if (fullAuditRecoveryState) fullAuditRecoveryState.commissionMap = fullAuditCommissionMap;
   }
   const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const saveAnswer = await new Promise((resolve) => {
@@ -2611,7 +2705,7 @@ async function runFullAudit() {
     const fXlsx = path.join(outDir, `full-audit-combined-${ts}.xlsx`);
     writeFullReportCombinedCSV(rateMerchants, activationResults, fXlsx);
     console.log(chalk.green(`Full audit report → ${fXlsx}`));
-    if (activationResults.length > 0 && byAppId) {
+      if (activationResults.length > 0 && byAppId) {
       for (const [appIdStr, list] of Object.entries(byAppId)) {
         const ids = (list || []).map(r => r.merchantId).filter(id => id != null);
         if (ids.length > 0) offerActivation.markMerchantsAsTested(Number(appIdStr), ids);
@@ -2619,6 +2713,11 @@ async function runFullAudit() {
       console.log(chalk.gray('Merchants marked as tested for offer activation.\n'));
     }
   }
+  if (fullAuditRecoveryState) {
+    fullAuditRecoveryState.commissionMap = fullAuditCommissionMap;
+  }
+  fullAuditRecoveryState = null;
+  removeFullAuditRecoveryListeners();
 }
 
 /**
