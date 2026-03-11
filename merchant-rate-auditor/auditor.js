@@ -2415,6 +2415,7 @@ function writeFullAuditRecoveryFile() {
 function removeFullAuditRecoveryListeners() {
   if (!fullAuditRecoveryListenersAttached) return;
   fullAuditRecoveryListenersAttached = false;
+  if (process.__fullAuditRecoveryCallback) process.__fullAuditRecoveryCallback = null;
   process.removeListener('uncaughtException', fullAuditRecoveryOnExit);
   process.removeListener('unhandledRejection', fullAuditRecoveryOnExit);
   process.removeListener('SIGINT', fullAuditRecoveryOnSignal);
@@ -2453,6 +2454,12 @@ async function runFullAudit() {
   };
   if (!fullAuditRecoveryListenersAttached) {
     fullAuditRecoveryListenersAttached = true;
+    process.__fullAuditRecoveryCallback = () => {
+      writeFullAuditRecoveryFile();
+      removeFullAuditRecoveryListeners();
+      fullAuditRecoveryState = null;
+      if (process.__fullAuditRecoveryCallback) process.__fullAuditRecoveryCallback = null;
+    };
     process.on('uncaughtException', fullAuditRecoveryOnExit);
     process.on('unhandledRejection', fullAuditRecoveryOnExit);
     process.on('SIGINT', fullAuditRecoveryOnSignal);
@@ -2608,10 +2615,13 @@ async function runFullAudit() {
   let activationResults = [];
   let byAppId = {};
   if (runOffer) {
-    const batch = await offerActivation.runOfferActivationBatchForAppIds(appIds, { merchantsByAppId });
-    activationResults = batch.results || [];
+    fullAuditRecoveryState.activationResults = activationResults;
+    const batch = await offerActivation.runOfferActivationBatchForAppIds(appIds, {
+      merchantsByAppId,
+      activationResultsRef: activationResults
+    });
+    activationResults = batch.results || activationResults;
     byAppId = batch.byAppId || {};
-    if (fullAuditRecoveryState) fullAuditRecoveryState.activationResults = activationResults;
   } else {
     console.log(chalk.gray('Skipping offer activation.'));
   }

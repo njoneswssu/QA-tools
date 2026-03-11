@@ -59,6 +59,13 @@ function clearInterruptSave() {
 }
 
 process.on('SIGINT', () => {
+  if (typeof process.__fullAuditRecoveryCallback === 'function') {
+    try {
+      process.__fullAuditRecoveryCallback();
+    } catch (e) {
+      console.error(chalk.red('Full audit recovery failed: ' + (e && e.message ? e.message : String(e))));
+    }
+  }
   saveInterruptedResults();
   process.exit(130);
 });
@@ -1329,7 +1336,7 @@ async function deleteAllOfferActivationResults() {
  * @returns {Promise<Array>} results
  */
 async function runBatchForOneAppId(appId, options = {}) {
-  const { limit = 10, session = {}, skipAlreadyTested = true, merchants: providedMerchants = null } = options;
+  const { limit = 10, session = {}, skipAlreadyTested = true, merchants: providedMerchants = null, activationResultsRef = null } = options;
   let toTest;
   if (providedMerchants && providedMerchants.length > 0) {
     toTest = providedMerchants.filter(m => m.URL || m.Domain);
@@ -1360,8 +1367,28 @@ async function runBatchForOneAppId(appId, options = {}) {
   setInterruptSave(results, appId);
   for (let idx = 0; idx < toTest.length; idx++) {
     const merchant = toTest[idx];
-    const result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
-    results.push({ ...result, appId });
+    let result;
+    try {
+      result = await testMerchantActivation(merchant, appId, null, sessionObj, activeDomains);
+    } catch (err) {
+      const merchantName = merchant.Name || `Merchant ID ${merchant.ID}`;
+      const merchantId = merchant.ID;
+      const merchantDomain = merchant.Domain || (merchant.URL ? extractDomain(merchant.URL) : null) || 'unknown';
+      const errMsg = err && (err.message || String(err)) || 'Test threw unexpectedly';
+      console.log(chalk.red(`  Error testing ${merchantName} (${merchantDomain}): ${errMsg}`));
+      result = {
+        merchantId,
+        merchantName,
+        merchantDomain,
+        success: false,
+        error: errMsg,
+        redirectChain: [],
+        issues: [{ type: 'test_error', severity: 'high', message: errMsg }]
+      };
+    }
+    const row = { ...result, appId };
+    results.push(row);
+    if (options.activationResultsRef) options.activationResultsRef.push(row);
     const done = results.length;
     if (done % progressEvery === 0 || done === totalToTest) {
       const ok = results.filter(r => r.success).length;
@@ -1382,7 +1409,7 @@ async function runBatchForOneAppId(appId, options = {}) {
  * @returns {Promise<{ results: Array, byAppId: Object }>}
  */
 async function runOfferActivationBatchForAppIds(appIds, options = {}) {
-  const { limit = 10, merchantsByAppId = null } = options;
+  const { limit = 10, merchantsByAppId = null, activationResultsRef = null } = options;
   let session = { deviceId: '', trackingCode: '', shoppingTripCode: '' };
   const saved = loadSavedSession();
   if (saved && (saved.deviceId || saved.trackingCode || saved.shoppingTripCode)) {
@@ -1411,8 +1438,8 @@ async function runOfferActivationBatchForAppIds(appIds, options = {}) {
     const count = merchants ? merchants.length : limit;
     console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (${count} merchants)...`));
     const results = merchants
-      ? await runBatchForOneAppId(appId, { session, merchants })
-      : await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true });
+      ? await runBatchForOneAppId(appId, { session, merchants, activationResultsRef })
+      : await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true, activationResultsRef });
     byAppId[appId] = results;
     allResults.push(...results);
   }
@@ -1845,7 +1872,25 @@ async function runOfferActivationTest() {
               }
               console.log(chalk.gray('  Resuming...\n'));
             }
-            const result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
+            let result;
+            try {
+              result = await testMerchantActivation(merchant, config.appId, null, session, activeDomains);
+            } catch (err) {
+              const merchantName = merchant.Name || `Merchant ID ${merchant.ID}`;
+              const merchantId = merchant.ID;
+              const merchantDomain = merchant.Domain || (merchant.URL ? extractDomain(merchant.URL) : null) || 'unknown';
+              const errMsg = err && (err.message || String(err)) || 'Test threw unexpectedly';
+              console.log(chalk.red(`  Error testing ${merchantName} (${merchantDomain}): ${errMsg}`));
+              result = {
+                merchantId,
+                merchantName,
+                merchantDomain,
+                success: false,
+                error: errMsg,
+                redirectChain: [],
+                issues: [{ type: 'test_error', severity: 'high', message: errMsg }]
+              };
+            }
             results.push({ ...result, appId: config.appId });
             const done = results.length;
             if (done % progressEvery === 0 || done === totalToTest) {
