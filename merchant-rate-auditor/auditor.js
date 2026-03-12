@@ -2801,22 +2801,28 @@ function promptForAppIds() {
 }
 
 /**
- * Commissions menu: look up overall commission by merchant name or ID (CSV or BigQuery).
+ * Commissions menu: look up overall commission by merchant name(s) or ID(s) (CSV or BigQuery).
+ * Supports multiple comma-separated names or IDs.
  */
 async function runCommissionsMenu() {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const ask = (q) => new Promise((res) => rl.question(chalk.cyan(q), (a) => res((a || '').trim())));
   console.log(chalk.bold.cyan('\n💰 Commission Lookup\n'));
-  const input = await ask('Merchant name or ID (partial match for name): ');
+  const input = await ask('Merchant name(s) or ID(s) (comma-separated; names use partial match): ');
   rl.close();
   if (!input) {
     console.log(chalk.yellow('No input entered.'));
     return;
   }
-  const isNumeric = /^[\d,\s]+$/.test(input);
+  const tokens = input.split(',').map((s) => s.trim()).filter(Boolean);
+  if (tokens.length === 0) {
+    console.log(chalk.yellow('No valid name(s) or ID(s) entered.'));
+    return;
+  }
+  const allNumeric = tokens.every((t) => /^\d+$/.test(t));
   let merchants = [];
-  if (isNumeric) {
-    const ids = input.split(/[,\s]+/).map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n) && n > 0);
+  if (allNumeric) {
+    const ids = tokens.map((s) => parseInt(s, 10)).filter((n) => !isNaN(n) && n > 0);
     if (ids.length === 0) {
       console.log(chalk.yellow('No valid merchant ID(s) entered.'));
       return;
@@ -2835,22 +2841,24 @@ async function runCommissionsMenu() {
       console.log(chalk.yellow('No valid App ID(s).'));
       return;
     }
-    const q = input.toLowerCase();
     const seen = new Set();
-    for (const appId of appIds) {
-      try {
-        const raw = await offerActivation.fetchMerchantData(appId);
-        (raw || []).forEach((m) => {
-          const name = (m.Name || '').trim();
-          if (name.toLowerCase().includes(q) && !seen.has(m.ID)) {
-            seen.add(m.ID);
-            merchants.push({ merchantId: String(m.ID), merchantName: name });
-          }
-        });
-      } catch (_) {}
+    for (const token of tokens) {
+      const q = token.toLowerCase();
+      for (const appId of appIds) {
+        try {
+          const raw = await offerActivation.fetchMerchantData(appId);
+          (raw || []).forEach((m) => {
+            const name = (m.Name || '').trim();
+            if (name.toLowerCase().includes(q) && !seen.has(m.ID)) {
+              seen.add(m.ID);
+              merchants.push({ merchantId: String(m.ID), merchantName: name });
+            }
+          });
+        } catch (_) {}
+      }
     }
     if (merchants.length === 0) {
-      console.log(chalk.yellow(`No merchants found matching "${input}" in the given App ID(s).`));
+      console.log(chalk.yellow(`No merchants found matching "${tokens.join(', ')}" in the given App ID(s).`));
       return;
     }
   }
