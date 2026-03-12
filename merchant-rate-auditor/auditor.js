@@ -34,6 +34,28 @@ const CONFIG = {
   bigQueryProjectId: 'wildfire-1000'
 };
 
+/**
+ * Ask a yes/no question; re-prompts until the user enters yes, no, y, or n (case-insensitive).
+ * @param {string} question - Prompt text (e.g. "Save? (yes/no): ")
+ * @param {{ yellow?: boolean }} [opts] - If yellow, use chalk.yellow for the prompt.
+ * @returns {Promise<boolean>} true for yes, false for no.
+ */
+async function askYesNo(question, opts = {}) {
+  const style = opts.yellow ? chalk.yellow : chalk.cyan;
+  for (;;) {
+    const answer = await new Promise((resolve) => {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      rl.question(style(question), (a) => {
+        rl.close();
+        resolve((a && a.trim()) ? a.toLowerCase().trim() : '');
+      });
+    });
+    if (answer === 'yes' || answer === 'y') return true;
+    if (answer === 'no' || answer === 'n') return false;
+    console.log(chalk.yellow('Please enter yes or no.'));
+  }
+}
+
 // Hex code pattern: matches strings that look like hex codes
 // Examples: "FF0000", "#ABCDEF", "0x123456", "abc123"
 const HEX_CODE_PATTERN = /^(0x|#)?[0-9A-Fa-f]{3,8}$/;
@@ -1057,13 +1079,7 @@ function buildRateMerchantsForCombinedReport(report, rateFalseNegativeKeys = nul
 async function promptAndMarkRateFalseNegatives(report) {
   const issueRows = generateSimplifiedExport(report);
   if (issueRows.length === 0) return new Set();
-  const wantMark = await new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question(chalk.cyan('Mark any rate issues as false negatives? (yes/no): '), (a) => {
-      rl.close();
-      resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-    });
-  });
+  const wantMark = await askYesNo('Mark any rate issues as false negatives? (yes/no): ');
   if (!wantMark) return new Set();
   console.log(chalk.yellow('\nRate issues:\n'));
   issueRows.forEach((r, i) => {
@@ -1326,19 +1342,8 @@ function exportToJSON(exportData, filepath, report = null) {
 /**
  * Prompt user if they want CSV export
  */
-function promptForCSVExport() {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  
-  return new Promise((resolve) => {
-    rl.question(chalk.cyan('\n📊 Export as CSV as well? (yes/no): '), (answer) => {
-      rl.close();
-      const wantsCSV = answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y';
-      resolve(wantsCSV);
-    });
-  });
+async function promptForCSVExport() {
+  return askYesNo('\n📊 Export as CSV as well? (yes/no): ');
 }
 
 /**
@@ -1354,13 +1359,7 @@ async function saveReport(report, skipCSVPrompt = false) {
   let rateMerchants = buildRateMerchantsForCombinedReport(report, new Set());
   const merchantIds = collectMerchantIdsFromReport(report);
   if (merchantIds.length > 0 && process.stdin.isTTY) {
-    const useBq = await new Promise((resolve) => {
-      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-      rl.question(chalk.cyan('Fetch commission data from BigQuery? (yes/no): '), (a) => {
-        rl.close();
-        resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-      });
-    });
+    const useBq = await askYesNo('Fetch commission data from BigQuery? (yes/no): ');
     if (useBq) {
       console.log(chalk.blue('Running BigQuery for commission data...'));
       const commissionMap = await fetchCommissionFromBigQuery(merchantIds);
@@ -2008,13 +2007,7 @@ async function deleteFilesByAppId(outDir) {
   }
   console.log(chalk.yellow(`\nFiles containing App ID ${appId}:\n`));
   matching.forEach((f) => console.log(chalk.gray('  ' + f)));
-  const rl2 = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const confirm = await new Promise((res) => {
-    rl2.question(chalk.cyan('\nDelete these files? (yes/no): '), (a) => {
-      rl2.close();
-      res(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-    });
-  });
+  const confirm = await askYesNo('\nDelete these files? (yes/no): ');
   if (!confirm) {
     console.log(chalk.gray('Cancelled.'));
     return;
@@ -2062,13 +2055,7 @@ async function deleteAllResultFiles(outDir) {
     return;
   }
   console.log(chalk.yellow(`\nThis will delete ${files.length} result file(s). Session and tested-merchants list will be kept.\n`));
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const confirm = await new Promise((res) => {
-    rl.question(chalk.cyan('Delete all result files? (yes/no): '), (a) => {
-      rl.close();
-      res(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-    });
-  });
+  const confirm = await askYesNo('Delete all result files? (yes/no): ');
   if (!confirm) {
     console.log(chalk.gray('Cancelled.'));
     return;
@@ -2112,13 +2099,7 @@ async function runFileManagerMenu() {
 
   async function askDeleteCombinedSources(filesToDelete) {
     if (!filesToDelete || filesToDelete.length === 0) return;
-    const delRl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const yes = await new Promise((res) => {
-      delRl.question(chalk.cyan('Delete the individual files that were combined? (yes/no): '), (a) => {
-        delRl.close();
-        res(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-      });
-    });
+    const yes = await askYesNo('Delete the individual files that were combined? (yes/no): ');
     if (yes) {
       for (const f of filesToDelete) {
         try {
@@ -2344,13 +2325,7 @@ async function promptAndMarkNeedsInvestigation(activationResults) {
     console.log(chalk.gray(`  ${i + 1}. ID ${r.merchantId} — ${r.merchantName || '(no name)'}`));
   });
   console.log('');
-  const wantMark = await new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question(chalk.cyan('Mark any of these for further investigation? (yes/no): '), (a) => {
-      rl.close();
-      resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-    });
-  });
+  const wantMark = await askYesNo('Mark any of these for further investigation? (yes/no): ');
   if (!wantMark) return;
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const answer = await new Promise((resolve) => {
@@ -2376,6 +2351,69 @@ async function promptAndMarkNeedsInvestigation(activationResults) {
 
 let fullAuditRecoveryState = null;
 let fullAuditRecoveryListenersAttached = false;
+
+const FULL_AUDIT_CHECKPOINT_BASE = 'full-audit-checkpoint';
+
+/**
+ * Write current full-audit state to full-audit-checkpoint.xlsx only.
+ * @param {{ silent?: boolean }} [opts] - If silent true, do not log "ended unexpectedly" (used for proactive save before batch).
+ */
+function writeFullAuditRecoveryFileToCheckpoint(opts) {
+  const silent = opts && opts.silent === true;
+  if (!fullAuditRecoveryState) return;
+  const state = fullAuditRecoveryState;
+  const hasReport = state.report && (state.report.results || []).length > 0;
+  const hasActivation = (state.activationResults || []).length > 0;
+  if (!hasReport && !hasActivation) return;
+  const outDir = path.resolve(CONFIG.outputDir);
+  try {
+    if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  } catch (err) {
+    console.error(chalk.red('Checkpoint save failed (mkdir): ' + (err && err.message ? err.message : String(err))));
+    return;
+  }
+  const dateTested = new Date().toISOString().slice(0, 10);
+  let rateMerchants = [];
+  if (hasReport) {
+    rateMerchants = buildRateMerchantsForCombinedReport(state.report, state.rateFalseNegativeKeys || new Set());
+    rateMerchants = rateMerchants.filter((m) => m.issueType != null && String(m.issueType).trim() !== '' && String(m.issueType) !== 'None');
+    rateMerchants.forEach((m) => {
+      m.commission = (state.commissionMap && state.commissionMap.get) ? state.commissionMap.get(String(m.merchantId)) : undefined;
+      m.dateTested = m.dateTested || dateTested;
+    });
+    rateMerchants.sort((a, b) => {
+      const ca = a.commission != null && a.commission !== '' ? Number(a.commission) : -Infinity;
+      const cb = b.commission != null && b.commission !== '' ? Number(b.commission) : -Infinity;
+      if (cb !== ca) return cb - ca;
+      return (b.count || 0) - (a.count || 0);
+    });
+    if (rateMerchants.length === 0) {
+      rateMerchants = [{ merchantName: '(No rate issues)', dateTested, issueType: 'Info', reason: 'Audit completed with no rate issues' }];
+    }
+  }
+  const activationResults = (state.activationResults || []).map((r) => ({ ...r, dateTested: r.dateTested || dateTested }));
+  const fXlsx = path.join(outDir, `${FULL_AUDIT_CHECKPOINT_BASE}.xlsx`);
+  try {
+    writeFullReportCombinedCSV(rateMerchants, activationResults, fXlsx);
+  } catch (err) {
+    console.error(chalk.red('Checkpoint save failed: ' + (err && err.message ? err.message : String(err))));
+    return;
+  }
+  const absoluteXlsx = path.resolve(fXlsx);
+  if (silent) {
+    console.log(chalk.gray(`  Checkpoint saved (if test aborts, open): ${absoluteXlsx}`));
+  } else {
+    console.error(chalk.yellow(`\n⚠️  Full audit ended unexpectedly. Results saved to ${absoluteXlsx}\n`));
+  }
+}
+
+function clearFullAuditCheckpoint() {
+  try {
+    const outDir = path.resolve(CONFIG.outputDir);
+    const f = path.join(outDir, FULL_AUDIT_CHECKPOINT_BASE + '.xlsx');
+    if (fs.existsSync(f)) fs.unlinkSync(f);
+  } catch (_) {}
+}
 
 function writeFullAuditRecoveryFile() {
   if (!fullAuditRecoveryState) return;
@@ -2403,6 +2441,9 @@ function writeFullAuditRecoveryFile() {
       });
     }
     const activationResults = (state.activationResults || []).map((r) => ({ ...r, dateTested: r.dateTested || dateTested }));
+    if (rateMerchants.length === 0 && hasReport) {
+      rateMerchants = [{ merchantName: '(No rate issues)', dateTested, issueType: 'Info', reason: 'Audit completed with no rate issues' }];
+    }
     const baseName = `full-audit-recovery-${ts}`;
     const fXlsx = path.join(outDir, `${baseName}.xlsx`);
     writeFullReportCombinedCSV(rateMerchants, activationResults, fXlsx);
@@ -2423,14 +2464,14 @@ function removeFullAuditRecoveryListeners() {
 }
 
 function fullAuditRecoveryOnExit() {
-  writeFullAuditRecoveryFile();
+  writeFullAuditRecoveryFileToCheckpoint();
   removeFullAuditRecoveryListeners();
   fullAuditRecoveryState = null;
   process.exit(1);
 }
 
 function fullAuditRecoveryOnSignal() {
-  writeFullAuditRecoveryFile();
+  writeFullAuditRecoveryFileToCheckpoint();
   removeFullAuditRecoveryListeners();
   fullAuditRecoveryState = null;
   process.exit(130);
@@ -2455,7 +2496,7 @@ async function runFullAudit() {
   if (!fullAuditRecoveryListenersAttached) {
     fullAuditRecoveryListenersAttached = true;
     process.__fullAuditRecoveryCallback = () => {
-      writeFullAuditRecoveryFile();
+      writeFullAuditRecoveryFileToCheckpoint();
       removeFullAuditRecoveryListeners();
       fullAuditRecoveryState = null;
       if (process.__fullAuditRecoveryCallback) process.__fullAuditRecoveryCallback = null;
@@ -2471,13 +2512,7 @@ async function runFullAudit() {
     console.log(chalk.cyan(`  App ID ${appId}: ${testedSet.size} merchant(s) already tested`));
   }
   console.log('');
-  const specificNamesAnswer = await new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question(chalk.cyan('Are you testing specific merchant names? (yes/no): '), (a) => {
-      rl.close();
-      resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-    });
-  });
+  const specificNamesAnswer = await askYesNo('Are you testing specific merchant names? (yes/no): ');
   let maxMerchants = null;
   let useSpecificMerchants = false;
   let nameSet = null; // set of lowercased merchant names to match
@@ -2517,7 +2552,13 @@ async function runFullAudit() {
     const raw = await offerActivation.fetchMerchantData(appId);
     let withUrl = (raw || []).filter(m => m.URL || m.Domain);
     if (useSpecificMerchants && nameSet) {
-      withUrl = withUrl.filter((m) => nameSet.has((m.Name || '').trim().toLowerCase()));
+      withUrl = withUrl.filter((m) => {
+        const merchantLower = (m.Name || '').trim().toLowerCase();
+        if (!merchantLower) return false;
+        return Array.from(nameSet).some(
+          (entered) => merchantLower === entered || merchantLower.includes(entered) || entered.includes(merchantLower)
+        );
+      });
     } else if (maxMerchants != null) {
       withUrl = shuffleArray(withUrl).slice(0, maxMerchants);
     }
@@ -2591,13 +2632,7 @@ async function runFullAudit() {
   let fullAuditCommissionMap = new Map();
   const merchantIdsForBq = collectMerchantIdsFromReport(report);
   if (merchantIdsForBq.length > 0 && process.stdin.isTTY) {
-    const useBq = await new Promise((resolve) => {
-      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-      rl.question(chalk.cyan('Fetch commission data from BigQuery? (yes/no): '), (a) => {
-        rl.close();
-        resolve(!!(a && (a.toLowerCase().trim() === 'yes' || a.toLowerCase().trim() === 'y')));
-      });
-    });
+    const useBq = await askYesNo('Fetch commission data from BigQuery? (yes/no): ');
     if (useBq) {
       console.log(chalk.blue('Running BigQuery for commission data...'));
       fullAuditCommissionMap = await fetchCommissionFromBigQuery(merchantIdsForBq);
@@ -2605,23 +2640,29 @@ async function runFullAudit() {
   }
   // Do NOT save Part 1 here; save combined at the end.
   console.log(chalk.bold.cyan('\n——— Part 2: Offer Activation ———\n'));
-  const runOffer = await new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question(chalk.cyan('Run offer activation for these App IDs? (yes/no): '), (answer) => {
-      rl.close();
-      resolve(!!(answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')));
-    });
-  });
+  const runOffer = await askYesNo('Run offer activation for these App IDs? (yes/no): ');
   let activationResults = [];
   let byAppId = {};
   if (runOffer) {
     fullAuditRecoveryState.activationResults = activationResults;
-    const batch = await offerActivation.runOfferActivationBatchForAppIds(appIds, {
-      merchantsByAppId,
-      activationResultsRef: activationResults
-    });
-    activationResults = batch.results || activationResults;
-    byAppId = batch.byAppId || {};
+    writeFullAuditRecoveryFileToCheckpoint({ silent: true });
+    try {
+      const batch = await offerActivation.runOfferActivationBatchForAppIds(appIds, {
+        merchantsByAppId,
+        activationResultsRef: activationResults,
+        onMerchantDone: () => writeFullAuditRecoveryFileToCheckpoint({ silent: true })
+      });
+      activationResults = batch.results || activationResults;
+      byAppId = batch.byAppId || {};
+      clearFullAuditCheckpoint();
+    } catch (batchErr) {
+      console.error(chalk.red('\nOffer activation batch failed: ' + (batchErr && batchErr.message ? batchErr.message : String(batchErr))));
+      writeFullAuditRecoveryFileToCheckpoint();
+      console.log(chalk.yellow('Partial results saved to audit-results/full-audit-checkpoint.xlsx'));
+      fullAuditRecoveryState = null;
+      removeFullAuditRecoveryListeners();
+      return;
+    }
   } else {
     console.log(chalk.gray('Skipping offer activation.'));
   }
@@ -2677,13 +2718,7 @@ async function runFullAudit() {
     }
     if (fullAuditRecoveryState) fullAuditRecoveryState.commissionMap = fullAuditCommissionMap;
   }
-  const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const saveAnswer = await new Promise((resolve) => {
-    saveRl.question(chalk.cyan('Save full audit results (Excel)? (yes/no): '), (answer) => {
-      saveRl.close();
-      resolve(!!(answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y')));
-    });
-  });
+  const saveAnswer = await askYesNo('Save full audit results (Excel)? (yes/no): ');
   if (saveAnswer) {
     const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const outDir = CONFIG.outputDir;
@@ -2945,23 +2980,10 @@ async function main() {
     const confirmed = args.includes('--yes') || args.includes('-y');
     
     if (!confirmed) {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-      
-      return new Promise((resolve) => {
-        rl.question(chalk.yellow('⚠️  Are you sure you want to delete all audit results? (yes/no): '), (answer) => {
-          rl.close();
-          if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
-            clearAllResults();
-            resolve();
-          } else {
-            console.log(chalk.gray('Cancelled.'));
-            resolve();
-          }
-        });
-      });
+      const confirm = await askYesNo('⚠️  Are you sure you want to delete all audit results? (yes/no): ', { yellow: true });
+      if (confirm) clearAllResults();
+      else console.log(chalk.gray('Cancelled.'));
+      return;
     } else {
       clearAllResults();
       return;
@@ -3091,10 +3113,8 @@ async function runMerchantRateAuditMenu() {
         break;
       }
       case '4': {
-        const clearRl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        const ans = await new Promise((res) => clearRl.question(chalk.yellow('⚠️  Are you sure you want to delete all audit results? (yes/no): '), res));
-        clearRl.close();
-        if (ans && (ans.toLowerCase() === 'yes' || ans.toLowerCase() === 'y')) clearAllResults();
+        const confirm = await askYesNo('⚠️  Are you sure you want to delete all audit results? (yes/no): ', { yellow: true });
+        if (confirm) clearAllResults();
         else console.log(chalk.gray('Cancelled.'));
         break;
       }

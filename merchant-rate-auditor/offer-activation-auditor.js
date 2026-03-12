@@ -1336,7 +1336,7 @@ async function deleteAllOfferActivationResults() {
  * @returns {Promise<Array>} results
  */
 async function runBatchForOneAppId(appId, options = {}) {
-  const { limit = 10, session = {}, skipAlreadyTested = true, merchants: providedMerchants = null, activationResultsRef = null } = options;
+  const { limit = 10, session = {}, skipAlreadyTested = true, merchants: providedMerchants = null, activationResultsRef = null, onMerchantDone = null } = options;
   let toTest;
   if (providedMerchants && providedMerchants.length > 0) {
     toTest = providedMerchants.filter(m => m.URL || m.Domain);
@@ -1389,6 +1389,7 @@ async function runBatchForOneAppId(appId, options = {}) {
     const row = { ...result, appId };
     results.push(row);
     if (options.activationResultsRef) options.activationResultsRef.push(row);
+    if (typeof options.onMerchantDone === 'function') options.onMerchantDone();
     const done = results.length;
     if (done % progressEvery === 0 || done === totalToTest) {
       const ok = results.filter(r => r.success).length;
@@ -1409,7 +1410,7 @@ async function runBatchForOneAppId(appId, options = {}) {
  * @returns {Promise<{ results: Array, byAppId: Object }>}
  */
 async function runOfferActivationBatchForAppIds(appIds, options = {}) {
-  const { limit = 10, merchantsByAppId = null, activationResultsRef = null } = options;
+  const { limit = 10, merchantsByAppId = null, activationResultsRef = null, onMerchantDone = null } = options;
   let session = { deviceId: '', trackingCode: '', shoppingTripCode: '' };
   const saved = loadSavedSession();
   if (saved && (saved.deviceId || saved.trackingCode || saved.shoppingTripCode)) {
@@ -1438,8 +1439,8 @@ async function runOfferActivationBatchForAppIds(appIds, options = {}) {
     const count = merchants ? merchants.length : limit;
     console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (${count} merchants)...`));
     const results = merchants
-      ? await runBatchForOneAppId(appId, { session, merchants, activationResultsRef })
-      : await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true, activationResultsRef });
+      ? await runBatchForOneAppId(appId, { session, merchants, activationResultsRef, onMerchantDone })
+      : await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true, activationResultsRef, onMerchantDone });
     byAppId[appId] = results;
     allResults.push(...results);
   }
@@ -1472,16 +1473,21 @@ async function showOfferActivationMenu() {
 }
 
 /**
- * Ask a single question (yes/no). Returns true for yes.
+ * Ask a single question (yes/no). Re-prompts until the user enters yes, no, y, or n (case-insensitive). Returns true for yes.
  */
-function askYesNo(question) {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  return new Promise((resolve) => {
-    rl.question(chalk.cyan(question), (answer) => {
-      rl.close();
-      resolve(!!(answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')));
+async function askYesNo(question) {
+  for (;;) {
+    const answer = await new Promise((resolve) => {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      rl.question(chalk.cyan(question), (a) => {
+        rl.close();
+        resolve((a && a.trim()) ? a.toLowerCase().trim() : '');
+      });
     });
-  });
+    if (answer === 'yes' || answer === 'y') return true;
+    if (answer === 'no' || answer === 'n') return false;
+    console.log(chalk.yellow('Please enter yes or no.'));
+  }
 }
 
 /**
@@ -1732,26 +1738,14 @@ async function runOfferActivationTest() {
           } else if (lastResult && lastResult.issues && lastResult.issues.length > 0) {
             console.log(chalk.red('\n❌ ' + (lastResult.issues[0].message || lastResult.error || 'Test failed.')));
           }
-          const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-          const testAnother = await new Promise((resolve) => {
-            rl.question(chalk.cyan('\nTest another link? (yes/no): '), (answer) => {
-              rl.close();
-              resolve(answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y'));
-            });
-          });
+          const testAnother = await askYesNo('\nTest another link? (yes/no): ');
           if (!testAnother) {
             if (unsavedLinkResults.length > 0) {
-              const saveRl = readline.createInterface({ input: process.stdin, output: process.stdout });
-              await new Promise((resolve) => {
-                saveRl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
-                  saveRl.close();
-                  if (answer && (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y')) {
-                    exportResultsToCSV(unsavedLinkResults);
-                    unsavedLinkResults = [];
-                  }
-                  resolve();
-                });
-              });
+              const save = await askYesNo('Save results? (yes/no): ');
+              if (save) {
+                exportResultsToCSV(unsavedLinkResults);
+                unsavedLinkResults = [];
+              }
             }
             break;
           }
@@ -1909,20 +1903,13 @@ async function runOfferActivationTest() {
           clearInterruptSave();
           printResultsSummary(results);
           await promptAndMarkFalseNegatives(results);
-          const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-          await new Promise((resolve) => {
-            rl.question(chalk.cyan('Save results? (yes/no): '), (answer) => {
-              const isYes = answer && (answer.toLowerCase().trim() === 'yes' || answer.toLowerCase().trim() === 'y');
-              if (isYes) {
-                exportResultsToCSV(results);
-                unsavedBatchResults = null;
-                const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
-                if (merchantIds.length > 0) markMerchantsAsTested(config.appId, merchantIds);
-              }
-              rl.close();
-              resolve();
-            });
-          });
+          const save = await askYesNo('Save results? (yes/no): ');
+          if (save) {
+            exportResultsToCSV(results);
+            unsavedBatchResults = null;
+            const merchantIds = results.map(r => r.merchantId).filter(id => id != null);
+            if (merchantIds.length > 0) markMerchantsAsTested(config.appId, merchantIds);
+          }
         }
         break;
       }
