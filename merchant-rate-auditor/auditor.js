@@ -2574,7 +2574,12 @@ async function runFullAudit() {
         );
       });
     } else if (maxMerchants != null) {
-      withUrl = shuffleArray(withUrl).slice(0, maxMerchants);
+      const testedSet = offerActivation.loadTestedMerchants(appId);
+      const untested = withUrl.filter((m) => !testedSet.has(Number(m.ID)));
+      const tested = withUrl.filter((m) => testedSet.has(Number(m.ID)));
+      const untestedShuffled = shuffleArray(untested);
+      const testedShuffled = shuffleArray(tested);
+      withUrl = [...untestedShuffled, ...testedShuffled].slice(0, maxMerchants);
     }
     merchantsByAppId[appId] = withUrl;
   }
