@@ -2487,6 +2487,20 @@ async function runFullAudit() {
   const appIds = await promptForAppIds();
   if (!appIds || appIds.length === 0) return;
 
+  // If a checkpoint from a previous aborted run exists, promote it to a full-audit-combined file so it isn't overwritten
+  const outDir = path.resolve(CONFIG.outputDir);
+  const checkpointPath = path.join(outDir, `${FULL_AUDIT_CHECKPOINT_BASE}.xlsx`);
+  if (fs.existsSync(checkpointPath)) {
+    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const combinedPath = path.join(outDir, `full-audit-combined-${ts}.xlsx`);
+    try {
+      fs.renameSync(checkpointPath, combinedPath);
+      console.log(chalk.gray(`Previous checkpoint saved as: ${path.basename(combinedPath)}\n`));
+    } catch (err) {
+      console.log(chalk.yellow('Could not rename checkpoint to combined file: ' + (err && err.message ? err.message : String(err))));
+    }
+  }
+
   fullAuditRecoveryState = {
     report: null,
     activationResults: [],
