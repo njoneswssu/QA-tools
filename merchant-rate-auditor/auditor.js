@@ -1132,6 +1132,15 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
     if (isoMatch) return isoMatch[0];
     return s;
   };
+  /** Return exactly one date (YYYY-MM-DD) for the Dates tested column so it never spills into other columns. */
+  const singleDateOnly = (v) => {
+    const s = normalizeDateTested(v);
+    if (!s) return '';
+    const first = s.split(/[;,]\s*/)[0].trim();
+    const m = first.match(/\d{4}-\d{2}-\d{2}/);
+    return m ? m[0] : '';
+  };
+  const looksLikeDate = (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '').trim());
   const normalizeCell = (v) => {
     if (v == null || v === '') return '';
     return String(v).replace(/,/g, '; ');
@@ -1142,9 +1151,12 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
       .map((hop) => `${hop.url} (${hop.statusCode} ${hop.statusText || ''})`.trim())
       .join(' → ');
   };
-  const rateWithIssues = (rateMerchants || []).filter(
+  let rateWithIssues = (rateMerchants || []).filter(
     (m) => m.issueType != null && String(m.issueType).trim() !== '' && String(m.issueType) !== 'None'
   );
+  const rateDedupe = new Map();
+  rateWithIssues.forEach((m) => rateDedupe.set(`${m.merchantId}|${m.appId}`, m));
+  rateWithIssues = Array.from(rateDedupe.values());
   const rateHeaders = [
     'Dates tested',
     'Merchant Name',
@@ -1175,10 +1187,12 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
     'Issue Type',
     'Issue Message'
   ];
-  const rateRows = rateWithIssues.map((m) => [
-    normalizeDateTested(m.dateTested),
-    m.merchantName ?? '',
-    m.merchantId ?? '',
+  const rateRows = rateWithIssues.map((m) => {
+    const name = m.merchantName ?? '';
+    return [
+      singleDateOnly(m.dateTested),
+      looksLikeDate(name) ? '' : name,
+      m.merchantId ?? '',
     m.appId ?? '',
     m.merchantCategory ?? '',
     m.commission !== undefined && m.commission !== null && m.commission !== '' ? m.commission : '',
@@ -1188,7 +1202,8 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
     m.rateAmount ?? '',
     m.count ?? '',
     m.falseNegative ? 'Yes' : ''
-  ]);
+  ];
+  });
   const activationRows = [];
   for (const r of activationResults || []) {
     const redirectPath = redirectPathFor(r);
@@ -1197,9 +1212,10 @@ function writeFullReportCombinedCSV(rateMerchants, activationResults, filepath, 
       : (r.error ? [{ type: 'error', message: r.error }] : [{ type: '', message: '' }]);
     const issueTypes = issues.map((i) => i.type ?? '').filter(Boolean).join('; ') || (r.error ? 'error' : '');
     const issueMessages = issues.map((i) => i.message ?? '').filter(Boolean).join('; ') || (r.error ? r.error : '');
+    const actName = r.merchantName ?? '';
     activationRows.push([
-      normalizeDateTested(r.dateTested),
-      r.merchantName ?? '',
+      singleDateOnly(r.dateTested),
+      looksLikeDate(actName) ? '' : actName,
       r.merchantId ?? '',
       r.appId ?? '',
       r.merchantDomain ?? '',
@@ -1981,6 +1997,7 @@ async function deleteFilesByAppId(outDir) {
         f.startsWith('offer-activation-results-') ||
         f.startsWith('offer-activation-combined-') ||
         f.startsWith('full-audit-combined-') ||
+        f.startsWith('full-audit-merged-') ||
         f.startsWith('full-report-combined-') ||
         f.startsWith('merchant-rate-combined-')
       );
@@ -2043,6 +2060,7 @@ async function deleteAllResultFiles(outDir) {
         f.startsWith('offer-activation-combined-') ||
         f.startsWith('offer-activation-interrupted-') ||
         f.startsWith('full-audit-combined-') ||
+        f.startsWith('full-audit-merged-') ||
         f.startsWith('full-report-combined-') ||
         f.startsWith('merchant-rate-combined-') ||
         (f.startsWith('offer-activation-') && (lower.endsWith('.json') || lower.endsWith('.csv')))
@@ -2221,11 +2239,23 @@ async function runFileManagerMenu() {
     }
     try {
       const XLSX = require('xlsx');
-      const allRate = [];
+      let allRate = [];
       const allActivation = [];
       const sourceDates = [];
-      const rateHeaders = ['Merchant Name', 'Merchant ID', 'App ID', 'Merchant Category', 'Commission', 'Issue Type', 'Reason or Message', 'Rate Name', 'Rate Amount', 'Count', 'False Negative'];
-      const activationHeaders = ['Merchant Name', 'Merchant ID', 'App ID', 'Domain', 'Success', 'False Negative', 'Needs Investigation', 'Test URL', 'Final URL', 'Redirect Path', 'Redirect Count', 'Issue Type', 'Issue Message'];
+      const rateHeadersWithDate = ['Dates tested', 'Merchant Name', 'Merchant ID', 'App ID', 'Merchant Category', 'Commission', 'Issue Type', 'Reason or Message', 'Rate Name', 'Rate Amount', 'Count', 'False Negative'];
+      const activationHeadersWithDate = ['Dates tested', 'Merchant Name', 'Merchant ID', 'App ID', 'Domain', 'Success', 'False Negative', 'Needs Investigation', 'Test URL', 'Final URL', 'Redirect Path', 'Redirect Count', 'Issue Type', 'Issue Message'];
+      const cell = (v) => (v !== undefined && v !== null && v !== '' ? String(v).trim() : '');
+      const findHeaderRow = (aoa, withDateFirst) => {
+        if (withDateFirst) {
+          return aoa.findIndex(row => row && cell(row[0]) === 'Dates tested' && cell(row[1]) === 'Merchant Name');
+        }
+        return aoa.findIndex(row => row && cell(row[0]) === 'Merchant Name');
+      };
+      const getByHeader = (headers, row, key) => {
+        const idx = headers.findIndex(h => cell(h) === key);
+        return idx >= 0 && row[idx] !== undefined && row[idx] !== null ? row[idx] : '';
+      };
+      const looksLikeDateVal = (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '').trim());
       for (const file of xlsxFiles) {
         const filepath = path.join(outDir, file);
         const wb = XLSX.readFile(filepath);
@@ -2236,60 +2266,65 @@ async function runFileManagerMenu() {
         const actSheet = sheetNames.find(n => /offer\s*activation/i.test(n));
         if (rateSheet) {
           const aoa = XLSX.utils.sheet_to_json(wb.Sheets[rateSheet], { header: 1, defval: '' });
-          const headerRowIdx = aoa.findIndex(row => row && row[0] === 'Merchant Name');
-          const dataStart = headerRowIdx >= 0 ? headerRowIdx + 1 : (aoa[0] && aoa[0][0] === 'Merchant Name' ? 1 : 3);
-          const headers = headerRowIdx >= 0 ? aoa[headerRowIdx] : rateHeaders;
+          let headerRowIdx = findHeaderRow(aoa, true);
+          if (headerRowIdx < 0) headerRowIdx = findHeaderRow(aoa, false);
+          const dataStart = headerRowIdx >= 0 ? headerRowIdx + 1 : 1;
+          const headers = headerRowIdx >= 0 ? aoa[headerRowIdx] : rateHeadersWithDate;
           for (let i = dataStart; i < aoa.length; i++) {
             const row = aoa[i];
             if (!row || !row.some(c => c !== undefined && c !== null && c !== '')) continue;
-            const obj = {};
-            headers.forEach((h, j) => { obj[h] = row[j]; });
+            let nameVal = getByHeader(headers, row, 'Merchant Name');
+            if (looksLikeDateVal(nameVal)) nameVal = '';
             allRate.push({
-              merchantName: obj['Merchant Name'],
+              merchantName: nameVal,
               dateTested: dateFromName,
-              merchantId: obj['Merchant ID'],
-              appId: obj['App ID'],
-              merchantCategory: obj['Merchant Category'],
-              commission: obj['Commission'],
-              issueType: obj['Issue Type'],
-              reason: obj['Reason or Message'],
-              rateName: obj['Rate Name'],
-              rateAmount: obj['Rate Amount'],
-              count: obj['Count'],
-              falseNegative: /yes/i.test(String(obj['False Negative'] || ''))
+              merchantId: getByHeader(headers, row, 'Merchant ID'),
+              appId: getByHeader(headers, row, 'App ID'),
+              merchantCategory: getByHeader(headers, row, 'Merchant Category'),
+              commission: getByHeader(headers, row, 'Commission'),
+              issueType: getByHeader(headers, row, 'Issue Type'),
+              reason: getByHeader(headers, row, 'Reason or Message'),
+              rateName: getByHeader(headers, row, 'Rate Name'),
+              rateAmount: getByHeader(headers, row, 'Rate Amount'),
+              count: getByHeader(headers, row, 'Count'),
+              falseNegative: /yes/i.test(String(getByHeader(headers, row, 'False Negative') || ''))
             });
           }
         }
         if (actSheet) {
           const aoa = XLSX.utils.sheet_to_json(wb.Sheets[actSheet], { header: 1, defval: '' });
-          const headerRowIdx = aoa.findIndex(row => row && row[0] === 'Merchant Name');
-          const dataStart = headerRowIdx >= 0 ? headerRowIdx + 1 : 3;
-          const headers = headerRowIdx >= 0 ? aoa[headerRowIdx] : activationHeaders;
+          let headerRowIdx = findHeaderRow(aoa, true);
+          if (headerRowIdx < 0) headerRowIdx = findHeaderRow(aoa, false);
+          const dataStart = headerRowIdx >= 0 ? headerRowIdx + 1 : 1;
+          const headers = headerRowIdx >= 0 ? aoa[headerRowIdx] : activationHeadersWithDate;
           for (let i = dataStart; i < aoa.length; i++) {
             const row = aoa[i];
             if (!row || !row.some(c => c !== undefined && c !== null && c !== '')) continue;
-            const obj = {};
-            headers.forEach((h, j) => { obj[h] = row[j]; });
+            let actNameVal = getByHeader(headers, row, 'Merchant Name');
+            if (looksLikeDateVal(actNameVal)) actNameVal = '';
             allActivation.push({
-              merchantName: obj['Merchant Name'],
+              merchantName: actNameVal,
               dateTested: dateFromName,
-              merchantId: obj['Merchant ID'],
-              appId: obj['App ID'],
-              merchantDomain: obj['Domain'],
-              success: /yes/i.test(String(obj['Success'] || '')),
-              falseNegative: /yes/i.test(String(obj['False Negative'] || '')),
-              needsInvestigation: /yes/i.test(String(obj['Needs Investigation'] || '')),
-              testUrl: obj['Test URL'],
-              finalUrl: obj['Final URL'],
-              redirectCount: obj['Redirect Count'],
-              error: obj['Issue Message']
+              merchantId: getByHeader(headers, row, 'Merchant ID'),
+              appId: getByHeader(headers, row, 'App ID'),
+              merchantDomain: getByHeader(headers, row, 'Domain'),
+              success: /yes/i.test(String(getByHeader(headers, row, 'Success') || '')),
+              falseNegative: /yes/i.test(String(getByHeader(headers, row, 'False Negative') || '')),
+              needsInvestigation: /yes/i.test(String(getByHeader(headers, row, 'Needs Investigation') || '')),
+              testUrl: getByHeader(headers, row, 'Test URL'),
+              finalUrl: getByHeader(headers, row, 'Final URL'),
+              redirectCount: getByHeader(headers, row, 'Redirect Count'),
+              error: getByHeader(headers, row, 'Issue Message')
             });
           }
         }
       }
-      const fXlsx = path.join(outDir, `full-audit-combined-${ts}.xlsx`);
+      const rateByKey = new Map();
+      allRate.forEach((r) => rateByKey.set(`${r.merchantId}|${r.appId}`, r));
+      allRate = Array.from(rateByKey.values());
+      const fXlsx = path.join(outDir, `full-audit-merged-${ts}.xlsx`);
       writeFullReportCombinedCSV(allRate, allActivation, fXlsx, { sourceDates });
-      console.log(chalk.green(`Combined ${xlsxFiles.length} full-audit file(s) → ${fXlsx}`));
+      console.log(chalk.green(`Combined ${xlsxFiles.length} full-audit file(s) → ${path.basename(fXlsx)}`));
       await askDeleteCombinedSources(xlsxFiles);
     } catch (err) {
       console.log(chalk.red('Failed to combine full audits: ' + (err.message || err)));
