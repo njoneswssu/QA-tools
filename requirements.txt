@@ -1,0 +1,4 @@
+# Install with: pip install -r requirements.txt
+# Prefer: pip install -e .  (editable install from pyproject.toml)
+nicegui>=1.4.0
+playwright>=1.40.0
