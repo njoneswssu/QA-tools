@@ -1799,15 +1799,28 @@ async function runOfferActivationTest() {
             const name = (m.Name || '').trim().toLowerCase();
             return configSpecific.merchantNames.some((entered) => name.includes(entered) || entered.includes(name));
           });
-          console.log(chalk.gray(`  Filtered to ${allTestable1.length} merchant(s) matching: ${configSpecific.merchantNames.join(', ')}`));
-          const testedSet1 = loadTestedMerchants(configSpecific.appId);
-          const toTest1 = allTestable1.filter(m => !testedSet1.has(Number(m.ID)));
-          if (toTest1.length === 0) {
-            console.log(chalk.yellow('  No untested merchants left for these names.'));
+          console.log(chalk.gray(`  Found ${allTestable1.length} merchant(s) matching: ${configSpecific.merchantNames.join(', ')}`));
+          if (allTestable1.length === 0) {
+            console.log(chalk.yellow('  No merchants match those names.'));
             break;
           }
+          const testedSet1 = loadTestedMerchants(configSpecific.appId);
+          const alreadyTestedCount = allTestable1.filter(m => testedSet1.has(Number(m.ID))).length;
+          let toTest1 = allTestable1;
+          if (alreadyTestedCount > 0) {
+            console.log(chalk.yellow(`  ${alreadyTestedCount} of ${allTestable1.length} matching merchant(s) were already tested.`));
+            const testAnyway = await askYesNo('Test them anyway? (yes/no): ');
+            if (!testAnyway) {
+              toTest1 = allTestable1.filter(m => !testedSet1.has(Number(m.ID)));
+              if (toTest1.length === 0) {
+                console.log(chalk.gray('  Skipping already-tested merchants; none left to test.'));
+                break;
+              }
+              console.log(chalk.gray(`  Testing ${toTest1.length} untested matching merchant(s).`));
+            }
+          }
           const toTestFinal1 = shuffleArray(toTest1);
-          console.log(chalk.gray(`  Testing all ${toTestFinal1.length} matching untested merchant(s) (random order).`));
+          console.log(chalk.gray(`  Testing ${toTestFinal1.length} merchant(s) (random order).`));
           let activeDomains1 = [];
           try {
             activeDomains1 = await fetchActiveDomains(configSpecific.appId);
