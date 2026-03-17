@@ -51,13 +51,16 @@ Open http://localhost:8080
 
 ## Flow
 
-1. **Load preview products** — Fetches product links from Supreme’s current seasonal preview (e.g. Fall/Winter 2024). Uses Playwright with short delays so it doesn’t look like a bot.
-2. **Select product** — Choose the item from the dropdown (filled from the preview).
-3. **Select size** — Pick a size if the item has one (Small, Medium, Large, etc.).
-4. **Add to cart** — Clicks through to the product page and adds to cart with randomized delays (about 1.5–4 seconds between actions). A browser window stays open for 5 minutes so you can complete checkout and captcha.
+1. **Products (one-time load)** — On first run, click **Refresh preview** to fetch seasonal preview products; they are cached in `~/.supreme_checkout/preview_products.json`. On later visits the app loads from cache.
+2. **Load upcoming** — Fetches product data from Supreme’s JSON endpoints and adds items that are *not* in the preview lookbook (potential upcoming release). No browser; avoids the failing `/collections/all` page.
+3. **Search (optional)** — Use **Search site** to find products by keyword (uses `/search?q=...`; does not use `/collections/all` to avoid navigation errors).
+4. **Filter & select** — Type in “Filter list” to narrow the dropdown by name or URL. Choose a size if the item has one.
+5. **Add to cart** — Adds to cart with randomized delays. A browser stays open so you can complete captcha and checkout.
 
 ## Notes
 
-- **Preview URL**: The scraper uses `https://www.supreme.com/previews/fallwinter2024/all` by default. For new seasons, change `DEFAULT_PREVIEW_URL` in `supreme_checkout/scraper.py`.
+- **Preview URL**: The scraper uses `https://www.supreme.com/previews/springsummer2026/all` by default. For new seasons, change `DEFAULT_PREVIEW_URL` in `supreme_checkout/scraper.py`.
+- **Cache**: Preview products are stored in `~/.supreme_checkout/preview_products.json`. Delete that file to clear the cache.
+- **Load upcoming**: Uses JSON endpoints (`/products.json` or `/collections/all/products.json`) if available. If Supreme changes their API, update `_JSON_PRODUCT_URLS` in `supreme_checkout/scraper.py`.
 - **Add-to-cart**: Only adds to cart; no checkout or captcha handling. The browser is left open so you can finish manually.
 - **Delays**: Delays between actions are randomized to mimic human behavior and reduce bot detection.
