@@ -79,17 +79,36 @@ def index():
             ).style("border-radius: 0;")
             ui.spinner("dots", size="md").bind_visibility_from(load_state, "loading")
 
-        # Product choice
+        # Product choice — search and select
         ui.label("PRODUCT").classes("text-uppercase text-caption mt-6 mb-2").style(
             "letter-spacing: 0.2em; opacity: 0.9;"
         )
-        product_options: dict[str, str] = {}  # display -> url
+        full_product_options: dict[str, str] = {}  # display -> url (all loaded products)
         product_select = ui.select(
-            options=product_options,
+            options={},
             label="Select item",
             with_input=True,
         ).classes("w-full bg-white/10").style("border-radius: 0;")
         product_select_ref = product_select
+
+        def apply_product_filter():
+            """Filter product dropdown by current search query and update select options."""
+            query = (search_input.value or "").strip().lower()
+            if not query:
+                filtered = dict(full_product_options)
+            else:
+                filtered = {
+                    name: url
+                    for name, url in full_product_options.items()
+                    if query in name.lower()
+                }
+            product_select.set_options(filtered)
+
+        search_input = ui.input(
+            label="Search products",
+            placeholder="Type to filter by product name...",
+        ).classes("w-full bg-white/10 mb-2").style("border-radius: 0;")
+        search_input.on("input", lambda: apply_product_filter())
 
         ui.label("SIZE (if applicable)").classes("text-uppercase text-caption mt-4 mb-2").style(
             "letter-spacing: 0.2em; opacity: 0.9;"
@@ -148,13 +167,13 @@ def index():
                 return
             load_state["loading"] = False
             load_btn._props["loading"] = False
-            new_options = {}
+            full_product_options.clear()
             for p in products:
                 key = product_display_name(p)
-                new_options[key] = p.url
-            product_select.set_options(new_options)
+                full_product_options[key] = p.url
+            apply_product_filter()
             if status_message:
-                status_message.set_text(f"Loaded {len(products)} preview products. Select one and size (if needed), then click Add to cart.")
+                status_message.set_text(f"Loaded {len(products)} preview products. Search or select one, choose size if needed, then click Add to cart.")
 
 
 def main():
