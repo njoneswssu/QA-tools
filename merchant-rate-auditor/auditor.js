@@ -2700,14 +2700,45 @@ async function runFullAudit() {
   if (runOffer) {
     fullAuditRecoveryState.activationResults = activationResults;
     writeFullAuditRecoveryFileToCheckpoint({ silent: true });
+    const pauseControl = { paused: false, stopRequested: false };
+    const waitForResume = () => new Promise((resolve) => {
+      console.log(chalk.yellow('\n  ⏸ Paused. Press Enter to resume, or type s + Enter to stop and save.'));
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      rl.question('', (line) => {
+        rl.close();
+        if ((line || '').trim().toLowerCase() === 's') pauseControl.stopRequested = true;
+        pauseControl.paused = false;
+        resolve();
+      });
+    });
+    let keypressAttached = false;
+    const wasRaw = process.stdin.isTTY && process.stdin.isRaw;
+    if (process.stdin.isTTY) {
+      console.log(chalk.gray('  (Press P to pause, S to stop early. When paused, press Enter to resume.)\n'));
+      readline.emitKeypressEvents(process.stdin);
+      if (!process.stdin.isRaw) process.stdin.setRawMode(true);
+      process.stdin.resume();
+      process.stdin.setEncoding('utf8');
+      process.stdin.on('keypress', (_str, key) => {
+        if (key && (key.name === 'p' || key.name === 'P')) pauseControl.paused = true;
+        else if (key && (key.name === 's' || key.name === 'S')) pauseControl.stopRequested = true;
+      });
+      keypressAttached = true;
+    }
     try {
       const batch = await offerActivation.runOfferActivationBatchForAppIds(appIds, {
         merchantsByAppId,
         activationResultsRef: activationResults,
-        onMerchantDone: () => writeFullAuditRecoveryFileToCheckpoint({ silent: true })
+        onMerchantDone: () => writeFullAuditRecoveryFileToCheckpoint({ silent: true }),
+        pauseControl,
+        waitForResume
       });
       activationResults = batch.results || activationResults;
       byAppId = batch.byAppId || {};
+      if (keypressAttached) {
+        process.stdin.removeAllListeners('keypress');
+        if (!wasRaw) process.stdin.setRawMode(false);
+      }
       clearFullAuditCheckpoint();
     } catch (batchErr) {
       console.error(chalk.red('\nOffer activation batch failed: ' + (batchErr && batchErr.message ? batchErr.message : String(batchErr))));

@@ -1336,7 +1336,7 @@ async function deleteAllOfferActivationResults() {
  * @returns {Promise<Array>} results
  */
 async function runBatchForOneAppId(appId, options = {}) {
-  const { limit = 10, session = {}, skipAlreadyTested = true, merchants: providedMerchants = null, activationResultsRef = null, onMerchantDone = null } = options;
+  const { limit = 10, session = {}, skipAlreadyTested = true, merchants: providedMerchants = null, activationResultsRef = null, onMerchantDone = null, pauseControl = null, waitForResume = null } = options;
   let toTest;
   if (providedMerchants && providedMerchants.length > 0) {
     toTest = providedMerchants.filter(m => m.URL || m.Domain);
@@ -1366,6 +1366,11 @@ async function runBatchForOneAppId(appId, options = {}) {
   const progressEvery = 10;
   setInterruptSave(results, appId);
   for (let idx = 0; idx < toTest.length; idx++) {
+    if (pauseControl && pauseControl.stopRequested) break;
+    if (pauseControl && pauseControl.paused && typeof waitForResume === 'function') {
+      await waitForResume();
+      if (pauseControl.stopRequested) break;
+    }
     const merchant = toTest[idx];
     let result;
     try {
@@ -1410,7 +1415,7 @@ async function runBatchForOneAppId(appId, options = {}) {
  * @returns {Promise<{ results: Array, byAppId: Object }>}
  */
 async function runOfferActivationBatchForAppIds(appIds, options = {}) {
-  const { limit = 10, merchantsByAppId = null, activationResultsRef = null, onMerchantDone = null } = options;
+  const { limit = 10, merchantsByAppId = null, activationResultsRef = null, onMerchantDone = null, pauseControl = null, waitForResume = null } = options;
   let session = { deviceId: '', trackingCode: '', shoppingTripCode: '' };
   const saved = loadSavedSession();
   if (saved && (saved.deviceId || saved.trackingCode || saved.shoppingTripCode)) {
@@ -1439,8 +1444,8 @@ async function runOfferActivationBatchForAppIds(appIds, options = {}) {
     const count = merchants ? merchants.length : limit;
     console.log(chalk.blue(`\n🚀 Offer activation batch for App ID ${appId} (${count} merchants)...`));
     const results = merchants
-      ? await runBatchForOneAppId(appId, { session, merchants, activationResultsRef, onMerchantDone })
-      : await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true, activationResultsRef, onMerchantDone });
+      ? await runBatchForOneAppId(appId, { session, merchants, activationResultsRef, onMerchantDone, pauseControl, waitForResume })
+      : await runBatchForOneAppId(appId, { limit, session, skipAlreadyTested: true, activationResultsRef, onMerchantDone, pauseControl, waitForResume });
     byAppId[appId] = results;
     allResults.push(...results);
   }
@@ -1459,13 +1464,14 @@ async function showOfferActivationMenu() {
   return new Promise((resolve) => {
     console.log(chalk.bold.magenta('\n🔗 Offer Activation Testing\n'));
     console.log(chalk.yellow('What would you like to test?'));
-    console.log(chalk.gray('  1) Test a merchant link (simulate offer activation from the link)'));
-    console.log(chalk.gray('  2) Test merchants from feed (batch)'));
-    console.log(chalk.gray('  3) Back to main menu'));
+    console.log(chalk.gray('  1) Test specific merchant name(s)'));
+    console.log(chalk.gray('  2) Test a merchant link (simulate offer activation from the link)'));
+    console.log(chalk.gray('  3) Test merchants from feed (batch)'));
     console.log(chalk.gray('  4) Exit'));
-    console.log(chalk.gray('  5) Delete all results\n'));
+    console.log(chalk.gray('  5) Delete all results'));
+    console.log(chalk.gray('  6) Back to main menu\n'));
     
-    rl.question(chalk.cyan('Choice (1-5): '), (answer) => {
+    rl.question(chalk.cyan('Choice (1-6): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
@@ -1659,6 +1665,65 @@ async function promptForBatchConfig() {
 }
 
 /**
+ * Prompt for batch config when testing specific merchant name(s) only (option 1).
+ * Asks: App ID, merchant names (comma-separated), max to test, then device/session.
+ */
+async function promptForSpecificMerchantNamesConfig() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  const appIdAnswer = await new Promise((r) => {
+    console.log(chalk.yellow('\nTest specific merchant name(s):'));
+    rl.question(chalk.cyan('App ID to test: '), r);
+  });
+  const namesInput = await new Promise((r) => {
+    rl.question(chalk.cyan('Merchant names (comma-separated, partial match): '), r);
+  });
+  rl.close();
+  const appId = parseInt(appIdAnswer.trim());
+  const merchantNames = (namesInput || '').split(',').map(s => s.trim()).filter(Boolean).map(s => s.toLowerCase());
+  if (isNaN(appId) || appId <= 0) {
+    console.log(chalk.red('Invalid App ID'));
+    return null;
+  }
+  if (merchantNames.length === 0) {
+    console.log(chalk.red('Enter at least one merchant name.'));
+    return null;
+  }
+  let deviceId = '';
+  let trackingCode = '';
+  let shoppingTripCode = '';
+  const saved = loadSavedSession();
+  if (saved && (saved.deviceId || saved.trackingCode || saved.shoppingTripCode)) {
+    const useSaved = await askYesNo('Use saved device/tracking for this batch? (yes/no): ');
+    if (useSaved) {
+      deviceId = saved.deviceId || '';
+      trackingCode = saved.trackingCode || '';
+      shoppingTripCode = saved.shoppingTripCode || '';
+      console.log(chalk.gray('  Using saved session.'));
+    }
+  }
+  if (!deviceId && !trackingCode && !shoppingTripCode) {
+    const rl2 = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const dAnswer = await new Promise((r) => rl2.question(chalk.cyan('Device ID (optional): '), r));
+    const tcAnswer = await new Promise((r) => rl2.question(chalk.cyan('Tracking code (optional): '), r));
+    const scAnswer = await new Promise((r) => rl2.question(chalk.cyan('Shopping trip (optional): '), r));
+    rl2.close();
+    deviceId = (dAnswer && dAnswer.trim()) || '';
+    trackingCode = (tcAnswer && tcAnswer.trim()) || '';
+    shoppingTripCode = (scAnswer && scAnswer.trim()) || '';
+    if (deviceId || trackingCode || shoppingTripCode) {
+      const saveIt = await askYesNo('Save this device/session for next time? (yes/no): ');
+      if (saveIt && saveSession(deviceId, trackingCode, shoppingTripCode)) {
+        console.log(chalk.green('  Saved.'));
+      }
+    }
+  }
+  return { appId, deviceId, trackingCode, shoppingTripCode, merchantNames };
+}
+
+/**
  * Run a single activation test from a built URL (used by active/alternative domain flows).
  * Success = redirects back to the original merchant domain.
  */
@@ -1720,7 +1785,121 @@ async function runOfferActivationTest() {
 
     switch (choice) {
       case '1': {
-        // Test a link — loop: test → "Test another link?" → if no, "Save results?"
+        unsavedBatchResults = null;
+        const configSpecific = await promptForSpecificMerchantNamesConfig();
+        if (configSpecific) {
+          console.log(chalk.blue(`\n🚀 Testing specific merchant name(s) for App ID ${configSpecific.appId}...`));
+          const merchants = await fetchMerchantData(configSpecific.appId);
+          if (merchants.length === 0) {
+            console.log(chalk.red('No merchants found'));
+            break;
+          }
+          let allTestable1 = merchants.filter(m => m.URL || m.Domain);
+          allTestable1 = allTestable1.filter((m) => {
+            const name = (m.Name || '').trim().toLowerCase();
+            return configSpecific.merchantNames.some((entered) => name.includes(entered) || entered.includes(name));
+          });
+          console.log(chalk.gray(`  Filtered to ${allTestable1.length} merchant(s) matching: ${configSpecific.merchantNames.join(', ')}`));
+          const testedSet1 = loadTestedMerchants(configSpecific.appId);
+          const toTest1 = allTestable1.filter(m => !testedSet1.has(Number(m.ID)));
+          if (toTest1.length === 0) {
+            console.log(chalk.yellow('  No untested merchants left for these names.'));
+            break;
+          }
+          const toTestFinal1 = shuffleArray(toTest1);
+          console.log(chalk.gray(`  Testing all ${toTestFinal1.length} matching untested merchant(s) (random order).`));
+          let activeDomains1 = [];
+          try {
+            activeDomains1 = await fetchActiveDomains(configSpecific.appId);
+            if (activeDomains1.length > 0) {
+              console.log(chalk.gray(`  Using active-domain feed (${activeDomains1.length} domains).`));
+            }
+          } catch (_) {}
+          console.log(chalk.blue(`\nTesting ${toTestFinal1.length} merchants...\n`));
+          const session1 = { deviceId: configSpecific.deviceId || '', trackingCode: configSpecific.trackingCode || '', shoppingTripCode: configSpecific.shoppingTripCode || '' };
+          const results1 = [];
+          setInterruptSave(results1, configSpecific.appId);
+          let paused1 = false;
+          let stopRequested1 = false;
+          const wasRaw1 = process.stdin.isTTY && process.stdin.isRaw;
+          const useKeypress1 = process.stdin.isTTY;
+          const pauseRl1 = readline.createInterface({ input: process.stdin, output: process.stdout });
+          pauseRl1.on('line', (line) => {
+            const t = (line || '').trim().toLowerCase();
+            if (t === 'p') paused1 = true;
+            else if (t === 's') stopRequested1 = true;
+          });
+          if (useKeypress1) {
+            readline.emitKeypressEvents(process.stdin);
+            if (!process.stdin.isRaw) process.stdin.setRawMode(true);
+            process.stdin.resume();
+            process.stdin.setEncoding('utf8');
+            process.stdin.on('keypress', (_str, key) => {
+              if (key && (key.name === 'p' || key.name === 'P')) paused1 = true;
+              else if (key && (key.name === 's' || key.name === 'S')) stopRequested1 = true;
+            });
+          }
+          const totalToTest1 = toTestFinal1.length;
+          const progressEvery1 = 10;
+          console.log(chalk.gray('  (Press P to pause, S to stop early. When paused, press Enter to resume.)\n'));
+          for (let idx = 0; idx < toTestFinal1.length; idx++) {
+            const merchant = toTestFinal1[idx];
+            if (stopRequested1) { console.log(chalk.yellow('\n  ⏹ Stopping test early.\n')); break; }
+            if (paused1) {
+              if (useKeypress1) process.stdin.setRawMode(false);
+              console.log(chalk.yellow('\n  ⏸ Paused. Press Enter to resume, or type s + Enter to stop and save.'));
+              await new Promise((resolve) => {
+                const resumeRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+                resumeRl.question('', (line) => {
+                  resumeRl.close();
+                  if ((line || '').trim().toLowerCase() === 's') stopRequested1 = true;
+                  paused1 = false;
+                  if (useKeypress1 && !wasRaw1) process.stdin.setRawMode(true);
+                  resolve();
+                });
+              });
+              if (stopRequested1) { console.log(chalk.yellow('\n  ⏹ Stopping test early.\n')); break; }
+              console.log(chalk.gray('  Resuming...\n'));
+            }
+            let result;
+            try {
+              result = await testMerchantActivation(merchant, configSpecific.appId, null, session1, activeDomains1);
+            } catch (err) {
+              const merchantName = merchant.Name || `Merchant ID ${merchant.ID}`;
+              const merchantDomain = merchant.Domain || (merchant.URL ? extractDomain(merchant.URL) : null) || 'unknown';
+              const errMsg = err && (err.message || String(err)) || 'Test threw unexpectedly';
+              console.log(chalk.red(`  Error testing ${merchantName} (${merchantDomain}): ${errMsg}`));
+              result = { merchantId: merchant.ID, merchantName, merchantDomain, success: false, error: errMsg, redirectChain: [], issues: [{ type: 'test_error', severity: 'high', message: errMsg }] };
+            }
+            results1.push({ ...result, appId: configSpecific.appId });
+            const done = results1.length;
+            if (done % progressEvery1 === 0 || done === totalToTest1) {
+              const ok = results1.filter(r => r.success).length;
+              const fail = done - ok;
+              console.log(chalk.blue(`  Progress: ${done}/${totalToTest1} — ${chalk.green(ok)} OK, ${fail > 0 ? chalk.red(fail) : fail} failed`));
+            }
+            await new Promise(r => setTimeout(r, CONFIG.delayBetweenMerchantsMs));
+          }
+          if (useKeypress1) { process.stdin.removeAllListeners('keypress'); if (!wasRaw1) process.stdin.setRawMode(false); }
+          pauseRl1.removeAllListeners('line');
+          pauseRl1.close();
+          clearInterruptSave();
+          printResultsSummary(results1);
+          await promptAndMarkFalseNegatives(results1);
+          const save1 = await askYesNo('Save results? (yes/no): ');
+          if (save1) {
+            exportResultsToCSV(results1);
+            unsavedBatchResults = null;
+            const merchantIds = results1.map(r => r.merchantId).filter(id => id != null);
+            if (merchantIds.length > 0) markMerchantsAsTested(configSpecific.appId, merchantIds);
+          } else {
+            unsavedBatchResults = results1;
+          }
+        }
+        break;
+      }
+
+      case '2': {
         let lastResult = null;
         do {
           const input = await promptForLink();
@@ -1753,7 +1932,7 @@ async function runOfferActivationTest() {
         break;
       }
 
-      case '2': {
+      case '3': {
         unsavedBatchResults = null;
         const config = await promptForBatchConfig();
         if (config) {
@@ -1765,39 +1944,13 @@ async function runOfferActivationTest() {
           }
           const allTestable = merchants.filter(m => m.URL || m.Domain);
           const testedSet = loadTestedMerchants(config.appId);
-          const alreadyTestedInList = allTestable.filter(m => testedSet.has(Number(m.ID)));
-          let toTest = allTestable;
-          if (alreadyTestedInList.length > 0) {
-            console.log(chalk.yellow(`  ${alreadyTestedInList.length} of ${allTestable.length} merchants were already tested.`));
-            const action = await new Promise((resolve) => {
-              const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-              rl.question(chalk.cyan('Skip them, test them again, or cancel? (skip / again / cancel): '), (answer) => {
-                rl.close();
-                const a = (answer && answer.trim().toLowerCase()) || '';
-                if (a === 'skip' || a === 's') resolve('skip');
-                else if (a === 'again' || a === 'a') resolve('again');
-                else resolve('cancel');
-              });
-            });
-            if (action === 'cancel') {
-              console.log(chalk.gray('  Batch cancelled.'));
-              break;
-            }
-            if (action === 'skip') {
-              toTest = allTestable.filter(m => !testedSet.has(Number(m.ID)));
-              if (toTest.length === 0) {
-                console.log(chalk.yellow('  No untested merchants left.'));
-                break;
-              }
-              console.log(chalk.gray(`  Testing ${Math.min(config.limit, toTest.length)} untested merchants (random order).`));
-            } else {
-              console.log(chalk.gray(`  Testing ${Math.min(config.limit, toTest.length)} merchants (random order).`));
-            }
-          } else {
-            console.log(chalk.gray(`  Testing ${Math.min(config.limit, toTest.length)} merchants (random order).`));
+          const toTest = allTestable.filter(m => !testedSet.has(Number(m.ID)));
+          if (toTest.length === 0) {
+            console.log(chalk.yellow('  No untested merchants left for this App ID.'));
+            break;
           }
-          // Random order, then take up to limit
-          toTest = shuffleArray(toTest).slice(0, config.limit);
+          const toTestFinal = shuffleArray(toTest).slice(0, config.limit);
+          console.log(chalk.gray(`  Testing ${toTestFinal.length} unique (untested) merchant(s) (random order).`));
           // Same process as single-link: fetch active domains so we resolve each merchant to the correct campaignId
           let activeDomains = [];
           try {
@@ -1808,7 +1961,7 @@ async function runOfferActivationTest() {
           } catch (_) {
             console.log(chalk.gray('  Active-domain feed unavailable; using App ID as campaign for all merchants.'));
           }
-          console.log(chalk.blue(`\nTesting ${toTest.length} merchants...\n`));
+          console.log(chalk.blue(`\nTesting ${toTestFinal.length} merchants...\n`));
           const session = {
             deviceId: config.deviceId || '',
             trackingCode: config.trackingCode || '',
@@ -1837,11 +1990,11 @@ async function runOfferActivationTest() {
             });
           }
           // Progress update every 10 merchants (e.g. 200 merchants → updates at 10, 20, 30, … 200)
-          const totalToTest = toTest.length;
+          const totalToTest = toTestFinal.length;
           const progressEvery = 10;
           console.log(chalk.gray('  (Press P to pause, S to stop early. When paused, press Enter to resume.)\n'));
-          for (let idx = 0; idx < toTest.length; idx++) {
-            const merchant = toTest[idx];
+          for (let idx = 0; idx < toTestFinal.length; idx++) {
+            const merchant = toTestFinal[idx];
             if (stopRequested) {
               console.log(chalk.yellow('\n  ⏹ Stopping test early.\n'));
               break;
@@ -1914,10 +2067,6 @@ async function runOfferActivationTest() {
         break;
       }
 
-      case '3':
-        await offerSaveBeforeLeaving();
-        return;
-
       case '4':
         await offerSaveBeforeLeaving();
         console.log(chalk.gray('\nGoodbye! 👋\n'));
@@ -1927,8 +2076,12 @@ async function runOfferActivationTest() {
         await deleteAllOfferActivationResults();
         break;
 
+      case '6':
+        await offerSaveBeforeLeaving();
+        return;
+
       default:
-        console.log(chalk.red('Invalid choice. Enter 1-5.'));
+        console.log(chalk.red('Invalid choice. Enter 1-6.'));
     }
   }
 }
