@@ -2886,6 +2886,86 @@ function promptForAppIds() {
 }
 
 /**
+ * Prompt for App IDs without exiting the process on empty input (returns []).
+ */
+function promptForAppIdsOptional() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  return new Promise((resolve) => {
+    console.log(chalk.yellow('Enter the App IDs (comma-separated or space-separated):'));
+    console.log(chalk.gray('Example: 451, 206, 209\n'));
+    rl.question(chalk.cyan('App IDs: '), (answer) => {
+      rl.close();
+      const appIds = answer
+        .split(/[,\s]+/)
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0)
+        .map((id) => parseInt(id, 10))
+        .filter((id) => !isNaN(id) && id > 0);
+      resolve(appIds);
+    });
+  });
+}
+
+/**
+ * Run merchant rate audit limited to merchants whose names match the given tokens (substring, case-insensitive).
+ */
+async function runMerchantRateAuditByMerchantNames() {
+  const appIds = await promptForAppIdsOptional();
+  if (appIds.length === 0) {
+    console.log(chalk.red('\n❌ No valid App IDs provided.\n'));
+    return;
+  }
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const namesInput = await new Promise((res) => {
+    rl.question(chalk.cyan('Merchant names (comma-separated, partial match): '), res);
+  });
+  rl.close();
+  const nameTokens = (namesInput || '').split(',').map((s) => s.trim()).filter(Boolean).map((s) => s.toLowerCase());
+  if (nameTokens.length === 0) {
+    console.log(chalk.red('\n❌ Enter at least one merchant name.\n'));
+    return;
+  }
+  const nameSet = new Set(nameTokens);
+  console.log(chalk.cyan(`\nAuditing rate data for names matching: ${nameTokens.join(', ')} (App IDs: ${appIds.join(', ')})\n`));
+  const results = [];
+  for (const appId of appIds) {
+    let raw;
+    try {
+      raw = await offerActivation.fetchMerchantData(appId);
+    } catch (e) {
+      console.log(chalk.yellow(`  App ID ${appId}: could not load merchant feed (${e && e.message ? e.message : e}).`));
+      continue;
+    }
+    const withUrl = (raw || []).filter((m) => m.URL || m.Domain);
+    const matching = withUrl.filter((m) => {
+      const merchantLower = (m.Name || '').trim().toLowerCase();
+      if (!merchantLower) return false;
+      return Array.from(nameSet).some(
+        (entered) => merchantLower === entered || merchantLower.includes(entered) || entered.includes(merchantLower)
+      );
+    });
+    if (matching.length === 0) {
+      console.log(chalk.yellow(`  App ID ${appId}: no merchants match those names.`));
+      continue;
+    }
+    const merchantIds = matching.map((m) => m.ID);
+    console.log(chalk.gray(`  App ID ${appId}: auditing ${merchantIds.length} merchant(s) — ${matching.map((m) => m.Name || m.ID).slice(0, 5).join(', ')}${matching.length > 5 ? '…' : ''}`));
+    const result = await auditAppId(appId, { limitToMerchantIds: merchantIds });
+    results.push(result);
+  }
+  if (results.length === 0) {
+    console.log(chalk.yellow('\nNo audits completed (no matching merchants).\n'));
+    return;
+  }
+  const report = generateReport(results);
+  printResults(report);
+  await saveReport(report, false);
+}
+
+/**
  * Commissions menu: look up overall commission by merchant name(s) or ID(s) (CSV or BigQuery).
  * Supports multiple comma-separated names or IDs.
  */
@@ -3048,13 +3128,14 @@ function showMainMenu() {
     console.log(chalk.bold.cyan('\n📊 Merchant Rate Audit\n'));
     console.log(chalk.yellow('What would you like to do?'));
     console.log(chalk.gray('  1) Run new audit'));
-    console.log(chalk.gray('  2) List previous audits'));
-    console.log(chalk.gray('  3) Lookup audits by App ID'));
-    console.log(chalk.gray('  4) Clear all audit results'));
-    console.log(chalk.gray('  5) Back to main menu'));
-    console.log(chalk.gray('  6) Exit\n'));
+    console.log(chalk.gray('  2) Audit specific merchant name(s)'));
+    console.log(chalk.gray('  3) List previous audits'));
+    console.log(chalk.gray('  4) Lookup audits by App ID'));
+    console.log(chalk.gray('  5) Clear all audit results'));
+    console.log(chalk.gray('  6) Back to main menu'));
+    console.log(chalk.gray('  7) Exit\n'));
     
-    rl.question(chalk.cyan('Choice (1-6): '), (answer) => {
+    rl.question(chalk.cyan('Choice (1-7): '), (answer) => {
       rl.close();
       resolve(answer.trim());
     });
@@ -3189,9 +3270,12 @@ async function runMerchantRateAuditMenu() {
         break;
       }
       case '2':
+        await runMerchantRateAuditByMerchantNames();
+        break;
+      case '3':
         displayAuditList(listPreviousAudits());
         break;
-      case '3': {
+      case '4': {
         const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
         const answer = await new Promise((res) => rl.question(chalk.cyan('Enter App ID(s) to lookup (comma or space separated): '), res));
         rl.close();
@@ -3205,15 +3289,15 @@ async function runMerchantRateAuditMenu() {
         }
         break;
       }
-      case '4': {
+      case '5': {
         const confirm = await askYesNo('⚠️  Are you sure you want to delete all audit results? (yes/no): ', { yellow: true });
         if (confirm) clearAllResults();
         else console.log(chalk.gray('Cancelled.'));
         break;
       }
-      case '5':
-        return; // Back to main menu
       case '6':
+        return; // Back to main menu
+      case '7':
         console.log(chalk.gray('\nGoodbye! 👋\n'));
         process.exit(0);
       default:
