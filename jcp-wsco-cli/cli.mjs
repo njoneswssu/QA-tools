@@ -24,6 +24,7 @@ import {
   getFirstExportBlockForOrder,
   wrapComergentData,
   splitComergentBlocks,
+  canonicalOrderKey,
 } from './xml-convert.js';
 
 const SEARCH_URL = 'http://transfer.levsuite.com/search_wsco.php';
@@ -31,7 +32,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, 'output');
 
 function normPo(s) {
-  return String(s).trim();
+  return canonicalOrderKey(s);
 }
 
 /**
@@ -219,7 +220,7 @@ function buildSummaryAndConvert(text, searchedOrder) {
   const normalized = normPo(searchedOrder);
   let acceptOnlyBlocksMatchingSearchedPo = 0;
   for (const block of blocks) {
-    if (getOrderNumberFromComergentBlock(block) !== normalized) continue;
+    if (normPo(getOrderNumberFromComergentBlock(block)) !== normalized) continue;
     if (block.includes(SHIPMENT)) continue;
     if (block.includes(ACCEPT)) acceptOnlyBlocksMatchingSearchedPo += 1;
   }
@@ -429,7 +430,9 @@ async function main() {
     exit(1);
   }
 
-  const orderSet = new Set(orderNumbers.map(normPo));
+  orderNumbers = orderNumbers.map(normPo).filter(Boolean);
+
+  const orderSet = new Set(orderNumbers);
 
   /** @type {Set<string>} */
   let shipmentOnlySet = new Set();

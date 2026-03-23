@@ -6,6 +6,30 @@
 export const SHIPMENT = 'ORDER INPUT SHIPMENT';
 export const ACCEPT = 'ORDER INPUT ORDER STATUS UPDATE ACCEPT';
 
+function poPadWidth() {
+  const n = Number(process.env.JCP_PO_PAD_WIDTH);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 8;
+}
+
+/**
+ * Trim, strip BOM, and left-pad pure-digit order numbers to a fixed width (default 8).
+ * Matches XML `<OrderNumber>` values that include leading zeros when the pasted PO omits them.
+ * Non-numeric PO strings are returned trimmed only. Set `JCP_PO_PAD_WIDTH` to change width.
+ * @param {string | number | null | undefined} s
+ * @returns {string}
+ */
+export function canonicalOrderKey(s) {
+  const t = String(s ?? '')
+    .trim()
+    .replace(/^\uFEFF/, '');
+  if (!t) return '';
+  const w = poPadWidth();
+  if (/^\d+$/.test(t) && t.length < w) {
+    return t.padStart(w, '0');
+  }
+  return t;
+}
+
 /** Same algorithm as generateCurrentDate() in xml-converter.html */
 function generateCurrentDate() {
   const now = new Date();
@@ -116,9 +140,9 @@ export function splitComergentBlocks(xmlText) {
  * @returns {{ kind: 'regular' | 'acceptOnly', block: string } | null}
  */
 export function getFirstExportBlockForOrder(xmlText, enteredOrder) {
-  const normalized = enteredOrder.trim();
+  const normalized = canonicalOrderKey(enteredOrder);
   for (const block of splitComergentBlocks(xmlText)) {
-    if (getOrderNumberFromComergentBlock(block) !== normalized) continue;
+    if (canonicalOrderKey(getOrderNumberFromComergentBlock(block)) !== normalized) continue;
     if (block.includes(SHIPMENT)) return { kind: 'regular', block };
     if (block.includes(ACCEPT)) return { kind: 'acceptOnly', block };
   }
@@ -139,7 +163,7 @@ export function convertXmlForEnteredOrder(xmlText, enteredOrder, options = {}) {
       ? options.maxMatchingBlocks
       : Number.POSITIVE_INFINITY;
 
-  const normalized = enteredOrder.trim();
+  const normalized = canonicalOrderKey(enteredOrder);
   const blocks = splitComergentBlocks(xmlText);
   let skippedNoShipment = 0;
   let skippedWrongOrder = 0;
@@ -150,7 +174,7 @@ export function convertXmlForEnteredOrder(xmlText, enteredOrder, options = {}) {
       skippedNoShipment += 1;
       continue;
     }
-    const on = getOrderNumberFromComergentBlock(block);
+    const on = canonicalOrderKey(getOrderNumberFromComergentBlock(block));
     if (on !== normalized) {
       skippedWrongOrder += 1;
       continue;
@@ -182,14 +206,14 @@ export function convertXmlAcceptOnlyToShipmentOnly(xmlText, enteredOrder, option
       ? options.maxMatchingBlocks
       : Number.POSITIVE_INFINITY;
 
-  const normalized = enteredOrder.trim();
+  const normalized = canonicalOrderKey(enteredOrder);
   const blocks = splitComergentBlocks(xmlText);
   let skippedHasShipment = 0;
   let skippedNoAccept = 0;
   const parts = [];
 
   for (const block of blocks) {
-    if (getOrderNumberFromComergentBlock(block) !== normalized) continue;
+    if (canonicalOrderKey(getOrderNumberFromComergentBlock(block)) !== normalized) continue;
     if (block.includes(SHIPMENT)) {
       skippedHasShipment += 1;
       continue;
