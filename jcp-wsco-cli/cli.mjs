@@ -2,6 +2,9 @@
 /**
  * Interactive CLI: search JCP WSCO POs on transfer.levsuite.com, inspect XML hits,
  * and convert using the same rules as ../xml-converter.html.
+ *
+ * Flow: enter POs → choose which are ORDER INPUT SHIPMENT–only vs regular pair → search → summary → write.
+ * Compact terminal output by default; VERBOSE=1 or --verbose for per-file details.
  */
 
 import { createInterface } from 'node:readline/promises';
@@ -15,8 +18,8 @@ import {
   SHIPMENT,
   ACCEPT,
   convertXmlForEnteredOrder,
-  convertAcceptBlockToShipmentOnlyLikeHtml,
   convertComergentBlockPairLikeHtml,
+  buildShipmentBlockLikeHtml,
   getOrderNumberFromComergentBlock,
   getFirstExportBlockForOrder,
   wrapComergentData,
@@ -27,30 +30,44 @@ const SEARCH_URL = 'http://transfer.levsuite.com/search_wsco.php';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, 'output');
 
-function parseOrderArgs() {
-  const args = argv.slice(2);
-  const orders = [];
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--orders' && args[i + 1]) {
-      orders.push(
-        ...args[i + 1]
-          .split(/[\s,]+/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-      );
-      i++;
-    } else if (!args[i].startsWith('--')) {
-      orders.push(args[i].trim());
-    }
-  }
-  return orders.filter(Boolean);
+function normPo(s) {
+  return String(s).trim();
 }
 
 function parseOrderLine(line) {
   return line
     .split(/[\s,]+/)
-    .map((s) => s.trim())
+    .map((s) => normPo(s))
     .filter(Boolean);
+}
+
+function parseOrderArgs() {
+  const args = argv.slice(2);
+  const orders = [];
+  let verbose = false;
+  /** @type {string[]} */
+  let shipmentOnly = [];
+
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === '--verbose' || a === '-v') {
+      verbose = true;
+      continue;
+    }
+    if (a === '--shipment-only' && args[i + 1]) {
+      shipmentOnly = parseOrderLine(args[++i]);
+      continue;
+    }
+    if (a === '--orders' && args[i + 1]) {
+      orders.push(...parseOrderLine(args[++i]));
+      continue;
+    }
+    if (!a.startsWith('--')) {
+      orders.push(normPo(a));
+    }
+  }
+
+  return { orders: orders.filter(Boolean), verbose, shipmentOnly };
 }
 
 async function promptLine(rl, question) {
@@ -125,7 +142,7 @@ function buildSummaryAndConvert(text, searchedOrder) {
   const orderInputMatch = text.match(/<OrderInput>\s*([^<]+)\s*<\/OrderInput>/i);
   const orderInput = orderInputMatch ? orderInputMatch[1].trim() : '(no OrderInput tag found)';
   const orderNumbersInFile = [...new Set(blocks.map((b) => getOrderNumberFromComergentBlock(b)).filter(Boolean))];
-  const normalized = searchedOrder.trim();
+  const normalized = normPo(searchedOrder);
   let acceptOnlyBlocksMatchingSearchedPo = 0;
   for (const block of blocks) {
     if (getOrderNumberFromComergentBlock(block) !== normalized) continue;
@@ -151,12 +168,16 @@ function buildSummaryAndConvert(text, searchedOrder) {
  * @param {import('playwright').Page} page
  * @param {import('playwright').BrowserContext} context
  * @param {string[]} orderNumbers
+ * @param {(po: string, index: number, total: number) => void} [onProgress]
  */
-async function fillReport(page, context, orderNumbers) {
-  /** @type {Array<{ order: string, findings: Array<object>, ordersNoMatch: boolean, statusNoMatch: boolean }>} */
+async function fillReport(page, context, orderNumbers, onProgress) {
+  /** @type {Array<{ order: string, findings: Array<any>, ordersNoMatch: boolean, statusNoMatch: boolean }>} */
   const report = [];
+  const total = orderNumbers.length;
 
-  for (const order of orderNumbers) {
+  for (let i = 0; i < orderNumbers.length; i++) {
+    const order = orderNumbers[i];
+    onProgress?.(order, i + 1, total);
     await runSearch(page, order);
     const pageUrl = page.url();
 
@@ -235,11 +256,11 @@ function getExportSource(row) {
 /**
  * @param {Array<{ order: string, findings: Array<any>, ordersNoMatch: boolean, statusNoMatch: boolean }>} report
  */
-function printReport(report) {
-  console.log('========== RESULTS ==========\n');
+function printVerboseReport(report) {
+  console.log('\n========== RESULTS (verbose) ==========\n');
 
   for (const row of report) {
-    console.log(`--- PO ${row.order} (searched) ---`);
+    console.log(`--- PO ${row.order} ---`);
     if (row.findings.length === 0) {
       console.log('  No .xml links on the results page.');
       if (row.ordersNoMatch) console.log('  (Orders: no results message present.)');
@@ -249,47 +270,75 @@ function printReport(report) {
       console.log(`  [${f.category}] ${f.abs}`);
       console.log(`    HTTP: ${f.httpStatus || '—'}${f.fetchError ? `  Error: ${f.fetchError}` : ''}`);
       console.log(
-        `    ORDER INPUT SHIPMENT: ${f.summary.hasShipment ? 'yes' : 'no'}  |  ${ACCEPT}: ${f.summary.hasAccept ? 'yes' : 'no'}  |  <Comergent> blocks: ${f.summary.blockCount}`
+        `    ${SHIPMENT}: ${f.summary.hasShipment ? 'yes' : 'no'}  |  ${ACCEPT}: ${f.summary.hasAccept ? 'yes' : 'no'}  |  <Comergent> blocks: ${f.summary.blockCount}`
       );
-      console.log(`    <OrderInput> value: ${f.summary.orderInput}`);
+      console.log(`    <OrderInput>: ${f.summary.orderInput}`);
       if (f.summary.orderNumbersInFile.length) {
         console.log(`    <OrderNumber> in file: ${f.summary.orderNumbersInFile.join(', ')}`);
       }
       console.log(
-        `    Blocks matching PO with ${SHIPMENT}: ${f.summary.blocksMatchingSearchedPo}  |  with ${ACCEPT} only (no ${SHIPMENT}): ${f.summary.acceptOnlyBlocksMatchingSearchedPo}  (other PO in file: ${f.summary.skippedWrongOrder}, no ${SHIPMENT}: ${f.summary.skippedNoShipment})`
+        `    Match ${SHIPMENT}: ${f.summary.blocksMatchingSearchedPo}  |  ${ACCEPT}-only: ${f.summary.acceptOnlyBlocksMatchingSearchedPo}`
       );
     }
-
-    const withShipment = row.findings.filter((f) => f.summary.blocksMatchingSearchedPo > 0 && f.rawXml);
-    const withAcceptOnly = row.findings.filter((f) => f.summary.acceptOnlyBlocksMatchingSearchedPo > 0 && f.rawXml);
-    if (withShipment.length > 1) {
-      console.log(
-        `  Note: ${withShipment.length} XML files have ${SHIPMENT} blocks for PO ${row.order}; export uses the first such file (one block).`
-      );
-    } else if (withShipment.length === 1 && withShipment[0].summary.blocksMatchingSearchedPo > 1) {
-      console.log(
-        `  Note: that file has ${withShipment[0].summary.blocksMatchingSearchedPo} matching ${SHIPMENT} blocks; export uses the first block only.`
-      );
-    }
-    if (withAcceptOnly.length > 1) {
-      console.log(
-        `  Note: ${withAcceptOnly.length} XML files have ${ACCEPT}-only blocks for PO ${row.order}; export uses the first such file (one block).`
-      );
-    }
-
     const src = getExportSource(row);
     if (src) {
-      console.log(`  Export classification for PO ${row.order}: ${src.kind === 'regular' ? 'regular (' + ACCEPT + ' + ' + SHIPMENT + ' pair)' : 'ACCEPT-only (shipment block only if you confirm)'}`);
+      console.log(`  First export block: ${src.kind}`);
     }
-
     console.log('');
   }
 }
 
-async function main() {
-  const headless = process.env.HEADFUL === '1' || process.env.HEADFUL === 'true' ? false : true;
+/**
+ * @param {string[]} orderNumbers
+ * @param {Set<string>} shipmentOnlySet
+ * @param {Array<{ order: string, findings: any[], ordersNoMatch: boolean, statusNoMatch: boolean }>} report
+ */
+function printCompactSummary(orderNumbers, shipmentOnlySet, report) {
+  console.log('\n========== SUMMARY ==========');
+  const regularList = orderNumbers.filter((o) => !shipmentOnlySet.has(normPo(o)));
+  const shipList = orderNumbers.filter((o) => shipmentOnlySet.has(normPo(o)));
+  console.log(
+    `Shipment-only (${SHIPMENT} block): ${shipList.length ? shipList.join(', ') : '(none)'}  |  Regular (${ACCEPT} + ${SHIPMENT} pair): ${regularList.length ? regularList.join(', ') : '(none)'}`
+  );
+  console.log('PO          Mode         XML files  Export');
+  console.log('----------  -----------  ---------  ------');
 
-  let orderNumbers = parseOrderArgs();
+  const issues = [];
+
+  for (let i = 0; i < orderNumbers.length; i++) {
+    const order = normPo(orderNumbers[i]);
+    const row = report[i];
+    if (!row) continue;
+    const mode = shipmentOnlySet.has(order) ? 'shipment' : 'regular';
+    const n = row.findings.length;
+    const src = getExportSource(row);
+    let exportCol = '—';
+    if (src) {
+      exportCol = 'ok';
+    } else {
+      exportCol = 'skip';
+      let why = 'no matching <Comergent>';
+      if (n === 0) why = 'no .xml links';
+      issues.push(`  ${order}  (${why})`);
+    }
+    const modePad = mode.padEnd(11);
+    const orderPad = order.padEnd(10);
+    console.log(`${orderPad}  ${modePad}  ${String(n).padEnd(9)}  ${exportCol}`);
+  }
+
+  if (issues.length) {
+    console.log('\nNot exported:');
+    console.log(issues.join('\n'));
+  }
+  console.log('');
+}
+
+async function main() {
+  const parsed = parseOrderArgs();
+  let verbose = parsed.verbose || process.env.VERBOSE === '1' || process.env.VERBOSE === 'true';
+  let orderNumbers = parsed.orders;
+  let shipmentOnlyFromArgs = parsed.shipmentOnly.map(normPo);
+
   const rl = createInterface({ input, output });
 
   if (orderNumbers.length === 0) {
@@ -303,30 +352,53 @@ async function main() {
     exit(1);
   }
 
-  console.log(`\nSearching ${SEARCH_URL} for: ${orderNumbers.join(', ')}\n`);
+  const orderSet = new Set(orderNumbers.map(normPo));
 
+  /** @type {Set<string>} */
+  let shipmentOnlySet = new Set();
+
+  if (shipmentOnlyFromArgs.length > 0) {
+    const unknown = shipmentOnlyFromArgs.filter((p) => !orderSet.has(normPo(p)));
+    const known = shipmentOnlyFromArgs.filter((p) => orderSet.has(normPo(p)));
+    if (unknown.length) {
+      console.log(`Note: ignoring PO(s) not in this run: ${unknown.join(', ')}`);
+    }
+    shipmentOnlySet = new Set(known.map(normPo));
+  } else if (input.isTTY) {
+    console.log(`\nThis run: ${orderNumbers.join(', ')}`);
+    const shipLine = await promptLine(
+      rl,
+      `Which PO(s) should be ${SHIPMENT} only (one shipment XML block each)? Enter POs separated by commas/spaces, or press Enter for none.\nAll other POs get regular conversion (${ACCEPT} + ${SHIPMENT} pair). `
+    );
+    const requested = parseOrderLine(shipLine);
+    const unknown = requested.filter((p) => !orderSet.has(normPo(p)));
+    if (unknown.length) {
+      console.log(`Note: ignoring PO(s) not in this run: ${unknown.join(', ')}`);
+    }
+    shipmentOnlySet = new Set(requested.filter((p) => orderSet.has(normPo(p))).map(normPo));
+  }
+
+  console.log(`\nSearching ${SEARCH_URL} … (${orderNumbers.length} PO(s))`);
+
+  const headless = process.env.HEADFUL === '1' || process.env.HEADFUL === 'true' ? false : true;
   const browser = await chromium.launch({ headless });
   const context = await browser.newContext();
   const page = await context.newPage();
   let report;
   try {
-    report = await fillReport(page, context, orderNumbers);
+    report = await fillReport(page, context, orderNumbers, (po, idx, total) => {
+      if (!verbose) {
+        process.stdout.write(`  [${idx}/${total}] ${po}\n`);
+      }
+    });
   } finally {
     await browser.close();
   }
 
-  printReport(report);
-
-  const perPo = report.map((row) => ({ row, src: getExportSource(row) }));
-  const acceptList = perPo.filter((p) => p.src?.kind === 'acceptOnly');
-  const regularList = perPo.filter((p) => p.src?.kind === 'regular');
-
-  if (acceptList.length === 0 && regularList.length === 0) {
-    console.log(
-      `No <Comergent> blocks with <OrderNumber> matching your PO(s) and (${SHIPMENT} or ${ACCEPT}) were found. Done.\n`
-    );
-    await rl.close();
-    return;
+  if (verbose) {
+    printVerboseReport(report);
+  } else {
+    printCompactSummary(orderNumbers, shipmentOnlySet, report);
   }
 
   /** @type {string[]} */
@@ -334,78 +406,31 @@ async function main() {
   /** @type {string[]} */
   const regularParts = [];
 
-  if (acceptList.length > 0) {
-    const poStr = acceptList.map((p) => p.row.order).join(', ');
-    const okAccept = await promptYesNo(
-      rl,
-      `\nHave these POs already been accepted?\nPO(s): ${poStr}\n(${ACCEPT} in the matching block, no ${SHIPMENT}.)\nIf yes, export only the ORDER INPUT SHIPMENT block for these? [y/N] `
-    );
-    if (okAccept) {
-      for (const p of acceptList) {
-        shipmentOnlyParts.push(convertAcceptBlockToShipmentOnlyLikeHtml(p.src.block));
-      }
-    }
-  }
+  for (let i = 0; i < orderNumbers.length; i++) {
+    const order = normPo(orderNumbers[i]);
+    const row = report[i];
+    if (!row) continue;
+    const src = getExportSource(row);
+    if (!src) continue;
 
-  const regularQuestion =
-    regularList.length > 0
-      ? `\nInclude regular conversion (${ACCEPT} block + ${SHIPMENT} block, as in xml-converter.html) for PO(s): ${regularList.map((p) => p.row.order).join(', ')}? [y/N] `
-      : `\nDo you have any order numbers that need regular conversion (${ACCEPT} + ${SHIPMENT} pair)? [y/N] `;
-
-  const wantRegular = await promptYesNo(rl, regularQuestion);
-
-  if (wantRegular) {
-    if (regularList.length > 0) {
-      for (const p of regularList) {
-        regularParts.push(convertComergentBlockPairLikeHtml(p.src.block));
-      }
+    if (shipmentOnlySet.has(order)) {
+      shipmentOnlyParts.push(buildShipmentBlockLikeHtml(src.block));
     } else {
-      const extraLine = await promptLine(
-        rl,
-        'Enter PO number(s) for regular conversion (comma or space separated): '
-      );
-      const extraOrders = parseOrderLine(extraLine);
-      if (extraOrders.length === 0) {
-        console.log('No POs entered; skipping regular conversion from this step.\n');
-      } else {
-        console.log(`\nSearching ${SEARCH_URL} for: ${extraOrders.join(', ')}\n`);
-        const browser2 = await chromium.launch({ headless });
-        const context2 = await browser2.newContext();
-        const page2 = await context2.newPage();
-        let report2;
-        try {
-          report2 = await fillReport(page2, context2, extraOrders);
-        } finally {
-          await browser2.close();
-        }
-        printReport(report2);
-        for (const row of report2) {
-          const src = getExportSource(row);
-          if (src?.kind === 'regular') {
-            regularParts.push(convertComergentBlockPairLikeHtml(src.block));
-          } else if (src?.kind === 'acceptOnly') {
-            console.log(
-              `  Note: PO ${row.order} is ${ACCEPT}-only in this pass; it was not added as a regular pair. Re-run with that PO in the first search if you need ACCEPT-only export.\n`
-            );
-          } else {
-            console.log(`  Note: PO ${row.order} had no exportable block for regular conversion.\n`);
-          }
-        }
-      }
+      regularParts.push(convertComergentBlockPairLikeHtml(src.block));
     }
   }
 
   const combinedInner = shipmentOnlyParts.join('') + regularParts.join('');
 
   if (!combinedInner.trim()) {
-    console.log('Nothing selected to write. Done.\n');
+    console.log('No exportable XML for any PO. Done.\n');
     await rl.close();
     return;
   }
 
   const okWrite = await promptYesNo(
     rl,
-    `\nWrite one ComergentData file with ${shipmentOnlyParts.length} shipment-only <Comergent> block(s) and ${regularParts.length} regular pair(s) (no XML declaration on line 1)? [y/N] `
+    `\nWrite one ComergentData file: ${shipmentOnlyParts.length} shipment-only block(s), ${regularParts.length} regular pair(s) (no XML declaration on line 1)? [y/N] `
   );
 
   if (!okWrite) {
