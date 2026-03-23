@@ -1,0 +1,14 @@
+{
+  "name": "jcp-wsco-cli",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "jcp-wsco": "./cli.mjs"
+  },
+  "scripts": {
+    "start": "node cli.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}
