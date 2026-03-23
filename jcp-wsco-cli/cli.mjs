@@ -34,11 +34,66 @@ function normPo(s) {
   return String(s).trim();
 }
 
+/**
+ * Parses PO lists: commas/spaces/tabs on one line, or one PO per line (column paste / spreadsheet).
+ * Strips BOM. Splits lines on \r\n; each line also splits on comma, semicolon, or tab.
+ * @param {string} line
+ * @returns {string[]}
+ */
 function parseOrderLine(line) {
-  return line
-    .split(/[\s,]+/)
-    .map((s) => normPo(s))
-    .filter(Boolean);
+  const raw = String(line ?? '').replace(/^\uFEFF/, '');
+  if (!normPo(raw)) return [];
+
+  const lines = raw.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const out = [];
+
+  if (lines.length > 1) {
+    for (const l of lines) {
+      const cells = l.split(/[,;\t]+/).map(normPo).filter(Boolean);
+      if (cells.length) out.push(...cells);
+      else out.push(normPo(l));
+    }
+  } else {
+    out.push(...lines[0].split(/[,;\s\t]+/).map(normPo).filter(Boolean));
+  }
+
+  return out;
+}
+
+/**
+ * Multiline paste: type or paste lines, then an empty line to finish.
+ * @param {import('node:readline/promises').Interface} rl
+ * @param {string} intro
+ * @returns {Promise<string>} joined lines (no trailing empty)
+ */
+async function promptMultilineBlock(rl, intro) {
+  console.log(intro);
+  console.log('Finish with an empty line (after a single PO, press Enter twice).');
+  const lines = [];
+  while (true) {
+    const line = await rl.question(lines.length === 0 ? '> ' : '  ');
+    if (!normPo(line)) break;
+    lines.push(line);
+  }
+  return lines.join('\n');
+}
+
+/**
+ * @param {string[]} tokens from parseOrderLine
+ * @param {Set<string>} orderSet
+ * @returns {{ set: Set<string>, unknown: string[] }}
+ */
+function resolveShipmentOnlySelection(tokens, orderSet) {
+  const t = tokens.map(normPo).filter(Boolean);
+  if (t.length === 1 && /^all$/i.test(t[0])) {
+    return { set: new Set(orderSet), unknown: [] };
+  }
+  if (t.length === 1 && /^(none|no)$/i.test(t[0])) {
+    return { set: new Set(), unknown: [] };
+  }
+  const unknown = t.filter((p) => !orderSet.has(p));
+  const known = t.filter((p) => orderSet.has(p));
+  return { set: new Set(known), unknown };
 }
 
 function parseOrderArgs() {
@@ -70,8 +125,27 @@ function parseOrderArgs() {
   return { orders: orders.filter(Boolean), verbose, shipmentOnly };
 }
 
-async function promptLine(rl, question) {
-  return (await rl.question(question)).trim();
+/**
+ * @param {import('node:readline/promises').Interface} rl
+ * @param {Set<string>} orderSet
+ * @param {string[]} orderNumbers
+ * @returns {Promise<Set<string>>}
+ */
+async function promptShipmentOnlyMode(rl, orderSet, orderNumbers) {
+  console.log(`\nThis run: ${orderNumbers.join(', ')}`);
+  const block = await promptMultilineBlock(
+    rl,
+    `Which PO(s) should be ${SHIPMENT} only (one shipment XML block each)?\n` +
+      `• Type **all** on its own line so every PO in this run is shipment-only.\n` +
+      `• Or list POs (one per line / column paste, or commas on one line).\n` +
+      `• Leave blank (empty finish) so every PO uses regular conversion (${ACCEPT} + ${SHIPMENT} pair).`
+  );
+  const requested = parseOrderLine(block);
+  const { set, unknown } = resolveShipmentOnlySelection(requested, orderSet);
+  if (unknown.length) {
+    console.log(`Note: ignoring PO(s) not in this run: ${unknown.join(', ')}`);
+  }
+  return set;
 }
 
 /**
@@ -342,8 +416,11 @@ async function main() {
   const rl = createInterface({ input, output });
 
   if (orderNumbers.length === 0) {
-    const line = await promptLine(rl, 'Enter JCP WCSO PO number(s), separated by commas or spaces: ');
-    orderNumbers = parseOrderLine(line);
+    const block = await promptMultilineBlock(
+      rl,
+      'Enter JCP WCSO PO number(s). Use commas/spaces on one line, or paste a column (one PO per line).'
+    );
+    orderNumbers = parseOrderLine(block);
   }
 
   if (orderNumbers.length === 0) {
@@ -358,24 +435,13 @@ async function main() {
   let shipmentOnlySet = new Set();
 
   if (shipmentOnlyFromArgs.length > 0) {
-    const unknown = shipmentOnlyFromArgs.filter((p) => !orderSet.has(normPo(p)));
-    const known = shipmentOnlyFromArgs.filter((p) => orderSet.has(normPo(p)));
+    const { set, unknown } = resolveShipmentOnlySelection(shipmentOnlyFromArgs, orderSet);
+    shipmentOnlySet = set;
     if (unknown.length) {
       console.log(`Note: ignoring PO(s) not in this run: ${unknown.join(', ')}`);
     }
-    shipmentOnlySet = new Set(known.map(normPo));
   } else if (input.isTTY) {
-    console.log(`\nThis run: ${orderNumbers.join(', ')}`);
-    const shipLine = await promptLine(
-      rl,
-      `Which PO(s) should be ${SHIPMENT} only (one shipment XML block each)? Enter POs separated by commas/spaces, or press Enter for none.\nAll other POs get regular conversion (${ACCEPT} + ${SHIPMENT} pair). `
-    );
-    const requested = parseOrderLine(shipLine);
-    const unknown = requested.filter((p) => !orderSet.has(normPo(p)));
-    if (unknown.length) {
-      console.log(`Note: ignoring PO(s) not in this run: ${unknown.join(', ')}`);
-    }
-    shipmentOnlySet = new Set(requested.filter((p) => orderSet.has(normPo(p))).map(normPo));
+    shipmentOnlySet = await promptShipmentOnlyMode(rl, orderSet, orderNumbers);
   }
 
   console.log(`\nSearching ${SEARCH_URL} … (${orderNumbers.length} PO(s))`);
