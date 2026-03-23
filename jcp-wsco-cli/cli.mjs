@@ -15,7 +15,8 @@ import { chromium } from 'playwright';
 import {
   SHIPMENT,
   ACCEPT,
-  convertXmlDocumentToAcceptOnly,
+  convertXmlForEnteredOrder,
+  getOrderNumberFromComergentBlock,
   wrapComergentData,
   splitComergentBlocks,
 } from './xml-convert.js';
@@ -101,13 +102,26 @@ async function fetchXmlText(request, pageUrl, href) {
   return { abs, status, text };
 }
 
-function summarizeXml(text) {
+function buildSummaryAndConvert(text, searchedOrder) {
   const hasShipment = text.includes(SHIPMENT);
   const hasAccept = text.includes(ACCEPT);
-  const blockCount = splitComergentBlocks(text).length;
+  const blocks = splitComergentBlocks(text);
+  const blockCount = blocks.length;
   const orderInputMatch = text.match(/<OrderInput>\s*([^<]+)\s*<\/OrderInput>/i);
   const orderInput = orderInputMatch ? orderInputMatch[1].trim() : '(no OrderInput tag found)';
-  return { hasShipment, hasAccept, blockCount, orderInput };
+  const orderNumbersInFile = [...new Set(blocks.map((b) => getOrderNumberFromComergentBlock(b)).filter(Boolean))];
+  const converted = convertXmlForEnteredOrder(text, searchedOrder);
+  return {
+    hasShipment,
+    hasAccept,
+    blockCount,
+    orderInput,
+    orderNumbersInFile,
+    blocksMatchingSearchedPo: converted.paired,
+    skippedWrongOrder: converted.skippedWrongOrder,
+    skippedNoShipment: converted.skippedNoShipment,
+    convertOutput: converted.output,
+  };
 }
 
 async function main() {
@@ -139,7 +153,7 @@ async function main() {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  /** @type {Array<{ order: string, findings: Array<{ category: string, href: string, abs: string, httpStatus: number, summary: ReturnType<typeof summarizeXml>, rawXml?: string, fetchError?: string }>, ordersNoMatch: boolean, statusNoMatch: boolean }>} */
+  /** @type {Array<{ order: string, findings: Array<{ category: string, href: string, abs: string, httpStatus: number, summary: ReturnType<typeof buildSummaryAndConvert>, rawXml?: string, fetchError?: string }>, ordersNoMatch: boolean, statusNoMatch: boolean }>} */
   const report = [];
 
   try {
@@ -158,7 +172,7 @@ async function main() {
         const category = linkCategory(href);
         try {
           const { abs, status, text } = await fetchXmlText(context.request, pageUrl, href);
-          const summary = summarizeXml(text);
+          const summary = buildSummaryAndConvert(text, order);
           findings.push({
             category,
             href,
@@ -185,6 +199,11 @@ async function main() {
               hasAccept: false,
               blockCount: 0,
               orderInput: '(fetch failed)',
+              orderNumbersInFile: [],
+              blocksMatchingSearchedPo: 0,
+              skippedWrongOrder: 0,
+              skippedNoShipment: 0,
+              convertOutput: '',
             },
             fetchError: e instanceof Error ? e.message : String(e),
           });
@@ -207,7 +226,7 @@ async function main() {
   const allConvertedInner = [];
 
   for (const row of report) {
-    console.log(`--- PO ${row.order} ---`);
+    console.log(`--- PO ${row.order} (searched) ---`);
     if (row.findings.length === 0) {
       console.log('  No .xml links on the results page.');
       if (row.ordersNoMatch) console.log('  (Orders: no results message present.)');
@@ -220,13 +239,15 @@ async function main() {
         `    ORDER INPUT SHIPMENT: ${f.summary.hasShipment ? 'yes' : 'no'}  |  ${ACCEPT}: ${f.summary.hasAccept ? 'yes' : 'no'}  |  <Comergent> blocks: ${f.summary.blockCount}`
       );
       console.log(`    <OrderInput> value: ${f.summary.orderInput}`);
+      if (f.summary.orderNumbersInFile.length) {
+        console.log(`    <OrderNumber> in file: ${f.summary.orderNumbersInFile.join(', ')}`);
+      }
+      console.log(
+        `    Blocks matching searched PO ${row.order} with ${SHIPMENT}: ${f.summary.blocksMatchingSearchedPo}  (other PO in file: ${f.summary.skippedWrongOrder}, no ${SHIPMENT}: ${f.summary.skippedNoShipment})`
+      );
 
-      if (f.rawXml && f.summary.hasShipment) {
-        const { converted, skippedBlocks, shipmentBlocks } = convertXmlDocumentToAcceptOnly(f.rawXml);
-        console.log(
-          `    Convertible <Comergent> blocks (contain ${SHIPMENT}): ${shipmentBlocks}  (other blocks skipped: ${skippedBlocks})`
-        );
-        if (converted) allConvertedInner.push(converted);
+      if (f.summary.convertOutput) {
+        allConvertedInner.push(f.summary.convertOutput);
       }
     }
     console.log('');
@@ -234,14 +255,16 @@ async function main() {
 
   const convertibleCount = allConvertedInner.length;
   if (convertibleCount === 0) {
-    console.log(`No XML with ${SHIPMENT} was collected for conversion. Done.\n`);
+    console.log(
+      `No <Comergent> blocks with ${SHIPMENT} and <OrderNumber> matching your entered PO(s) were found. Done.\n`
+    );
     rl.close();
     return;
   }
 
   const ok = await promptYesNo(
     rl,
-    `\nConvert ${convertibleCount} XML snippet(s) to ${ACCEPT} and write a single ComergentData file? [y/N] `
+    `\nWrite ${convertibleCount} result bundle(s) (${ACCEPT} block + ${SHIPMENT} block each, as in xml-converter.html) into one ComergentData file (no XML declaration)? [y/N] `
   );
 
   if (!ok) {
@@ -253,7 +276,7 @@ async function main() {
   mkdirSync(OUT_DIR, { recursive: true });
   const ts = new Date().toISOString().replace(/[:.]/g, '-');
   const outPath = join(OUT_DIR, `converted_order_status_${ts}.xml`);
-  const wrapped = wrapComergentData(allConvertedInner.join('\n\n'));
+  const wrapped = wrapComergentData(allConvertedInner.join(''));
   writeFileSync(outPath, wrapped, 'utf8');
   console.log(`Wrote: ${outPath}\n`);
 
