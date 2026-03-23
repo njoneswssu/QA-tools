@@ -90,8 +90,14 @@ export function splitComergentBlocks(xmlText) {
  *
  * @param {string} xmlText
  * @param {string} enteredOrder - PO the user searched for
+ * @param {{ maxMatchingBlocks?: number }} [options] - default: all matches; use 1 for a single pair per document
  */
-export function convertXmlForEnteredOrder(xmlText, enteredOrder) {
+export function convertXmlForEnteredOrder(xmlText, enteredOrder, options = {}) {
+  const maxMatchingBlocks =
+    typeof options.maxMatchingBlocks === 'number' && options.maxMatchingBlocks > 0
+      ? options.maxMatchingBlocks
+      : Number.POSITIVE_INFINITY;
+
   const normalized = enteredOrder.trim();
   const blocks = splitComergentBlocks(xmlText);
   let skippedNoShipment = 0;
@@ -109,6 +115,9 @@ export function convertXmlForEnteredOrder(xmlText, enteredOrder) {
       continue;
     }
     parts.push(convertComergentBlockPairLikeHtml(block));
+    if (parts.length >= maxMatchingBlocks) {
+      break;
+    }
   }
 
   return {

@@ -49,9 +49,20 @@ async function promptLine(rl, question) {
   return answer;
 }
 
+/**
+ * @param {import('node:readline/promises').Interface} rl
+ * @param {string} question
+ * @returns {Promise<boolean>}
+ */
 async function promptYesNo(rl, question) {
-  const a = (await rl.question(question)).trim().toLowerCase();
-  return a === 'y' || a === 'yes';
+  let q = question;
+  while (true) {
+    const a = (await rl.question(q)).trim().toLowerCase();
+    if (a === 'y' || a === 'yes') return true;
+    if (a === 'n' || a === 'no') return false;
+    console.log('Please answer y or n (yes/no).');
+    q = 'Try again [y/N]: ';
+  }
 }
 
 /**
@@ -245,11 +256,29 @@ async function main() {
       console.log(
         `    Blocks matching searched PO ${row.order} with ${SHIPMENT}: ${f.summary.blocksMatchingSearchedPo}  (other PO in file: ${f.summary.skippedWrongOrder}, no ${SHIPMENT}: ${f.summary.skippedNoShipment})`
       );
-
-      if (f.summary.convertOutput) {
-        allConvertedInner.push(f.summary.convertOutput);
-      }
     }
+
+    const withMatch = row.findings.filter((f) => f.summary.blocksMatchingSearchedPo > 0 && f.rawXml);
+    if (withMatch.length > 1) {
+      console.log(
+        `  Note: ${withMatch.length} XML files contain matching blocks for PO ${row.order}; export uses the first file only (one ${ACCEPT} + ${SHIPMENT} pair).`
+      );
+    } else if (withMatch.length === 1 && withMatch[0].summary.blocksMatchingSearchedPo > 1) {
+      console.log(
+        `  Note: that file has ${withMatch[0].summary.blocksMatchingSearchedPo} matching <Comergent> blocks; export uses the first block only.`
+      );
+    }
+
+    const firstFinding = row.findings.find(
+      (f) => f.rawXml && f.summary.blocksMatchingSearchedPo > 0
+    );
+    if (firstFinding?.rawXml) {
+      const { output } = convertXmlForEnteredOrder(firstFinding.rawXml, row.order, {
+        maxMatchingBlocks: 1,
+      });
+      if (output) allConvertedInner.push(output);
+    }
+
     console.log('');
   }
 
@@ -258,18 +287,18 @@ async function main() {
     console.log(
       `No <Comergent> blocks with ${SHIPMENT} and <OrderNumber> matching your entered PO(s) were found. Done.\n`
     );
-    rl.close();
+    await rl.close();
     return;
   }
 
   const ok = await promptYesNo(
     rl,
-    `\nWrite ${convertibleCount} result bundle(s) (${ACCEPT} block + ${SHIPMENT} block each, as in xml-converter.html) into one ComergentData file (no XML declaration)? [y/N] `
+    `\nWrite ${convertibleCount} order bundle(s) (one ${ACCEPT} + ${SHIPMENT} pair per PO, as in xml-converter.html) into one ComergentData file (no XML declaration)? [y/N] `
   );
 
   if (!ok) {
     console.log('Skipped write.\n');
-    rl.close();
+    await rl.close();
     return;
   }
 
@@ -280,7 +309,7 @@ async function main() {
   writeFileSync(outPath, wrapped, 'utf8');
   console.log(`Wrote: ${outPath}\n`);
 
-  rl.close();
+  await rl.close();
 }
 
 main().catch((err) => {
