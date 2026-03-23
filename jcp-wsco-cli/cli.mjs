@@ -3,11 +3,12 @@
  * Interactive CLI: search JCP WSCO POs on transfer.levsuite.com, inspect XML hits,
  * and convert using the same rules as ../xml-converter.html.
  *
- * Flow: enter POs → choose which are ORDER INPUT SHIPMENT–only vs regular pair → search → summary → write.
+ * Flow: enter POs (one line, or type "paste" for a column) → shipment-only vs regular → search → summary → write.
  * Compact terminal output by default; VERBOSE=1 or --verbose for per-file details.
  */
 
 import { createInterface } from 'node:readline/promises';
+import readline from 'node:readline';
 import { stdin as input, stdout as output, argv, exit } from 'node:process';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -62,21 +63,76 @@ function parseOrderLine(line) {
 }
 
 /**
- * Multiline paste: type or paste lines, then an empty line to finish.
+ * Read a pasted column reliably. `readline.question()` only consumes one line per call, so a
+ * multi-line paste would drop middle rows. We pause the main UI and use a temporary interface.
  * @param {import('node:readline/promises').Interface} rl
- * @param {string} intro
- * @returns {Promise<string>} joined lines (no trailing empty)
+ * @param {string[]} introLines
+ * @returns {Promise<string>} non-empty lines joined with \n
  */
-async function promptMultilineBlock(rl, intro) {
-  console.log(intro);
-  console.log('Finish with an empty line (after a single PO, press Enter twice).');
-  const lines = [];
-  while (true) {
-    const line = await rl.question(lines.length === 0 ? '> ' : '  ');
-    if (!normPo(line)) break;
-    lines.push(line);
+async function readColumnUntilBlank(rl, introLines) {
+  for (const line of introLines) {
+    console.log(line);
   }
-  return lines.join('\n');
+  if (!input.isTTY) {
+    console.log('(Non-interactive: use one line, commas between POs.)');
+    return rl.question('> ');
+  }
+
+  console.log('Paste one PO per line, then press Enter on an empty line when finished.');
+  rl.pause();
+  const lines = [];
+
+  return await new Promise((resolve, reject) => {
+    let settled = false;
+    const iface = readline.createInterface({ input, output, terminal: true });
+
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      iface.removeAllListeners();
+      iface.close();
+      rl.resume();
+      resolve(value);
+    };
+
+    iface.on('line', (line) => {
+      if (!normPo(line)) {
+        finish(lines.join('\n'));
+        return;
+      }
+      lines.push(line);
+    });
+
+    iface.on('close', () => finish(lines.join('\n')));
+
+    iface.on('error', (err) => {
+      if (settled) return;
+      settled = true;
+      iface.removeAllListeners();
+      iface.close();
+      rl.resume();
+      reject(err);
+    });
+  });
+}
+
+/**
+ * One line (commas/spaces) = single Enter. Type **paste** + Enter to paste a column.
+ * @param {import('node:readline/promises').Interface} rl
+ * @param {string} title
+ * @returns {Promise<string[]>}
+ */
+async function promptPoList(rl, title) {
+  console.log(title);
+  console.log(
+    'Enter POs on one line (commas or spaces), or type **paste** and press Enter to paste a column (one PO per line), then a blank line.'
+  );
+  const first = await rl.question('> ');
+  if (/^paste$/i.test(first.trim())) {
+    const block = await readColumnUntilBlank(rl, []);
+    return parseOrderLine(block);
+  }
+  return parseOrderLine(first);
 }
 
 /**
@@ -134,14 +190,20 @@ function parseOrderArgs() {
  */
 async function promptShipmentOnlyMode(rl, orderSet, orderNumbers) {
   console.log(`\nThis run: ${orderNumbers.join(', ')}`);
-  const block = await promptMultilineBlock(
-    rl,
+  console.log(
     `Which PO(s) should be ${SHIPMENT} only (one shipment XML block each)?\n` +
-      `• Type **all** on its own line so every PO in this run is shipment-only.\n` +
-      `• Or list POs (one per line / column paste, or commas on one line).\n` +
-      `• Leave blank (empty finish) so every PO uses regular conversion (${ACCEPT} + ${SHIPMENT} pair).`
+      `• **all** — every PO shipment-only (one line).\n` +
+      `• **none** or leave blank — all regular (${ACCEPT} + ${SHIPMENT} pair).\n` +
+      `• Or list POs on one line (commas/spaces), or type **paste** for a column (blank line to finish).`
   );
-  const requested = parseOrderLine(block);
+  const first = await rl.question('> ');
+  let requested;
+  if (/^paste$/i.test(first.trim())) {
+    const block = await readColumnUntilBlank(rl, []);
+    requested = parseOrderLine(block);
+  } else {
+    requested = parseOrderLine(first);
+  }
   const { set, unknown } = resolveShipmentOnlySelection(requested, orderSet);
   if (unknown.length) {
     console.log(`Note: ignoring PO(s) not in this run: ${unknown.join(', ')}`);
@@ -417,11 +479,7 @@ async function main() {
   const rl = createInterface({ input, output });
 
   if (orderNumbers.length === 0) {
-    const block = await promptMultilineBlock(
-      rl,
-      'Enter JCP WCSO PO number(s). Use commas/spaces on one line, or paste a column (one PO per line).'
-    );
-    orderNumbers = parseOrderLine(block);
+    orderNumbers = await promptPoList(rl, 'JCP WCSO PO number(s) for this run:');
   }
 
   if (orderNumbers.length === 0) {
