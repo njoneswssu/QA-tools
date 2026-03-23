@@ -67,11 +67,12 @@ node auditor.js
 
 **Merchant Rate Audit submenu:**
 1. Run new audit
-2. List previous audits
-3. Lookup audits by App ID
-4. Clear merchant rate results (only merchant rate files)
-5. Back to main menu
-6. Exit
+2. Audit specific merchant name(s) — App ID(s) + comma-separated names (partial match); audits only matching merchants’ rates
+3. List previous audits
+4. Lookup audits by App ID
+5. Clear merchant rate results (only merchant rate files)
+6. Back to main menu
+7. Exit
 
 ### Command-Line Mode
 
