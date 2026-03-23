@@ -19,20 +19,11 @@ function generateCurrentDate() {
 }
 
 /**
- * @param {string} block - one <Comergent>...</Comergent> chunk
- * @returns {string} convertedBlock + shipmentBlock (concatenated, no separator), matching the HTML tool
+ * Second half of the HTML blue-button output: ORDER INPUT SHIPMENT block with dates / tracking.
+ * @param {string} block - one <Comergent>...</Comergent> chunk (source may be SHIPMENT or ACCEPT)
+ * @returns {string}
  */
-export function convertComergentBlockPairLikeHtml(block) {
-  let convertedBlock = block;
-
-  convertedBlock = convertedBlock.replace(/ORDER INPUT SHIPMENT/g, ACCEPT);
-  convertedBlock = convertedBlock.replace(/ORDER INPUT ORDER STATUS UPDATE ACCEPT/g, ACCEPT);
-  convertedBlock = convertedBlock.replace(/<ShipmentDate>.*?<\/ShipmentDate>/g, '');
-  convertedBlock = convertedBlock.replace(
-    /<JCPOrderShipmentUpdateInfoList[^>]*>[\s\S]*?<\/JCPOrderShipmentUpdateInfoList>/g,
-    ''
-  );
-
+export function buildShipmentBlockLikeHtml(block) {
   let shipmentBlock = block;
   shipmentBlock = shipmentBlock.replace(/<ShipmentDate>.*?<\/ShipmentDate>/g, '');
   shipmentBlock = shipmentBlock.replace(/ORDER INPUT SHIPMENT/g, SHIPMENT);
@@ -56,12 +47,46 @@ export function convertComergentBlockPairLikeHtml(block) {
     );
   }
 
-  convertedBlock = convertedBlock.replace(/\n\s*\n\s*\n/g, '\n\n');
-  convertedBlock = convertedBlock.replace(/^\s*\n/gm, '');
   shipmentBlock = shipmentBlock.replace(/\n\s*\n\s*\n/g, '\n\n');
   shipmentBlock = shipmentBlock.replace(/^\s*\n/gm, '');
 
-  return convertedBlock + shipmentBlock;
+  return shipmentBlock;
+}
+
+/**
+ * First half of the HTML blue-button output: ORDER INPUT ORDER STATUS UPDATE ACCEPT, no shipment noise.
+ * @param {string} block
+ * @returns {string}
+ */
+export function buildAcceptBlockLikeHtml(block) {
+  let convertedBlock = block;
+  convertedBlock = convertedBlock.replace(/ORDER INPUT SHIPMENT/g, ACCEPT);
+  convertedBlock = convertedBlock.replace(/ORDER INPUT ORDER STATUS UPDATE ACCEPT/g, ACCEPT);
+  convertedBlock = convertedBlock.replace(/<ShipmentDate>.*?<\/ShipmentDate>/g, '');
+  convertedBlock = convertedBlock.replace(
+    /<JCPOrderShipmentUpdateInfoList[^>]*>[\s\S]*?<\/JCPOrderShipmentUpdateInfoList>/g,
+    ''
+  );
+  convertedBlock = convertedBlock.replace(/\n\s*\n\s*\n/g, '\n\n');
+  convertedBlock = convertedBlock.replace(/^\s*\n/gm, '');
+  return convertedBlock;
+}
+
+/**
+ * @param {string} block - one <Comergent>...</Comergent> chunk
+ * @returns {string} convertedBlock + shipmentBlock (concatenated, no separator), matching the HTML tool
+ */
+export function convertComergentBlockPairLikeHtml(block) {
+  return buildAcceptBlockLikeHtml(block) + buildShipmentBlockLikeHtml(block);
+}
+
+/**
+ * When the source is already ACCEPT: export only the SHIPMENT block (per your rule).
+ * @param {string} block
+ * @returns {string}
+ */
+export function convertAcceptBlockToShipmentOnlyLikeHtml(block) {
+  return buildShipmentBlockLikeHtml(block);
 }
 
 /**
@@ -82,6 +107,22 @@ export function splitComergentBlocks(xmlText) {
     .split(/(?=<Comergent\b)/i)
     .map((b) => b.trim())
     .filter((b) => /^\s*<Comergent\b/i.test(b));
+}
+
+/**
+ * First <Comergent> for this PO that is either regular (SHIPMENT) or accept-only (ACCEPT, no SHIPMENT).
+ * @param {string} xmlText
+ * @param {string} enteredOrder
+ * @returns {{ kind: 'regular' | 'acceptOnly', block: string } | null}
+ */
+export function getFirstExportBlockForOrder(xmlText, enteredOrder) {
+  const normalized = enteredOrder.trim();
+  for (const block of splitComergentBlocks(xmlText)) {
+    if (getOrderNumberFromComergentBlock(block) !== normalized) continue;
+    if (block.includes(SHIPMENT)) return { kind: 'regular', block };
+    if (block.includes(ACCEPT)) return { kind: 'acceptOnly', block };
+  }
+  return null;
 }
 
 /**
@@ -125,6 +166,49 @@ export function convertXmlForEnteredOrder(xmlText, enteredOrder, options = {}) {
     paired: parts.length,
     skippedNoShipment,
     skippedWrongOrder,
+    comergentBlockCount: blocks.length,
+  };
+}
+
+/**
+ * Accept-only blocks for this PO: ORDER INPUT ORDER STATUS UPDATE ACCEPT and no SHIPMENT in block.
+ * @param {string} xmlText
+ * @param {string} enteredOrder
+ * @param {{ maxMatchingBlocks?: number }} [options]
+ */
+export function convertXmlAcceptOnlyToShipmentOnly(xmlText, enteredOrder, options = {}) {
+  const maxMatchingBlocks =
+    typeof options.maxMatchingBlocks === 'number' && options.maxMatchingBlocks > 0
+      ? options.maxMatchingBlocks
+      : Number.POSITIVE_INFINITY;
+
+  const normalized = enteredOrder.trim();
+  const blocks = splitComergentBlocks(xmlText);
+  let skippedHasShipment = 0;
+  let skippedNoAccept = 0;
+  const parts = [];
+
+  for (const block of blocks) {
+    if (getOrderNumberFromComergentBlock(block) !== normalized) continue;
+    if (block.includes(SHIPMENT)) {
+      skippedHasShipment += 1;
+      continue;
+    }
+    if (!block.includes(ACCEPT)) {
+      skippedNoAccept += 1;
+      continue;
+    }
+    parts.push(convertAcceptBlockToShipmentOnlyLikeHtml(block));
+    if (parts.length >= maxMatchingBlocks) {
+      break;
+    }
+  }
+
+  return {
+    output: parts.join(''),
+    paired: parts.length,
+    skippedHasShipment,
+    skippedNoAccept,
     comergentBlockCount: blocks.length,
   };
 }

@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
  * Interactive CLI: search JCP WSCO POs on transfer.levsuite.com, inspect XML hits,
- * and optionally convert ORDER INPUT SHIPMENT → ORDER INPUT ORDER STATUS UPDATE ACCEPT
- * using the same rules as ../xml-converter.html (XML mode, blue button).
+ * and convert using the same rules as ../xml-converter.html.
  */
 
 import { createInterface } from 'node:readline/promises';
@@ -16,7 +15,10 @@ import {
   SHIPMENT,
   ACCEPT,
   convertXmlForEnteredOrder,
+  convertAcceptBlockToShipmentOnlyLikeHtml,
+  convertComergentBlockPairLikeHtml,
   getOrderNumberFromComergentBlock,
+  getFirstExportBlockForOrder,
   wrapComergentData,
   splitComergentBlocks,
 } from './xml-convert.js';
@@ -44,9 +46,15 @@ function parseOrderArgs() {
   return orders.filter(Boolean);
 }
 
+function parseOrderLine(line) {
+  return line
+    .split(/[\s,]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 async function promptLine(rl, question) {
-  const answer = (await rl.question(question)).trim();
-  return answer;
+  return (await rl.question(question)).trim();
 }
 
 /**
@@ -89,10 +97,6 @@ async function runSearch(page, orderNumber) {
   await page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => {});
 }
 
-/**
- * Categorize links from results (best-effort from href).
- * @param {string} href
- */
 function linkCategory(href) {
   const h = href.toLowerCase();
   if (h.includes('/status/') || h.startsWith('status/')) return 'Status';
@@ -121,6 +125,13 @@ function buildSummaryAndConvert(text, searchedOrder) {
   const orderInputMatch = text.match(/<OrderInput>\s*([^<]+)\s*<\/OrderInput>/i);
   const orderInput = orderInputMatch ? orderInputMatch[1].trim() : '(no OrderInput tag found)';
   const orderNumbersInFile = [...new Set(blocks.map((b) => getOrderNumberFromComergentBlock(b)).filter(Boolean))];
+  const normalized = searchedOrder.trim();
+  let acceptOnlyBlocksMatchingSearchedPo = 0;
+  for (const block of blocks) {
+    if (getOrderNumberFromComergentBlock(block) !== normalized) continue;
+    if (block.includes(SHIPMENT)) continue;
+    if (block.includes(ACCEPT)) acceptOnlyBlocksMatchingSearchedPo += 1;
+  }
   const converted = convertXmlForEnteredOrder(text, searchedOrder);
   return {
     hasShipment,
@@ -128,6 +139,7 @@ function buildSummaryAndConvert(text, searchedOrder) {
     blockCount,
     orderInput,
     orderNumbersInFile,
+    acceptOnlyBlocksMatchingSearchedPo,
     blocksMatchingSearchedPo: converted.paired,
     skippedWrongOrder: converted.skippedWrongOrder,
     skippedNoShipment: converted.skippedNoShipment,
@@ -135,106 +147,96 @@ function buildSummaryAndConvert(text, searchedOrder) {
   };
 }
 
-async function main() {
-  const headless = process.env.HEADFUL === '1' || process.env.HEADFUL === 'true' ? false : true;
-
-  let orderNumbers = parseOrderArgs();
-  const rl = createInterface({ input, output });
-
-  if (orderNumbers.length === 0) {
-    const line = await promptLine(
-      rl,
-      'Enter JCP WCSO PO number(s), separated by commas or spaces: '
-    );
-    orderNumbers = line
-      .split(/[\s,]+/)
-      .map((s) => s.trim())
-      .filter(Boolean);
-  }
-
-  if (orderNumbers.length === 0) {
-    console.error('No order numbers provided.');
-    await rl.close();
-    exit(1);
-  }
-
-  console.log(`\nSearching ${SEARCH_URL} for: ${orderNumbers.join(', ')}\n`);
-
-  const browser = await chromium.launch({ headless });
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  /** @type {Array<{ order: string, findings: Array<{ category: string, href: string, abs: string, httpStatus: number, summary: ReturnType<typeof buildSummaryAndConvert>, rawXml?: string, fetchError?: string }>, ordersNoMatch: boolean, statusNoMatch: boolean }>} */
+/**
+ * @param {import('playwright').Page} page
+ * @param {import('playwright').BrowserContext} context
+ * @param {string[]} orderNumbers
+ */
+async function fillReport(page, context, orderNumbers) {
+  /** @type {Array<{ order: string, findings: Array<object>, ordersNoMatch: boolean, statusNoMatch: boolean }>} */
   const report = [];
 
-  try {
-    for (const order of orderNumbers) {
-      await runSearch(page, order);
-      const pageUrl = page.url();
+  for (const order of orderNumbers) {
+    await runSearch(page, order);
+    const pageUrl = page.url();
 
-      const hrefs = await page.locator('a[href]').evaluateAll((anchors) =>
-        anchors.map((a) => a.getAttribute('href')).filter(Boolean)
-      );
+    const hrefs = await page.locator('a[href]').evaluateAll((anchors) =>
+      anchors.map((a) => a.getAttribute('href')).filter(Boolean)
+    );
 
-      const xmlHrefs = [...new Set(hrefs.filter((h) => /\.xml(\?|$)/i.test(h) || h.toLowerCase().endsWith('.xml')))];
+    const xmlHrefs = [...new Set(hrefs.filter((h) => /\.xml(\?|$)/i.test(h) || h.toLowerCase().endsWith('.xml')))];
 
-      const findings = [];
-      for (const href of xmlHrefs) {
-        const category = linkCategory(href);
-        try {
-          const { abs, status, text } = await fetchXmlText(context.request, pageUrl, href);
-          const summary = buildSummaryAndConvert(text, order);
-          findings.push({
-            category,
-            href,
-            abs,
-            httpStatus: status,
-            summary,
-            rawXml: status >= 200 && status < 300 ? text : undefined,
-          });
-        } catch (e) {
-          const abs = (() => {
-            try {
-              return new URL(href, pageUrl).href;
-            } catch {
-              return href;
-            }
-          })();
-          findings.push({
-            category,
-            href,
-            abs,
-            httpStatus: 0,
-            summary: {
-              hasShipment: false,
-              hasAccept: false,
-              blockCount: 0,
-              orderInput: '(fetch failed)',
-              orderNumbersInFile: [],
-              blocksMatchingSearchedPo: 0,
-              skippedWrongOrder: 0,
-              skippedNoShipment: 0,
-              convertOutput: '',
-            },
-            fetchError: e instanceof Error ? e.message : String(e),
-          });
-        }
+    const findings = [];
+    for (const href of xmlHrefs) {
+      const category = linkCategory(href);
+      try {
+        const { abs, status, text } = await fetchXmlText(context.request, pageUrl, href);
+        const summary = buildSummaryAndConvert(text, order);
+        findings.push({
+          category,
+          href,
+          abs,
+          httpStatus: status,
+          summary,
+          rawXml: status >= 200 && status < 300 ? text : undefined,
+        });
+      } catch (e) {
+        const abs = (() => {
+          try {
+            return new URL(href, pageUrl).href;
+          } catch {
+            return href;
+          }
+        })();
+        findings.push({
+          category,
+          href,
+          abs,
+          httpStatus: 0,
+          summary: {
+            hasShipment: false,
+            hasAccept: false,
+            blockCount: 0,
+            orderInput: '(fetch failed)',
+            orderNumbersInFile: [],
+            acceptOnlyBlocksMatchingSearchedPo: 0,
+            blocksMatchingSearchedPo: 0,
+            skippedWrongOrder: 0,
+            skippedNoShipment: 0,
+            convertOutput: '',
+          },
+          fetchError: e instanceof Error ? e.message : String(e),
+        });
       }
-
-      const bodyText = await page.locator('body').innerText().catch(() => '');
-      const ordersNoMatch = /order files returned no results/i.test(bodyText);
-      const statusNoMatch = /status files returned no results/i.test(bodyText);
-
-      report.push({ order, findings, ordersNoMatch, statusNoMatch });
     }
-  } finally {
-    await browser.close();
+
+    const bodyText = await page.locator('body').innerText().catch(() => '');
+    const ordersNoMatch = /order files returned no results/i.test(bodyText);
+    const statusNoMatch = /status files returned no results/i.test(bodyText);
+
+    report.push({ order, findings, ordersNoMatch, statusNoMatch });
   }
 
-  console.log('========== RESULTS ==========\n');
+  return report;
+}
 
-  /** @type {string[]} */
-  const allConvertedInner = [];
+/**
+ * @param {{ order: string, findings: Array<{ rawXml?: string }> }} row
+ */
+function getExportSource(row) {
+  for (const f of row.findings) {
+    if (!f.rawXml) continue;
+    const hit = getFirstExportBlockForOrder(f.rawXml, row.order);
+    if (hit) return { finding: f, kind: hit.kind, block: hit.block };
+  }
+  return null;
+}
+
+/**
+ * @param {Array<{ order: string, findings: Array<any>, ordersNoMatch: boolean, statusNoMatch: boolean }>} report
+ */
+function printReport(report) {
+  console.log('========== RESULTS ==========\n');
 
   for (const row of report) {
     console.log(`--- PO ${row.order} (searched) ---`);
@@ -254,49 +256,159 @@ async function main() {
         console.log(`    <OrderNumber> in file: ${f.summary.orderNumbersInFile.join(', ')}`);
       }
       console.log(
-        `    Blocks matching searched PO ${row.order} with ${SHIPMENT}: ${f.summary.blocksMatchingSearchedPo}  (other PO in file: ${f.summary.skippedWrongOrder}, no ${SHIPMENT}: ${f.summary.skippedNoShipment})`
+        `    Blocks matching PO with ${SHIPMENT}: ${f.summary.blocksMatchingSearchedPo}  |  with ${ACCEPT} only (no ${SHIPMENT}): ${f.summary.acceptOnlyBlocksMatchingSearchedPo}  (other PO in file: ${f.summary.skippedWrongOrder}, no ${SHIPMENT}: ${f.summary.skippedNoShipment})`
       );
     }
 
-    const withMatch = row.findings.filter((f) => f.summary.blocksMatchingSearchedPo > 0 && f.rawXml);
-    if (withMatch.length > 1) {
+    const withShipment = row.findings.filter((f) => f.summary.blocksMatchingSearchedPo > 0 && f.rawXml);
+    const withAcceptOnly = row.findings.filter((f) => f.summary.acceptOnlyBlocksMatchingSearchedPo > 0 && f.rawXml);
+    if (withShipment.length > 1) {
       console.log(
-        `  Note: ${withMatch.length} XML files contain matching blocks for PO ${row.order}; export uses the first file only (one ${ACCEPT} + ${SHIPMENT} pair).`
+        `  Note: ${withShipment.length} XML files have ${SHIPMENT} blocks for PO ${row.order}; export uses the first such file (one block).`
       );
-    } else if (withMatch.length === 1 && withMatch[0].summary.blocksMatchingSearchedPo > 1) {
+    } else if (withShipment.length === 1 && withShipment[0].summary.blocksMatchingSearchedPo > 1) {
       console.log(
-        `  Note: that file has ${withMatch[0].summary.blocksMatchingSearchedPo} matching <Comergent> blocks; export uses the first block only.`
+        `  Note: that file has ${withShipment[0].summary.blocksMatchingSearchedPo} matching ${SHIPMENT} blocks; export uses the first block only.`
+      );
+    }
+    if (withAcceptOnly.length > 1) {
+      console.log(
+        `  Note: ${withAcceptOnly.length} XML files have ${ACCEPT}-only blocks for PO ${row.order}; export uses the first such file (one block).`
       );
     }
 
-    const firstFinding = row.findings.find(
-      (f) => f.rawXml && f.summary.blocksMatchingSearchedPo > 0
-    );
-    if (firstFinding?.rawXml) {
-      const { output } = convertXmlForEnteredOrder(firstFinding.rawXml, row.order, {
-        maxMatchingBlocks: 1,
-      });
-      if (output) allConvertedInner.push(output);
+    const src = getExportSource(row);
+    if (src) {
+      console.log(`  Export classification for PO ${row.order}: ${src.kind === 'regular' ? 'regular (' + ACCEPT + ' + ' + SHIPMENT + ' pair)' : 'ACCEPT-only (shipment block only if you confirm)'}`);
     }
 
     console.log('');
   }
+}
 
-  const convertibleCount = allConvertedInner.length;
-  if (convertibleCount === 0) {
+async function main() {
+  const headless = process.env.HEADFUL === '1' || process.env.HEADFUL === 'true' ? false : true;
+
+  let orderNumbers = parseOrderArgs();
+  const rl = createInterface({ input, output });
+
+  if (orderNumbers.length === 0) {
+    const line = await promptLine(rl, 'Enter JCP WCSO PO number(s), separated by commas or spaces: ');
+    orderNumbers = parseOrderLine(line);
+  }
+
+  if (orderNumbers.length === 0) {
+    console.error('No order numbers provided.');
+    await rl.close();
+    exit(1);
+  }
+
+  console.log(`\nSearching ${SEARCH_URL} for: ${orderNumbers.join(', ')}\n`);
+
+  const browser = await chromium.launch({ headless });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  let report;
+  try {
+    report = await fillReport(page, context, orderNumbers);
+  } finally {
+    await browser.close();
+  }
+
+  printReport(report);
+
+  const perPo = report.map((row) => ({ row, src: getExportSource(row) }));
+  const acceptList = perPo.filter((p) => p.src?.kind === 'acceptOnly');
+  const regularList = perPo.filter((p) => p.src?.kind === 'regular');
+
+  if (acceptList.length === 0 && regularList.length === 0) {
     console.log(
-      `No <Comergent> blocks with ${SHIPMENT} and <OrderNumber> matching your entered PO(s) were found. Done.\n`
+      `No <Comergent> blocks with <OrderNumber> matching your PO(s) and (${SHIPMENT} or ${ACCEPT}) were found. Done.\n`
     );
     await rl.close();
     return;
   }
 
-  const ok = await promptYesNo(
+  /** @type {string[]} */
+  const shipmentOnlyParts = [];
+  /** @type {string[]} */
+  const regularParts = [];
+
+  if (acceptList.length > 0) {
+    const poStr = acceptList.map((p) => p.row.order).join(', ');
+    const okAccept = await promptYesNo(
+      rl,
+      `\nHave these POs already been accepted?\nPO(s): ${poStr}\n(${ACCEPT} in the matching block, no ${SHIPMENT}.)\nIf yes, export only the ORDER INPUT SHIPMENT block for these? [y/N] `
+    );
+    if (okAccept) {
+      for (const p of acceptList) {
+        shipmentOnlyParts.push(convertAcceptBlockToShipmentOnlyLikeHtml(p.src.block));
+      }
+    }
+  }
+
+  const regularQuestion =
+    regularList.length > 0
+      ? `\nInclude regular conversion (${ACCEPT} block + ${SHIPMENT} block, as in xml-converter.html) for PO(s): ${regularList.map((p) => p.row.order).join(', ')}? [y/N] `
+      : `\nDo you have any order numbers that need regular conversion (${ACCEPT} + ${SHIPMENT} pair)? [y/N] `;
+
+  const wantRegular = await promptYesNo(rl, regularQuestion);
+
+  if (wantRegular) {
+    if (regularList.length > 0) {
+      for (const p of regularList) {
+        regularParts.push(convertComergentBlockPairLikeHtml(p.src.block));
+      }
+    } else {
+      const extraLine = await promptLine(
+        rl,
+        'Enter PO number(s) for regular conversion (comma or space separated): '
+      );
+      const extraOrders = parseOrderLine(extraLine);
+      if (extraOrders.length === 0) {
+        console.log('No POs entered; skipping regular conversion from this step.\n');
+      } else {
+        console.log(`\nSearching ${SEARCH_URL} for: ${extraOrders.join(', ')}\n`);
+        const browser2 = await chromium.launch({ headless });
+        const context2 = await browser2.newContext();
+        const page2 = await context2.newPage();
+        let report2;
+        try {
+          report2 = await fillReport(page2, context2, extraOrders);
+        } finally {
+          await browser2.close();
+        }
+        printReport(report2);
+        for (const row of report2) {
+          const src = getExportSource(row);
+          if (src?.kind === 'regular') {
+            regularParts.push(convertComergentBlockPairLikeHtml(src.block));
+          } else if (src?.kind === 'acceptOnly') {
+            console.log(
+              `  Note: PO ${row.order} is ${ACCEPT}-only in this pass; it was not added as a regular pair. Re-run with that PO in the first search if you need ACCEPT-only export.\n`
+            );
+          } else {
+            console.log(`  Note: PO ${row.order} had no exportable block for regular conversion.\n`);
+          }
+        }
+      }
+    }
+  }
+
+  const combinedInner = shipmentOnlyParts.join('') + regularParts.join('');
+
+  if (!combinedInner.trim()) {
+    console.log('Nothing selected to write. Done.\n');
+    await rl.close();
+    return;
+  }
+
+  const okWrite = await promptYesNo(
     rl,
-    `\nWrite ${convertibleCount} order bundle(s) (one ${ACCEPT} + ${SHIPMENT} pair per PO, as in xml-converter.html) into one ComergentData file (no XML declaration)? [y/N] `
+    `\nWrite one ComergentData file with ${shipmentOnlyParts.length} shipment-only <Comergent> block(s) and ${regularParts.length} regular pair(s) (no XML declaration on line 1)? [y/N] `
   );
 
-  if (!ok) {
+  if (!okWrite) {
     console.log('Skipped write.\n');
     await rl.close();
     return;
@@ -305,7 +417,7 @@ async function main() {
   mkdirSync(OUT_DIR, { recursive: true });
   const ts = new Date().toISOString().replace(/[:.]/g, '-');
   const outPath = join(OUT_DIR, `converted_order_status_${ts}.xml`);
-  const wrapped = wrapComergentData(allConvertedInner.join(''));
+  const wrapped = wrapComergentData(combinedInner);
   writeFileSync(outPath, wrapped, 'utf8');
   console.log(`Wrote: ${outPath}\n`);
 
