@@ -37,6 +37,21 @@ function normPo(s) {
 }
 
 /**
+ * Same PO pasted twice → one entry (first wins for shipment/regular grouping).
+ * @param {string[]} normalizedOrderNumbers already normPo'd
+ */
+function dedupePoListInOrder(normalizedOrderNumbers) {
+  const seen = new Set();
+  const out = [];
+  for (const o of normalizedOrderNumbers) {
+    if (seen.has(o)) continue;
+    seen.add(o);
+    out.push(o);
+  }
+  return out;
+}
+
+/**
  * Parses PO lists: commas/spaces/tabs on one line, or one PO per line (column paste / spreadsheet).
  * Strips BOM. Splits lines on \r\n; each line also splits on comma, semicolon, or tab.
  * @param {string} line
@@ -489,6 +504,14 @@ async function main() {
   }
 
   orderNumbers = orderNumbers.map(normPo).filter(Boolean);
+  const countBeforeDedupe = orderNumbers.length;
+  orderNumbers = dedupePoListInOrder(orderNumbers);
+  if (orderNumbers.length < countBeforeDedupe) {
+    const n = countBeforeDedupe - orderNumbers.length;
+    console.log(
+      `Note: removed ${n} duplicate PO entr${n === 1 ? 'y' : 'ies'} — each PO is searched and converted once.`
+    );
+  }
 
   const orderSet = new Set(orderNumbers);
 

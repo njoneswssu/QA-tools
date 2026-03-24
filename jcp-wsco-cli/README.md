@@ -98,6 +98,8 @@ The **shipment-only** step supports the same: one line with **`all`**, **`none`*
 
 One-line input still supports commas, spaces, tabs, and strips a UTF-8 **BOM** on paste.
 
+**Duplicates:** If the same PO appears more than once (after normalization / leading zeros), extras are dropped: **one search and one conversion block** per distinct PO.
+
 ### Leading zeros on numeric POs
 
 If a PO is **digits only** and shorter than the configured width (default **8**), it is left-padded with zeros so it matches XML like `02450977`. Example: `2450977` → `02450977`. Already-wide numbers (length ≥ width) are unchanged. Non-numeric PO strings are only trimmed.
