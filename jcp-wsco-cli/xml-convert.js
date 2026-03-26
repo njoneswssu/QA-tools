@@ -30,6 +30,36 @@ export function canonicalOrderKey(s) {
   return t;
 }
 
+/**
+ * First `<Comergent>...</Comergent>` using depth counting (avoids stopping at a spurious inner `</Comergent>`).
+ * @param {string} s
+ * @returns {{ openTag: string, inner: string } | null}
+ */
+function parseComergentElement(s) {
+  const text = String(s);
+  const start = text.search(/<Comergent\b/i);
+  if (start < 0) return null;
+  const openMatch = text.slice(start).match(/^<Comergent\b[^>]*>/i);
+  if (!openMatch) return null;
+  const openEnd = start + openMatch[0].length;
+  let depth = 1;
+  const re = /<Comergent\b[^>]*>|<\/Comergent>/gi;
+  re.lastIndex = openEnd;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    if (/^<\/Comergent>/i.test(m[0])) {
+      depth -= 1;
+      if (depth === 0) {
+        const inner = text.slice(openEnd, m.index);
+        return { openTag: openMatch[0], inner };
+      }
+    } else {
+      depth += 1;
+    }
+  }
+  return null;
+}
+
 /** Same algorithm as generateCurrentDate() in xml-converter.html */
 function generateCurrentDate() {
   const now = new Date();
@@ -42,13 +72,8 @@ function generateCurrentDate() {
   return `${year}-${month}-${day} 0:0:0.0`;
 }
 
-/**
- * Second half of the HTML blue-button output: ORDER INPUT SHIPMENT block with dates / tracking.
- * @param {string} block - one <Comergent>...</Comergent> chunk (source may be SHIPMENT or ACCEPT)
- * @returns {string}
- */
-export function buildShipmentBlockLikeHtml(block) {
-  let shipmentBlock = block;
+function applyShipmentInnerTransforms(inner) {
+  let shipmentBlock = inner;
   shipmentBlock = shipmentBlock.replace(/<ShipmentDate>.*?<\/ShipmentDate>/g, '');
   shipmentBlock = shipmentBlock.replace(/ORDER INPUT SHIPMENT/g, SHIPMENT);
   shipmentBlock = shipmentBlock.replace(/ORDER INPUT ORDER STATUS UPDATE ACCEPT/g, SHIPMENT);
@@ -78,12 +103,22 @@ export function buildShipmentBlockLikeHtml(block) {
 }
 
 /**
- * First half of the HTML blue-button output: ORDER INPUT ORDER STATUS UPDATE ACCEPT, no shipment noise.
- * @param {string} block
+ * Second half of the HTML blue-button output: ORDER INPUT SHIPMENT block with dates / tracking.
+ * @param {string} block - one <Comergent>...</Comergent> chunk (source may be SHIPMENT or ACCEPT)
  * @returns {string}
  */
-export function buildAcceptBlockLikeHtml(block) {
-  let convertedBlock = block;
+export function buildShipmentBlockLikeHtml(block) {
+  const parsed = parseComergentElement(block);
+  if (!parsed) {
+    const t = applyShipmentInnerTransforms(String(block).trim());
+    return `<Comergent>\n${t}\n</Comergent>`;
+  }
+  const inner = applyShipmentInnerTransforms(parsed.inner);
+  return `${parsed.openTag}${inner}</Comergent>`;
+}
+
+function applyAcceptInnerTransforms(inner) {
+  let convertedBlock = inner;
   convertedBlock = convertedBlock.replace(/ORDER INPUT SHIPMENT/g, ACCEPT);
   convertedBlock = convertedBlock.replace(/ORDER INPUT ORDER STATUS UPDATE ACCEPT/g, ACCEPT);
   convertedBlock = convertedBlock.replace(/<ShipmentDate>.*?<\/ShipmentDate>/g, '');
@@ -94,6 +129,21 @@ export function buildAcceptBlockLikeHtml(block) {
   convertedBlock = convertedBlock.replace(/\n\s*\n\s*\n/g, '\n\n');
   convertedBlock = convertedBlock.replace(/^\s*\n/gm, '');
   return convertedBlock;
+}
+
+/**
+ * First half of the HTML blue-button output: ORDER INPUT ORDER STATUS UPDATE ACCEPT, no shipment noise.
+ * @param {string} block
+ * @returns {string}
+ */
+export function buildAcceptBlockLikeHtml(block) {
+  const parsed = parseComergentElement(block);
+  if (!parsed) {
+    const t = applyAcceptInnerTransforms(String(block).trim());
+    return `<Comergent>\n${t}\n</Comergent>`;
+  }
+  const inner = applyAcceptInnerTransforms(parsed.inner);
+  return `${parsed.openTag}${inner}</Comergent>`;
 }
 
 /**
@@ -134,6 +184,21 @@ export function splitComergentBlocks(xmlText) {
 }
 
 /**
+ * Source XML often wraps `<Comergent>` in `<ComergentData>`; split chunks may include trailing `</ComergentData>`.
+ * @param {string} fragment
+ * @returns {string}
+ */
+export function isolateComergentElement(fragment) {
+  let s = String(fragment)
+    .trim()
+    .replace(/^\s*<\?xml[^?]*\?>\s*/i, '');
+  s = s.replace(/<ComergentData[^>]*>/gi, '').replace(/<\/ComergentData>/gi, '');
+  const parsed = parseComergentElement(s);
+  if (parsed) return `${parsed.openTag}${parsed.inner}</Comergent>`.trim();
+  return s.trim();
+}
+
+/**
  * First <Comergent> for this PO that is either regular (SHIPMENT) or accept-only (ACCEPT, no SHIPMENT).
  * @param {string} xmlText
  * @param {string} enteredOrder
@@ -143,8 +208,9 @@ export function getFirstExportBlockForOrder(xmlText, enteredOrder) {
   const normalized = canonicalOrderKey(enteredOrder);
   for (const block of splitComergentBlocks(xmlText)) {
     if (canonicalOrderKey(getOrderNumberFromComergentBlock(block)) !== normalized) continue;
-    if (block.includes(SHIPMENT)) return { kind: 'regular', block };
-    if (block.includes(ACCEPT)) return { kind: 'acceptOnly', block };
+    const isolated = isolateComergentElement(block);
+    if (isolated.includes(SHIPMENT)) return { kind: 'regular', block: isolated };
+    if (isolated.includes(ACCEPT)) return { kind: 'acceptOnly', block: isolated };
   }
   return null;
 }
@@ -179,7 +245,7 @@ export function convertXmlForEnteredOrder(xmlText, enteredOrder, options = {}) {
       skippedWrongOrder += 1;
       continue;
     }
-    parts.push(convertComergentBlockPairLikeHtml(block));
+    parts.push(convertComergentBlockPairLikeHtml(isolateComergentElement(block)));
     if (parts.length >= maxMatchingBlocks) {
       break;
     }
@@ -222,7 +288,7 @@ export function convertXmlAcceptOnlyToShipmentOnly(xmlText, enteredOrder, option
       skippedNoAccept += 1;
       continue;
     }
-    parts.push(convertAcceptBlockToShipmentOnlyLikeHtml(block));
+    parts.push(convertAcceptBlockToShipmentOnlyLikeHtml(isolateComergentElement(block)));
     if (parts.length >= maxMatchingBlocks) {
       break;
     }
@@ -243,7 +309,9 @@ export function convertXmlAcceptOnlyToShipmentOnly(xmlText, enteredOrder, option
  * @returns {string}
  */
 export function wrapComergentData(inner) {
-  const body = inner.trim();
+  let body = String(inner).trim();
   if (!body) return '';
+  body = body.replace(/<ComergentData[^>]*>/gi, '').replace(/<\/ComergentData>/gi, '');
+  body = body.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
   return `<ComergentData>\n${body}\n</ComergentData>\n`;
 }
