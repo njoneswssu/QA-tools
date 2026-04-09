@@ -51,10 +51,102 @@ function openShotPreview(src) {
   const box = document.getElementById('shotLightbox');
   const fullImg = document.getElementById('shotLightboxImg');
   const dock = document.getElementById('shotLightboxDock');
+  const bodyEl = box.querySelector('.shot-lightbox__body');
+  fullImg.onload = () => {
+    if (bodyEl) bodyEl.scrollTop = 0;
+  };
   fullImg.src = src;
+  if (fullImg.complete && bodyEl) bodyEl.scrollTop = 0;
   box.classList.remove('minimized');
   box.hidden = false;
   dock.hidden = true;
+}
+
+const BACKUP_FILE_VERSION = 1;
+
+async function exportResultsBackup() {
+  const { testResults = [], resultsHiddenProductIds = [] } = await chrome.storage.local.get([
+    'testResults',
+    'resultsHiddenProductIds'
+  ]);
+  const payload = {
+    version: BACKUP_FILE_VERSION,
+    exportedAt: new Date().toISOString(),
+    extension: 'lowes-promo-tester',
+    testResults,
+    resultsHiddenProductIds
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const d = new Date();
+  const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  a.href = url;
+  a.download = `lowes-promo-tester-backup-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  toast(`Exported ${testResults.length} result(s)`);
+}
+
+function parseBackupPayload(text) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error('Not valid JSON');
+  }
+  if (!data || typeof data !== 'object') throw new Error('Invalid backup file');
+  if (!Array.isArray(data.testResults)) throw new Error('Backup must contain a testResults array');
+  return data;
+}
+
+async function applyImportedBackup(text) {
+  const data = parseBackupPayload(text);
+  const incoming = data.testResults.filter((r) => r && typeof r === 'object');
+  const hiddenIn = Array.isArray(data.resultsHiddenProductIds)
+    ? data.resultsHiddenProductIds.map(String)
+    : [];
+  const replace = confirm(
+    'Replace all current results with this backup?\n\nOK = replace\nCancel = merge with current (duplicate ids: keep version from file)'
+  );
+  if (replace) {
+    try {
+      await chrome.storage.local.set({
+        testResults: incoming,
+        resultsHiddenProductIds: hiddenIn
+      });
+    } catch (e) {
+      throw new Error(e.message?.includes('quota') ? 'Too large for storage — export without screenshots or clear old results' : e.message);
+    }
+    toast(`Imported ${incoming.length} result(s) (replaced)`);
+    return;
+  }
+  const { testResults: existing = [], resultsHiddenProductIds: oldHidden = [] } = await chrome.storage.local.get([
+    'testResults',
+    'resultsHiddenProductIds'
+  ]);
+  const seen = new Set();
+  const merged = [];
+  for (const r of [...incoming, ...existing]) {
+    const id = String(r?.id ?? '');
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    merged.push(r);
+  }
+  merged.sort((a, b) => Number(b.id) - Number(a.id));
+  const hidSet = new Set((oldHidden || []).map(String));
+  hiddenIn.forEach((id) => hidSet.add(id));
+  try {
+    await chrome.storage.local.set({
+      testResults: merged,
+      resultsHiddenProductIds: [...hidSet]
+    });
+  } catch (e) {
+    throw new Error(e.message?.includes('quota') ? 'Too large for storage after merge' : e.message);
+  }
+  toast(`Merged backup: ${incoming.length} from file, ${merged.length} total`);
 }
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
@@ -537,9 +629,31 @@ document.getElementById('btnResultsFilterNone').addEventListener('click', async 
 
 document.getElementById('btnClear').addEventListener('click', async () => {
   if (!confirm('Clear all saved results?')) return;
-  await chrome.storage.local.set({ testResults: [] });
+  await chrome.storage.local.set({ testResults: [], resultsHiddenProductIds: [] });
   await loadResults();
   toast('Cleared');
+});
+
+document.getElementById('btnExportBackup').addEventListener('click', () => {
+  exportResultsBackup().catch((e) => toast(e.message || 'Export failed'));
+});
+
+document.getElementById('btnImportBackup').addEventListener('click', () => {
+  document.getElementById('backupFileInput').click();
+});
+
+document.getElementById('backupFileInput').addEventListener('change', async (e) => {
+  const input = e.target;
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file) return;
+  try {
+    const text = await file.text();
+    await applyImportedBackup(text);
+    await loadResults();
+  } catch (err) {
+    toast(err.message || 'Import failed');
+  }
 });
 
 initShotLightbox();

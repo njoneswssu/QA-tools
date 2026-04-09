@@ -14,6 +14,9 @@
       <span id="totalProducts">0</span> products ·
       <span id="avgPromo">0</span>% avg promo
     </div>
+    <p class="hdr-hint muted">
+      Removing the extension clears saved results. Use <strong>Export backup</strong> below to keep a copy, then <strong>Import backup</strong> after reinstalling.
+    </p>
   </header>
 
   <section class="panel">
@@ -47,6 +50,13 @@
         <p class="results-scope-note" id="resultsScopeNote" hidden></p>
       </div>
       <div class="results-toolbar-actions">
+        <button type="button" id="btnExportBackup" class="btn small" title="Download JSON you can re-import after reinstalling the extension">
+          Export backup
+        </button>
+        <button type="button" id="btnImportBackup" class="btn small" title="Restore from a previously exported JSON file">
+          Import backup
+        </button>
+        <input type="file" id="backupFileInput" accept="application/json,.json" hidden />
         <button type="button" id="btnResultsFilter" class="btn small">Filter blinds</button>
         <button type="button" id="btnClear" class="btn small">Clear all</button>
       </div>
