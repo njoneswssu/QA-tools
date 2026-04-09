@@ -256,12 +256,124 @@ async function dismissLowesOverlays(maxPasses = 8) {
   }
 }
 
-/** Dismiss help modals and scroll to top before full-page capture. */
+/**
+ * Full-page capture: prefer scrolling the *window* when the document actually scrolls — that matches
+ * captureVisibleTab. Inner divs were winning before and often didn’t move the captured viewport.
+ */
+function findBestScrollContainer() {
+  const winVH = window.innerHeight;
+  const se = document.scrollingElement || document.documentElement;
+  const docH = Math.max(
+    se.scrollHeight,
+    document.documentElement.scrollHeight,
+    document.body?.scrollHeight || 0
+  );
+  const winExtra = Math.max(0, docH - winVH);
+
+  let innerBest = null;
+  let maxInnerExtra = 0;
+
+  const tryEl = (el) => {
+    if (!el || el === document.body || el === document.documentElement) return;
+    try {
+      const sh = el.scrollHeight;
+      const ch = el.clientHeight;
+      if (sh <= ch + 60) return;
+      const extra = sh - ch;
+      if (extra > maxInnerExtra) {
+        maxInnerExtra = extra;
+        innerBest = { mode: 'element', el, fullHeight: sh, viewHeight: ch };
+      }
+    } catch (_) {}
+  };
+
+  const scanRoot = (root) => {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('main, section, aside, article, div, [role="main"]').forEach(tryEl);
+  };
+  scanRoot(configuratorRoot());
+  scanRoot(document.body);
+  document.querySelectorAll('*').forEach((host) => {
+    if (host.shadowRoot) scanRoot(host.shadowRoot);
+  });
+
+  if (winExtra >= 48) {
+    return { mode: 'window', el: null, fullHeight: docH, viewHeight: winVH };
+  }
+  if (innerBest && maxInnerExtra > winExtra + 80) {
+    return innerBest;
+  }
+  if (innerBest && maxInnerExtra > 160) {
+    return innerBest;
+  }
+  return { mode: 'window', el: null, fullHeight: Math.max(docH, winVH), viewHeight: winVH };
+}
+
+/** When capturing via window scroll, reset nested scrollable panels to top so slice 0 isn’t mid-column. */
+function resetConfiguratorInnerScrollTops() {
+  try {
+    configuratorRoot().querySelectorAll('div, section, main, aside').forEach((el) => {
+      try {
+        if (el.scrollHeight > el.clientHeight + 60) el.scrollTop = 0;
+      } catch (_) {}
+    });
+  } catch (_) {}
+}
+
+let lastFullPageCaptureContext = null;
+
+function applyFullPageScrollY(y) {
+  const top = Math.max(0, Math.round(y));
+  const ctx = lastFullPageCaptureContext || findBestScrollContainer();
+  lastFullPageCaptureContext = ctx;
+  if (ctx.mode === 'element' && ctx.el) {
+    ctx.el.scrollTop = top;
+  } else {
+    const root = document.scrollingElement || document.documentElement;
+    root.scrollTop = top;
+    document.documentElement.scrollTop = top;
+    if (document.body) document.body.scrollTop = top;
+    window.scrollTo({ top, left: 0, behavior: 'instant' });
+  }
+}
+
+/** Dismiss help modals and scroll capture target to top before full-page capture. */
 async function prepareForFullPageScreenshot() {
   await dismissLowesOverlays(10);
   await pauseAwareSleep(200);
+  lastFullPageCaptureContext = findBestScrollContainer();
+  if (lastFullPageCaptureContext.mode === 'window') {
+    resetConfiguratorInnerScrollTops();
+  }
+  applyFullPageScrollY(0);
   window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  await pauseAwareSleep(200);
+  await pauseAwareSleep(250);
+}
+
+function querySelectorAllDeep(selector, root = document.documentElement) {
+  const out = [];
+  const seen = new Set();
+  function walk(node) {
+    if (!node) return;
+    if (node.nodeType === 1) {
+      try {
+        if (node.matches?.(selector) && !seen.has(node)) {
+          seen.add(node);
+          out.push(node);
+        }
+        for (const ch of node.children || []) {
+          walk(ch);
+          if (ch.shadowRoot) walk(ch.shadowRoot);
+        }
+      } catch (_) {}
+    } else if (node.nodeType === 11) {
+      for (const ch of node.children || []) {
+        walk(ch);
+      }
+    }
+  }
+  walk(root);
+  return out;
 }
 
 function getElementColorLabel(el) {
@@ -372,10 +484,20 @@ async function tryExpandColorSection() {
     if (t.length > 56) continue;
     const lower = t.toLowerCase();
     if (/(credit|cart|checkout|payment|sign in)/i.test(lower)) continue;
-    const isColorHeader =
+    const row = el.closest('div, li, section, tr, [class*="row" i]') || el;
+    const ctx = ((row.textContent || '') + ' ' + t).slice(0, 300).toLowerCase();
+    let isColorHeader =
       /^(color|colors|color name|fabric|finish|shade|slat color)s?$/i.test(lower) ||
-      /^color\s+name$/i.test(lower) ||
+      /^color\s*name$/i.test(t.trim()) ||
       /^choose\s+a\s+color/i.test(t);
+    if (!isColorHeader && /color name/i.test(ctx) && t.length < 44) {
+      if (
+        /color|swatch|fabric|shade|select|choose|paint|finish/i.test(lower) ||
+        el.getAttribute('aria-expanded') === 'false'
+      ) {
+        isColorHeader = true;
+      }
+    }
     if (!isColorHeader) continue;
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     await pauseAwareSleep(300);
@@ -386,8 +508,129 @@ async function tryExpandColorSection() {
   return false;
 }
 
+/** Lowe's ECP: color as tile radios, e.g. input.tile-input-radio[data-testid^="ecp-button-select-"]. */
+async function pickColorFromEcpTileRadios() {
+  const seen = new Set();
+  const inputs = [];
+  for (const el of configuratorRoot().querySelectorAll(
+    'input.tile-input-radio[type="radio"][data-testid^="ecp-button-select-"]'
+  )) {
+    if (seen.has(el)) continue;
+    seen.add(el);
+    inputs.push(el);
+  }
+  for (const el of querySelectorAllDeep(
+    'input.tile-input-radio[type="radio"][data-testid^="ecp-button-select-"]',
+    document.documentElement
+  )) {
+    if (seen.has(el)) continue;
+    seen.add(el);
+    inputs.push(el);
+  }
+
+  const cands = [];
+  for (const input of inputs) {
+    if (!input || input.disabled) continue;
+    if (isLikelyInfoOrHelpControl(input)) continue;
+    const doc = input.ownerDocument || document;
+    let label = null;
+    if (input.id) {
+      try {
+        label = doc.querySelector(`label[for="${CSS.escape(input.id)}"]`);
+      } catch (_) {
+        label = doc.querySelector(`label[for="${String(input.id).replace(/"/g, '\\"')}"]`);
+      }
+    }
+    if (!label) label = input.closest('label');
+    let clickTarget = null;
+    if (label && isVisible(label)) clickTarget = label;
+    if (!clickTarget) {
+      const wrap =
+        input.closest(
+          '[class*="tile" i], [data-testid*="tile" i], [class*="swatch" i], label, [role="radio"]'
+        ) || input.parentElement;
+      if (wrap && wrap !== input && isVisible(wrap)) clickTarget = wrap;
+    }
+    if (!clickTarget) clickTarget = input;
+    if (!isVisible(clickTarget)) continue;
+    const tid = (input.getAttribute('data-testid') || '').replace(/^ecp-button-select-/i, '');
+    const slug = tid.replace(/_/g, ' ').trim().slice(0, 80);
+    const name =
+      getElementColorLabel(clickTarget) ||
+      getElementColorLabel(input.closest('[class*="swatch" i], [class*="color" i]')) ||
+      slug ||
+      'Color';
+    cands.push({ el: clickTarget, name });
+  }
+  if (cands.length < 1) return null;
+  const pick = cands[Math.floor(Math.random() * cands.length)];
+  pick.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(350);
+  pick.el.click();
+  await pauseAwareSleep(1200);
+  return pick.name;
+}
+
+async function pickColorFromCombobox() {
+  const root = configuratorRoot();
+  const triggers = new Set([
+    ...root.querySelectorAll(
+      '[role="combobox"], [aria-haspopup="listbox"], button[aria-expanded][aria-controls], [data-testid*="combobox" i]'
+    ),
+    ...querySelectorAllDeep('[role="combobox"]', document.documentElement)
+  ]);
+  for (const combo of triggers) {
+    if (!combo || !isVisible(combo)) continue;
+    if (isLikelyInfoOrHelpControl(combo)) continue;
+    if (combo.closest('[role="dialog"], [aria-modal="true"]')) continue;
+    const aria = `${combo.getAttribute('aria-label') || ''} ${combo.getAttribute('placeholder') || ''}`.toLowerCase();
+    const block = (combo.closest('div, section, li, fieldset, tr')?.textContent || '').slice(0, 450).toLowerCase();
+    const blob = `${aria} ${block}`;
+    const isColorish =
+      /color|fabric|finish|shade|swatch|paint|wood.?tone|material color/i.test(blob) &&
+      !/filter\s+by|sort\s+by/i.test(blob);
+    if (!isColorish) continue;
+    if (
+      /\b(opacity|mount|width|height|quantity|cell size|headrail|lift)\b/i.test(block) &&
+      !/\b(color|fabric|swatch|shade|finish)\b/i.test(aria)
+    ) {
+      continue;
+    }
+    combo.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(400);
+    combo.click();
+    await pauseAwareSleep(600);
+    let options = [];
+    const listboxes = document.querySelectorAll('[role="listbox"]');
+    for (const lb of listboxes) {
+      if (!isVisible(lb)) continue;
+      const opts = [...lb.querySelectorAll('[role="option"], [role="menuitem"], [role="menuitemradio"]')].filter(
+        isVisible
+      );
+      if (opts.length >= 1) {
+        options = opts;
+        break;
+      }
+    }
+    if (options.length < 1) {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await pauseAwareSleep(200);
+      continue;
+    }
+    const pick = options[Math.floor(Math.random() * options.length)];
+    pick.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(280);
+    pick.click();
+    await pauseAwareSleep(1400);
+    return (
+      getElementColorLabel(pick) || (pick.textContent || '').trim().split('\n')[0].slice(0, 80) || 'Color'
+    );
+  }
+  return null;
+}
+
 async function pickColorFromSelect() {
-  const selects = document.querySelectorAll('select');
+  const selects = querySelectorAllDeep('select', document.documentElement);
   for (const sel of selects) {
     const meta = `${sel.name || ''} ${sel.id || ''} ${sel.getAttribute('aria-label') || ''}`.toLowerCase();
     if (meta.includes('material') && !meta.includes('color')) continue;
@@ -418,8 +661,11 @@ async function pickColorFromSelect() {
 
 /** Any select whose real options look like color names (Lowe's sometimes omits "color" in name/id). */
 async function pickColorFromSelectByOptionText() {
-  const root = configuratorRoot();
-  for (const sel of root.querySelectorAll('select')) {
+  const selects = new Set([
+    ...configuratorRoot().querySelectorAll('select'),
+    ...querySelectorAllDeep('select', document.documentElement)
+  ]);
+  for (const sel of selects) {
     if (!isVisible(sel)) continue;
     if (isLikelyDimensionSelect(sel)) continue;
     const meta = `${sel.name || ''} ${sel.id || ''} ${sel.getAttribute('aria-label') || ''}`.toLowerCase();
@@ -430,7 +676,7 @@ async function pickColorFromSelectByOptionText() {
       if (/^choose|^select|^--|^\.\.\./i.test(tx)) return false;
       return looksLikeColorNameText(tx);
     });
-    if (opts.length < 2) continue;
+    if (opts.length < 1) continue;
     const pick = opts[Math.floor(Math.random() * opts.length)];
     const name = ((pick.textContent || '').trim() || pick.value).slice(0, 80);
     sel.focus();
@@ -517,7 +763,9 @@ async function pickColorRadioOrRole() {
     const inColor = el.closest(
       '[class*="color" i], [class*="swatch" i], [class*="fabric" i], [class*="option" i], [data-testid*="color" i], [data-testid*="swatch" i]'
     );
-    if (!inColor) continue;
+    const meta = `${el.getAttribute('aria-label') || ''} ${el.getAttribute('name') || ''}`.toLowerCase();
+    const inMain = el.closest('main, [role="main"], [class*="configur" i]');
+    if (!inColor && !(inMain && /color|fabric|swatch|finish|shade/i.test(meta))) continue;
     const name = getElementColorLabel(el);
     roleCand.push({ el, name: name || 'Swatch' });
   }
@@ -652,7 +900,7 @@ async function pickColorSwatch() {
 
   document
     .querySelectorAll(
-      'button, [role="button"], [role="option"], li, div[role="gridcell"], div[tabindex="0"]'
+      'button, [role="button"], [role="option"], li, div[role="gridcell"], [role="gridcell"], div[tabindex="0"]'
     )
     .forEach(consider);
 
@@ -888,6 +1136,8 @@ async function runTest(product) {
   async function pickColorOnce() {
     await tryExpandColorSection();
     return (
+      (await pickColorFromEcpTileRadios()) ||
+      (await pickColorFromCombobox()) ||
       (await pickColorFromSelect()) ||
       (await pickColorFromSelectByOptionText()) ||
       (await pickColorFromListbox()) ||
@@ -991,20 +1241,15 @@ if (!globalThis.__LOWES_PROMO_TESTER_LISTENER__) {
       (async () => {
         try {
           await prepareForFullPageScreenshot();
-          await pauseAwareSleep(150);
-          const docEl = document.documentElement;
-          const body = document.body;
-          const fullHeight = Math.max(
-            docEl.scrollHeight,
-            body?.scrollHeight || 0,
-            docEl.offsetHeight,
-            docEl.clientHeight
-          );
+          await pauseAwareSleep(200);
+          const ctx = lastFullPageCaptureContext || findBestScrollContainer();
+          lastFullPageCaptureContext = ctx;
           sendResponse({
             ok: true,
-            fullHeight,
-            viewHeight: window.innerHeight,
-            dpr: window.devicePixelRatio || 1
+            fullHeight: ctx.fullHeight,
+            viewHeight: ctx.viewHeight,
+            dpr: window.devicePixelRatio || 1,
+            scrollMode: ctx.mode
           });
         } catch (_) {
           sendResponse({ ok: false });
@@ -1013,14 +1258,20 @@ if (!globalThis.__LOWES_PROMO_TESTER_LISTENER__) {
       return true;
     }
     if (msg.type === 'SCROLL_FULL_CAPTURE_Y') {
-      try {
-        const y = Math.max(0, Math.round(Number(msg.y) || 0));
-        window.scrollTo({ top: y, left: 0, behavior: 'instant' });
-        sendResponse({ ok: true, y: window.scrollY });
-      } catch (_) {
-        sendResponse({ ok: false });
-      }
-      return false;
+      (async () => {
+        try {
+          const y = Math.max(0, Math.round(Number(msg.y) || 0));
+          applyFullPageScrollY(y);
+          await new Promise((r) => setTimeout(r, 100));
+          const ctx = lastFullPageCaptureContext || findBestScrollContainer();
+          const reportedY =
+            ctx.mode === 'element' && ctx.el ? ctx.el.scrollTop : window.scrollY || window.pageYOffset;
+          sendResponse({ ok: true, y: reportedY, scrollMode: ctx.mode });
+        } catch (_) {
+          sendResponse({ ok: false });
+        }
+      })();
+      return true;
     }
     return false;
   });

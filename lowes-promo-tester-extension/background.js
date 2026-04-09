@@ -130,7 +130,7 @@ function computeScrollPositions(fullHeight, viewHeight) {
   return [...new Set(positions)].sort((a, b) => a - b);
 }
 
-const MAX_FULL_PAGE_SLICES = 34;
+const MAX_FULL_PAGE_SLICES = 60;
 
 async function dataUrlToBlob(dataUrl) {
   const r = await fetch(dataUrl);
@@ -138,36 +138,51 @@ async function dataUrlToBlob(dataUrl) {
 }
 
 async function blobToDataUrlFromBlob(blob) {
-  const buf = await blob.arrayBuffer();
-  let binary = '';
-  const bytes = new Uint8Array(buf);
-  const len = bytes.length;
-  for (let i = 0; i < len; i += 65536) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + 65536, len)));
-  }
-  const ct = blob.type && blob.type.includes('png') ? 'image/png' : 'image/png';
-  return `data:${ct};base64,${btoa(binary)}`;
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onloadend = () => {
+      const url = r.result;
+      if (typeof url === 'string') resolve(url);
+      else reject(new Error('readAsDataURL failed'));
+    };
+    r.onerror = () => reject(r.error || new Error('FileReader error'));
+    r.readAsDataURL(blob);
+  });
 }
 
-async function stitchScreenshotSlices(slices, positions, fullHeight, dpr) {
-  if (!slices.length || slices.length !== positions.length) {
-    return slices[0] || null;
-  }
+/**
+ * Stack viewport captures top-to-bottom. Matches real scroll steps better than
+ * placing by scrollY*dpr (capture scale can differ from window.devicePixelRatio).
+ */
+async function stitchScreenshotSlicesVertical(slices) {
+  if (!slices.length) return null;
   const blobs = await Promise.all(slices.map(dataUrlToBlob));
-  const bmp0 = await createImageBitmap(blobs[0]);
-  const sliceW = bmp0.width;
-  bmp0.close();
-  let canvasH = Math.ceil(fullHeight * dpr);
+  const bmps = [];
+  let maxW = 0;
+  let totalH = 0;
+  for (const b of blobs) {
+    const bmp = await createImageBitmap(b);
+    maxW = Math.max(maxW, bmp.width);
+    totalH += bmp.height;
+    bmps.push(bmp);
+  }
   const MAX_H = 16384;
-  if (canvasH > MAX_H) canvasH = MAX_H;
-  const canvas = new OffscreenCanvas(sliceW, canvasH);
+  const canvasH = Math.min(totalH, MAX_H);
+  const canvas = new OffscreenCanvas(maxW, canvasH);
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, sliceW, canvasH);
-  for (let i = 0; i < blobs.length; i++) {
-    const bmp = await createImageBitmap(blobs[i]);
-    const destY = Math.round(positions[i] * dpr);
-    ctx.drawImage(bmp, 0, destY);
+  ctx.fillRect(0, 0, maxW, canvasH);
+  let y = 0;
+  for (const bmp of bmps) {
+    if (y >= canvasH) break;
+    const room = canvasH - y;
+    if (bmp.height <= room) {
+      ctx.drawImage(bmp, 0, y);
+      y += bmp.height;
+    } else {
+      ctx.drawImage(bmp, 0, 0, bmp.width, room, 0, y, bmp.width, room);
+      y = canvasH;
+    }
     bmp.close();
   }
   const outBlob = await canvas.convertToBlob({ type: 'image/png' });
@@ -192,7 +207,6 @@ async function captureFullPageScreenshot(tabId, windowId) {
   if (!meta?.ok || meta.fullHeight == null) return null;
   const fullHeight = Math.max(1, meta.fullHeight);
   const viewHeight = Math.max(1, meta.viewHeight || 600);
-  const dpr = meta.dpr || 1;
   const minSlices = Math.ceil(fullHeight / viewHeight);
   if (minSlices > MAX_FULL_PAGE_SLICES) {
     try {
@@ -207,31 +221,31 @@ async function captureFullPageScreenshot(tabId, windowId) {
     }
   }
   const positions = computeScrollPositions(fullHeight, viewHeight);
-  const pairs = [];
+  const slices = [];
   for (const pos of positions) {
     try {
       await chrome.tabs.sendMessage(tabId, { type: 'SCROLL_FULL_CAPTURE_Y', y: pos });
     } catch {}
-    await sleep(380);
+    await sleep(520);
     let dataUrl = null;
     try {
       dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
     } catch {}
-    if (dataUrl) pairs.push({ pos, dataUrl });
+    if (dataUrl) slices.push(dataUrl);
   }
-  if (pairs.length === 0) return null;
-  const slices = pairs.map((p) => p.dataUrl);
-  const posUsed = pairs.map((p) => p.pos);
+  if (slices.length === 0) return null;
   if (slices.length === 1) return parseCaptureDataUrl(slices[0]);
   try {
     if (typeof OffscreenCanvas === 'undefined' || typeof createImageBitmap === 'undefined') {
       return parseCaptureDataUrl(slices[0]);
     }
-    const stitchedUrl = await stitchScreenshotSlices(slices, posUsed, fullHeight, dpr);
-    return parseCaptureDataUrl(stitchedUrl);
+    const stitchedUrl = await stitchScreenshotSlicesVertical(slices);
+    const parsed = parseCaptureDataUrl(stitchedUrl);
+    if (parsed) return parsed;
   } catch {
-    return parseCaptureDataUrl(slices[0]);
+    /* fall through */
   }
+  return parseCaptureDataUrl(slices[0]);
 }
 
 async function captureScreenshotReliable(tabId, windowId) {
@@ -509,7 +523,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         await chrome.storage.local.set({ sequenceRunning: false, shouldStop: false, automationPaused: false });
         sendResponse({ ok: true });
       } catch (e) {
-        await chrome.storage.local.set({ sequenceRunning: false, automationPaused: false });
+        await chrome.storage.local.set({ sequenceRunning: false, shouldStop: false, automationPaused: false });
         sendResponse({ ok: false, error: e.message });
       }
     })();

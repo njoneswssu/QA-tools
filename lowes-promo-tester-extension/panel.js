@@ -214,6 +214,29 @@ async function syncSequencePauseButton() {
   } catch (_) {}
 }
 
+async function syncSeqRunButton() {
+  const btnSeq = document.getElementById('btnSeq');
+  const pauseBtn = document.getElementById('btnSeqPause');
+  if (!btnSeq || !pauseBtn) return;
+  try {
+    const { sequenceRunning } = await chrome.storage.local.get('sequenceRunning');
+    if (sequenceRunning) {
+      btnSeq.textContent = 'Stop testing';
+      btnSeq.classList.remove('primary');
+      btnSeq.classList.add('danger');
+      pauseBtn.hidden = false;
+      await syncSequencePauseButton();
+    } else {
+      btnSeq.textContent = 'Start testing';
+      btnSeq.classList.add('primary');
+      btnSeq.classList.remove('danger');
+      pauseBtn.hidden = true;
+      pauseBtn.classList.remove('primary');
+      pauseBtn.classList.add('warn');
+    }
+  } catch (_) {}
+}
+
 function updateSelectedCount() {
   const el = document.getElementById('selectedCount');
   if (!el) return;
@@ -534,23 +557,39 @@ document.getElementById('btnRunActive').addEventListener('click', async () => {
 });
 
 document.getElementById('btnSeq').addEventListener('click', async () => {
+  const { sequenceRunning } = await chrome.storage.local.get('sequenceRunning');
+  if (sequenceRunning) {
+    try {
+      await chrome.runtime.sendMessage({ type: 'STOP_SEQUENCE' });
+      toast('Stopping after the current step…');
+    } catch (e) {
+      toast(e.message || 'Could not stop');
+    }
+    return;
+  }
+
   if (!selected.size) {
     toast('Select at least one product');
     return;
   }
   if (!confirm(`Start testing ${selected.size} product(s) in one tab, one after another?`)) return;
+
+  await chrome.storage.local.set({ shouldStop: false });
+  const btnSeq = document.getElementById('btnSeq');
   const pauseBtn = document.getElementById('btnSeqPause');
+  btnSeq.textContent = 'Stop testing';
+  btnSeq.classList.remove('primary');
+  btnSeq.classList.add('danger');
   pauseBtn.hidden = false;
   await syncSequencePauseButton();
+
   toast('Run started — Pause freezes between steps; keep the side panel open for screenshots');
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
   const tabId = tabs[0]?.url?.includes('lowes.com') ? tabs[0].id : undefined;
   chrome.runtime.sendMessage(
     { type: 'RUN_SEQUENCE', productIds: Array.from(selected), tabId },
     async (res) => {
-      pauseBtn.hidden = true;
-      pauseBtn.classList.remove('primary');
-      pauseBtn.classList.add('warn');
+      await syncSeqRunButton();
       await loadResults();
       if (chrome.runtime.lastError) {
         toast(chrome.runtime.lastError.message);
@@ -657,5 +696,12 @@ document.getElementById('backupFileInput').addEventListener('change', async (e) 
 });
 
 initShotLightbox();
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== 'local' || !changes.sequenceRunning) return;
+  syncSeqRunButton();
+});
+
 loadProducts();
 loadResults();
+syncSeqRunButton();
