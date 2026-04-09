@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lowe's Promo Tester</title>
+  <link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+  <header class="hdr">
+    <h1>Lowe's Promo Tester</h1>
+    <div class="stats" id="stats">
+      <span id="totalTests">0</span> tests ·
+      <span id="totalProducts">0</span> products ·
+      <span id="avgPromo">0</span>% avg promo
+    </div>
+  </header>
+
+  <section class="panel">
+    <label class="lbl">Products</label>
+    <div class="search-row">
+      <input type="text" id="productSearch" placeholder="Search…" />
+      <label class="check-all"><input type="checkbox" id="checkAll" /> All</label>
+      <button type="button" id="btnUncheckFiltered" class="btn small" title="Uncheck products that match the current search">
+        Uncheck shown
+      </button>
+    </div>
+    <div class="btn-row tight">
+      <button type="button" id="btnPause" class="btn">Pause automation</button>
+    </div>
+    <div id="productList" class="product-list"></div>
+
+    <div class="btn-row">
+      <button type="button" id="btnPrepare" class="btn primary">Start testing</button>
+      <button type="button" id="btnSeq" class="btn">Test all (one tab)</button>
+      <button type="button" id="btnStop" class="btn danger" hidden>Stop</button>
+    </div>
+
+    <div id="linksSection" class="links-section" hidden>
+      <label class="lbl">Open or run</label>
+      <div id="productLinks"></div>
+    </div>
+
+    <div class="active-run">
+      <label class="lbl">Active Lowe's tab</label>
+      <select id="activeProductSelect"></select>
+      <button type="button" id="btnRunActive" class="btn primary">Run on active tab</button>
+    </div>
+  </section>
+
+  <section class="results-section">
+    <div class="results-toolbar">
+      <label class="lbl">Results</label>
+      <button type="button" id="btnClear" class="btn small">Clear all</button>
+    </div>
+    <div id="resultsGrid" class="results-grid"></div>
+  </section>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="panel.js"></script>
+</body>
+</html>
