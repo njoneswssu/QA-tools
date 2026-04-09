@@ -508,51 +508,147 @@ async function tryExpandColorSection() {
   return false;
 }
 
+/** Radios under #colorId (and shadow roots inside it) — Lowe's Levolor / ECP color tiles. */
+function queryRadiosUnderElement(rootEl) {
+  const out = [];
+  const seen = new Set();
+  function walk(node) {
+    if (!node) return;
+    if (node.nodeType === 1) {
+      try {
+        if (node.matches?.('input[type="radio"]') && !seen.has(node)) {
+          seen.add(node);
+          out.push(node);
+        }
+      } catch (_) {}
+      try {
+        if (node.shadowRoot) walk(node.shadowRoot);
+      } catch (_) {}
+      for (const ch of node.children || []) walk(ch);
+    } else if (node.nodeType === 11) {
+      for (const ch of node.children || []) walk(ch);
+    }
+  }
+  walk(rootEl);
+  return out;
+}
+
+function resolveLowesColorTileClickTarget(input, stopAncestor) {
+  if (!input) return null;
+  const doc = input.ownerDocument || document;
+  let label = null;
+  if (input.id) {
+    try {
+      label = doc.querySelector(`label[for="${CSS.escape(input.id)}"]`);
+    } catch (_) {
+      label = doc.querySelector(`label[for="${String(input.id).replace(/"/g, '\\"')}"]`);
+    }
+  }
+  if (!label) label = input.closest('label');
+  const rectOk = (el) => {
+    if (!el || !el.getBoundingClientRect) return false;
+    const r = el.getBoundingClientRect();
+    return r.width >= 20 && r.height >= 20;
+  };
+  if (label && isVisible(label) && rectOk(label)) {
+    return label;
+  }
+  let cur = input.parentElement;
+  for (let d = 0; d < 10 && cur && cur !== stopAncestor; d++) {
+    if (cur !== input && isVisible(cur) && rectOk(cur)) {
+      return cur;
+    }
+    cur = cur.parentElement;
+  }
+  if (isVisible(input) && rectOk(input)) return input;
+  return label || input.parentElement || null;
+}
+
+/** Color picker wrapper from Lowe's PDP: <div id="colorId" data-testid="colorId"> */
+async function pickColorFromColorIdContainer() {
+  const box = document.querySelector('#colorId, [data-testid="colorId"]');
+  if (!box) return null;
+  box.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(450);
+
+  const inputs = queryRadiosUnderElement(box).filter((inp) => inp && !inp.disabled && !isLikelyInfoOrHelpControl(inp));
+  const cands = [];
+  for (const input of inputs) {
+    const clickEl = resolveLowesColorTileClickTarget(input, box);
+    if (!clickEl) continue;
+    const tid = (input.getAttribute('data-testid') || '').replace(/^ecp-button-select-/i, '');
+    const slug = tid.replace(/_/g, ' ').trim().slice(0, 80);
+    const name =
+      getElementColorLabel(clickEl) ||
+      getElementColorLabel(input.closest('[class*="swatch" i], [class*="color" i]')) ||
+      slug ||
+      'Color';
+    cands.push({ el: clickEl, name, input });
+  }
+
+  function walkRoleRadio(node) {
+    const out = [];
+    if (!node) return out;
+    if (node.nodeType === 1) {
+      try {
+        if (node.matches?.('[role="radio"]') && isVisible(node)) out.push(node);
+      } catch (_) {}
+      try {
+        if (node.shadowRoot) out.push(...walkRoleRadio(node.shadowRoot));
+      } catch (_) {}
+      for (const ch of node.children || []) out.push(...walkRoleRadio(ch));
+    } else if (node.nodeType === 11) {
+      for (const ch of node.children || []) out.push(...walkRoleRadio(ch));
+    }
+    return out;
+  }
+  if (cands.length < 1) {
+    for (const el of walkRoleRadio(box)) {
+      if (isLikelyInfoOrHelpControl(el)) continue;
+      const name = getElementColorLabel(el) || (el.textContent || '').trim().slice(0, 80) || 'Color';
+      cands.push({ el, name, input: null });
+    }
+  }
+
+  if (cands.length < 1) return null;
+  const pick = cands[Math.floor(Math.random() * cands.length)];
+  pick.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(350);
+  pick.el.click();
+  await pauseAwareSleep(400);
+  if (pick.input && !pick.input.checked) {
+    try {
+      pick.input.click();
+    } catch (_) {}
+    await pauseAwareSleep(400);
+  }
+  await pauseAwareSleep(400);
+  return pick.name;
+}
+
 /** Lowe's ECP: color as tile radios, e.g. input.tile-input-radio[data-testid^="ecp-button-select-"]. */
 async function pickColorFromEcpTileRadios() {
   const seen = new Set();
   const inputs = [];
-  for (const el of configuratorRoot().querySelectorAll(
-    'input.tile-input-radio[type="radio"][data-testid^="ecp-button-select-"]'
-  )) {
-    if (seen.has(el)) continue;
+  const add = (el) => {
+    if (!el || seen.has(el)) return;
     seen.add(el);
     inputs.push(el);
-  }
-  for (const el of querySelectorAllDeep(
-    'input.tile-input-radio[type="radio"][data-testid^="ecp-button-select-"]',
-    document.documentElement
-  )) {
-    if (seen.has(el)) continue;
-    seen.add(el);
-    inputs.push(el);
-  }
+  };
+  const root = configuratorRoot();
+  root.querySelectorAll('input.tile-input-radio[type="radio"][data-testid^="ecp-button-select-"]').forEach(add);
+  root
+    .querySelectorAll('input.tile-input-radio[type="radio"], input.backyard.radio[type="radio"], input.radio.tile-input-radio[type="radio"]')
+    .forEach(add);
+  querySelectorAllDeep('input.tile-input-radio[type="radio"][data-testid^="ecp-button-select-"]', root).forEach(add);
+  querySelectorAllDeep('input.tile-input-radio[type="radio"]', root).forEach(add);
 
   const cands = [];
   for (const input of inputs) {
     if (!input || input.disabled) continue;
     if (isLikelyInfoOrHelpControl(input)) continue;
-    const doc = input.ownerDocument || document;
-    let label = null;
-    if (input.id) {
-      try {
-        label = doc.querySelector(`label[for="${CSS.escape(input.id)}"]`);
-      } catch (_) {
-        label = doc.querySelector(`label[for="${String(input.id).replace(/"/g, '\\"')}"]`);
-      }
-    }
-    if (!label) label = input.closest('label');
-    let clickTarget = null;
-    if (label && isVisible(label)) clickTarget = label;
-    if (!clickTarget) {
-      const wrap =
-        input.closest(
-          '[class*="tile" i], [data-testid*="tile" i], [class*="swatch" i], label, [role="radio"]'
-        ) || input.parentElement;
-      if (wrap && wrap !== input && isVisible(wrap)) clickTarget = wrap;
-    }
-    if (!clickTarget) clickTarget = input;
-    if (!isVisible(clickTarget)) continue;
+    const clickTarget = resolveLowesColorTileClickTarget(input, document.documentElement);
+    if (!clickTarget) continue;
     const tid = (input.getAttribute('data-testid') || '').replace(/^ecp-button-select-/i, '');
     const slug = tid.replace(/_/g, ' ').trim().slice(0, 80);
     const name =
@@ -560,14 +656,21 @@ async function pickColorFromEcpTileRadios() {
       getElementColorLabel(input.closest('[class*="swatch" i], [class*="color" i]')) ||
       slug ||
       'Color';
-    cands.push({ el: clickTarget, name });
+    cands.push({ el: clickTarget, name, input });
   }
   if (cands.length < 1) return null;
   const pick = cands[Math.floor(Math.random() * cands.length)];
   pick.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
   await pauseAwareSleep(350);
   pick.el.click();
-  await pauseAwareSleep(1200);
+  await pauseAwareSleep(400);
+  if (pick.input && !pick.input.checked) {
+    try {
+      pick.input.click();
+    } catch (_) {}
+    await pauseAwareSleep(400);
+  }
+  await pauseAwareSleep(400);
   return pick.name;
 }
 
@@ -1136,6 +1239,7 @@ async function runTest(product) {
   async function pickColorOnce() {
     await tryExpandColorSection();
     return (
+      (await pickColorFromColorIdContainer()) ||
       (await pickColorFromEcpTileRadios()) ||
       (await pickColorFromCombobox()) ||
       (await pickColorFromSelect()) ||

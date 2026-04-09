@@ -354,31 +354,32 @@ body {
   font-weight: 700;
   color: #c62828;
 }
-/* Compact thumbnail in results — full PNG height was blowing up the card */
+/*
+ * Card preview: full-page captures are very tall — contain + max-height shrinks width to a hairline.
+ * Fixed viewport + cover + top shows the upper part of the page; lightbox still uses the full image src.
+ */
 .card img.result-shot {
   display: block;
   width: 100%;
-  max-width: 100%;
-  max-height: 120px;
-  height: auto;
-  object-fit: contain;
-  object-position: left top;
-  border-radius: 4px;
-  border: 1px solid #eee;
-  background: #f3f4f6;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 0;
+  border: none;
+  background: #e8eaed;
 }
 .result-shot-wrap {
   display: block;
   width: 100%;
-  max-height: 128px;
+  height: 132px;
   margin-top: 8px;
   padding: 0;
-  border: none;
-  background: #f3f4f6;
+  background: #e8eaed;
   cursor: zoom-in;
   text-align: left;
   border-radius: 4px;
   overflow: hidden;
+  border: 1px solid #e0e0e0;
 }
 .result-shot-wrap:focus-visible {
   outline: 2px solid #1565c0;
