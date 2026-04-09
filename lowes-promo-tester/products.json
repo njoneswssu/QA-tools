@@ -172,5 +172,53 @@
     "name": "Allen Roth Custom Horizontal Blinds",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5004860441&refinement=description--allen-roth-Custom-Horizontal-Blinds",
     "model": "Allen Roth Custom Horizontal Blinds"
+  },
+  {
+    "id": "30",
+    "name": "LEVOLOR Custom Real Wood Horizontal Blinds",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5004860139&refinement=description--LEVOLOR-Custom-Real-Wood-Blinds",
+    "model": "LEVOLOR Custom Real Wood Horizontal Blinds"
+  },
+  {
+    "id": "31",
+    "name": "LEVOLOR Custom NuWood Faux Wood Horizontal Blinds",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5014075469&refinement=description--LEVOLOR-Custom-NuWood-Faux-Wood-Blinds",
+    "model": "LEVOLOR Custom NuWood Faux Wood Horizontal Blinds"
+  },
+  {
+    "id": "32",
+    "name": "LEVOLOR Custom Premium 9/16\" Cellular Shade",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=501027979&refinement=description--LEVOLOR-Custom-Premium-9-16-Cellular-shade",
+    "model": "LEVOLOR Custom Premium 9/16\" Cellular Shade"
+  },
+  {
+    "id": "33",
+    "name": "LEVOLOR Custom Day Night 9/16\" Cellular Shade",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5014103421&refinement=description--LEVOLOR-Custom-Day-Night-9-16-Cellular-shade",
+    "model": "LEVOLOR Custom Day Night 9/16\" Cellular Shade"
+  },
+  {
+    "id": "34",
+    "name": "Allen + Roth Custom Banded (Zebra) Roller Shade",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5015646745&refinement=description--Bali-Custom-Banded-Zebra-Roller-shade",
+    "model": "Bali Custom Banded (Zebra) Roller Shade (Lowe’s custom zebra / layered shade)"
+  },
+  {
+    "id": "35",
+    "name": "Allen + Roth Custom Faux Wood Horizontal Blinds",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5015293435&refinement=description--allen-roth-Custom-Faux-wood-Horizontal-blinds",
+    "model": "Allen + Roth Custom Faux Wood Horizontal Blinds"
+  },
+  {
+    "id": "36",
+    "name": "Allen + Roth Custom Natural Shade",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5014103435&refinement=description--allen-roth-Custom-Natural-Shade",
+    "model": "Allen + Roth Custom Natural Shade"
+  },
+  {
+    "id": "37",
+    "name": "Allen + Roth Custom Vertical Blinds",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5004858358&refinement=description--Bali-Custom-Fabric-and-Vinyl-Vertical-blinds",
+    "model": "Bali Custom Fabric and Vinyl Vertical Blinds (Lowe’s custom vertical configurator)"
   }
 ]

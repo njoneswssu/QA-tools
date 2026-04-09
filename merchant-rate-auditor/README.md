@@ -245,6 +245,28 @@ Run full audit combines **Part 1: Merchant Rate Audit** and **Part 2: Offer Acti
 
 ## What It Detects
 
+### All issue types (reference)
+
+These are the `issue.type` values the auditor can emit for a single rate (a rate may match more than one rule):
+
+| `issue.type` | Severity | What gets flagged |
+|--------------|----------|-------------------|
+| `shareasale_commission` | high | Rate **Name** matches a ShareASale commission phrase (e.g. “shareasale commission”). |
+| `commission_in_name` | medium | Word **“commission”** in **Name** (case-insensitive). |
+| `commission_in_content` | medium | **“commission”** in **Content** (if present). |
+| `commission_in_default_lead` | medium | **“commission”** in **DefaultLead** (if present). |
+| `zero_rate_online_purchase` | high | **Amount** is zero **and** **Name** is exactly `online purchase` (case-insensitive). |
+| `percentage_in_name` | high | **Name** contains a percentage pattern like `30%`, `5.5%`, etc. (any `%` in the name). |
+| `invalid_rate_name` | high | **Name** fails `isInvalidRateName`: empty/whitespace, placeholders (`commission`, `default`, `test`, …), only digits, too short, or other invalid patterns (see §4 below). |
+| `underscore_in_name` | high | **Name** contains `_`. |
+| `api_in_name` | medium | **Name** contains `API` (case-insensitive). |
+| `wildfire_in_name` | medium | **Name** contains `Wildfire` (case-insensitive). |
+| `in_app_rate` | high | **Name** matches in-app / iOS in-app patterns **and** **Amount** is **not** zero. |
+| `hex_code_rate` | high | **Amount** looks like a hex code (e.g. `#ABCDEF`, `0x123456`, long hex-like strings), excluding normal 0–100 numeric rates. |
+| `hex_code_name` | high | **Name** looks like a hex code by the same rules. |
+
+**Note:** `merchantCategories` is passed into `validateRate` for future use; `rateMatchesMerchantCategory` and `isProductLikeName` exist in code but are **not** used to add flags today.
+
 ### 1. ShareASale Commission Rates
 Rates that contain "ShareASale commission" (case-insensitive) as a phrase in the name field.
 
@@ -297,12 +319,26 @@ Rates with names that don't make sense for merchant rates, such as:
 - Name: `""` (empty) ❌
 
 ### 5. Hex Code Commission Rates
-Rates where the amount or name field contains a hex code value instead of a valid commission rate.
+Rates where the **Amount** or **Name** field looks like a hex code instead of a normal commission value (see table above: `hex_code_rate`, `hex_code_name`). Short numeric strings that parse as 0–100 are treated as amounts, not hex.
 
 **Examples:**
 - Amount: `"FF0000"` (should be a number like `"5.0"`)
 - Amount: `"#ABCDEF"` (should be a number)
 - Amount: `"0x123456"` (should be a number)
+- Name: `"56df0a61"` (hex-like name)
+
+### 6. Zero rate + exact “online purchase” name
+If **Amount** is zero and **Name** is exactly `online purchase` (nothing else), the rate is flagged (`zero_rate_online_purchase`). Other zero rates with different names are not flagged by this rule alone.
+
+### 7. Underscore in rate name
+Any underscore `_` in **Name** is flagged (`underscore_in_name`).
+
+### 8. “API” or “Wildfire” in rate name
+- **Name** containing `API` → `api_in_name`
+- **Name** containing `Wildfire` → `wildfire_in_name`
+
+### 9. In-app purchase wording in name (non-zero amount)
+**Name** matches patterns such as “in app”, “in-app”, or “iOS in-app”, and the rate **Amount** is **not** zero → `in_app_rate`.
 
 ## Output
 
