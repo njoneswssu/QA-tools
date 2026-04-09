@@ -3,15 +3,6 @@ const selected = new Set();
 
 let shotLightboxSrc = '';
 
-function syncLightboxSizeButton() {
-  const box = document.getElementById('shotLightbox');
-  const t = document.getElementById('shotLightboxToggleSize');
-  if (!box || !t) return;
-  const expanded = box.classList.contains('shot-lightbox--expanded');
-  t.textContent = expanded ? 'Smaller' : 'Larger';
-  t.title = expanded ? 'Shrink preview' : 'Expand preview';
-}
-
 function initShotLightbox() {
   const box = document.getElementById('shotLightbox');
   const dock = document.getElementById('shotLightboxDock');
@@ -21,7 +12,7 @@ function initShotLightbox() {
   function closeAll() {
     box.hidden = true;
     dock.hidden = true;
-    box.classList.remove('minimized', 'shot-lightbox--compact', 'shot-lightbox--expanded');
+    box.classList.remove('minimized');
     fullImg.removeAttribute('src');
     dockImg.removeAttribute('src');
     shotLightboxSrc = '';
@@ -32,25 +23,11 @@ function initShotLightbox() {
     fullImg.src = shotLightboxSrc;
     box.hidden = false;
     box.classList.remove('minimized');
-    box.classList.add('shot-lightbox--compact');
-    box.classList.remove('shot-lightbox--expanded');
-    syncLightboxSizeButton();
     dock.hidden = true;
   }
 
   document.getElementById('shotLightboxBackdrop').addEventListener('click', closeAll);
   document.getElementById('shotLightboxClose').addEventListener('click', closeAll);
-  document.getElementById('shotLightboxToggleSize').addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (box.classList.contains('shot-lightbox--expanded')) {
-      box.classList.remove('shot-lightbox--expanded');
-      box.classList.add('shot-lightbox--compact');
-    } else {
-      box.classList.remove('shot-lightbox--compact');
-      box.classList.add('shot-lightbox--expanded');
-    }
-    syncLightboxSizeButton();
-  });
   document.getElementById('shotLightboxMin').addEventListener('click', (e) => {
     e.stopPropagation();
     if (!shotLightboxSrc) return;
@@ -75,9 +52,7 @@ function openShotPreview(src) {
   const fullImg = document.getElementById('shotLightboxImg');
   const dock = document.getElementById('shotLightboxDock');
   fullImg.src = src;
-  box.classList.remove('minimized', 'shot-lightbox--expanded');
-  box.classList.add('shot-lightbox--compact');
-  syncLightboxSizeButton();
+  box.classList.remove('minimized');
   box.hidden = false;
   dock.hidden = true;
 }
@@ -333,14 +308,51 @@ function uniqueProductsFromResults(rows) {
   return [...m.entries()].sort((a, b) => a[1].localeCompare(b[1]));
 }
 
+function applyResultsFilterSearch() {
+  const input = document.getElementById('resultsFilterSearch');
+  const host = document.getElementById('resultsFilterList');
+  if (!input || !host) return;
+  host.querySelectorAll('.results-filter-no-match').forEach((n) => n.remove());
+  const q = (input.value || '').toLowerCase().trim();
+  const rows = host.querySelectorAll('.results-filter-row');
+  let visible = 0;
+  for (const row of rows) {
+    const blob = (row.dataset.filterBlob || '').toLowerCase();
+    const match = !q || blob.includes(q);
+    row.classList.toggle('results-filter-row--hidden', !match);
+    if (match) visible++;
+  }
+  if (rows.length && !visible) {
+    const p = document.createElement('p');
+    p.className = 'results-filter-no-match results-filter-empty-msg muted';
+    p.textContent = 'No blinds match this search. Clear the box to see all.';
+    host.appendChild(p);
+  }
+}
+
+function getShownFilterPids() {
+  const host = document.getElementById('resultsFilterList');
+  if (!host) return [];
+  return [...host.querySelectorAll('.results-filter-row:not(.results-filter-row--hidden)')].map((r) => r.dataset.pid).filter(Boolean);
+}
+
 async function renderResultsFilterList(allResults, hidden) {
   const host = document.getElementById('resultsFilterList');
   if (!host) return;
   host.innerHTML = '';
   const pairs = uniqueProductsFromResults(allResults);
+  if (!pairs.length) {
+    const p = document.createElement('p');
+    p.className = 'results-filter-empty-msg muted';
+    p.textContent = 'No saved results yet — nothing to filter.';
+    host.appendChild(p);
+    return;
+  }
   for (const [pid, label] of pairs) {
     const row = document.createElement('div');
     row.className = 'results-filter-row';
+    row.dataset.pid = pid;
+    row.dataset.filterBlob = `${label} ${pid}`.toLowerCase();
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.checked = !hidden.has(pid);
@@ -360,6 +372,7 @@ async function renderResultsFilterList(allResults, hidden) {
     row.appendChild(lab);
     host.appendChild(row);
   }
+  applyResultsFilterSearch();
 }
 
 chrome.storage.onChanged.addListener((changes, area) => {
@@ -478,6 +491,38 @@ document.getElementById('btnResultsFilter').addEventListener('click', async () =
   if (!p.hidden) {
     await renderResultsFilterList(testResults, hidden);
   }
+});
+
+document.getElementById('btnResultsFilterClose').addEventListener('click', () => {
+  document.getElementById('resultsFilterPanel').hidden = true;
+});
+
+document.getElementById('resultsFilterSearch').addEventListener('input', () => {
+  applyResultsFilterSearch();
+});
+
+document.getElementById('btnResultsFilterCheckShown').addEventListener('click', async () => {
+  const pids = getShownFilterPids();
+  if (!pids.length) {
+    toast('No blinds in the filtered list — adjust search or add results.');
+    return;
+  }
+  const { resultsHiddenProductIds = [] } = await chrome.storage.local.get('resultsHiddenProductIds');
+  const set = new Set((resultsHiddenProductIds || []).map(String));
+  pids.forEach((pid) => set.delete(pid));
+  await chrome.storage.local.set({ resultsHiddenProductIds: [...set] });
+});
+
+document.getElementById('btnResultsFilterUncheckShown').addEventListener('click', async () => {
+  const pids = getShownFilterPids();
+  if (!pids.length) {
+    toast('No blinds in the filtered list — adjust search or add results.');
+    return;
+  }
+  const { resultsHiddenProductIds = [] } = await chrome.storage.local.get('resultsHiddenProductIds');
+  const set = new Set((resultsHiddenProductIds || []).map(String));
+  pids.forEach((pid) => set.add(pid));
+  await chrome.storage.local.set({ resultsHiddenProductIds: [...set] });
 });
 
 document.getElementById('btnResultsFilterAll').addEventListener('click', async () => {

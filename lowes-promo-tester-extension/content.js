@@ -256,39 +256,12 @@ async function dismissLowesOverlays(maxPasses = 8) {
   }
 }
 
-function findReviewSelectionsElement() {
-  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div');
-  for (const el of headings) {
-    if (!isVisible(el)) continue;
-    const txt = (el.textContent || '').trim();
-    if (!/review\s*selections/i.test(txt) || txt.length > 100) continue;
-    return (
-      el.closest(
-        '[class*="sidebar" i], aside, [class*="summary" i], [class*="sticky" i], [class*="drawer" i], [class*="rail" i]'
-      ) ||
-      el.parentElement ||
-      el
-    );
-  }
-  return document.querySelector(
-    '[class*="ReviewSelection" i], [id*="review-selection" i], [data-testid*="review-selection" i]'
-  );
-}
-
-async function prepareScreenshotViewport() {
+/** Dismiss help modals and scroll to top before full-page capture. */
+async function prepareForFullPageScreenshot() {
   await dismissLowesOverlays(10);
   await pauseAwareSleep(200);
-  const el = findReviewSelectionsElement();
-  if (el && isVisible(el)) {
-    el.scrollIntoView({ block: 'start', behavior: 'auto' });
-    await pauseAwareSleep(400);
-    return;
-  }
-  const aside = document.querySelector('aside, [class*="summary-column" i], [class*="SummaryColumn" i]');
-  if (aside && isVisible(aside)) {
-    aside.scrollIntoView({ block: 'end', behavior: 'auto' });
-    await pauseAwareSleep(300);
-  }
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  await pauseAwareSleep(200);
 }
 
 function getElementColorLabel(el) {
@@ -961,7 +934,7 @@ async function runTest(product) {
     promo_percentage = '0';
   }
 
-  await prepareScreenshotViewport();
+  await prepareForFullPageScreenshot();
   await pauseAwareSleep(500);
 
   return {
@@ -1006,13 +979,48 @@ if (!globalThis.__LOWES_PROMO_TESTER_LISTENER__) {
     if (msg.type === 'PREPARE_SCREENSHOT') {
       (async () => {
         try {
-          await prepareScreenshotViewport();
+          await prepareForFullPageScreenshot();
           sendResponse({ ok: true });
         } catch (_) {
           sendResponse({ ok: false });
         }
       })();
       return true;
+    }
+    if (msg.type === 'GET_FULL_PAGE_CAPTURE_METRICS') {
+      (async () => {
+        try {
+          await prepareForFullPageScreenshot();
+          await pauseAwareSleep(150);
+          const docEl = document.documentElement;
+          const body = document.body;
+          const fullHeight = Math.max(
+            docEl.scrollHeight,
+            body?.scrollHeight || 0,
+            docEl.offsetHeight,
+            docEl.clientHeight
+          );
+          sendResponse({
+            ok: true,
+            fullHeight,
+            viewHeight: window.innerHeight,
+            dpr: window.devicePixelRatio || 1
+          });
+        } catch (_) {
+          sendResponse({ ok: false });
+        }
+      })();
+      return true;
+    }
+    if (msg.type === 'SCROLL_FULL_CAPTURE_Y') {
+      try {
+        const y = Math.max(0, Math.round(Number(msg.y) || 0));
+        window.scrollTo({ top: y, left: 0, behavior: 'instant' });
+        sendResponse({ ok: true, y: window.scrollY });
+      } catch (_) {
+        sendResponse({ ok: false });
+      }
+      return false;
     }
     return false;
   });

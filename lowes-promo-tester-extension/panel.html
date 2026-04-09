@@ -52,14 +52,32 @@
       </div>
     </div>
     <div id="resultsFilterPanel" class="results-filter-panel" hidden>
-      <div class="results-filter-header">
-        <strong>Show results for</strong>
-        <div class="results-filter-bulk">
-          <button type="button" id="btnResultsFilterAll" class="btn small">Check all</button>
-          <button type="button" id="btnResultsFilterNone" class="btn small">Uncheck all</button>
-        </div>
+      <div class="results-filter-top">
+        <strong class="results-filter-title">Show results for</strong>
+        <button type="button" id="btnResultsFilterClose" class="btn small results-filter-close" title="Close filter">
+          Close
+        </button>
       </div>
-      <p class="results-filter-hint muted">Unchecked blinds stay saved but are hidden from the list below.</p>
+      <div class="results-filter-bulk">
+        <button type="button" id="btnResultsFilterAll" class="btn small">Check all</button>
+        <button type="button" id="btnResultsFilterNone" class="btn small">Uncheck all</button>
+        <button type="button" id="btnResultsFilterCheckShown" class="btn small" title="Check every blind that matches the search below">
+          Check matches
+        </button>
+        <button type="button" id="btnResultsFilterUncheckShown" class="btn small" title="Uncheck every blind that matches the search below">
+          Uncheck matches
+        </button>
+      </div>
+      <label class="results-filter-search-lbl" for="resultsFilterSearch">Search blinds</label>
+      <input
+        type="search"
+        id="resultsFilterSearch"
+        class="results-filter-search"
+        placeholder="Type to narrow the list…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <p class="results-filter-hint muted">Unchecked blinds stay saved but are hidden from the results list.</p>
       <div id="resultsFilterList" class="results-filter-list"></div>
     </div>
     <div id="resultsGrid" class="results-grid"></div>
@@ -73,7 +91,6 @@
       <div class="shot-lightbox__toolbar">
         <span class="shot-lightbox__title">Configuration</span>
         <div class="shot-lightbox__actions">
-          <button type="button" class="shot-lightbox__btn" id="shotLightboxToggleSize" title="Expand preview">Larger</button>
           <button type="button" class="shot-lightbox__btn" id="shotLightboxMin" title="Minimize to bar">Minimize</button>
           <button type="button" class="shot-lightbox__btn shot-lightbox__btn--close" id="shotLightboxClose" title="Close">Close</button>
         </div>

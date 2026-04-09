@@ -113,7 +113,132 @@ function requestExtensionPageCapture(tabId) {
   });
 }
 
+function computeScrollPositions(fullHeight, viewHeight) {
+  const vh = Math.max(1, Math.floor(viewHeight));
+  const fh = Math.max(vh, Math.ceil(fullHeight));
+  const maxY = Math.max(0, fh - vh);
+  if (maxY === 0) return [0];
+  const positions = [];
+  let y = 0;
+  while (y < maxY) {
+    positions.push(y);
+    y += vh;
+  }
+  if (positions[positions.length - 1] !== maxY) {
+    positions.push(maxY);
+  }
+  return [...new Set(positions)].sort((a, b) => a - b);
+}
+
+const MAX_FULL_PAGE_SLICES = 34;
+
+async function dataUrlToBlob(dataUrl) {
+  const r = await fetch(dataUrl);
+  return r.blob();
+}
+
+async function blobToDataUrlFromBlob(blob) {
+  const buf = await blob.arrayBuffer();
+  let binary = '';
+  const bytes = new Uint8Array(buf);
+  const len = bytes.length;
+  for (let i = 0; i < len; i += 65536) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + 65536, len)));
+  }
+  const ct = blob.type && blob.type.includes('png') ? 'image/png' : 'image/png';
+  return `data:${ct};base64,${btoa(binary)}`;
+}
+
+async function stitchScreenshotSlices(slices, positions, fullHeight, dpr) {
+  if (!slices.length || slices.length !== positions.length) {
+    return slices[0] || null;
+  }
+  const blobs = await Promise.all(slices.map(dataUrlToBlob));
+  const bmp0 = await createImageBitmap(blobs[0]);
+  const sliceW = bmp0.width;
+  bmp0.close();
+  let canvasH = Math.ceil(fullHeight * dpr);
+  const MAX_H = 16384;
+  if (canvasH > MAX_H) canvasH = MAX_H;
+  const canvas = new OffscreenCanvas(sliceW, canvasH);
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, sliceW, canvasH);
+  for (let i = 0; i < blobs.length; i++) {
+    const bmp = await createImageBitmap(blobs[i]);
+    const destY = Math.round(positions[i] * dpr);
+    ctx.drawImage(bmp, 0, destY);
+    bmp.close();
+  }
+  const outBlob = await canvas.convertToBlob({ type: 'image/png' });
+  return blobToDataUrlFromBlob(outBlob);
+}
+
+async function captureFullPageScreenshot(tabId, windowId) {
+  await chrome.tabs.update(tabId, { active: true });
+  await chrome.windows.update(windowId, { focused: true });
+  for (let i = 0; i < 50; i++) {
+    const t = await chrome.tabs.get(tabId);
+    if (t.active && t.windowId === windowId) break;
+    await sleep(80);
+  }
+  await sleep(450);
+  let meta;
+  try {
+    meta = await chrome.tabs.sendMessage(tabId, { type: 'GET_FULL_PAGE_CAPTURE_METRICS' });
+  } catch {
+    return null;
+  }
+  if (!meta?.ok || meta.fullHeight == null) return null;
+  const fullHeight = Math.max(1, meta.fullHeight);
+  const viewHeight = Math.max(1, meta.viewHeight || 600);
+  const dpr = meta.dpr || 1;
+  const minSlices = Math.ceil(fullHeight / viewHeight);
+  if (minSlices > MAX_FULL_PAGE_SLICES) {
+    try {
+      await chrome.tabs.sendMessage(tabId, { type: 'SCROLL_FULL_CAPTURE_Y', y: 0 });
+    } catch {}
+    await sleep(400);
+    try {
+      const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
+      return parseCaptureDataUrl(dataUrl);
+    } catch {
+      return null;
+    }
+  }
+  const positions = computeScrollPositions(fullHeight, viewHeight);
+  const pairs = [];
+  for (const pos of positions) {
+    try {
+      await chrome.tabs.sendMessage(tabId, { type: 'SCROLL_FULL_CAPTURE_Y', y: pos });
+    } catch {}
+    await sleep(380);
+    let dataUrl = null;
+    try {
+      dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
+    } catch {}
+    if (dataUrl) pairs.push({ pos, dataUrl });
+  }
+  if (pairs.length === 0) return null;
+  const slices = pairs.map((p) => p.dataUrl);
+  const posUsed = pairs.map((p) => p.pos);
+  if (slices.length === 1) return parseCaptureDataUrl(slices[0]);
+  try {
+    if (typeof OffscreenCanvas === 'undefined' || typeof createImageBitmap === 'undefined') {
+      return parseCaptureDataUrl(slices[0]);
+    }
+    const stitchedUrl = await stitchScreenshotSlices(slices, posUsed, fullHeight, dpr);
+    return parseCaptureDataUrl(stitchedUrl);
+  } catch {
+    return parseCaptureDataUrl(slices[0]);
+  }
+}
+
 async function captureScreenshotReliable(tabId, windowId) {
+  try {
+    const full = await captureFullPageScreenshot(tabId, windowId);
+    if (full?.base64) return full;
+  } catch {}
   try {
     return await captureScreenshotForTab(tabId, windowId);
   } catch (_) {
@@ -236,13 +361,6 @@ async function persistTestResult(tabId, partial) {
   if (tab?.windowId == null) return row;
 
   try {
-    try {
-      await chrome.tabs.sendMessage(tabId, { type: 'PREPARE_SCREENSHOT' });
-    } catch (_) {
-      /* tab may not have content script yet */
-    }
-    await sleep(600);
-
     const cap = await captureScreenshotReliable(tab.id, tab.windowId);
     if (!cap?.base64) {
       const { testResults: trOnly = [] } = await chrome.storage.local.get('testResults');

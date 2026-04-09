@@ -221,27 +221,49 @@ body {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
 }
-.results-filter-header {
+.results-filter-top {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
-.results-filter-header strong {
+.results-filter-title {
   font-size: 12px;
+}
+.results-filter-close {
+  flex-shrink: 0;
 }
 .results-filter-bulk {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
+  margin-bottom: 8px;
+}
+.results-filter-search-lbl {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #555;
+}
+.results-filter-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+  border: 1px solid #cfd8dc;
+  border-radius: 6px;
+  font-size: 12px;
 }
 .results-filter-hint {
   margin: 0 0 8px;
   font-size: 11px;
 }
 .results-filter-list {
-  max-height: 180px;
+  max-height: 200px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -254,10 +276,19 @@ body {
   font-size: 12px;
   line-height: 1.35;
 }
+.results-filter-row--hidden {
+  display: none !important;
+}
 .results-filter-row label {
   cursor: pointer;
   flex: 1;
   min-width: 0;
+}
+.results-filter-empty-msg {
+  margin: 0;
+  padding: 8px 0;
+  font-size: 12px;
+  color: #777;
 }
 .results-grid {
   display: flex;
@@ -399,8 +430,9 @@ body {
 .shot-lightbox__panel {
   position: relative;
   z-index: 1;
+  width: min(92vw, 920px);
   max-width: calc(100vw - 16px);
-  max-height: calc(100vh - 16px);
+  max-height: min(92vh, 900px);
   min-height: 0;
   background: #fff;
   border-radius: 10px;
@@ -408,66 +440,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-.shot-lightbox.shot-lightbox--compact {
-  align-items: flex-end;
-  justify-content: center;
-  padding: 0;
-}
-.shot-lightbox.shot-lightbox--compact .shot-lightbox__backdrop {
-  background: rgba(0, 0, 0, 0.32);
-}
-.shot-lightbox.shot-lightbox--compact .shot-lightbox__panel {
-  width: 100%;
-  max-width: 100%;
-  height: 240px;
-  max-height: 240px;
-  height: min(45dvh, 260px);
-  max-height: min(45dvh, 260px);
-  border-radius: 10px 10px 0 0;
-  box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.22);
-}
-.shot-lightbox.shot-lightbox--compact .shot-lightbox__body {
-  flex: 1 1 auto;
-  min-height: 96px;
-  max-height: none;
-  padding: 6px;
-  overflow: hidden;
-}
-.shot-lightbox.shot-lightbox--compact .shot-lightbox__body img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  object-position: center;
-}
-.shot-lightbox.shot-lightbox--compact .shot-lightbox__toolbar {
-  padding: 5px 8px;
-}
-.shot-lightbox.shot-lightbox--compact .shot-lightbox__title {
-  font-size: 11px;
-}
-.shot-lightbox.shot-lightbox--compact .shot-lightbox__btn {
-  padding: 3px 7px;
-  font-size: 10px;
-}
-.shot-lightbox.shot-lightbox--expanded {
-  align-items: center;
-  padding: 8px;
-}
-.shot-lightbox.shot-lightbox--expanded .shot-lightbox__backdrop {
-  background: rgba(0, 0, 0, 0.55);
-}
-.shot-lightbox.shot-lightbox--expanded .shot-lightbox__panel {
-  max-width: calc(100% - 16px);
-  max-height: calc(100% - 16px);
-  border-radius: 10px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-}
-.shot-lightbox.shot-lightbox--expanded .shot-lightbox__body {
-  max-height: min(78vh, 680px);
-  padding: 8px;
 }
 .shot-lightbox.minimized .shot-lightbox__panel {
   display: none;
@@ -513,23 +485,23 @@ body {
 }
 .shot-lightbox__body {
   flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
+  min-height: 120px;
+  max-height: min(82vh, 720px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 8px;
-  max-height: min(85vh, 720px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #eceff1;
 }
 .shot-lightbox__body img {
   max-width: 100%;
-  max-height: min(78vh, 640px);
   width: auto;
   height: auto;
-  object-fit: contain;
   display: block;
+  margin: 0 auto;
   border-radius: 6px;
   border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .shot-lightbox-dock {
   position: fixed;
