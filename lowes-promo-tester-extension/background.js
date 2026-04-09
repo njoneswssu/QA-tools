@@ -38,10 +38,18 @@ function waitTabComplete(tabId) {
   });
 }
 
+function parseCaptureDataUrl(dataUrl) {
+  if (!dataUrl || typeof dataUrl !== 'string') return null;
+  const i = dataUrl.indexOf(',');
+  if (i < 0) return null;
+  const header = dataUrl.slice(0, i);
+  const base64 = dataUrl.slice(i + 1);
+  if (!header.includes('base64') || base64.length < 40) return null;
+  return { dataUrl, base64 };
+}
+
 /**
- * Prefer tabs.captureTab(tabId) when the browser supports it: captures that tab even when the side panel
- * has focus or another tab was briefly active. Falls back to captureVisibleTab after
- * focusing the window and waiting for the tab to become active.
+ * Prefer tabs.captureTab when available; else captureVisibleTab after focusing the Lowe's tab.
  */
 async function captureScreenshotForTab(tabId, windowId) {
   let lastErr = null;
@@ -50,10 +58,8 @@ async function captureScreenshotForTab(tabId, windowId) {
     for (let attempt = 0; attempt < 4; attempt++) {
       try {
         const dataUrl = await chrome.tabs.captureTab(tabId, { format: 'png' });
-        if (dataUrl && dataUrl.length > 100) {
-          const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
-          return { dataUrl, base64 };
-        }
+        const parsed = parseCaptureDataUrl(dataUrl);
+        if (parsed) return parsed;
       } catch (e) {
         lastErr = e;
         await sleep(350 * (attempt + 1));
@@ -74,14 +80,46 @@ async function captureScreenshotForTab(tabId, windowId) {
   for (let attempt = 0; attempt < 6; attempt++) {
     try {
       const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
-      const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
-      return { dataUrl, base64 };
+      const parsed = parseCaptureDataUrl(dataUrl);
+      if (parsed) return parsed;
     } catch (e) {
       lastErr = e;
       await sleep(450 * (attempt + 1));
     }
   }
   throw lastErr || new Error('captureVisibleTab failed');
+}
+
+function requestExtensionPageCapture(tabId) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), 10000);
+    try {
+      chrome.runtime.sendMessage({ type: 'REQUEST_TAB_CAPTURE', tabId }, (response) => {
+        clearTimeout(timer);
+        if (chrome.runtime.lastError) {
+          resolve(null);
+          return;
+        }
+        if (response && response.ok && response.base64) {
+          resolve({ dataUrl: response.dataUrl, base64: response.base64 });
+        } else {
+          resolve(null);
+        }
+      });
+    } catch (_) {
+      clearTimeout(timer);
+      resolve(null);
+    }
+  });
+}
+
+async function captureScreenshotReliable(tabId, windowId) {
+  try {
+    return await captureScreenshotForTab(tabId, windowId);
+  } catch (_) {
+    /* side panel + service worker: try panel fallback */
+  }
+  return requestExtensionPageCapture(tabId);
 }
 
 function todayLocal() {
@@ -142,13 +180,50 @@ async function setTestResultsStripScreenshotsOnQuota(nextRows) {
   await storageLocalSet({ testResults: slim });
 }
 
+function fingerprintFromPartial(partial) {
+  const w = partial.width != null ? parseInt(partial.width, 10) : null;
+  const h = partial.height != null ? parseInt(partial.height, 10) : null;
+  let pr = partial.promotional_price != null ? parseFloat(String(partial.promotional_price)) : null;
+  if (Number.isNaN(pr)) pr = null;
+  return `${String(partial.product_id ?? '')}|${w}|${h}|${pr}`;
+}
+
+function fingerprintFromRow(r) {
+  return `${String(r.product_id ?? '')}|${r.width}|${r.height}|${r.promotional_price}`;
+}
+
 async function persistTestResult(tabId, partial) {
-  const id = Date.now();
   const testDate = todayLocal();
   const createdAtIso = new Date().toISOString();
-  const row = buildServerShapedRow(partial, id, testDate, null, null, createdAtIso);
   const { testResults = [] } = await chrome.storage.local.get('testResults');
-  const next = [row, ...testResults];
+  const now = Date.now();
+  const pfp = fingerprintFromPartial(partial);
+  const latest = testResults[0];
+  const dupRecent =
+    latest &&
+    fingerprintFromRow(latest) === pfp &&
+    !Number.isNaN(Number(latest.id)) &&
+    now - Number(latest.id) < 20000;
+
+  let id;
+  let row;
+  let next;
+  if (dupRecent) {
+    id = latest.id;
+    row = buildServerShapedRow(
+      partial,
+      id,
+      testDate,
+      latest.screenshot_data ?? null,
+      latest.screenshot_url ?? null,
+      latest.created_at || createdAtIso
+    );
+    next = [row, ...testResults.slice(1)];
+  } else {
+    id = Date.now();
+    row = buildServerShapedRow(partial, id, testDate, null, null, createdAtIso);
+    next = [row, ...testResults];
+  }
   await setTestResultsStripScreenshotsOnQuota(next);
 
   let tab = null;
@@ -168,9 +243,13 @@ async function persistTestResult(tabId, partial) {
     }
     await sleep(600);
 
-    const cap = await captureScreenshotForTab(tab.id, tab.windowId);
+    const cap = await captureScreenshotReliable(tab.id, tab.windowId);
+    if (!cap?.base64) {
+      const { testResults: trOnly = [] } = await chrome.storage.local.get('testResults');
+      return trOnly.find((r) => r.id == id) || row;
+    }
     const { testResults: tr = [] } = await chrome.storage.local.get('testResults');
-    const idx = tr.findIndex((r) => r.id === id);
+    const idx = tr.findIndex((r) => r.id == id);
     if (idx >= 0) {
       const updated = [...tr];
       updated[idx] = {
@@ -192,7 +271,7 @@ async function persistTestResult(tabId, partial) {
   }
 
   const { testResults: tr2 = [] } = await chrome.storage.local.get('testResults');
-  return tr2.find((r) => r.id === id) || row;
+  return tr2.find((r) => r.id == id) || row;
 }
 
 /** Content script may not be ready immediately after navigation; retry before failing. */
@@ -268,7 +347,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     (async () => {
       const { productIds, tabId: preferredTabId } = msg;
       try {
-        await chrome.storage.local.set({ shouldStop: false, sequenceRunning: true });
+        await chrome.storage.local.set({ shouldStop: false, sequenceRunning: true, automationPaused: false });
         const products = await loadProducts();
         const selected = products.filter((p) => productIds.includes(p.id));
         let tabId = preferredTabId;
@@ -281,8 +360,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         }
 
         for (let i = 0; i < selected.length; i++) {
-          const { shouldStop } = await chrome.storage.local.get('shouldStop');
-          if (shouldStop) break;
+          for (;;) {
+            const { shouldStop, automationPaused } = await chrome.storage.local.get(['shouldStop', 'automationPaused']);
+            if (shouldStop) break;
+            if (!automationPaused) break;
+            await sleep(250);
+          }
+          const { shouldStop: stopNow } = await chrome.storage.local.get('shouldStop');
+          if (stopNow) break;
 
           const product = selected[i];
           await chrome.tabs.update(tabId, { url: product.url });
@@ -303,10 +388,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           }
         }
 
-        await chrome.storage.local.set({ sequenceRunning: false, shouldStop: false });
+        await chrome.storage.local.set({ sequenceRunning: false, shouldStop: false, automationPaused: false });
         sendResponse({ ok: true });
       } catch (e) {
-        await chrome.storage.local.set({ sequenceRunning: false });
+        await chrome.storage.local.set({ sequenceRunning: false, automationPaused: false });
         sendResponse({ ok: false, error: e.message });
       }
     })();

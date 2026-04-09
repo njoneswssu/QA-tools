@@ -41,6 +41,90 @@ function isVisible(el) {
   return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none';
 }
 
+/** React-controlled selects often need the prototype setter, not plain `sel.value =`. */
+function setNativeSelectValue(sel, value) {
+  if (!sel) return;
+  try {
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    if (desc && desc.set) desc.set.call(sel, value);
+    else sel.value = value;
+  } catch (_) {
+    try {
+      sel.value = value;
+    } catch (_) {}
+  }
+  sel.dispatchEvent(new Event('input', { bubbles: true }));
+  sel.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function configuratorRoot() {
+  return (
+    document.querySelector(
+      'main, [role="main"], [class*="Configurator" i], [class*="configurator" i], [id*="threekit" i], [class*="ProductDetail" i]'
+    ) || document.body
+  );
+}
+
+function elementClassString(el) {
+  const c = el.className;
+  if (typeof c === 'string') return c;
+  if (c && typeof c.baseVal === 'string') return c.baseVal;
+  return '';
+}
+
+/** Lowe's uses small (i) / SVG buttons that open Mount, Opacity, etc. help modals — never click these. */
+function isLikelyInfoOrHelpControl(el) {
+  if (!el) return true;
+  const aria = (el.getAttribute('aria-label') || '').toLowerCase();
+  const title = (el.getAttribute('title') || '').toLowerCase();
+  const cls = elementClassString(el).toLowerCase();
+  const tid = (el.getAttribute('data-testid') || '').toLowerCase();
+  const combined = `${aria} ${title} ${cls} ${tid}`;
+  if (
+    /information|more info|learn more|tooltip|what is|definition|measuring|how to measure|watch video|see details|read more|show details|help with|about (the |this )?(mount|opacity|width|height)/.test(
+      combined
+    )
+  ) {
+    return true;
+  }
+  if (/\b(info|help|tooltip|infotip|popover)[-_]?(icon|btn|button)?\b|information[_-]?icon|icon[_-]?info/.test(cls)) {
+    return true;
+  }
+  if (/\b(info|help|tooltip)\b/.test(tid) && !/(color|fabric|swatch)/.test(tid)) return true;
+  const r = el.getBoundingClientRect();
+  const tag = el.tagName.toUpperCase();
+  const hasSvg = !!el.querySelector('svg');
+  const txt = (el.textContent || '').trim();
+  if (
+    hasSvg &&
+    (tag === 'BUTTON' || el.getAttribute('role') === 'button' || tag === 'A') &&
+    txt.length <= 4 &&
+    r.width > 0 &&
+    r.width <= 40 &&
+    r.height > 0 &&
+    r.height <= 40
+  ) {
+    if (/\b(color|fabric|swatch|palette|shade|finish|select)\b/.test(combined)) return false;
+    return true;
+  }
+  return false;
+}
+
+function isLikelyDimensionSelect(sel) {
+  const opts = Array.from(sel.options).filter((o) => o.value);
+  if (opts.length < 2) return false;
+  let dimLike = 0;
+  for (const o of opts) {
+    const t = (o.textContent || '').trim();
+    if (/^\d+(\.\d+)?"\s*$/.test(t) || /^\d+\s*["']?\s*x\s*\d+/i.test(t)) dimLike++;
+    else if (/^\d{1,3}$/.test(t)) {
+      const n = parseInt(t, 10);
+      if (n >= 8 && n <= 120) dimLike++;
+    }
+  }
+  return dimLike / opts.length > 0.55;
+}
+
 function isAccessDenied() {
   const bodyText = document.body?.textContent || '';
   const title = document.title || '';
@@ -95,9 +179,7 @@ async function selectSelectValue(keyword, value) {
       Array.from(sel.options).find((o) => o.value === strVal) ||
       Array.from(sel.options).find((o) => (o.textContent || '').includes(strVal));
     if (opt) {
-      sel.value = opt.value;
-      sel.dispatchEvent(new Event('input', { bubbles: true }));
-      sel.dispatchEvent(new Event('change', { bubbles: true }));
+      setNativeSelectValue(sel, opt.value);
       await pauseAwareSleep(800);
       return true;
     }
@@ -111,8 +193,7 @@ async function selectWidthHeight(width, height) {
     for (const sel of document.querySelectorAll('select')) {
       const opt = Array.from(sel.options).find((o) => o.value === String(width));
       if (opt) {
-        sel.value = opt.value;
-        sel.dispatchEvent(new Event('change', { bubbles: true }));
+        setNativeSelectValue(sel, opt.value);
         await pauseAwareSleep(800);
         ok = true;
         break;
@@ -125,8 +206,7 @@ async function selectWidthHeight(width, height) {
     for (const sel of document.querySelectorAll('select')) {
       const opt = Array.from(sel.options).find((o) => o.value === String(height));
       if (opt) {
-        sel.value = opt.value;
-        sel.dispatchEvent(new Event('change', { bubbles: true }));
+        setNativeSelectValue(sel, opt.value);
         await pauseAwareSleep(800);
         break;
       }
@@ -134,35 +214,474 @@ async function selectWidthHeight(width, height) {
   }
 }
 
+async function dismissLowesOverlays(maxPasses = 8) {
+  for (let pass = 0; pass < maxPasses; pass++) {
+    let dismissed = false;
+    const modals = document.querySelectorAll('[role="dialog"], [aria-modal="true"]');
+    for (const modal of modals) {
+      if (!isVisible(modal)) continue;
+      const candidates = modal.querySelectorAll('button, [role="button"], a[href="#"]');
+      for (const b of candidates) {
+        if (!isVisible(b)) continue;
+        const tx = (b.textContent || '').trim().toLowerCase();
+        const aria = (b.getAttribute('aria-label') || '').toLowerCase();
+        if (
+          aria.includes('close') ||
+          tx === 'close' ||
+          tx === '×' ||
+          tx === '✕' ||
+          tx === 'got it' ||
+          tx === 'ok'
+        ) {
+          b.click();
+          dismissed = true;
+          await pauseAwareSleep(450);
+          break;
+        }
+      }
+      if (dismissed) break;
+    }
+    if (!dismissed) {
+      for (const b of document.querySelectorAll('button[aria-label*="close" i]')) {
+        const modal = b.closest('[role="dialog"], [aria-modal="true"]');
+        if (modal && isVisible(modal) && isVisible(b)) {
+          b.click();
+          dismissed = true;
+          await pauseAwareSleep(450);
+          break;
+        }
+      }
+    }
+    if (!dismissed) break;
+  }
+}
+
+function findReviewSelectionsElement() {
+  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div');
+  for (const el of headings) {
+    if (!isVisible(el)) continue;
+    const txt = (el.textContent || '').trim();
+    if (!/review\s*selections/i.test(txt) || txt.length > 100) continue;
+    return (
+      el.closest(
+        '[class*="sidebar" i], aside, [class*="summary" i], [class*="sticky" i], [class*="drawer" i], [class*="rail" i]'
+      ) ||
+      el.parentElement ||
+      el
+    );
+  }
+  return document.querySelector(
+    '[class*="ReviewSelection" i], [id*="review-selection" i], [data-testid*="review-selection" i]'
+  );
+}
+
+async function prepareScreenshotViewport() {
+  await dismissLowesOverlays(10);
+  await pauseAwareSleep(200);
+  const el = findReviewSelectionsElement();
+  if (el && isVisible(el)) {
+    el.scrollIntoView({ block: 'start', behavior: 'auto' });
+    await pauseAwareSleep(400);
+    return;
+  }
+  const aside = document.querySelector('aside, [class*="summary-column" i], [class*="SummaryColumn" i]');
+  if (aside && isVisible(aside)) {
+    aside.scrollIntoView({ block: 'end', behavior: 'auto' });
+    await pauseAwareSleep(300);
+  }
+}
+
+function getElementColorLabel(el) {
+  if (!el) return '';
+  const t = (el.textContent || '').trim();
+  const firstLine = t.split('\n').map((s) => s.trim()).find(Boolean) || '';
+  if (firstLine.length >= 2 && firstLine.length <= 96) return firstLine;
+  const aria = (el.getAttribute('aria-label') || '').trim();
+  if (aria.length >= 2 && aria.length <= 80) {
+    return aria
+      .replace(/\s*,?\s*selected\s*/i, '')
+      .replace(/^select\s+/i, '')
+      .trim();
+  }
+  const title = (el.getAttribute('title') || '').trim();
+  if (title.length >= 2) return title;
+  const lid = el.getAttribute('aria-labelledby');
+  if (lid) {
+    for (const id of lid.split(/\s+/)) {
+      const lb = document.getElementById(id);
+      if (lb) {
+        const x = (lb.textContent || '').trim().split('\n')[0];
+        if (x) return x.slice(0, 96);
+      }
+    }
+  }
+  return '';
+}
+
+function looksLikeColorNameText(s) {
+  if (!s || s.length < 2 || s.length > 96) return false;
+  const line = s.trim().split('\n')[0].trim();
+  if (/^\d+$/.test(line)) return false;
+  if (/^(filter|search|select|choose|view|more|less)$/i.test(line)) return false;
+  const lower = line.toLowerCase();
+  if (lower.includes('width') || lower.includes('height') || lower.includes('price')) return false;
+  const known =
+    /\b(white|ivory|cream|beige|tan|sand|bone|linen|pebble|granite|gray|grey|charcoal|black|brown|walnut|oak|maple|cherry|mahogany|natural|espresso|wheat|khaki|taupe|blue|navy|green|red|yellow|snow|mist|stone|canvas|silk|woven|cellular|fabric|material|faux|wood|bamboo|iron|nickel|daylight|barley|toulouse|bellamy|brushed|satin|pvc|vinyl|alabaster)\b/;
+  if (known.test(lower)) return true;
+  return line.split(/\s+/).length <= 8 && /^[A-Za-z0-9][A-Za-z0-9\s\-'/.]+$/.test(line);
+}
+
+async function pickMaterialStyleFromSelect() {
+  const selects = document.querySelectorAll('select');
+  for (const sel of selects) {
+    const meta = `${sel.name || ''} ${sel.id || ''} ${sel.getAttribute('aria-label') || ''}`.toLowerCase();
+    const fs = sel.closest('fieldset');
+    const leg = (fs?.querySelector('legend')?.textContent || '').toLowerCase();
+    const combined = `${meta} ${leg}`;
+    if (!combined.includes('material')) continue;
+    if (combined.includes('color name')) continue;
+    const opts = Array.from(sel.options).filter((o) => {
+      if (!o.value) return false;
+      const tx = (o.textContent || '').trim();
+      if (/^choose|^select|^--|^\.\.\./i.test(tx)) return false;
+      return true;
+    });
+    if (opts.length < 1) continue;
+    const pick = opts[Math.floor(Math.random() * opts.length)];
+    sel.focus();
+    setNativeSelectValue(sel, pick.value);
+    await pauseAwareSleep(900);
+    return ((pick.textContent || '').trim() || pick.value).slice(0, 80);
+  }
+  return null;
+}
+
+async function pickMaterialFromFieldset() {
+  for (const fs of document.querySelectorAll('fieldset')) {
+    const leg = (fs.querySelector('legend')?.textContent || '').toLowerCase();
+    if (!leg.includes('material') && !leg.includes('style') && !leg.includes('product type')) continue;
+    const btns = fs.querySelectorAll('button, [role="button"], [role="radio"], input[type="radio"]');
+    const vis = [...btns].filter((b) => isVisible(b) && !isLikelyInfoOrHelpControl(b));
+    if (vis.length < 1) continue;
+    const pick = vis[Math.floor(Math.random() * vis.length)];
+    let target = pick;
+    if (pick.tagName === 'INPUT' && pick.type === 'radio') {
+      if (pick.id) {
+        try {
+          const lab = document.querySelector(`label[for="${CSS.escape(pick.id)}"]`);
+          if (lab && isVisible(lab)) target = lab;
+        } catch (_) {}
+      } else {
+        const lab = pick.closest('label');
+        if (lab && isVisible(lab)) target = lab;
+      }
+    }
+    if (!isVisible(target)) continue;
+    target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(350);
+    target.click();
+    await pauseAwareSleep(1100);
+    return (leg || 'material').slice(0, 40);
+  }
+  return null;
+}
+
+async function tryExpandColorSection() {
+  const root = configuratorRoot();
+  const clickers = root.querySelectorAll(
+    'button, [role="button"], [role="tab"], div[tabindex="0"], span[tabindex="0"]'
+  );
+  for (const el of clickers) {
+    if (!isVisible(el)) continue;
+    if (isLikelyInfoOrHelpControl(el)) continue;
+    if (el.closest('[role="dialog"], [aria-modal="true"]')) continue;
+    const t = (el.textContent || '').trim().replace(/\s+/g, ' ');
+    if (t.length > 56) continue;
+    const lower = t.toLowerCase();
+    if (/(credit|cart|checkout|payment|sign in)/i.test(lower)) continue;
+    const isColorHeader =
+      /^(color|colors|color name|fabric|finish|shade|slat color)s?$/i.test(lower) ||
+      /^color\s+name$/i.test(lower) ||
+      /^choose\s+a\s+color/i.test(t);
+    if (!isColorHeader) continue;
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(300);
+    el.click();
+    await pauseAwareSleep(700);
+    return true;
+  }
+  return false;
+}
+
+async function pickColorFromSelect() {
+  const selects = document.querySelectorAll('select');
+  for (const sel of selects) {
+    const meta = `${sel.name || ''} ${sel.id || ''} ${sel.getAttribute('aria-label') || ''}`.toLowerCase();
+    if (meta.includes('material') && !meta.includes('color')) continue;
+    const near = sel.closest('[class*="color" i], [class*="fabric" i], [data-testid*="color" i], fieldset');
+    const nearTxt = (near && (near.textContent || '').slice(0, 400).toLowerCase()) || '';
+    const hit =
+      meta.includes('color') ||
+      meta.includes('fabric') ||
+      meta.includes('finish') ||
+      nearTxt.includes('color name');
+    if (!hit) continue;
+    const opts = Array.from(sel.options).filter((o) => {
+      if (!o.value) return false;
+      const tx = (o.textContent || '').trim();
+      if (/^choose|^select|^--|^\.\.\./i.test(tx)) return false;
+      return true;
+    });
+    if (opts.length < 1) continue;
+    const pick = opts[Math.floor(Math.random() * opts.length)];
+    const name = ((pick.textContent || '').trim() || pick.value).slice(0, 80);
+    sel.focus();
+    setNativeSelectValue(sel, pick.value);
+    await pauseAwareSleep(900);
+    return name;
+  }
+  return null;
+}
+
+/** Any select whose real options look like color names (Lowe's sometimes omits "color" in name/id). */
+async function pickColorFromSelectByOptionText() {
+  const root = configuratorRoot();
+  for (const sel of root.querySelectorAll('select')) {
+    if (!isVisible(sel)) continue;
+    if (isLikelyDimensionSelect(sel)) continue;
+    const meta = `${sel.name || ''} ${sel.id || ''} ${sel.getAttribute('aria-label') || ''}`.toLowerCase();
+    if (meta.includes('width') || meta.includes('height')) continue;
+    const opts = Array.from(sel.options).filter((o) => {
+      if (!o.value) return false;
+      const tx = (o.textContent || '').trim();
+      if (/^choose|^select|^--|^\.\.\./i.test(tx)) return false;
+      return looksLikeColorNameText(tx);
+    });
+    if (opts.length < 2) continue;
+    const pick = opts[Math.floor(Math.random() * opts.length)];
+    const name = ((pick.textContent || '').trim() || pick.value).slice(0, 80);
+    sel.focus();
+    setNativeSelectValue(sel, pick.value);
+    await pauseAwareSleep(900);
+    return name;
+  }
+  return null;
+}
+
+async function pickColorFromListbox() {
+  for (const lb of document.querySelectorAll('[role="listbox"]')) {
+    if (!isVisible(lb)) continue;
+    if (lb.closest('nav, header, footer, [class*="cart" i], [role="dialog"], [aria-modal="true"]')) continue;
+    let blob = '';
+    const labelledBy = lb.getAttribute('aria-labelledby');
+    if (labelledBy) {
+      for (const id of labelledBy.split(/\s+/)) {
+        const n = document.getElementById(id);
+        if (n) blob += `${n.textContent || ''} `;
+      }
+    }
+    const owner = lb.closest('section, [class*="option" i], fieldset, div');
+    const heading = owner?.querySelector('h2, h3, h4, h5, legend');
+    if (heading) blob += `${heading.textContent || ''} `;
+    const lower = blob.toLowerCase();
+    if (/\bopacity\b/.test(lower)) continue;
+    if (!/(color|finish|fabric|shade|slat)/.test(lower)) continue;
+    if (/(width|height|quantity)/.test(lower) && !/(color|finish|fabric|shade)/.test(lower)) continue;
+    const opts = [...lb.querySelectorAll('[role="option"]')].filter(isVisible);
+    if (opts.length < 2) continue;
+    const pick = opts[Math.floor(Math.random() * opts.length)];
+    const name = getElementColorLabel(pick) || (pick.textContent || '').trim().slice(0, 80) || 'Option';
+    pick.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(350);
+    pick.click();
+    await pauseAwareSleep(1200);
+    return name;
+  }
+  return null;
+}
+
+async function pickColorRadioOrRole() {
+  const tryClick = async (el, nameGuess) => {
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(350);
+    el.click();
+    await pauseAwareSleep(1200);
+    return nameGuess || 'Color option';
+  };
+
+  const radios = document.querySelectorAll('input[type="radio"]');
+  const radioCand = [];
+  for (const r of radios) {
+    const meta = `${r.name || ''} ${r.id || ''} ${r.getAttribute('aria-label') || ''}`.toLowerCase();
+    if (!meta.includes('color') && !meta.includes('fabric') && !meta.includes('finish')) continue;
+    let label = null;
+    if (r.id) {
+      try {
+        label = document.querySelector(`label[for="${CSS.escape(r.id)}"]`);
+      } catch (_) {
+        label = document.querySelector(`label[for="${r.id.replace(/"/g, '\\"')}"]`);
+      }
+    }
+    if (!label) label = r.closest('label');
+    const clickTarget = label && isVisible(label) ? label : r;
+    if (!isVisible(clickTarget)) continue;
+    const name =
+      getElementColorLabel(label) ||
+      getElementColorLabel(r.closest('[class*="swatch" i], [class*="color" i]')) ||
+      (r.getAttribute('value') || '');
+    radioCand.push({ el: clickTarget, name });
+  }
+  if (radioCand.length >= 1) {
+    const pick = radioCand[Math.floor(Math.random() * radioCand.length)];
+    return tryClick(pick.el, pick.name || null);
+  }
+
+  const roleRadios = document.querySelectorAll('[role="radio"]');
+  const roleCand = [];
+  for (const el of roleRadios) {
+    if (!isVisible(el)) continue;
+    if (el.closest('header, nav, [class*="cart" i], [class*="payment" i]')) continue;
+    const inColor = el.closest(
+      '[class*="color" i], [class*="swatch" i], [class*="fabric" i], [class*="option" i], [data-testid*="color" i], [data-testid*="swatch" i]'
+    );
+    if (!inColor) continue;
+    const name = getElementColorLabel(el);
+    roleCand.push({ el, name: name || 'Swatch' });
+  }
+  if (roleCand.length >= 1) {
+    const pick = roleCand[Math.floor(Math.random() * roleCand.length)];
+    return tryClick(pick.el, pick.name);
+  }
+  return null;
+}
+
+async function pickLowesCompoundSwatch() {
+  const compound =
+    /\b(iron|daylight|nickel|barley|pebble|granite|canvas|linen|snow|mist|walnut|oak|cherry|espresso|natural)\s+[A-Za-z][A-Za-z-]+/i;
+  const nodes = document.querySelectorAll(
+    'li, button, div[role="button"], [role="option"], span[tabindex="0"], div[tabindex="0"]'
+  );
+  const candidates = [];
+  for (const el of nodes) {
+    if (!isVisible(el)) continue;
+    if (isLikelyInfoOrHelpControl(el)) continue;
+    if (el.closest('nav, header, footer, [class*="cart" i], [role="dialog"], [aria-modal="true"]')) continue;
+    const t = (el.textContent || '').trim().replace(/\s+/g, ' ');
+    if (t.length < 6 || t.length > 100) continue;
+    if (!compound.test(t) && !/\b(toulouse|bellamy)\b/i.test(t)) continue;
+    if (
+      !el.closest(
+        'main, [class*="configur" i], [class*="product-detail" i], [id*="product" i], [class*="customize" i], [class*="option" i]'
+      )
+    ) {
+      continue;
+    }
+    candidates.push({ el, name: t.split('\n')[0].trim().slice(0, 96) });
+  }
+  if (candidates.length === 0) return null;
+  const pick = candidates[Math.floor(Math.random() * candidates.length)];
+  pick.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(450);
+  pick.el.click();
+  await pauseAwareSleep(1800);
+  return pick.name;
+}
+
+async function pickConfiguratorColorChips() {
+  const root = configuratorRoot();
+  const nodes = root.querySelectorAll(
+    'button, [role="button"], div[tabindex="0"], li[tabindex="0"], span[tabindex="0"]'
+  );
+  const candidates = [];
+  for (const el of nodes) {
+    if (!isVisible(el)) continue;
+    if (isLikelyInfoOrHelpControl(el)) continue;
+    if (el.closest('nav, header, footer, [class*="cart" i], [role="dialog"], [aria-modal="true"]')) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 18 || r.width > 96 || r.height < 18 || r.height > 96) continue;
+    const ar = r.width / r.height;
+    if (ar < 0.72 || ar > 1.4) continue;
+    const cs = getComputedStyle(el);
+    const hasBg = cs.backgroundImage && cs.backgroundImage !== 'none';
+    const hasChildImg = el.querySelector('img');
+    const cls = elementClassString(el).toLowerCase();
+    const aria = (el.getAttribute('aria-label') || '').toLowerCase();
+    const looksChip =
+      hasBg ||
+      hasChildImg ||
+      /\b(swatch|chip|tile|thumbnail|variant|color|fabric)\b/.test(cls) ||
+      /\b(color|fabric|finish)\b/.test(aria);
+    if (!looksChip) continue;
+    const t = (el.textContent || '').trim();
+    if (t.length > 100) continue;
+    const name = getElementColorLabel(el) || t.split('\n')[0].trim().slice(0, 80) || 'Chip';
+    candidates.push({ el, name });
+  }
+  if (candidates.length === 0) return null;
+  const pick = candidates[Math.floor(Math.random() * candidates.length)];
+  pick.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(400);
+  pick.el.click();
+  await pauseAwareSleep(1800);
+  return pick.name;
+}
+
 async function pickColorSwatch() {
-  const allElements = Array.from(document.querySelectorAll('button, div[role="button"], [class*="swatch"], [class*="color"]'));
+  const excludePatterns = ['credit', 'card', 'payment', 'checkout', 'cart', 'sign in', 'login'];
   const swatches = [];
 
-  allElements.forEach((el) => {
-    const hasImage =
-      el.querySelector('img') ||
-      el.style.backgroundImage ||
-      getComputedStyle(el).backgroundImage !== 'none';
-    if (!hasImage) return;
-
-    const text = (el.textContent || '').trim();
-    const className = (el.className || '').toString().toLowerCase();
+  const consider = (el) => {
+    if (!isVisible(el)) return;
+    if (isLikelyInfoOrHelpControl(el)) return;
+    if (el.closest('header, nav, footer, [class*="cart" i], [class*="checkout" i]')) return;
+    const className = elementClassString(el).toLowerCase();
     const ariaLabel = (el.getAttribute('aria-label') || '').toLowerCase();
-    const excludePatterns = ['credit', 'center', 'card', 'payment', 'checkout', 'cart', 'filter', 'search', 'sign in', 'login'];
+    const text = (el.textContent || '').trim();
     if (excludePatterns.some((p) => text.toLowerCase().includes(p) || ariaLabel.includes(p))) return;
 
-    if (text && text.length >= 3 && text.length <= 25) {
-      const isColorName =
-        !text.match(/^\d+$/) &&
-        text.split(/\s+/).length <= 3 &&
-        !/^(Filter|Search|Select|Choose|View|More|Less)$/i.test(text);
-      if (!isColorName) return;
-      const parent = el.closest('[class*="color"], [class*="swatch"], [class*="option"]');
-      const isInColorArea =
-        parent !== null || className.includes('swatch') || className.includes('color') || ariaLabel.includes('color');
-      if (isInColorArea) swatches.push({ name: text.split('\n')[0].trim(), el });
+    const inColorRegion = el.closest(
+      '[class*="color" i], [class*="swatch" i], [class*="fabric" i], [class*="finish" i], [data-testid*="color" i], [data-testid*="swatch" i], fieldset[class*="option" i]'
+    );
+    const looksLikeTile =
+      className.includes('swatch') ||
+      className.includes('color-chip') ||
+      ariaLabel.includes('color') ||
+      ariaLabel.includes('fabric') ||
+      inColorRegion;
+
+    const hasImg =
+      el.querySelector('img') ||
+      (el.style && el.style.backgroundImage && el.style.backgroundImage !== 'none') ||
+      (getComputedStyle(el).backgroundImage && getComputedStyle(el).backgroundImage !== 'none');
+
+    const cs = getComputedStyle(el);
+    const bg = cs.backgroundColor;
+    const hasSolidFill =
+      bg &&
+      bg !== 'rgba(0, 0, 0, 0)' &&
+      bg !== 'transparent' &&
+      !bg.startsWith('rgba(0, 0, 0, 0');
+
+    const r = el.getBoundingClientRect();
+    const smallish = r.width >= 6 && r.width <= 200 && r.height >= 6 && r.height <= 200;
+
+    const name = getElementColorLabel(el);
+    const nameOk = name && looksLikeColorNameText(name);
+
+    if (nameOk && looksLikeTile) {
+      swatches.push({ name: name.split('\n')[0].trim(), el });
+      return;
     }
-  });
+    if (looksLikeTile && (hasImg || (hasSolidFill && smallish))) {
+      swatches.push({ name: name ? name.split('\n')[0].trim() : 'Swatch', el });
+    }
+  };
+
+  document
+    .querySelectorAll(
+      'button, [role="button"], [role="option"], li, div[role="gridcell"], div[tabindex="0"]'
+    )
+    .forEach(consider);
 
   if (swatches.length === 0) return null;
   const pick = swatches[Math.floor(Math.random() * swatches.length)];
@@ -174,20 +693,55 @@ async function pickColorSwatch() {
 }
 
 async function fallbackColorClick() {
-  const colorNames = ['Cream', 'Granite', 'Ivory', 'White', 'Pebble', 'Beige', 'Gray', 'Black', 'Brown'];
-  const clickables = document.querySelectorAll('button, a, div[role="button"]');
+  const colorNames = [
+    'Iron Toulouse',
+    'Daylight Bellamy',
+    'Cream',
+    'Granite',
+    'Ivory',
+    'White',
+    'Pebble',
+    'Beige',
+    'Gray',
+    'Grey',
+    'Black',
+    'Brown',
+    'Natural',
+    'Walnut',
+    'Snow',
+    'Linen',
+    'Canvas',
+    'Toulouse',
+    'Bellamy',
+    'Iron',
+    'Nickel',
+    'Daylight',
+    'Barley',
+    'Alabaster',
+    'Espresso'
+  ];
+  const root = configuratorRoot();
+  const clickables = root.querySelectorAll(
+    'button, a, div[role="button"], [role="radio"], [role="option"], span[role="button"], li[role="option"]'
+  );
+  const list = [...clickables].filter(
+    (el) => isVisible(el) && !isLikelyInfoOrHelpControl(el) && !el.closest('header, nav, [class*="cart" i], [role="dialog"]')
+  );
   for (const colorName of colorNames) {
-    for (const el of Array.from(clickables).slice(0, 120)) {
+    const esc = colorName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(esc.replace(/\s+/g, '\\s+'), 'i');
+    for (const el of list) {
       const text = el.textContent || '';
-      if (text.includes(colorName) && isVisible(el)) {
-        try {
-          el.scrollIntoView({ block: 'center' });
-          await pauseAwareSleep(200);
-          el.click();
-          await pauseAwareSleep(2000);
-          return colorName;
-        } catch (_) {}
-      }
+      const aria = el.getAttribute('aria-label') || '';
+      const title = el.getAttribute('title') || '';
+      if (!re.test(text) && !re.test(aria) && !re.test(title)) continue;
+      try {
+        el.scrollIntoView({ block: 'center' });
+        await pauseAwareSleep(220);
+        el.click();
+        await pauseAwareSleep(2000);
+        return colorName;
+      } catch (_) {}
     }
   }
   return null;
@@ -352,10 +906,36 @@ async function runTest(product) {
   await pauseAwareSleep(3500 + Math.random() * 2500);
   await stopGuard();
 
-  let color = await pickColorSwatch();
-  if (!color) color = await fallbackColorClick();
+  await dismissLowesOverlays(6);
+  const matLabel = await pickMaterialStyleFromSelect();
+  if (!matLabel) await pickMaterialFromFieldset();
+  await pauseAwareSleep(1200);
+  await dismissLowesOverlays(6);
 
-  await pauseAwareSleep(3500 + Math.random() * 2500);
+  async function pickColorOnce() {
+    await tryExpandColorSection();
+    return (
+      (await pickColorFromSelect()) ||
+      (await pickColorFromSelectByOptionText()) ||
+      (await pickColorFromListbox()) ||
+      (await pickColorRadioOrRole()) ||
+      (await pickLowesCompoundSwatch()) ||
+      (await pickConfiguratorColorChips()) ||
+      (await pickColorSwatch()) ||
+      (await fallbackColorClick())
+    );
+  }
+
+  let color = await pickColorOnce();
+  if (!color) {
+    await pauseAwareSleep(1600);
+    await dismissLowesOverlays(6);
+    await tryExpandColorSection();
+    color = await pickColorOnce();
+  }
+
+  await pauseAwareSleep(2500 + Math.random() * 1500);
+  await dismissLowesOverlays(6);
   await stopGuard();
 
   let prices = extractPricesFromDom();
@@ -381,8 +961,8 @@ async function runTest(product) {
     promo_percentage = '0';
   }
 
-  window.scrollTo(0, 0);
-  await pauseAwareSleep(600);
+  await prepareScreenshotViewport();
+  await pauseAwareSleep(500);
 
   return {
     product_id: product.id,
@@ -424,31 +1004,15 @@ if (!globalThis.__LOWES_PROMO_TESTER_LISTENER__) {
       return false;
     }
     if (msg.type === 'PREPARE_SCREENSHOT') {
-      try {
-        const selectors = [
-          '[class*="PriceSummary" i]',
-          '[class*="price-summary" i]',
-          '[data-testid*="price" i]',
-          '[class*="Configurator" i]',
-          '[class*="configure" i]',
-          'main [class*="price" i]',
-          '[class*="ProductPricing" i]'
-        ];
-        for (const sel of selectors) {
-          const el = document.querySelector(sel);
-          if (el && isVisible(el)) {
-            el.scrollIntoView({ block: 'center', behavior: 'auto' });
-            sendResponse({ ok: true });
-            return false;
-          }
+      (async () => {
+        try {
+          await prepareScreenshotViewport();
+          sendResponse({ ok: true });
+        } catch (_) {
+          sendResponse({ ok: false });
         }
-        const prices = document.querySelectorAll('[class*="price"], [class*="Price"], h5, h4, h3');
-        if (prices[0]) prices[0].scrollIntoView({ block: 'center', behavior: 'auto' });
-        sendResponse({ ok: true });
-      } catch (_) {
-        sendResponse({ ok: false });
-      }
-      return false;
+      })();
+      return true;
     }
     return false;
   });
