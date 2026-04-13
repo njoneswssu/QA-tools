@@ -248,7 +248,42 @@ async function captureFullPageScreenshot(tabId, windowId) {
   return parseCaptureDataUrl(slices[0]);
 }
 
+/**
+ * Prefer captureTab first: it captures the Lowe's tab’s pixels even when the side panel is open.
+ * Full-page stitching uses captureVisibleTab and often captured the wrong surface or failed quietly.
+ */
+async function captureViewportWithCaptureTab(tabId, windowId) {
+  if (typeof chrome.tabs.captureTab !== 'function') return null;
+  await chrome.tabs.update(tabId, { active: true });
+  await chrome.windows.update(windowId, { focused: true });
+  for (let i = 0; i < 40; i++) {
+    const t = await chrome.tabs.get(tabId);
+    if (t.active && t.windowId === windowId) break;
+    await sleep(80);
+  }
+  await sleep(400);
+  let lastErr = null;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const dataUrl = await chrome.tabs.captureTab(tabId, { format: 'png' });
+      const parsed = parseCaptureDataUrl(dataUrl);
+      if (parsed?.base64) return parsed;
+    } catch (e) {
+      lastErr = e;
+      await sleep(400 * (attempt + 1));
+    }
+  }
+  if (lastErr) throw lastErr;
+  return null;
+}
+
 async function captureScreenshotReliable(tabId, windowId) {
+  try {
+    const viewport = await captureViewportWithCaptureTab(tabId, windowId);
+    if (viewport?.base64) return viewport;
+  } catch (_) {
+    /* fall through */
+  }
   try {
     const full = await captureFullPageScreenshot(tabId, windowId);
     if (full?.base64) return full;

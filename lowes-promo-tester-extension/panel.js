@@ -193,6 +193,30 @@ function productSearchBlob(p) {
   return parts.filter(Boolean).join(' ').toLowerCase();
 }
 
+function productSearchQuery() {
+  return (document.getElementById('productSearch').value || '').toLowerCase().trim();
+}
+
+/** Products whose rows are visible for the current search (all products when search is empty). */
+function getVisibleProducts() {
+  const q = productSearchQuery();
+  return products.filter((p) => !q || productSearchBlob(p).includes(q));
+}
+
+function syncCheckAllFromSelection() {
+  const cb = document.getElementById('checkAll');
+  if (!cb) return;
+  const visible = getVisibleProducts();
+  if (!visible.length) {
+    cb.checked = false;
+    cb.indeterminate = false;
+    return;
+  }
+  const nSel = visible.filter((p) => selected.has(p.id)).length;
+  cb.checked = nSel === visible.length;
+  cb.indeterminate = nSel > 0 && nSel < visible.length;
+}
+
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -254,7 +278,7 @@ async function loadProducts() {
 
 function renderProducts() {
   const list = document.getElementById('productList');
-  const q = (document.getElementById('productSearch').value || '').toLowerCase().trim();
+  const q = productSearchQuery();
   list.innerHTML = '';
   products.forEach((p) => {
     const text = productSearchBlob(p);
@@ -268,10 +292,8 @@ function renderProducts() {
     cb.checked = selected.has(p.id);
     cb.addEventListener('change', () => {
       if (cb.checked) selected.add(p.id);
-      else {
-        selected.delete(p.id);
-        document.getElementById('checkAll').checked = false;
-      }
+      else selected.delete(p.id);
+      syncCheckAllFromSelection();
       updateSelectedCount();
     });
     const lab = document.createElement('label');
@@ -282,6 +304,7 @@ function renderProducts() {
     row.appendChild(lab);
     list.appendChild(row);
   });
+  syncCheckAllFromSelection();
   updateSelectedCount();
 }
 
@@ -504,16 +527,24 @@ document.getElementById('productSearch').addEventListener('input', renderProduct
 
 document.getElementById('checkAll').addEventListener('change', (e) => {
   const on = e.target.checked;
-  selected.clear();
-  if (on) products.forEach((p) => selected.add(p.id));
+  const visible = getVisibleProducts();
+  if (on) {
+    visible.forEach((p) => selected.add(p.id));
+  } else {
+    visible.forEach((p) => selected.delete(p.id));
+  }
   renderProducts();
   updateSelectedCount();
 });
 
 document.getElementById('btnUncheckFiltered').addEventListener('click', () => {
-  const q = (document.getElementById('productSearch').value || '').toLowerCase().trim();
+  const q = productSearchQuery();
   if (!q) {
-    toast('Type in the search box first — only matching rows are unchecked');
+    const n = selected.size;
+    selected.clear();
+    syncCheckAllFromSelection();
+    renderProducts();
+    toast(n ? `Unchecked all ${n} product(s)` : 'Nothing was selected');
     return;
   }
   let n = 0;
@@ -523,7 +554,7 @@ document.getElementById('btnUncheckFiltered').addEventListener('click', () => {
       n++;
     }
   });
-  document.getElementById('checkAll').checked = false;
+  syncCheckAllFromSelection();
   renderProducts();
   toast(n ? `Unchecked ${n} matching product(s)` : 'No checked products match this search');
 });
