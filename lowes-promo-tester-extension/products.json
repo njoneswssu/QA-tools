@@ -54,12 +54,6 @@
     "model": "LEVOLOR Custom Day Night Cellular Shade"
   },
   {
-    "id": "11",
-    "name": "LEVOLOR Day Night Cellular Shades",
-    "url": "https://www.lowes.com/configure/blinds?omniItemId=5014103421&refinement=description--LEVOLOR-Levolor-Day-Night-Cellular-Shades",
-    "model": "LEVOLOR Day Night Cellular Shades"
-  },
-  {
     "id": "12",
     "name": "LEVOLOR Custom Cellular Vertical Cellular Shade",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5015173847&refinement=description--LEVOLOR-Custom-Cellular-Vertical-Cellular-Shade",
@@ -110,8 +104,14 @@
   {
     "id": "22",
     "name": "LEVOLOR French Doors",
-    "url": "https://www.lowes.com/configure/blinds?omniItemId=5014430067&refinement=description--LEVOLOR-Levolor-French-Doors",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5004889457&refinement=description--LEVOLOR-Custom-Horizontal-Faux-Wood-Shutters",
     "model": "LEVOLOR French Doors"
+  },
+  {
+       "id": "20",
+    "name": "LEVOLOR  Traditional Custom Traditional Polyresin Shutters",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5014430067&refinement=description--LEVOLOR-Levolor-French-Doors",
+    "model": "LEVOLOR  Traditional Custom Traditional Polyresin Shutters" 
   },
   {
     "id": "23",
