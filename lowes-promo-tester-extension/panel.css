@@ -179,20 +179,6 @@ body {
   opacity: 0.6;
   cursor: wait;
 }
-.active-run {
-  padding: 10px;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  margin-bottom: 8px;
-}
-#activeProductSelect {
-  width: 100%;
-  margin-bottom: 8px;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #cfd8dc;
-}
 .selected-count {
   margin: 0 0 8px;
   font-size: 12px;
@@ -316,6 +302,20 @@ body {
   align-items: flex-start;
   gap: 8px;
 }
+.card-hdr-main {
+  min-width: 0;
+  flex: 1;
+}
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.card .btn-capture-full {
+  flex: 0 1 auto;
+}
 .card-hdr h3 {
   margin: 0;
   font-size: 13px;
@@ -370,28 +370,65 @@ body {
 }
 .result-shot-wrap {
   display: block;
+  position: relative;
   width: 100%;
   height: 132px;
   margin-top: 8px;
   padding: 0;
   background: #e8eaed;
-  cursor: zoom-in;
   text-align: left;
   border-radius: 4px;
   overflow: hidden;
   border: 1px solid #e0e0e0;
 }
-.result-shot-wrap:focus-visible {
+.result-shot-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+  padding: 22px 8px 7px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.4) 55%, transparent 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  max-height: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  border-radius: 0 0 3px 3px;
+}
+.result-shot-btn {
+  display: block;
+  width: 100%;
+  height: 132px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: #e8eaed;
+  cursor: zoom-in;
+  text-align: left;
+  border-radius: 4px;
+}
+.result-shot-btn:focus-visible {
   outline: 2px solid #1565c0;
   outline-offset: 2px;
 }
 .card .del {
-  float: right;
   border: none;
   background: none;
   cursor: pointer;
   font-size: 14px;
   opacity: 0.6;
+  padding: 2px 4px;
+  line-height: 1;
+}
+.card .del:hover {
+  opacity: 1;
 }
 .toast {
   position: fixed;

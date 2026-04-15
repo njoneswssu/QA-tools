@@ -44,8 +44,128 @@ function parseCaptureDataUrl(dataUrl) {
   if (i < 0) return null;
   const header = dataUrl.slice(0, i);
   const base64 = dataUrl.slice(i + 1);
-  if (!header.includes('base64') || base64.length < 40) return null;
+  if (!header.includes('base64') || base64.length < 24) return null;
   return { dataUrl, base64 };
+}
+
+/**
+ * CDP screenshot of the actual page surface — works when captureTab / captureVisibleTab
+ * misbehave with the side panel or split view. Brief “Chrome is being controlled” bar may appear.
+ */
+async function captureViaDebugger(tabId) {
+  const target = { tabId };
+  let attached = false;
+  try {
+    try {
+      await chrome.debugger.attach(target, '1.3');
+      attached = true;
+    } catch (e) {
+      const msg = String(e?.message || e || '');
+      if (/Another debugger|already attached|Debugger is already attached/i.test(msg)) return null;
+      throw e;
+    }
+    await chrome.debugger.sendCommand(target, 'Page.enable', {});
+    let result;
+    try {
+      result = await chrome.debugger.sendCommand(target, 'Page.captureScreenshot', {
+        format: 'png',
+        captureBeyondViewport: true,
+        fromSurface: true
+      });
+    } catch {
+      try {
+        result = await chrome.debugger.sendCommand(target, 'Page.captureScreenshot', {
+          format: 'png',
+          captureBeyondViewport: true
+        });
+      } catch {
+        result = await chrome.debugger.sendCommand(target, 'Page.captureScreenshot', { format: 'png' });
+      }
+    }
+    const raw = result?.data;
+    if (!raw || typeof raw !== 'string') return null;
+    const dataUrl = `data:image/png;base64,${raw}`;
+    return parseCaptureDataUrl(dataUrl);
+  } catch {
+    return null;
+  } finally {
+    if (attached) {
+      try {
+        await chrome.debugger.detach(target);
+      } catch (_) {}
+    }
+  }
+}
+
+/**
+ * One-shot full document screenshot via layout metrics + clip (avoids repeated “header only” captures).
+ */
+async function captureViaDebuggerFullDocument(tabId) {
+  const target = { tabId };
+  let attached = false;
+  try {
+    try {
+      await chrome.debugger.attach(target, '1.3');
+      attached = true;
+    } catch (e) {
+      const msg = String(e?.message || e || '');
+      if (/Another debugger|already attached|Debugger is already attached/i.test(msg)) return null;
+      throw e;
+    }
+    await chrome.debugger.sendCommand(target, 'Page.enable', {});
+    const metrics = await chrome.debugger.sendCommand(target, 'Page.getLayoutMetrics', {});
+    const cs = metrics?.contentSize;
+    if (!cs || typeof cs.width !== 'number' || typeof cs.height !== 'number') {
+      return null;
+    }
+    let W = Math.min(Math.max(1, Math.ceil(cs.width)), 16384);
+    let H = Math.min(Math.max(1, Math.ceil(cs.height)), 24576);
+    const lv = metrics.layoutViewport;
+    if (lv && H < (lv.clientHeight || 0) * 1.25) {
+      H = Math.max(H, Math.ceil((lv.clientHeight || 800) * 3));
+    }
+    const maxPx = 16384;
+    const scaleCandidates = [];
+    for (const s of [2.5, 2.25, 2, 1.75, 1.5, 1.25, 1]) {
+      if (W * s <= maxPx && H * s <= maxPx) scaleCandidates.push(s);
+    }
+    if (!scaleCandidates.length) scaleCandidates.push(1);
+    let raw = null;
+    for (const scale of scaleCandidates) {
+      const clip = { x: 0, y: 0, width: W, height: H, scale };
+      try {
+        const result = await chrome.debugger.sendCommand(target, 'Page.captureScreenshot', {
+          format: 'png',
+          clip,
+          captureBeyondViewport: true,
+          fromSurface: true
+        });
+        raw = result?.data;
+      } catch {
+        try {
+          const result = await chrome.debugger.sendCommand(target, 'Page.captureScreenshot', {
+            format: 'png',
+            clip,
+            captureBeyondViewport: true
+          });
+          raw = result?.data;
+        } catch {
+          raw = null;
+        }
+      }
+      if (raw && typeof raw === 'string') break;
+    }
+    if (!raw || typeof raw !== 'string') return null;
+    return parseCaptureDataUrl(`data:image/png;base64,${raw}`);
+  } catch {
+    return null;
+  } finally {
+    if (attached) {
+      try {
+        await chrome.debugger.detach(target);
+      } catch (_) {}
+    }
+  }
 }
 
 /**
@@ -151,6 +271,53 @@ async function blobToDataUrlFromBlob(blob) {
 }
 
 /**
+ * Full-page PNGs are far too large for chrome.storage.local (~5–10 MB total).
+ * Downscale to high-quality JPEG so runs stay under quota but text stays readable.
+ */
+async function shrinkScreenshotForStorage(cap, options = {}) {
+  const maxSide = options.maxSide ?? 8192;
+  const quality = options.quality ?? 0.98;
+  const force = !!options.force;
+  if (!cap?.dataUrl || !cap?.base64) return cap;
+  /* Skip recompress when already modest size (keeps prior sharp saves). */
+  if (!force && cap.base64.length < 920000) return cap;
+  if (typeof createImageBitmap === 'undefined' || typeof OffscreenCanvas === 'undefined') return cap;
+  try {
+    const resp = await fetch(cap.dataUrl);
+    const blob = await resp.blob();
+    const bmp = await createImageBitmap(blob);
+    const maxDim = Math.max(bmp.width, bmp.height, 1);
+    const scale = Math.min(1, maxSide / maxDim);
+    const nw = Math.max(1, Math.round(bmp.width * scale));
+    const nh = Math.max(1, Math.round(bmp.height * scale));
+    const canvas = new OffscreenCanvas(nw, nh);
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    try {
+      ctx.imageSmoothingQuality = 'high';
+    } catch (_) {}
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, nw, nh);
+    ctx.drawImage(bmp, 0, 0, nw, nh);
+    bmp.close();
+    let outBlob = null;
+    try {
+      outBlob = await canvas.convertToBlob({ type: 'image/webp', quality: Math.min(0.99, quality) });
+    } catch (_) {
+      outBlob = null;
+    }
+    if (!outBlob || outBlob.size < 80) {
+      outBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality });
+    }
+    const dataUrl = await blobToDataUrlFromBlob(outBlob);
+    const parsed = parseCaptureDataUrl(dataUrl);
+    return parsed?.base64 ? parsed : cap;
+  } catch (_) {
+    return cap;
+  }
+}
+
+/**
  * Stack viewport captures top-to-bottom. Matches real scroll steps better than
  * placing by scrollY*dpr (capture scale can differ from window.devicePixelRatio).
  */
@@ -170,6 +337,10 @@ async function stitchScreenshotSlicesVertical(slices) {
   const canvasH = Math.min(totalH, MAX_H);
   const canvas = new OffscreenCanvas(maxW, canvasH);
   const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  try {
+    ctx.imageSmoothingQuality = 'high';
+  } catch (_) {}
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, maxW, canvasH);
   let y = 0;
@@ -291,9 +462,79 @@ async function captureScreenshotReliable(tabId, windowId) {
   try {
     return await captureScreenshotForTab(tabId, windowId);
   } catch (_) {
-    /* side panel + service worker: try panel fallback */
+    /* fall through */
   }
+  try {
+    const dbg = await captureViaDebugger(tabId);
+    if (dbg?.base64) return dbg;
+  } catch (_) {}
   return requestExtensionPageCapture(tabId);
+}
+
+/** Long / scrollable page first (debugger CDP), then stitched visible-tab slices, then viewport fallbacks. */
+async function captureFullWebpageForTab(tabId, windowId) {
+  try {
+    const big = await captureViaDebuggerFullDocument(tabId);
+    if (big?.base64) return big;
+  } catch (_) {}
+  try {
+    const dbg = await captureViaDebugger(tabId);
+    if (dbg?.base64) return dbg;
+  } catch (_) {}
+  try {
+    const full = await captureFullPageScreenshot(tabId, windowId);
+    if (full?.base64) return full;
+  } catch (_) {}
+  return captureScreenshotReliable(tabId, windowId);
+}
+
+function sameLowesProductPage(tabUrl, productUrl) {
+  try {
+    const a = new URL(tabUrl);
+    const b = new URL(productUrl);
+    const ga = a.searchParams.get('omniItemId');
+    const gb = b.searchParams.get('omniItemId');
+    if (ga && gb && ga === gb) return true;
+    return a.origin === b.origin && a.pathname === b.pathname && a.search === b.search;
+  } catch {
+    return false;
+  }
+}
+
+async function pickOrNavigateLowesTab(productUrl) {
+  const all = await chrome.tabs.query({});
+  const lowes = all.filter((t) => t.url && /lowes\.com/i.test(t.url));
+  let tab = lowes.find((t) => t.active);
+  if (!tab && lowes.length) tab = lowes[0];
+  if (!tab) {
+    const t = await chrome.tabs.create({ url: productUrl, active: true });
+    await waitTabComplete(t.id);
+    return chrome.tabs.get(t.id);
+  }
+  await chrome.windows.update(tab.windowId, { focused: true });
+  if (tab.url && sameLowesProductPage(tab.url, productUrl)) {
+    await chrome.tabs.update(tab.id, { active: true });
+    await sleep(800);
+    return chrome.tabs.get(tab.id);
+  }
+  await chrome.tabs.update(tab.id, { url: productUrl, active: true });
+  await waitTabComplete(tab.id);
+  return chrome.tabs.get(tab.id);
+}
+
+async function applyScreenshotToResultRow(resultId, cap) {
+  if (!cap?.base64) throw new Error('No image captured');
+  const slim = await shrinkScreenshotForStorage(cap);
+  const { testResults = [] } = await chrome.storage.local.get('testResults');
+  const idx = testResults.findIndex((r) => String(r.id) === String(resultId));
+  if (idx < 0) throw new Error('Result not found');
+  const updated = [...testResults];
+  updated[idx] = {
+    ...updated[idx],
+    screenshot_data: slim.base64,
+    screenshot_url: slim.dataUrl
+  };
+  await writeTestResultsWithQuotaMitigation(updated, idx);
 }
 
 function todayLocal() {
@@ -323,6 +564,11 @@ function buildServerShapedRow(partial, id, testDate, screenshotDataBase64, scree
     width: partial.width != null ? parseInt(partial.width, 10) : null,
     height: partial.height != null ? parseInt(partial.height, 10) : null,
     color: partial.color ?? null,
+    blinds_per_headrail: partial.blinds_per_headrail ?? null,
+    lift: partial.lift ?? null,
+    valance_style: partial.valance_style ?? null,
+    cassette_valance: partial.cassette_valance ?? null,
+    side_channels: partial.side_channels ?? null,
     original_price: toNum(partial.original_price),
     promotional_price: toNum(partial.promotional_price),
     promo_percentage: promoNum,
@@ -343,15 +589,105 @@ function storageLocalSet(obj) {
   });
 }
 
-async function setTestResultsStripScreenshotsOnQuota(nextRows) {
-  try {
-    await storageLocalSet({ testResults: nextRows });
-    return;
-  } catch (e) {
-    if (!String(e.message).toLowerCase().includes('quota')) throw e;
+/**
+ * Writes testResults; on quota, drops other screenshots (oldest first) then shrinks the protected row.
+ * @param {object[]} rows
+ * @param {number|null} protectIdx index of row we want to keep a screenshot for
+ */
+async function writeTestResultsWithQuotaMitigation(rows, protectIdx = null) {
+  let copy = rows.map((r) => ({ ...r }));
+  let shrinkPass = 0;
+  const shrinkSteps = [
+    { maxSide: 6144, quality: 0.97 },
+    { maxSide: 4800, quality: 0.95 },
+    { maxSide: 3600, quality: 0.93 },
+    { maxSide: 2800, quality: 0.9 },
+    { maxSide: 2048, quality: 0.86 },
+    { maxSide: 1600, quality: 0.8 },
+    { maxSide: 1280, quality: 0.75 }
+  ];
+  for (let round = 0; round < 220; round++) {
+    try {
+      await storageLocalSet({ testResults: copy });
+      return;
+    } catch (e) {
+      if (!String(e.message || '').toLowerCase().includes('quota')) throw e;
+    }
+    let clearedOther = false;
+    for (let i = copy.length - 1; i >= 0; i--) {
+      if (protectIdx != null && i === protectIdx) continue;
+      if (copy[i].screenshot_data || copy[i].screenshot_url) {
+        copy[i] = { ...copy[i], screenshot_data: null, screenshot_url: null };
+        clearedOther = true;
+        break;
+      }
+    }
+    if (clearedOther) continue;
+    if (protectIdx != null && copy[protectIdx]) {
+      const row = copy[protectIdx];
+      const du =
+        row.screenshot_url && String(row.screenshot_url).startsWith('data:')
+          ? row.screenshot_url
+          : row.screenshot_data
+            ? `data:image/png;base64,${row.screenshot_data}`
+            : '';
+      let parsed = parseCaptureDataUrl(du);
+      if (!parsed && row.screenshot_data) {
+        parsed =
+          parseCaptureDataUrl(`data:image/webp;base64,${row.screenshot_data}`) ||
+          parseCaptureDataUrl(`data:image/jpeg;base64,${row.screenshot_data}`);
+      }
+      if (parsed?.dataUrl && shrinkPass < 14) {
+        const step = shrinkSteps[Math.min(shrinkPass, shrinkSteps.length - 1)];
+        const more = await shrinkScreenshotForStorage(parsed, {
+          ...step,
+          force: true
+        });
+        copy[protectIdx] = {
+          ...copy[protectIdx],
+          screenshot_data: more.base64,
+          screenshot_url: more.dataUrl
+        };
+        shrinkPass++;
+        continue;
+      }
+    }
+    if (copy.length > 1) {
+      copy = copy.slice(0, -1);
+      continue;
+    }
+    throw new Error(
+      'Storage full — export a backup from the panel, then clear results or delete old entries.'
+    );
   }
-  const slim = nextRows.map((r) => ({ ...r, screenshot_data: null, screenshot_url: null }));
-  await storageLocalSet({ testResults: slim });
+}
+
+async function setTestResultsStripScreenshotsOnQuota(nextRows) {
+  let rows = nextRows.map((r) => ({ ...r }));
+  for (let round = 0; round < 120; round++) {
+    try {
+      await storageLocalSet({ testResults: rows });
+      return;
+    } catch (e) {
+      if (!String(e.message || '').toLowerCase().includes('quota')) throw e;
+    }
+    let cleared = false;
+    for (let i = rows.length - 1; i >= 0; i--) {
+      if (rows[i].screenshot_data || rows[i].screenshot_url) {
+        rows[i] = { ...rows[i], screenshot_data: null, screenshot_url: null };
+        cleared = true;
+        break;
+      }
+    }
+    if (cleared) continue;
+    if (rows.length > 1) {
+      rows = rows.slice(0, -1);
+      continue;
+    }
+    rows = rows.map((r) => ({ ...r, screenshot_data: null, screenshot_url: null }));
+    await storageLocalSet({ testResults: rows });
+    return;
+  }
 }
 
 function fingerprintFromPartial(partial) {
@@ -410,13 +746,15 @@ async function persistTestResult(tabId, partial) {
   if (tab?.windowId == null) return row;
 
   try {
-    const cap = await captureScreenshotReliable(tab.id, tab.windowId);
+    await sleep(900);
+    let cap = await captureScreenshotReliable(tab.id, tab.windowId);
     if (!cap?.base64) {
       const { testResults: trOnly = [] } = await chrome.storage.local.get('testResults');
-      return trOnly.find((r) => r.id == id) || row;
+      return trOnly.find((r) => String(r.id) === String(id)) || row;
     }
+    cap = await shrinkScreenshotForStorage(cap);
     const { testResults: tr = [] } = await chrome.storage.local.get('testResults');
-    const idx = tr.findIndex((r) => r.id == id);
+    const idx = tr.findIndex((r) => String(r.id) === String(id));
     if (idx >= 0) {
       const updated = [...tr];
       updated[idx] = {
@@ -424,21 +762,14 @@ async function persistTestResult(tabId, partial) {
         screenshot_data: cap.base64,
         screenshot_url: cap.dataUrl
       };
-      try {
-        await storageLocalSet({ testResults: updated });
-      } catch (e) {
-        if (String(e.message).toLowerCase().includes('quota')) {
-          const slim = updated.map((r) => ({ ...r, screenshot_data: null, screenshot_url: null }));
-          await storageLocalSet({ testResults: slim });
-        }
-      }
+      await writeTestResultsWithQuotaMitigation(updated, idx);
     }
   } catch (_) {
     /* row without screenshot */
   }
 
   const { testResults: tr2 = [] } = await chrome.storage.local.get('testResults');
-  return tr2.find((r) => r.id == id) || row;
+  return tr2.find((r) => String(r.id) === String(id)) || row;
 }
 
 /** Content script may not be ready immediately after navigation; retry before failing. */
@@ -461,20 +792,80 @@ async function sendRunTestToTab(tabId, product) {
   return { ok: false, error: lastErr?.message || 'No response from Lowe’s page (reload tab and try again)' };
 }
 
+async function sendApplyResultToTab(tabId, config) {
+  let lastErr = null;
+  for (let attempt = 0; attempt < 28; attempt++) {
+    try {
+      const response = await chrome.tabs.sendMessage(tabId, {
+        type: 'APPLY_RESULT_FOR_SCREENSHOT',
+        config
+      });
+      if (response && typeof response === 'object' && response.ok) {
+        return response;
+      }
+      lastErr = new Error(response?.error || 'Could not apply saved configuration');
+    } catch (e) {
+      lastErr = e;
+    }
+    await sleep(550);
+  }
+  return { ok: false, error: lastErr?.message || 'No response from Lowe’s page (reload tab and try again)' };
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === 'RUN_TEST_ON_TAB') {
+  if (msg.type === 'CAPTURE_WEBPAGE_FOR_RESULT') {
     (async () => {
-      const tabId = msg.tabId;
       try {
-        const response = await sendRunTestToTab(tabId, msg.product);
-        if (!response?.ok || !response.partial) {
-          sendResponse(response || { ok: false, error: 'No response from page' });
+        const resultId = msg.resultId;
+        if (resultId == null) {
+          sendResponse({ ok: false, error: 'Missing result id' });
           return;
         }
-        const final = await persistTestResult(tabId, response.partial);
-        sendResponse({ ok: true, result: final });
+        const { testResults = [] } = await chrome.storage.local.get('testResults');
+        const row = testResults.find((r) => String(r.id) === String(resultId));
+        if (!row) {
+          sendResponse({ ok: false, error: 'Result not found' });
+          return;
+        }
+        const productUrl = row.product_url;
+        if (!productUrl || typeof productUrl !== 'string' || !/lowes\.com/i.test(productUrl)) {
+          sendResponse({ ok: false, error: 'This result has no Lowe’s product URL to open' });
+          return;
+        }
+        const tab = await pickOrNavigateLowesTab(productUrl);
+        await sleep(5000);
+        const applied = await sendApplyResultToTab(tab.id, {
+          width: row.width,
+          height: row.height,
+          color: row.color
+        });
+        if (!applied?.ok) {
+          sendResponse({
+            ok: false,
+            error:
+              applied?.error ||
+              'Could not apply this result’s width, height, and color on the page — reload the Lowe’s tab and try again'
+          });
+          return;
+        }
+        await sleep(600);
+        try {
+          await chrome.tabs.sendMessage(tab.id, { type: 'PREPARE_SCREENSHOT' });
+        } catch (_) {}
+        await sleep(700);
+        const t2 = await chrome.tabs.get(tab.id);
+        const cap = await captureFullWebpageForTab(t2.id, t2.windowId);
+        if (!cap?.base64) {
+          sendResponse({
+            ok: false,
+            error: 'Screenshot failed — close DevTools on that tab if open, reload the Lowe’s page, and try again'
+          });
+          return;
+        }
+        await applyScreenshotToResultRow(resultId, cap);
+        sendResponse({ ok: true });
       } catch (e) {
-        sendResponse({ ok: false, error: e.message });
+        sendResponse({ ok: false, error: e.message || String(e) });
       }
     })();
     return true;

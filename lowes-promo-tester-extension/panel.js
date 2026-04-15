@@ -161,7 +161,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       const dataUrl = await chrome.tabs.captureVisibleTab(t.windowId, { format: 'png' });
       const i = dataUrl.indexOf(',');
       const base64 = i >= 0 && dataUrl.slice(0, i).includes('base64') ? dataUrl.slice(i + 1) : '';
-      if (base64.length < 40) {
+      if (base64.length < 24) {
         sendResponse({ ok: false, error: 'empty capture' });
         return;
       }
@@ -273,7 +273,6 @@ async function loadProducts() {
   const res = await fetch(url);
   products = await res.json();
   renderProducts();
-  fillActiveSelect();
 }
 
 function renderProducts() {
@@ -308,17 +307,6 @@ function renderProducts() {
   updateSelectedCount();
 }
 
-function fillActiveSelect() {
-  const sel = document.getElementById('activeProductSelect');
-  sel.innerHTML = '';
-  products.forEach((p) => {
-    const o = document.createElement('option');
-    o.value = p.id;
-    o.textContent = displayName(p.name);
-    sel.appendChild(o);
-  });
-}
-
 async function loadResults() {
   const { testResults = [], resultsHiddenProductIds = [] } = await chrome.storage.local.get([
     'testResults',
@@ -328,7 +316,7 @@ async function loadResults() {
   const visibleRows = testResults.filter((r) => !hidden.has(String(r.product_id ?? '')));
   const grid = document.getElementById('resultsGrid');
   if (!testResults.length) {
-    grid.innerHTML = '<p class="muted">No results yet. Use Start testing or Run on active tab.</p>';
+    grid.innerHTML = '<p class="muted">No results yet. Use <strong>Start testing</strong> above.</p>';
   } else if (!visibleRows.length) {
     grid.innerHTML =
       '<p class="muted">Every blind is hidden — open <strong>Filter blinds</strong> and check products to show them again.</p>';
@@ -379,8 +367,13 @@ function renderResults(rowsToShow) {
       (r.screenshot_data ? `data:image/png;base64,${r.screenshot_data}` : '');
     card.innerHTML = `
       <div class="card-hdr">
-        <div>
-          <button type="button" class="del" data-id="${r.id}" title="Delete">🗑</button>
+        <div class="card-hdr-main">
+          <div class="card-actions">
+            <button type="button" class="btn small btn-capture-full" title="Open this product if needed, restore this result’s width/height/color, then save a full-page screenshot">
+              Capture webpage
+            </button>
+            <button type="button" class="del" data-id="${r.id}" title="Delete this result permanently">🗑</button>
+          </div>
           <h3>${displayName(r.product_name || r.model)}</h3>
           <div class="row">${r.model || ''}</div>
         </div>
@@ -394,20 +387,30 @@ function renderResults(rowsToShow) {
       ${r.error ? `<div class="err">${escapeHtml(r.error)}</div>` : ''}
     `;
     card.querySelector('.del').addEventListener('click', () => deleteResult(r.id));
+    card.querySelector('.btn-capture-full').addEventListener('click', () => captureWebpageForResult(r));
     if (shot) {
-      const wrap = document.createElement('button');
-      wrap.type = 'button';
+      const previewTitle = displayName(r.product_name || r.model || 'Result');
+      const wrap = document.createElement('div');
       wrap.className = 'result-shot-wrap';
-      wrap.setAttribute('aria-label', 'View screenshot full size');
+      const caption = document.createElement('div');
+      caption.className = 'result-shot-caption';
+      caption.textContent = previewTitle;
+      caption.setAttribute('aria-hidden', 'true');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'result-shot-btn';
+      btn.setAttribute('aria-label', `View full screenshot: ${previewTitle}`);
       const img = document.createElement('img');
       img.src = shot;
       img.className = 'result-shot';
-      img.alt = 'Configuration screenshot';
-      wrap.appendChild(img);
-      wrap.addEventListener('click', (e) => {
+      img.alt = `Configuration screenshot — ${previewTitle}`;
+      btn.appendChild(img);
+      btn.addEventListener('click', (e) => {
         e.preventDefault();
         openShotPreview(img.src);
       });
+      wrap.appendChild(caption);
+      wrap.appendChild(btn);
       card.appendChild(wrap);
     }
     grid.appendChild(card);
@@ -427,10 +430,46 @@ function escapeHtml(s) {
 }
 
 async function deleteResult(id) {
+  if (
+    !confirm(
+      'Delete this result permanently?\n\nIt will be removed from saved results. This cannot be undone.'
+    )
+  ) {
+    return;
+  }
   const { testResults = [] } = await chrome.storage.local.get('testResults');
-  const next = testResults.filter((r) => r.id !== id);
+  const next = testResults.filter((r) => String(r.id) !== String(id));
   await chrome.storage.local.set({ testResults: next });
   await loadResults();
+}
+
+async function captureWebpageForResult(r) {
+  const label = displayName(r.product_name || r.model || 'this result');
+  if (!r.product_url || !String(r.product_url).includes('lowes.com')) {
+    toast('This result has no Lowe’s product URL — nothing to open for capture.');
+    return;
+  }
+  if (
+    !confirm(
+      `Capture full webpage for “${label}”?\n\n` +
+        'A Lowe’s tab will open or switch to this product if needed. The same width, height, and color as this result will be applied on the configurator. ' +
+        'Unsaved changes on that tab may be lost. A full-page screenshot will be saved on this card.'
+    )
+  ) {
+    return;
+  }
+  toast('Opening Lowe’s tab and capturing…');
+  try {
+    const res = await chrome.runtime.sendMessage({ type: 'CAPTURE_WEBPAGE_FOR_RESULT', resultId: r.id });
+    if (res?.ok) {
+      toast('Full webpage screenshot saved');
+      await loadResults();
+    } else {
+      toast(res?.error || 'Capture failed');
+    }
+  } catch (e) {
+    toast(e.message || 'Capture failed');
+  }
 }
 
 function uniqueProductsFromResults(rows) {
@@ -557,34 +596,6 @@ document.getElementById('btnUncheckFiltered').addEventListener('click', () => {
   syncCheckAllFromSelection();
   renderProducts();
   toast(n ? `Unchecked ${n} matching product(s)` : 'No checked products match this search');
-});
-
-document.getElementById('btnRunActive').addEventListener('click', async () => {
-  const id = document.getElementById('activeProductSelect').value;
-  const product = products.find((p) => p.id === id);
-  if (!product) return;
-  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-  const tab = tabs[0];
-  if (!tab?.id || !tab.url?.includes('lowes.com')) {
-    toast('Switch to a Lowe’s tab first (or use Start testing).');
-    return;
-  }
-  toast('Running…');
-  try {
-    const res = await chrome.runtime.sendMessage({
-      type: 'RUN_TEST_ON_TAB',
-      tabId: tab.id,
-      product
-    });
-    if (res?.ok) {
-      toast('Done');
-      await loadResults();
-    } else {
-      toast(res?.error || 'Failed');
-    }
-  } catch (e) {
-    toast(e.message || 'Failed — refresh the Lowe’s tab and try again');
-  }
 });
 
 document.getElementById('btnSeq').addEventListener('click', async () => {

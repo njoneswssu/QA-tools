@@ -81,7 +81,7 @@ function isLikelyInfoOrHelpControl(el) {
   const tid = (el.getAttribute('data-testid') || '').toLowerCase();
   const combined = `${aria} ${title} ${cls} ${tid}`;
   if (
-    /information|more info|learn more|tooltip|what is|definition|measuring|how to measure|watch video|see details|read more|show details|help with|about (the |this )?(mount|opacity|width|height)/.test(
+    /information|more info|learn more|tooltip|what is|definition|measuring|how to measure|watch video|see details|read more|show details|help with|help me choose|about (the |this )?(mount|opacity|width|height|lift|cassette|valance)/.test(
       combined
     )
   ) {
@@ -441,6 +441,921 @@ async function pickMaterialStyleFromSelect() {
   return null;
 }
 
+function normLiftText(s) {
+  return (s || '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/[()]/g, ' ')
+    .trim();
+}
+
+/** Match order: Cordless → Continuous Cord Loop → Motorization (Tethered Wand) → Motorization. */
+const LIFT_MATCHERS = [
+  (n) => /\bcordless\b/.test(n),
+  (n) => /\bcontinuous\s+cord\s+loop\b/.test(n) || /\bcord\s+loop\b/.test(n),
+  (n) => /\bmotorization\b/.test(n) && /\btethered\b/.test(n),
+  (n) => /\bmotorization\b/.test(n) && !/\btethered\b/.test(n)
+];
+
+function pickLiftChoiceFromLabels(labels) {
+  const rows = labels
+    .map((text) => ({ text: (text || '').trim(), n: normLiftText(text) }))
+    .filter((r) => r.text.length > 2 && !/^choose|^select|^--/i.test(r.text));
+  if (!rows.length) return null;
+  for (const match of LIFT_MATCHERS) {
+    for (const r of rows) {
+      if (match(r.n)) return r.text;
+    }
+  }
+  return rows[0].text;
+}
+
+/**
+ * Lowe's ECP lift row uses the same tile pattern as color: `input.tile-input-radio[data-testid^="ecp-button-select-"]`
+ * with lift-specific suffixes (not color slugs).
+ */
+const ECP_LIFT_SUFFIX_GROUPS = [
+  ['CORDLESS'],
+  ['CONTINUOUS_LOOP', 'CONTINUOUS_CORD_LOOP'],
+  ['IN_WAND'],
+  ['IN_MOTORIZED', 'MOTORIZED']
+];
+
+const ECP_LIFT_SUFFIX_READABLE = {
+  CORDLESS: 'Cordless',
+  CONTINUOUS_LOOP: 'Continuous Cord Loop',
+  CONTINUOUS_CORD_LOOP: 'Continuous Cord Loop',
+  IN_WAND: 'Motorization (Tethered Wand)',
+  IN_MOTORIZED: 'Motorization',
+  MOTORIZED: 'Motorization'
+};
+
+function ecpButtonSelectSuffix(input) {
+  const tid = (input.getAttribute('data-testid') || '').trim();
+  const m = /^ecp-button-select-(.+)$/i.exec(tid);
+  return m ? m[1].toUpperCase().replace(/\s+/g, '_') : '';
+}
+
+function isEcpLiftTileSuffix(suf) {
+  return ECP_LIFT_SUFFIX_GROUPS.some((g) => g.includes(suf));
+}
+
+async function trySelectLiftFromEcpTileRadios() {
+  const root = configuratorRoot();
+  const seen = new Set();
+  const inputs = [];
+  const add = (el) => {
+    if (!el || seen.has(el) || el.disabled || isLikelyInfoOrHelpControl(el)) return;
+    const tid = el.getAttribute('data-testid') || '';
+    if (!/^ecp-button-select-/i.test(tid)) return;
+    const cls = elementClassString(el).toLowerCase();
+    if (!cls.includes('tile-input-radio')) return;
+    if (el.closest('#colorId, [data-testid="colorId"]')) return;
+    const suf = ecpButtonSelectSuffix(el);
+    if (!isEcpLiftTileSuffix(suf)) return;
+    seen.add(el);
+    inputs.push(el);
+  };
+  root.querySelectorAll('input[type="radio"][data-testid^="ecp-button-select-"]').forEach(add);
+  querySelectorAllDeep('input[type="radio"][data-testid^="ecp-button-select-"]', root).forEach(add);
+
+  if (inputs.length < 1) return null;
+
+  for (const group of ECP_LIFT_SUFFIX_GROUPS) {
+    for (const suf of group) {
+      const input = inputs.find((inp) => ecpButtonSelectSuffix(inp) === suf);
+      if (!input) continue;
+      const clickEl = resolveLowesColorTileClickTarget(input, document.documentElement);
+      if (!clickEl || !isVisible(clickEl)) continue;
+      const readable = ECP_LIFT_SUFFIX_READABLE[suf] || suf.replace(/_/g, ' ');
+      clickEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(400);
+      clickEl.click();
+      await pauseAwareSleep(400);
+      if (!input.checked) {
+        try {
+          input.click();
+        } catch (_) {}
+        await pauseAwareSleep(400);
+      }
+      await pauseAwareSleep(600);
+      return readable;
+    }
+  }
+  return null;
+}
+
+function hasLiftContext(el) {
+  let p = el;
+  for (let d = 0; d < 12 && p; d++) {
+    const txt = (p.textContent || '').slice(0, 1400).toLowerCase();
+    if (/\blift\b/.test(txt)) return true;
+    p = p.parentElement;
+  }
+  return false;
+}
+
+/** Lowe’s often renders lift below color — scroll until a Lift heading exists or we reach the bottom. */
+async function scrollConfiguratorTowardsLift() {
+  for (let i = 0; i < 16; i++) {
+    const legends = [...document.querySelectorAll('fieldset legend, h2, h3, h4, h5')];
+    const liftHead = legends.find((l) => /\blift\b/i.test(l.textContent || ''));
+    if (liftHead) {
+      liftHead.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(550);
+      return;
+    }
+    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+    if (nearBottom) break;
+    window.scrollBy({ top: Math.min(480, window.innerHeight * 0.75), behavior: 'smooth' });
+    await pauseAwareSleep(380);
+  }
+}
+
+async function scrollLiftSectionIntoView() {
+  const heads = document.querySelectorAll('legend, h2, h3, h4, h5, [class*="label" i]');
+  for (const h of heads) {
+    const t = (h.textContent || '').trim();
+    if (!/\blift\b/i.test(t)) continue;
+    if (/\blift\b/i.test(t) && (/\boption\b/i.test(t) || t.length <= 48)) {
+      h.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(450);
+      return;
+    }
+  }
+  for (const h of heads) {
+    if (/\blift\b/i.test(h.textContent || '')) {
+      h.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(450);
+      return;
+    }
+  }
+}
+
+function liftDirectClickOk(el, n) {
+  if (/\bcontinuous\s+cord\s+loop\b/.test(n)) return true;
+  if (/\bmotorization\b/.test(n) && /\btethered\b/.test(n)) return true;
+  if (/\bmotorization\b/.test(n) && !/\btethered\b/.test(n) && n.length < 48) return true;
+  if (/\bcordless\b/.test(n)) return hasLiftContext(el);
+  return false;
+}
+
+/** Tile / card rows: visible text matches a lift product name (Levolor often uses non-fieldset tiles). */
+async function trySelectLiftFromDirectPhrases() {
+  const root = configuratorRoot();
+  const nodes = root.querySelectorAll(
+    'button, [role="button"], [role="radio"], [role="option"], label, li, div[tabindex="0"], span[tabindex="0"], a'
+  );
+  const list = [...nodes].filter(
+    (el) =>
+      isVisible(el) &&
+      !isLikelyInfoOrHelpControl(el) &&
+      !el.closest('nav, header, footer, [class*="cart" i], [role="dialog"], [aria-modal="true"]')
+  );
+  for (const match of LIFT_MATCHERS) {
+    for (const el of list) {
+      const t = (el.textContent || '').trim().replace(/\s+/g, ' ');
+      const aria = el.getAttribute('aria-label') || '';
+      if (t.length > 160 || t.length < 3) continue;
+      const n = normLiftText(`${t} ${aria}`);
+      if (!match(n)) continue;
+      if (!liftDirectClickOk(el, n)) continue;
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(400);
+      el.click();
+      await pauseAwareSleep(1200);
+      return t.split('\n')[0].trim().slice(0, 120);
+    }
+  }
+  return null;
+}
+
+async function trySelectLiftFromSelect() {
+  for (const fs of document.querySelectorAll('fieldset')) {
+    const leg = (fs.querySelector('legend')?.textContent || '').toLowerCase();
+    const blob = (fs.textContent || '').slice(0, 500).toLowerCase();
+    if (!/\blift\b/.test(leg) && !/\blift\s*option\b/.test(blob)) continue;
+    const sel = fs.querySelector('select');
+    if (!sel || !isVisible(sel)) continue;
+    const opts = Array.from(sel.options).filter((o) => {
+      if (!o.value) return false;
+      const tx = (o.textContent || '').trim();
+      if (/^choose|^select|^--|^\.\.\./i.test(tx)) return false;
+      return true;
+    });
+    if (opts.length < 1) continue;
+    const label = pickLiftChoiceFromLabels(opts.map((o) => (o.textContent || '').trim()));
+    const opt =
+      opts.find((o) => (o.textContent || '').trim() === label) ||
+      opts.find((o) => normLiftText(o.textContent || '') === normLiftText(label)) ||
+      opts[0];
+    sel.focus();
+    setNativeSelectValue(sel, opt.value);
+    await pauseAwareSleep(900);
+    return ((opt.textContent || '').trim() || opt.value).slice(0, 120);
+  }
+  for (const sel of document.querySelectorAll('select')) {
+    if (!isVisible(sel)) continue;
+    const meta = `${sel.name || ''} ${sel.id || ''} ${sel.getAttribute('aria-label') || ''}`.toLowerCase();
+    if (!/\blift\b/.test(meta)) continue;
+    const opts = Array.from(sel.options).filter((o) => {
+      if (!o.value) return false;
+      const tx = (o.textContent || '').trim();
+      if (/^choose|^select|^--|^\.\.\./i.test(tx)) return false;
+      return true;
+    });
+    if (opts.length < 1) continue;
+    const label = pickLiftChoiceFromLabels(opts.map((o) => (o.textContent || '').trim()));
+    const opt =
+      opts.find((o) => (o.textContent || '').trim() === label) ||
+      opts.find((o) => normLiftText(o.textContent || '') === normLiftText(label)) ||
+      opts[0];
+    sel.focus();
+    setNativeSelectValue(sel, opt.value);
+    await pauseAwareSleep(900);
+    return ((opt.textContent || '').trim() || opt.value).slice(0, 120);
+  }
+  return null;
+}
+
+async function trySelectLiftFromRadios() {
+  for (const fs of document.querySelectorAll('fieldset')) {
+    const leg = (fs.querySelector('legend')?.textContent || '').toLowerCase();
+    const blob = (fs.textContent || '').slice(0, 500).toLowerCase();
+    if (!/\blift\b/.test(leg) && !/\blift\s*option\b/.test(blob)) continue;
+    const radios = [...fs.querySelectorAll('input[type="radio"]')].filter((r) => isVisible(r));
+    const cands = [];
+    for (const r of radios) {
+      let label = null;
+      if (r.id) {
+        try {
+          label = document.querySelector(`label[for="${CSS.escape(r.id)}"]`);
+        } catch (_) {
+          label = document.querySelector(`label[for="${r.id.replace(/"/g, '\\"')}"]`);
+        }
+      }
+      if (!label) label = r.closest('label');
+      const text = (label?.textContent || r.getAttribute('aria-label') || r.value || '').trim();
+      if (text.length < 3) continue;
+      const click = label && isVisible(label) ? label : r;
+      cands.push({ text, click });
+    }
+    if (cands.length < 1) continue;
+    const label = pickLiftChoiceFromLabels(cands.map((c) => c.text));
+    const hit =
+      cands.find((c) => c.text === label) ||
+      cands.find((c) => normLiftText(c.text) === normLiftText(label)) ||
+      cands[0];
+    hit.click.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(350);
+    hit.click.click();
+    await pauseAwareSleep(1100);
+    return hit.text.slice(0, 120);
+  }
+  return null;
+}
+
+async function trySelectLiftFromRoleRadios() {
+  const groups = document.querySelectorAll('[role="radiogroup"], fieldset');
+  for (const g of groups) {
+    const blob = (g.textContent || '').slice(0, 900).toLowerCase();
+    if (!/\blift\b/.test(blob)) continue;
+    const roles = [...g.querySelectorAll('[role="radio"]')].filter((el) => isVisible(el));
+    if (roles.length < 1) continue;
+    const cands = roles.map((el) => ({
+      text: (el.textContent || el.getAttribute('aria-label') || '').trim().split('\n')[0].slice(0, 120),
+      el
+    }));
+    const label = pickLiftChoiceFromLabels(cands.map((c) => c.text));
+    const hit =
+      cands.find((c) => c.text === label) ||
+      cands.find((c) => normLiftText(c.text) === normLiftText(label)) ||
+      cands[0];
+    hit.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(350);
+    hit.el.click();
+    await pauseAwareSleep(1100);
+    return hit.text.slice(0, 120);
+  }
+  return null;
+}
+
+async function trySelectLiftFromCombobox() {
+  const root = configuratorRoot();
+  const triggers = new Set([
+    ...root.querySelectorAll(
+      '[role="combobox"], [aria-haspopup="listbox"], button[aria-expanded][aria-controls], [data-testid*="combobox" i]'
+    ),
+    ...document.querySelectorAll('[role="combobox"]')
+  ]);
+  for (const combo of triggers) {
+    if (!combo || !isVisible(combo)) continue;
+    if (isLikelyInfoOrHelpControl(combo)) continue;
+    if (combo.closest('[role="dialog"], [aria-modal="true"]')) continue;
+    const block = (combo.closest('div, section, li, fieldset, tr')?.textContent || '').slice(0, 520).toLowerCase();
+    if (!/\blift\b/.test(block)) continue;
+    if (/\b(color|fabric|swatch|finish)\b/.test(block) && !/\blift\b/.test((combo.getAttribute('aria-label') || '').toLowerCase())) {
+      continue;
+    }
+    combo.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(400);
+    combo.click();
+    await pauseAwareSleep(650);
+    let options = [];
+    const ctlId = combo.getAttribute('aria-controls');
+    if (ctlId) {
+      try {
+        const lb0 = document.getElementById(ctlId.split(/\s+/)[0]);
+        if (lb0 && isVisible(lb0)) {
+          const opts = [...lb0.querySelectorAll('[role="option"], [role="menuitem"], [role="menuitemradio"]')].filter(
+            isVisible
+          );
+          if (opts.length >= 1) options = opts;
+        }
+      } catch (_) {}
+    }
+    if (options.length < 1) {
+      for (const lb of document.querySelectorAll('[role="listbox"]')) {
+        if (!isVisible(lb)) continue;
+        const opts = [...lb.querySelectorAll('[role="option"], [role="menuitem"], [role="menuitemradio"]')].filter(
+          isVisible
+        );
+        if (opts.length >= 1) {
+          options = opts;
+          break;
+        }
+      }
+    }
+    if (options.length < 1) {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await pauseAwareSleep(200);
+      continue;
+    }
+    const cands = options.map((el) => ({
+      text: (el.textContent || '').trim().split('\n')[0].slice(0, 120),
+      el
+    }));
+    const label = pickLiftChoiceFromLabels(cands.map((c) => c.text));
+    const hit =
+      cands.find((c) => c.text === label) ||
+      cands.find((c) => normLiftText(c.text) === normLiftText(label)) ||
+      cands[0];
+    hit.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(280);
+    hit.el.click();
+    await pauseAwareSleep(1200);
+    return hit.text.slice(0, 120);
+  }
+  return null;
+}
+
+/**
+ * Ensures a lift control is set (Cordless, Continuous Cord Loop, Motorization, etc.).
+ * Call after color so lift tiles below the fold are mounted. No-op if the page has no lift block.
+ */
+async function selectLiftOptionPreferred() {
+  await scrollConfiguratorTowardsLift();
+  await scrollLiftSectionIntoView();
+  await dismissLowesOverlays(4);
+  let picked =
+    (await trySelectLiftFromEcpTileRadios()) ||
+    (await trySelectLiftFromDirectPhrases()) ||
+    (await trySelectLiftFromSelect()) ||
+    (await trySelectLiftFromRadios()) ||
+    (await trySelectLiftFromRoleRadios()) ||
+    (await trySelectLiftFromCombobox());
+  if (!picked) {
+    await scrollConfiguratorTowardsLift();
+    picked =
+      (await trySelectLiftFromEcpTileRadios()) ||
+      (await trySelectLiftFromDirectPhrases()) ||
+      (await trySelectLiftFromCombobox()) ||
+      (await trySelectLiftFromRadios());
+  }
+  return picked || null;
+}
+
+/**
+ * Cassette valance must run only after lift is applied. When Lowe’s uses ECP lift
+ * tile radios, wait until one is checked (or briefly settle if lift is non-ECP).
+ */
+async function waitForLiftSelectionApplied() {
+  for (let i = 0; i < 36; i++) {
+    await stopGuard();
+    const root = configuratorRoot();
+    const liftRadios = [...root.querySelectorAll('input[type="radio"][data-testid^="ecp-button-select-"]')].filter(
+      (r) => isEcpLiftTileSuffix(ecpButtonSelectSuffix(r))
+    );
+    if (liftRadios.length < 1) {
+      await pauseAwareSleep(700);
+      return;
+    }
+    if (liftRadios.some((r) => r.checked)) {
+      await pauseAwareSleep(550);
+      return;
+    }
+    await pauseAwareSleep(200);
+  }
+  await pauseAwareSleep(400);
+}
+
+/** Top-row valance style (not size). “Cassette Valance Size” only appears after Curved Cassette. */
+const ECP_VALANCE_STYLE_SUFFIXES = ['NO_VALANCE', 'CURVED_CASSETTE', 'DELUXE_VALANCE'];
+
+const ECP_VALANCE_STYLE_READABLE = {
+  NO_VALANCE: 'No Valance',
+  CURVED_CASSETTE: 'Curved Cassette',
+  DELUXE_VALANCE: 'Deluxe Valance'
+};
+
+function isEcpValanceStyleSuffix(suf) {
+  return ECP_VALANCE_STYLE_SUFFIXES.includes(suf);
+}
+
+async function scrollConfiguratorTowardsValance() {
+  for (let i = 0; i < 14; i++) {
+    const legends = [...document.querySelectorAll('fieldset legend, h2, h3, h4, h5')];
+    const head = legends.find((l) => {
+      const t = (l.textContent || '').trim();
+      if (/cassette\s+valance\s+size/i.test(t)) return false;
+      return /^valance\b/i.test(t) || /^\s*valance\s*:/i.test(t);
+    });
+    if (head) {
+      head.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(520);
+      return;
+    }
+    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+    if (nearBottom) break;
+    window.scrollBy({ top: Math.min(480, window.innerHeight * 0.72), behavior: 'smooth' });
+    await pauseAwareSleep(360);
+  }
+}
+
+/** Random among available ECP valance tiles (No / Curved Cassette / Deluxe). */
+async function trySelectValanceStyleFromEcpTileRadios() {
+  const root = configuratorRoot();
+  const seen = new Set();
+  const inputs = [];
+  const add = (el) => {
+    if (!el || seen.has(el) || el.disabled || isLikelyInfoOrHelpControl(el)) return;
+    const tid = el.getAttribute('data-testid') || '';
+    if (!/^ecp-button-select-/i.test(tid)) return;
+    const cls = elementClassString(el).toLowerCase();
+    if (!cls.includes('tile-input-radio')) return;
+    if (el.closest('#colorId, [data-testid="colorId"]')) return;
+    const suf = ecpButtonSelectSuffix(el);
+    if (!isEcpValanceStyleSuffix(suf)) return;
+    seen.add(el);
+    inputs.push(el);
+  };
+  root.querySelectorAll('input[type="radio"][data-testid^="ecp-button-select-"]').forEach(add);
+  querySelectorAllDeep('input[type="radio"][data-testid^="ecp-button-select-"]', root).forEach(add);
+  const available = ECP_VALANCE_STYLE_SUFFIXES.filter((suf) => inputs.some((inp) => ecpButtonSelectSuffix(inp) === suf));
+  if (available.length < 1) return null;
+  const sufPick = available[Math.floor(Math.random() * available.length)];
+  const input = inputs.find((inp) => ecpButtonSelectSuffix(inp) === sufPick);
+  if (!input) return null;
+  const clickEl = resolveLowesColorTileClickTarget(input, document.documentElement);
+  if (!clickEl || !isVisible(clickEl)) return null;
+  clickEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(400);
+  clickEl.click();
+  await pauseAwareSleep(400);
+  if (!input.checked) {
+    try {
+      input.click();
+    } catch (_) {}
+    await pauseAwareSleep(400);
+  }
+  await pauseAwareSleep(500);
+  return sufPick;
+}
+
+/**
+ * ECP cassette valance — Lowe’s uses the same tile radios as color/lift, e.g.
+ * data-testid="ecp-button-select-MEDIUM_CASSETTE" | "ecp-button-select-LARGE_CASSETTE"
+ * (input.backyard.radio.tile-input-radio).
+ */
+const ECP_CASSETTE_SUFFIX_GROUPS = [
+  [
+    'MEDIUM_CASSETTE',
+    'MEDIUM_CASSETTE_VALANCE',
+    'CASSETTE_VALANCE_MEDIUM',
+    'CASSETTE_MEDIUM',
+    'MEDIUM_VALANCE',
+    'CASSETTE_M'
+  ],
+  [
+    'LARGE_CASSETTE',
+    'LARGE_CASSETTE_VALANCE',
+    'CASSETTE_VALANCE_LARGE',
+    'CASSETTE_LARGE',
+    'LARGE_VALANCE',
+    'CASSETTE_L'
+  ]
+];
+
+const ECP_CASSETTE_SUFFIX_READABLE = {
+  MEDIUM_CASSETTE_VALANCE: 'Medium Cassette Valance',
+  MEDIUM_CASSETTE: 'Medium Cassette Valance',
+  CASSETTE_VALANCE_MEDIUM: 'Medium Cassette Valance',
+  CASSETTE_MEDIUM: 'Medium Cassette Valance',
+  MEDIUM_VALANCE: 'Medium Cassette Valance',
+  CASSETTE_M: 'Medium Cassette Valance',
+  LARGE_CASSETTE_VALANCE: 'Large Cassette Valance',
+  LARGE_CASSETTE: 'Large Cassette Valance',
+  CASSETTE_VALANCE_LARGE: 'Large Cassette Valance',
+  CASSETTE_LARGE: 'Large Cassette Valance',
+  LARGE_VALANCE: 'Large Cassette Valance',
+  CASSETTE_L: 'Large Cassette Valance'
+};
+
+function isEcpCassetteSuffix(suf) {
+  return ECP_CASSETTE_SUFFIX_GROUPS.some((g) => g.includes(suf));
+}
+
+function hasCassetteValanceContext(el) {
+  let p = el;
+  for (let d = 0; d < 14 && p; d++) {
+    const txt = (p.textContent || '').slice(0, 1600).toLowerCase();
+    if (/\bcassette\b/.test(txt) && /\bvalance\b/.test(txt)) return true;
+    if (/cassette\s+valance/i.test(txt)) return true;
+    p = p.parentElement;
+  }
+  return false;
+}
+
+async function scrollConfiguratorTowardsCassetteValance() {
+  for (let i = 0; i < 16; i++) {
+    const legends = [...document.querySelectorAll('fieldset legend, h2, h3, h4, h5')];
+    const head = legends.find((l) => /cassette|valance/i.test(l.textContent || ''));
+    if (head) {
+      head.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(550);
+      return;
+    }
+    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+    if (nearBottom) break;
+    window.scrollBy({ top: Math.min(480, window.innerHeight * 0.75), behavior: 'smooth' });
+    await pauseAwareSleep(380);
+  }
+}
+
+async function trySelectCassetteValanceFromEcpTileRadios() {
+  const root = configuratorRoot();
+  const seen = new Set();
+  const inputs = [];
+  const add = (el) => {
+    if (!el || seen.has(el) || el.disabled || isLikelyInfoOrHelpControl(el)) return;
+    const tid = el.getAttribute('data-testid') || '';
+    if (!/^ecp-button-select-/i.test(tid)) return;
+    const cls = elementClassString(el).toLowerCase();
+    if (!cls.includes('tile-input-radio')) return;
+    if (el.closest('#colorId, [data-testid="colorId"]')) return;
+    const suf = ecpButtonSelectSuffix(el);
+    if (isEcpLiftTileSuffix(suf)) return;
+    if (!isEcpCassetteSuffix(suf)) return;
+    seen.add(el);
+    inputs.push(el);
+  };
+  root.querySelectorAll('input[type="radio"][data-testid^="ecp-button-select-"]').forEach(add);
+  querySelectorAllDeep('input[type="radio"][data-testid^="ecp-button-select-"]', root).forEach(add);
+  if (inputs.length < 1) return null;
+
+  const pool = [];
+  for (const suf of ['MEDIUM_CASSETTE', 'LARGE_CASSETTE']) {
+    const inp = inputs.find((i) => ecpButtonSelectSuffix(i) === suf);
+    if (inp) pool.push({ input: inp, suf });
+  }
+  if (pool.length < 1) {
+    for (const group of ECP_CASSETTE_SUFFIX_GROUPS) {
+      for (const suf of group) {
+        if (suf === 'MEDIUM_CASSETTE' || suf === 'LARGE_CASSETTE') continue;
+        const input = inputs.find((inp) => ecpButtonSelectSuffix(inp) === suf);
+        if (!input) continue;
+        pool.push({ input, suf });
+      }
+      if (pool.length) break;
+    }
+  }
+  if (pool.length < 1) return null;
+  const { input, suf } = pool[Math.floor(Math.random() * pool.length)];
+  const clickEl = resolveLowesColorTileClickTarget(input, document.documentElement);
+  if (!clickEl || !isVisible(clickEl)) return null;
+  const readable = ECP_CASSETTE_SUFFIX_READABLE[suf] || suf.replace(/_/g, ' ');
+  clickEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(400);
+  clickEl.click();
+  await pauseAwareSleep(400);
+  if (!input.checked) {
+    try {
+      input.click();
+    } catch (_) {}
+    await pauseAwareSleep(400);
+  }
+  await pauseAwareSleep(600);
+  return readable;
+}
+
+async function trySelectCassetteValanceFromSelect() {
+  for (const fs of document.querySelectorAll('fieldset')) {
+    const leg = (fs.querySelector('legend')?.textContent || '').toLowerCase();
+    const blob = (fs.textContent || '').slice(0, 600).toLowerCase();
+    const hit =
+      /cassette\s+valance\s+size/i.test(leg + blob) ||
+      (/\bcassette\b/i.test(leg) && /\bsize\b/i.test(leg)) ||
+      (/cassette\s+valance/i.test(blob) && /\bsize\b/i.test(blob) && !/^valance\s*$/i.test(leg.trim()));
+    if (!hit) continue;
+    const sel = fs.querySelector('select');
+    if (!sel || !isVisible(sel)) continue;
+    const opts = Array.from(sel.options).filter((o) => {
+      if (!o.value) return false;
+      const tx = (o.textContent || '').trim();
+      if (/^choose|^select|^--|^\.\.\./i.test(tx)) return false;
+      return true;
+    });
+    if (opts.length < 1) continue;
+    const sizeLike = opts.filter((o) => /medium|large/i.test((o.textContent || '').trim()));
+    const pickPool = sizeLike.length ? sizeLike : opts;
+    const pick = pickPool[Math.floor(Math.random() * pickPool.length)];
+    sel.focus();
+    setNativeSelectValue(sel, pick.value);
+    await pauseAwareSleep(900);
+    return ((pick.textContent || '').trim() || pick.value).slice(0, 120);
+  }
+  return null;
+}
+
+async function trySelectCassetteValanceFromRadios() {
+  for (const fs of document.querySelectorAll('fieldset')) {
+    const leg = (fs.querySelector('legend')?.textContent || '').toLowerCase();
+    const blob = (fs.textContent || '').slice(0, 600).toLowerCase();
+    if (!/cassette\s+valance\s+size/i.test(leg) && !/cassette\s+valance/i.test(blob)) continue;
+    if (/^valance\s*$/i.test(leg.trim()) && !/size/i.test(leg)) continue;
+    const radios = [...fs.querySelectorAll('input[type="radio"]')].filter((r) => isVisible(r));
+    const cands = [];
+    for (const r of radios) {
+      let label = null;
+      if (r.id) {
+        try {
+          label = document.querySelector(`label[for="${CSS.escape(r.id)}"]`);
+        } catch (_) {
+          label = document.querySelector(`label[for="${r.id.replace(/"/g, '\\"')}"]`);
+        }
+      }
+      if (!label) label = r.closest('label');
+      const text = (label?.textContent || r.getAttribute('aria-label') || r.value || '').trim();
+      if (text.length < 3) continue;
+      const click = label && isVisible(label) ? label : r;
+      cands.push({ text, click });
+    }
+    if (cands.length < 1) continue;
+    const sizeCands = cands.filter((c) => /medium|large/i.test(c.text));
+    const pool = sizeCands.length ? sizeCands : cands;
+    const hit = pool[Math.floor(Math.random() * pool.length)];
+    hit.click.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(350);
+    hit.click.click();
+    await pauseAwareSleep(1100);
+    return hit.text.slice(0, 120);
+  }
+  return null;
+}
+
+async function trySelectCassetteValanceDirectPhrases() {
+  const root = configuratorRoot();
+  const nodes = root.querySelectorAll(
+    'button, [role="button"], [role="radio"], label, li, div[tabindex="0"], span[tabindex="0"], a'
+  );
+  const list = [...nodes].filter(
+    (el) =>
+      isVisible(el) &&
+      !isLikelyInfoOrHelpControl(el) &&
+      !el.closest('nav, header, footer, [class*="cart" i], [role="dialog"], [aria-modal="true"]')
+  );
+  const tryClick = async (el, name) => {
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await pauseAwareSleep(400);
+    el.click();
+    await pauseAwareSleep(1200);
+    return name;
+  };
+  const candidates = [];
+  for (const el of list) {
+    const t = (el.textContent || '').trim().replace(/\s+/g, ' ');
+    if (t.length > 120 || t.length < 8) continue;
+    if (!/medium\s+cassette\s+valance|large\s+cassette\s+valance/i.test(t)) continue;
+    if (!hasCassetteValanceContext(el) && !/^medium\s+cassette\s+valance$/i.test(t) && !/^large\s+cassette\s+valance$/i.test(t)) {
+      continue;
+    }
+    const name = /^large\s+/i.test(t) ? 'Large Cassette Valance' : 'Medium Cassette Valance';
+    candidates.push({ el, name });
+  }
+  if (candidates.length < 1) return null;
+  const pick = candidates[Math.floor(Math.random() * candidates.length)];
+  return tryClick(pick.el, pick.name);
+}
+
+/**
+ * Random valance style (No / Curved Cassette / Deluxe). Cassette size (M/L) only if Curved Cassette
+ * — that row is hidden for other styles. Call after lift + {@link waitForLiftSelectionApplied}.
+ */
+async function selectValanceStyleAndOptionalCassetteSize() {
+  await scrollConfiguratorTowardsValance();
+  await dismissLowesOverlays(4);
+  let styleSuf = await trySelectValanceStyleFromEcpTileRadios();
+  if (!styleSuf) {
+    await scrollConfiguratorTowardsValance();
+    styleSuf = await trySelectValanceStyleFromEcpTileRadios();
+  }
+  await pauseAwareSleep(850);
+  await dismissLowesOverlays(4);
+
+  let cassetteLabel = null;
+  if (styleSuf === 'CURVED_CASSETTE') {
+    await scrollConfiguratorTowardsCassetteValance();
+    await dismissLowesOverlays(4);
+    cassetteLabel =
+      (await trySelectCassetteValanceFromEcpTileRadios()) ||
+      (await trySelectCassetteValanceFromSelect()) ||
+      (await trySelectCassetteValanceFromRadios()) ||
+      (await trySelectCassetteValanceDirectPhrases());
+    if (!cassetteLabel) {
+      await scrollConfiguratorTowardsCassetteValance();
+      cassetteLabel =
+        (await trySelectCassetteValanceFromEcpTileRadios()) ||
+        (await trySelectCassetteValanceDirectPhrases()) ||
+        (await trySelectCassetteValanceFromRadios());
+    }
+    await pauseAwareSleep(500);
+  }
+
+  const styleLabel = styleSuf ? ECP_VALANCE_STYLE_READABLE[styleSuf] || styleSuf.replace(/_/g, ' ') : null;
+  return { valance_style: styleLabel, valance_suffix: styleSuf, cassette_valance: cassetteLabel };
+}
+
+/** Blinds per headrail — ECP tiles after color on many SKUs. */
+const ECP_HEADRAIL_BLINDS_SUFFIXES = ['SINGLE_RAIL', 'TWO_ON_ONE'];
+
+const ECP_HEADRAIL_READABLE = {
+  SINGLE_RAIL: 'Single rail',
+  TWO_ON_ONE: 'Two on one headrail'
+};
+
+function isEcpHeadrailBlindsSuffix(suf) {
+  return ECP_HEADRAIL_BLINDS_SUFFIXES.includes(suf);
+}
+
+async function scrollConfiguratorTowardsHeadrailBlinds() {
+  for (let i = 0; i < 14; i++) {
+    const legends = [...document.querySelectorAll('fieldset legend, h2, h3, h4, h5')];
+    const head = legends.find((l) => {
+      const t = (l.textContent || '').toLowerCase();
+      return /\bheadrail\b/.test(t) || /blinds?\s+per\s+headrail/i.test(t) || /\btwo\s+on\s+one\b/i.test(t);
+    });
+    if (head) {
+      head.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(520);
+      return;
+    }
+    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+    if (nearBottom) break;
+    window.scrollBy({ top: Math.min(480, window.innerHeight * 0.72), behavior: 'smooth' });
+    await pauseAwareSleep(360);
+  }
+}
+
+async function trySelectHeadrailBlindsPerFromEcpTileRadios() {
+  const root = configuratorRoot();
+  const seen = new Set();
+  const inputs = [];
+  const add = (el) => {
+    if (!el || seen.has(el) || el.disabled || isLikelyInfoOrHelpControl(el)) return;
+    const tid = el.getAttribute('data-testid') || '';
+    if (!/^ecp-button-select-/i.test(tid)) return;
+    const cls = elementClassString(el).toLowerCase();
+    if (!cls.includes('tile-input-radio')) return;
+    if (el.closest('#colorId, [data-testid="colorId"]')) return;
+    const suf = ecpButtonSelectSuffix(el);
+    if (!isEcpHeadrailBlindsSuffix(suf)) return;
+    seen.add(el);
+    inputs.push(el);
+  };
+  root.querySelectorAll('input[type="radio"][data-testid^="ecp-button-select-"]').forEach(add);
+  querySelectorAllDeep('input[type="radio"][data-testid^="ecp-button-select-"]', root).forEach(add);
+  const available = ECP_HEADRAIL_BLINDS_SUFFIXES.filter((suf) => inputs.some((inp) => ecpButtonSelectSuffix(inp) === suf));
+  if (available.length < 1) return null;
+  const sufPick = available[Math.floor(Math.random() * available.length)];
+  const input = inputs.find((inp) => ecpButtonSelectSuffix(inp) === sufPick);
+  if (!input) return null;
+  const clickEl = resolveLowesColorTileClickTarget(input, document.documentElement);
+  if (!clickEl || !isVisible(clickEl)) return null;
+  clickEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(400);
+  clickEl.click();
+  await pauseAwareSleep(400);
+  if (!input.checked) {
+    try {
+      input.click();
+    } catch (_) {}
+    await pauseAwareSleep(400);
+  }
+  await pauseAwareSleep(500);
+  return ECP_HEADRAIL_READABLE[sufPick] || sufPick.replace(/_/g, ' ');
+}
+
+/** Call right after color. */
+async function selectBlindsPerHeadrailPreferred() {
+  await scrollConfiguratorTowardsHeadrailBlinds();
+  await dismissLowesOverlays(4);
+  let picked = await trySelectHeadrailBlindsPerFromEcpTileRadios();
+  if (!picked) {
+    await scrollConfiguratorTowardsHeadrailBlinds();
+    picked = await trySelectHeadrailBlindsPerFromEcpTileRadios();
+  }
+  return picked || null;
+}
+
+/** Side channels — ECP after valance / cassette block when shown. */
+const ECP_SIDECHANNEL_SUFFIXES = ['YES_SIDECHANNEL', 'NO_SIDECHANNEL'];
+
+const ECP_SIDECHANNEL_READABLE = {
+  YES_SIDECHANNEL: 'Yes — side channels',
+  NO_SIDECHANNEL: 'No side channels'
+};
+
+function isEcpSideChannelSuffix(suf) {
+  return ECP_SIDECHANNEL_SUFFIXES.includes(suf);
+}
+
+async function scrollConfiguratorTowardsSideChannels() {
+  for (let i = 0; i < 14; i++) {
+    const legends = [...document.querySelectorAll('fieldset legend, h2, h3, h4, h5')];
+    const head = legends.find((l) => /\bside\s*channels?\b/i.test(l.textContent || ''));
+    if (head) {
+      head.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      await pauseAwareSleep(520);
+      return;
+    }
+    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+    if (nearBottom) break;
+    window.scrollBy({ top: Math.min(480, window.innerHeight * 0.72), behavior: 'smooth' });
+    await pauseAwareSleep(360);
+  }
+}
+
+async function trySelectSideChannelsFromEcpTileRadios() {
+  const root = configuratorRoot();
+  const seen = new Set();
+  const inputs = [];
+  const add = (el) => {
+    if (!el || seen.has(el) || el.disabled || isLikelyInfoOrHelpControl(el)) return;
+    const tid = el.getAttribute('data-testid') || '';
+    if (!/^ecp-button-select-/i.test(tid)) return;
+    const cls = elementClassString(el).toLowerCase();
+    if (!cls.includes('tile-input-radio')) return;
+    if (el.closest('#colorId, [data-testid="colorId"]')) return;
+    const suf = ecpButtonSelectSuffix(el);
+    if (!isEcpSideChannelSuffix(suf)) return;
+    seen.add(el);
+    inputs.push(el);
+  };
+  root.querySelectorAll('input[type="radio"][data-testid^="ecp-button-select-"]').forEach(add);
+  querySelectorAllDeep('input[type="radio"][data-testid^="ecp-button-select-"]', root).forEach(add);
+  const available = ECP_SIDECHANNEL_SUFFIXES.filter((suf) => inputs.some((inp) => ecpButtonSelectSuffix(inp) === suf));
+  if (available.length < 1) return null;
+  const sufPick = available[Math.floor(Math.random() * available.length)];
+  const input = inputs.find((inp) => ecpButtonSelectSuffix(inp) === sufPick);
+  if (!input) return null;
+  const clickEl = resolveLowesColorTileClickTarget(input, document.documentElement);
+  if (!clickEl || !isVisible(clickEl)) return null;
+  clickEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  await pauseAwareSleep(400);
+  clickEl.click();
+  await pauseAwareSleep(400);
+  if (!input.checked) {
+    try {
+      input.click();
+    } catch (_) {}
+    await pauseAwareSleep(400);
+  }
+  await pauseAwareSleep(500);
+  return ECP_SIDECHANNEL_READABLE[sufPick] || sufPick.replace(/_/g, ' ');
+}
+
+/** Call after {@link selectValanceStyleAndOptionalCassetteSize}. */
+async function selectSideChannelsPreferred() {
+  await scrollConfiguratorTowardsSideChannels();
+  await dismissLowesOverlays(4);
+  let picked = await trySelectSideChannelsFromEcpTileRadios();
+  if (!picked) {
+    await scrollConfiguratorTowardsSideChannels();
+    picked = await trySelectSideChannelsFromEcpTileRadios();
+  }
+  return picked || null;
+}
+
 async function pickMaterialFromFieldset() {
   for (const fs of document.querySelectorAll('fieldset')) {
     const leg = (fs.querySelector('legend')?.textContent || '').toLowerCase();
@@ -647,9 +1562,22 @@ async function pickColorFromEcpTileRadios() {
   for (const input of inputs) {
     if (!input || input.disabled) continue;
     if (isLikelyInfoOrHelpControl(input)) continue;
+    const tidRaw = input.getAttribute('data-testid') || '';
+    if (/^ecp-button-select-/i.test(tidRaw)) {
+      const suf = ecpButtonSelectSuffix(input);
+      if (
+        isEcpLiftTileSuffix(suf) ||
+        isEcpCassetteSuffix(suf) ||
+        isEcpValanceStyleSuffix(suf) ||
+        isEcpHeadrailBlindsSuffix(suf) ||
+        isEcpSideChannelSuffix(suf)
+      ) {
+        continue;
+      }
+    }
     const clickTarget = resolveLowesColorTileClickTarget(input, document.documentElement);
     if (!clickTarget) continue;
-    const tid = (input.getAttribute('data-testid') || '').replace(/^ecp-button-select-/i, '');
+    const tid = tidRaw.replace(/^ecp-button-select-/i, '');
     const slug = tid.replace(/_/g, ' ').trim().slice(0, 80);
     const name =
       getElementColorLabel(clickTarget) ||
@@ -1202,6 +2130,175 @@ function extractPricesRetry() {
   return priceData;
 }
 
+function normalizedColorLine(s) {
+  if (s == null || s === '') return '';
+  return String(s)
+    .trim()
+    .split(/\n/)[0]
+    .trim()
+    .toLowerCase();
+}
+
+function colorLabelsMatch(savedRaw, optionText) {
+  const a = normalizedColorLine(savedRaw);
+  const b = normalizedColorLine(optionText);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  if (b.includes(a) || a.includes(b)) return true;
+  const words = a.split(/\s+/).filter((w) => w.length > 2);
+  if (words.length && words.every((w) => b.includes(w))) return true;
+  return false;
+}
+
+/** Try to pick a color control whose label matches a previously saved result color. */
+async function selectColorBySavedName(savedColor) {
+  const needle = normalizedColorLine(savedColor);
+  if (!needle) return false;
+  await tryExpandColorSection();
+  const selects = new Set([
+    ...configuratorRoot().querySelectorAll('select'),
+    ...querySelectorAllDeep('select', document.documentElement)
+  ]);
+  for (const sel of selects) {
+    if (!isVisible(sel)) continue;
+    if (isLikelyDimensionSelect(sel)) continue;
+    const meta = `${sel.name || ''} ${sel.id || ''} ${sel.getAttribute('aria-label') || ''}`.toLowerCase();
+    if (meta.includes('width') || meta.includes('height')) continue;
+    const opts = Array.from(sel.options).filter((o) => {
+      if (!o.value) return false;
+      const tx = (o.textContent || '').trim();
+      if (/^choose|^select|^--|^\.\.\./i.test(tx)) return false;
+      return true;
+    });
+    for (const o of opts) {
+      const tx = (o.textContent || '').trim();
+      if (!colorLabelsMatch(savedColor, tx)) continue;
+      sel.focus();
+      setNativeSelectValue(sel, o.value);
+      await pauseAwareSleep(900);
+      return true;
+    }
+  }
+  for (const lb of document.querySelectorAll('[role="listbox"]')) {
+    if (!isVisible(lb)) continue;
+    if (lb.closest('nav, header, footer, [class*="cart" i], [role="dialog"], [aria-modal="true"]')) continue;
+    const opts = [...lb.querySelectorAll('[role="option"]')].filter(isVisible);
+    for (const opt of opts) {
+      const name = getElementColorLabel(opt) || (opt.textContent || '').trim();
+      if (!colorLabelsMatch(savedColor, name)) continue;
+      opt.scrollIntoView({ block: 'center', behavior: 'instant' });
+      await pauseAwareSleep(200);
+      opt.click();
+      await pauseAwareSleep(900);
+      return true;
+    }
+  }
+  for (const r of document.querySelectorAll('input[type="radio"]')) {
+    const meta = `${r.name || ''} ${r.id || ''} ${r.getAttribute('aria-label') || ''}`.toLowerCase();
+    if (!meta.includes('color') && !meta.includes('fabric') && !meta.includes('finish')) continue;
+    let label = null;
+    if (r.id) {
+      try {
+        label = document.querySelector(`label[for="${CSS.escape(r.id)}"]`);
+      } catch (_) {
+        label = document.querySelector(`label[for="${String(r.id).replace(/"/g, '\\"')}"]`);
+      }
+    }
+    if (!label) label = r.closest('label');
+    const blob = `${r.getAttribute('aria-label') || ''} ${(label && label.textContent) || ''}`;
+    if (!colorLabelsMatch(savedColor, blob)) continue;
+    const clickTarget = label && isVisible(label) ? label : r;
+    if (!isVisible(clickTarget)) continue;
+    clickTarget.scrollIntoView({ block: 'center', behavior: 'instant' });
+    await pauseAwareSleep(200);
+    clickTarget.click();
+    await pauseAwareSleep(900);
+    return true;
+  }
+  return false;
+}
+
+async function tryPickColorAny() {
+  await tryExpandColorSection();
+  return (
+    (await pickColorFromColorIdContainer()) ||
+    (await pickColorFromEcpTileRadios()) ||
+    (await pickColorFromCombobox()) ||
+    (await pickColorFromSelect()) ||
+    (await pickColorFromSelectByOptionText()) ||
+    (await pickColorFromListbox()) ||
+    (await pickColorRadioOrRole()) ||
+    (await pickLowesCompoundSwatch()) ||
+    (await pickConfiguratorColorChips()) ||
+    (await pickColorSwatch()) ||
+    (await fallbackColorClick())
+  );
+}
+
+/**
+ * Re-open customize, set width/height/color from a saved result row, then prepare for screenshot.
+ * Used by “Capture webpage” so the shot matches the card, not whatever was on screen.
+ */
+async function applySavedResultForScreenshot(config) {
+  await stopGuard();
+  if (isAccessDenied()) {
+    throw new Error('Access denied — open the product in this tab and retry.');
+  }
+  window.scrollTo(0, 0);
+  await pauseAwareSleep(400);
+  await clickCustomize();
+  await pauseAwareSleep(2200);
+  await dismissLowesOverlays(8);
+
+  const w = parseInt(String(config.width ?? ''), 10);
+  const h = parseInt(String(config.height ?? ''), 10);
+  if (Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0) {
+    await selectWidthHeight(w, h);
+    await pauseAwareSleep(3200);
+  }
+  await dismissLowesOverlays(6);
+  const matLabel = await pickMaterialStyleFromSelect();
+  if (!matLabel) await pickMaterialFromFieldset();
+  await pauseAwareSleep(800);
+  await dismissLowesOverlays(6);
+
+  if (config.color) {
+    const picked = await selectColorBySavedName(String(config.color));
+    if (!picked) {
+      await pauseAwareSleep(600);
+      await dismissLowesOverlays(4);
+      await tryExpandColorSection();
+      await selectColorBySavedName(String(config.color));
+    }
+    await pauseAwareSleep(1800);
+  }
+  await dismissLowesOverlays(6);
+
+  await selectBlindsPerHeadrailPreferred();
+  await pauseAwareSleep(700);
+  await dismissLowesOverlays(6);
+
+  await selectLiftOptionPreferred();
+  await waitForLiftSelectionApplied();
+  await pauseAwareSleep(400);
+  await dismissLowesOverlays(6);
+
+  await selectValanceStyleAndOptionalCassetteSize();
+  await pauseAwareSleep(700);
+  await dismissLowesOverlays(6);
+
+  await selectSideChannelsPreferred();
+  await pauseAwareSleep(700);
+  await dismissLowesOverlays(6);
+
+  await prepareForFullPageScreenshot();
+  await pauseAwareSleep(500);
+  window.scrollTo(0, 0);
+  applyFullPageScrollY(0);
+  await pauseAwareSleep(300);
+  return { ok: true };
+}
+
 async function runTest(product) {
   await stopGuard();
   if (isAccessDenied()) {
@@ -1236,34 +2333,36 @@ async function runTest(product) {
   await pauseAwareSleep(1200);
   await dismissLowesOverlays(6);
 
-  async function pickColorOnce() {
-    await tryExpandColorSection();
-    return (
-      (await pickColorFromColorIdContainer()) ||
-      (await pickColorFromEcpTileRadios()) ||
-      (await pickColorFromCombobox()) ||
-      (await pickColorFromSelect()) ||
-      (await pickColorFromSelectByOptionText()) ||
-      (await pickColorFromListbox()) ||
-      (await pickColorRadioOrRole()) ||
-      (await pickLowesCompoundSwatch()) ||
-      (await pickConfiguratorColorChips()) ||
-      (await pickColorSwatch()) ||
-      (await fallbackColorClick())
-    );
-  }
-
-  let color = await pickColorOnce();
+  let color = await tryPickColorAny();
   if (!color) {
     await pauseAwareSleep(1600);
     await dismissLowesOverlays(6);
     await tryExpandColorSection();
-    color = await pickColorOnce();
+    color = await tryPickColorAny();
   }
 
   await pauseAwareSleep(2500 + Math.random() * 1500);
   await dismissLowesOverlays(6);
   await stopGuard();
+
+  const blinds_per_headrail = await selectBlindsPerHeadrailPreferred();
+  await pauseAwareSleep(700);
+  await dismissLowesOverlays(6);
+
+  const lift = await selectLiftOptionPreferred();
+  await waitForLiftSelectionApplied();
+  await pauseAwareSleep(400);
+  await dismissLowesOverlays(6);
+
+  const valancePick = await selectValanceStyleAndOptionalCassetteSize();
+  const cassette_valance = valancePick.cassette_valance;
+  const valance_style = valancePick.valance_style;
+  await pauseAwareSleep(700);
+  await dismissLowesOverlays(6);
+
+  const side_channels = await selectSideChannelsPreferred();
+  await pauseAwareSleep(700);
+  await dismissLowesOverlays(6);
 
   let prices = extractPricesFromDom();
   let original_price = prices.original_price;
@@ -1299,6 +2398,11 @@ async function runTest(product) {
     width: w,
     height: h,
     color: color || null,
+    blinds_per_headrail: blinds_per_headrail || null,
+    lift: lift || null,
+    valance_style: valance_style || null,
+    cassette_valance: cassette_valance || null,
+    side_channels: side_channels || null,
     original_price,
     promotional_price,
     promo_percentage,
@@ -1373,6 +2477,20 @@ if (!globalThis.__LOWES_PROMO_TESTER_LISTENER__) {
           sendResponse({ ok: true, y: reportedY, scrollMode: ctx.mode });
         } catch (_) {
           sendResponse({ ok: false });
+        }
+      })();
+      return true;
+    }
+    if (msg.type === 'APPLY_RESULT_FOR_SCREENSHOT') {
+      (async () => {
+        try {
+          if (isAccessDenied()) {
+            throw new Error('Access denied on this page');
+          }
+          await applySavedResultForScreenshot(msg.config || {});
+          sendResponse({ ok: true });
+        } catch (e) {
+          sendResponse({ ok: false, error: e.message || String(e) });
         }
       })();
       return true;

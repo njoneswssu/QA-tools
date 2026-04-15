@@ -3,7 +3,7 @@
   "name": "Lowe's Promo Tester",
   "version": "1.0.0",
   "description": "Promo testing for Lowe's blind configurators — same flow as lowes-promo-tester (dimensions, color, prices, screenshot).",
-  "permissions": ["storage", "scripting", "tabs", "windows", "sidePanel", "activeTab"],
+  "permissions": ["storage", "scripting", "tabs", "windows", "sidePanel", "activeTab", "debugger"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
