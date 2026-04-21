@@ -83,12 +83,17 @@ function extractOrderNumberFromBlock(block) {
     return m ? m[1].trim() : '';
 }
 
+function stripAllComergentDataTags(text) {
+    return String(text)
+        .replace(/<ComergentData\b[^>]*>/gi, '')
+        .replace(/<\/ComergentData>/gi, '');
+}
+
+/** Remove every ComergentData wrapper and XML declarations so only <Comergent> fragments remain. */
 function stripOuterXmlDeclarationAndComergentData(text) {
     let t = String(text).trim();
-    t = t.replace(/^<\?xml[\s\S]*?\?>\s*/i, '');
-    if (/^<ComergentData\b/i.test(t) && /<\/ComergentData>\s*$/i.test(t)) {
-        t = t.replace(/^<ComergentData\b[^>]*>\s*/i, '').replace(/<\/ComergentData>\s*$/i, '');
-    }
+    t = t.replace(/<\?xml[\s\S]*?\?>\s*/gi, '');
+    t = stripAllComergentDataTags(t);
     return t.trim();
 }
 
@@ -113,7 +118,7 @@ function dedupeComergentBlocksByOrderNumber(blocks) {
 }
 
 function wrapSingleComergentData(innerXml) {
-    const body = String(innerXml).trim();
+    const body = stripAllComergentDataTags(String(innerXml)).trim();
     if (!body) return '';
     return `<ComergentData>\n${body}\n</ComergentData>`;
 }
