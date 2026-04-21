@@ -78,6 +78,58 @@ function generateCurrentDate() {
     return `${year}-${month}-${day} 0:0:0.0`;
 }
 
+function extractOrderNumberFromBlock(block) {
+    const m = String(block).match(/<OrderNumber>([^<]*)<\/OrderNumber>/i);
+    return m ? m[1].trim() : '';
+}
+
+function stripOuterXmlDeclarationAndComergentData(text) {
+    let t = String(text).trim();
+    t = t.replace(/^<\?xml[\s\S]*?\?>\s*/i, '');
+    if (/^<ComergentData\b/i.test(t) && /<\/ComergentData>\s*$/i.test(t)) {
+        t = t.replace(/^<ComergentData\b[^>]*>\s*/i, '').replace(/<\/ComergentData>\s*$/i, '');
+    }
+    return t.trim();
+}
+
+function splitComergentBlocks(inputText) {
+    const inner = stripOuterXmlDeclarationAndComergentData(inputText);
+    return inner.split(/(?=<Comergent>)/g).filter((b) => b.trim());
+}
+
+function dedupeComergentBlocksByOrderNumber(blocks) {
+    const seen = new Set();
+    const out = [];
+    for (let i = 0; i < blocks.length; i++) {
+        const block = blocks[i].trim();
+        if (!block) continue;
+        const orderNum = extractOrderNumberFromBlock(block);
+        const key = orderNum ? orderNum : `__no_order_${i}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(block);
+    }
+    return out;
+}
+
+function wrapSingleComergentData(innerXml) {
+    const body = String(innerXml).trim();
+    if (!body) return '';
+    return `<ComergentData>\n${body}\n</ComergentData>`;
+}
+
+function dedupeOrderNumberLines(inputText) {
+    const seen = new Set();
+    const out = [];
+    inputText.split('\n').forEach((line) => {
+        const t = line.trim();
+        if (!t || seen.has(t)) return;
+        seen.add(t);
+        out.push(t);
+    });
+    return out;
+}
+
 function generateXMLTemplate(orderNumber, isShipment = false) {
     const orderInput = isShipment ? 'ORDER INPUT SHIPMENT' : 'ORDER INPUT ORDER STATUS UPDATE ACCEPT';
     const shipmentDateTag = isShipment ? `\n                    <ShipmentDate>${generateCurrentDate()}</ShipmentDate>` : '';
@@ -175,8 +227,8 @@ function convertXML() {
         let finalOutput = '';
 
         if (currentMode === 'order') {
-            // Order number mode - generate XML from order numbers
-            const orderNumbers = inputText.split('\n').map(line => line.trim()).filter(line => line);
+            // Order number mode - generate XML from order numbers (unique only, first occurrence wins)
+            const orderNumbers = dedupeOrderNumberLines(inputText);
 
             orderNumbers.forEach((orderNumber, index) => {
                 if (!orderNumber) return;
@@ -192,10 +244,10 @@ function convertXML() {
             });
 
             const orderCount = orderNumbers.length;
-            showStatus(`Successfully converted ${orderCount} order number${orderCount > 1 ? 's' : ''}!`);
+            showStatus(`Successfully converted ${orderCount} unique order number${orderCount > 1 ? 's' : ''}!`);
         } else {
-            // XML mode - convert existing XML
-            const comergentBlocks = inputText.split(/(?=<Comergent>)/g).filter(block => block.trim());
+            // XML mode - one accept + one shipment pair per unique OrderNumber
+            const comergentBlocks = dedupeComergentBlocksByOrderNumber(splitComergentBlocks(inputText));
 
             comergentBlocks.forEach((block, index) => {
                 if (!block.trim()) return;
@@ -275,10 +327,10 @@ function convertXML() {
             });
 
             const blockCount = comergentBlocks.length;
-            showStatus(`Successfully converted ${blockCount} XML block${blockCount > 1 ? 's' : ''}!`);
+            showStatus(`Successfully converted ${blockCount} unique order${blockCount > 1 ? 's' : ''} (accept + shipment each)!`);
         }
 
-        outputArea.value = finalOutput;
+        outputArea.value = wrapSingleComergentData(finalOutput);
         copyBtn.disabled = false;
         downloadBtn.disabled = false;
     } catch (error) {
@@ -324,8 +376,10 @@ function downloadXML() {
     const seconds = String(now.getSeconds()).padStart(2, '0');
     const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
     
-    // Wrap XML with ComergentData tags
-    const wrappedXML = `<ComergentData>\n${outputArea.value}\n</ComergentData>`;
+    let wrappedXML = outputArea.value.trim();
+    if (!/^<ComergentData\b/i.test(wrappedXML)) {
+        wrappedXML = wrapSingleComergentData(wrappedXML);
+    }
 
     const blob = new Blob([wrappedXML], { type: 'application/xml' });
     const url = URL.createObjectURL(blob);
@@ -354,8 +408,8 @@ function reverseConvertXML() {
         let finalOutput = '';
 
         if (currentMode === 'order') {
-            // Order number mode - generate XML from order numbers
-            const orderNumbers = inputText.split('\n').map(line => line.trim()).filter(line => line);
+            // Order number mode - generate XML from order numbers (unique only)
+            const orderNumbers = dedupeOrderNumberLines(inputText);
 
             orderNumbers.forEach((orderNumber, index) => {
                 if (!orderNumber) return;
@@ -371,10 +425,10 @@ function reverseConvertXML() {
             });
 
             const orderCount = orderNumbers.length;
-            showStatus(`Successfully converted ${orderCount} order number${orderCount > 1 ? 's' : ''} to ORDER INPUT SHIPMENT!`);
+            showStatus(`Successfully converted ${orderCount} unique order number${orderCount > 1 ? 's' : ''} to ORDER INPUT SHIPMENT!`);
         } else {
-            // XML mode - convert existing XML to ORDER INPUT SHIPMENT ONLY
-            const comergentBlocks = inputText.split(/(?=<Comergent>)/g).filter(block => block.trim());
+            // XML mode - one shipment block per unique OrderNumber
+            const comergentBlocks = dedupeComergentBlocksByOrderNumber(splitComergentBlocks(inputText));
 
             comergentBlocks.forEach((block, index) => {
                 if (!block.trim()) return;
@@ -428,10 +482,10 @@ function reverseConvertXML() {
             });
 
             const blockCount = comergentBlocks.length;
-            showStatus(`Successfully converted ${blockCount} XML block${blockCount > 1 ? 's' : ''} to ORDER INPUT SHIPMENT!`);
+            showStatus(`Successfully converted ${blockCount} unique order${blockCount > 1 ? 's' : ''} to ORDER INPUT SHIPMENT!`);
         }
 
-        outputArea.value = finalOutput;
+        outputArea.value = wrapSingleComergentData(finalOutput);
         copyBtn.disabled = false;
         downloadBtn.disabled = false;
     } catch (error) {
