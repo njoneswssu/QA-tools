@@ -1,0 +1,45 @@
+# Team use: run this stack on an always-on machine (cloud VM, on-prem server) so everyone
+# shares one URL and one Postgres volume. Do not rely on a single laptop staying online.
+#
+# Copy .env.example → .env, set POSTGRES_PASSWORD (and optional RUN_API_KEY), then:
+#   docker compose up -d --build
+#
+# Teammates open: http://YOUR_SERVER_IP:${DASHBOARD_PORT:-3950}
+# (or put HTTPS in front — see DEPLOY.md)
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-citi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-citi}
+      POSTGRES_DB: ${POSTGRES_DB:-citi}
+    volumes:
+      - citi_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-citi} -d ${POSTGRES_DB:-citi}']
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '${DASHBOARD_PORT:-3950}:3950'
+    environment:
+      PORT: '3950'
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-citi}:${POSTGRES_PASSWORD:-citi}@db:5432/${POSTGRES_DB:-citi}
+      DATABASE_SSL: 'false'
+      TZ: ${TZ:-America/New_York}
+      RUN_API_KEY: ${RUN_API_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  citi_pg_data:

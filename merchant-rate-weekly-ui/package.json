@@ -1,0 +1,18 @@
+{
+  "name": "merchant-rate-weekly-ui",
+  "version": "1.0.0",
+  "description": "Web UI + weekly Monday merchant rate audit with Google Sheets export",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test:sheets": "node scripts/test-sheets.js"
+  },
+  "keywords": ["merchant-rate", "audit", "google-sheets"],
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "googleapis": "^144.0.0",
+    "node-cron": "^3.0.3"
+  }
+}
