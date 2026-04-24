@@ -7,9 +7,15 @@
     "start": "node server.js",
     "test:sheets": "node scripts/test-sheets.js"
   },
-  "keywords": ["merchant-rate", "audit", "google-sheets"],
+  "keywords": [
+    "merchant-rate",
+    "audit",
+    "google-sheets"
+  ],
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/bigquery": "^7.9.0",
+    "cron-parser": "^5.5.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "googleapis": "^144.0.0",

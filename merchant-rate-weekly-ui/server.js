@@ -7,6 +7,7 @@ const cron = require('node-cron');
 
 const { readAppIdsFromFile, writeAppIdsToFile } = require('./lib/audit-runner');
 const { executeAuditAndSync } = require('./lib/run-job');
+const { getNextRunIsoUtc } = require('./lib/next-cron-run');
 
 const PORT = parseInt(process.env.PORT || '3847', 10);
 const TZ = process.env.TZ || 'America/New_York';
@@ -14,6 +15,8 @@ const CRON_HOUR = String(process.env.WEEKLY_CRON_HOUR || '8').padStart(2, '0');
 const CRON_MINUTE = String(process.env.WEEKLY_CRON_MINUTE || '0').padStart(2, '0');
 /** Monday at configured local time */
 const CRON_EXPR = `${CRON_MINUTE} ${CRON_HOUR} * * 1`;
+const CRON_DISABLED =
+  process.env.DISABLE_WEEKLY_CRON === '1' || process.env.DISABLE_WEEKLY_CRON === 'true';
 
 const app = express();
 app.use(express.json());
@@ -27,7 +30,9 @@ app.get('/api/status', (req, res) => {
     cron: {
       expression: CRON_EXPR,
       timezone: TZ,
-      description: `Every Monday at ${CRON_HOUR}:${CRON_MINUTE} (${TZ})`
+      description: `Every Monday at ${CRON_HOUR}:${CRON_MINUTE} (${TZ})`,
+      automatedDisabled: CRON_DISABLED,
+      nextRunAt: CRON_DISABLED ? null : getNextRunIsoUtc(CRON_EXPR, TZ)
     },
     spreadsheetId: process.env.SPREADSHEET_ID || null,
     sheetGid: process.env.SHEET_GID || null
@@ -54,14 +59,15 @@ app.post('/api/config', (req, res) => {
 
 app.post('/api/run', async (req, res) => {
   const syncSheet = !!(req.body && req.body.syncSheet);
-  const result = await executeAuditAndSync({ syncSheet });
+  const appIds = req.body && req.body.appIds;
+  const result = await executeAuditAndSync({ syncSheet, appIds });
   if (!result.ok) {
     return res.status(500).json(result);
   }
   res.json(result);
 });
 
-if (process.env.DISABLE_WEEKLY_CRON === '1' || process.env.DISABLE_WEEKLY_CRON === 'true') {
+if (CRON_DISABLED) {
   console.log('Weekly cron disabled (DISABLE_WEEKLY_CRON).');
 } else {
   cron.schedule(
@@ -79,7 +85,7 @@ if (process.env.DISABLE_WEEKLY_CRON === '1' || process.env.DISABLE_WEEKLY_CRON =
 
 app.listen(PORT, () => {
   console.log(`Merchant rate weekly UI → http://localhost:${PORT}`);
-  if (process.env.DISABLE_WEEKLY_CRON !== '1' && process.env.DISABLE_WEEKLY_CRON !== 'true') {
+  if (!CRON_DISABLED) {
     console.log(`Scheduled: ${CRON_EXPR} (${TZ}) — sync to Google Sheet when issues exist`);
   }
 });

@@ -34,23 +34,44 @@ async function runMerchantRateAudit(appIds) {
       const result = await auditor.auditAppId(appId);
       results.push(result);
     }
-    const report = auditor.generateReport(results);
-    let rows = auditor.generateSimplifiedExport(report);
-    const merchantIds = auditor.collectMerchantIdsFromReport(report);
-    let commissionMap = await auditor.fetchCommissionFromBigQuery(merchantIds);
+    const report = generateReport(results);
+    let rows = generateSimplifiedExport(report);
+    const merchantIds = collectMerchantIdsFromReport(report);
+    let commissionMap = await fetchWeeklyCommissionMap(merchantIds);
     const csvPath = process.env.COMMISSION_CSV_PATH;
     if ((!commissionMap || commissionMap.size === 0) && csvPath && String(csvPath).trim()) {
       const csvResolved = path.isAbsolute(csvPath.trim())
         ? csvPath.trim()
         : path.resolve(prevCwd, csvPath.trim());
-      const fromCsv = auditor.loadCommissionDataFromCSV(csvResolved);
+      const fromCsv = loadCommissionDataFromCSV(csvResolved);
       if (fromCsv && fromCsv.size > 0) commissionMap = fromCsv;
     }
-    rows = auditor.enrichExportRowsWithCommissions(rows, commissionMap);
+    rows = enrichWeeklyRowsWithCommissions(rows, commissionMap);
+    sortIssueRowsByCommissionDesc(rows);
     return { report, rows, appIds: ids };
   } finally {
     process.chdir(prevCwd);
   }
+}
+
+/** Highest commission first; missing/invalid commission last; stable tie-breakers. */
+function commissionSortKey(r) {
+  const n = Number(r && r.commission);
+  if (!isNaN(n) && isFinite(n)) return n;
+  return -Infinity;
+}
+
+function sortIssueRowsByCommissionDesc(rows) {
+  if (!rows || rows.length < 2) return;
+  rows.sort((a, b) => {
+    const nb = commissionSortKey(b);
+    const na = commissionSortKey(a);
+    if (nb !== na) return nb - na;
+    const ida = Number(a.merchantId) || 0;
+    const idb = Number(b.merchantId) || 0;
+    if (ida !== idb) return ida - idb;
+    return String(a.issueType || '').localeCompare(String(b.issueType || ''));
+  });
 }
 
 function rowsToSheetValues(rows, runDateIso) {

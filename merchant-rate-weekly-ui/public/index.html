@@ -121,6 +121,12 @@
     .pill.ok { background: rgba(62, 207, 142, 0.15); color: var(--ok); }
     .pill.err { background: rgba(240, 107, 107, 0.15); color: var(--err); }
     .pill.run { background: rgba(61, 156, 240, 0.2); color: var(--accent); }
+    .countdown {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
   </style>
 </head>
 <body>
@@ -161,13 +167,74 @@
     const $ = (id) => document.getElementById(id);
     const log = (t) => { $('log').textContent = t; };
 
+    let countdownTimer = null;
+    let nextRunTargetMs = null;
+
+    function clearCountdown() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+    }
+
+    function formatCountdown(ms) {
+      if (ms <= 0) return 'due now';
+      const sec = Math.floor(ms / 1000);
+      const d = Math.floor(sec / 86400);
+      const h = Math.floor((sec % 86400) / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      const parts = [];
+      if (d > 0) parts.push(d + 'd');
+      if (d > 0 || h > 0) parts.push(h + 'h');
+      parts.push(m + 'm');
+      parts.push(String(s).padStart(2, '0') + 's');
+      return parts.join(' ');
+    }
+
+    function armCountdown(st) {
+      clearCountdown();
+      const el = $('countdown');
+      if (!el) return;
+      const c = st.cron || {};
+      if (c.automatedDisabled) {
+        el.textContent = 'off (DISABLE_WEEKLY_CRON)';
+        return;
+      }
+      if (!c.nextRunAt) {
+        el.textContent = '—';
+        return;
+      }
+      nextRunTargetMs = new Date(c.nextRunAt).getTime();
+      function tick() {
+        const el2 = $('countdown');
+        if (!el2) return;
+        let ms = nextRunTargetMs - Date.now();
+        if (ms <= 0) {
+          el2.textContent = 'due now';
+          fetch('/api/status')
+            .then((r) => r.json())
+            .then((fresh) => {
+              const nr = fresh.cron && fresh.cron.nextRunAt;
+              if (nr) nextRunTargetMs = new Date(nr).getTime();
+              const again = nextRunTargetMs - Date.now();
+              el2.textContent = again > 0 ? formatCountdown(again) : 'due now';
+            })
+            .catch(() => {});
+          return;
+        }
+        el2.textContent = formatCountdown(ms);
+      }
+      tick();
+      countdownTimer = setInterval(tick, 1000);
+    }
+
     async function refresh() {
       try {
         const [st, cfg] = await Promise.all([
           fetch('/api/status').then((r) => r.json()),
           fetch('/api/config').then((r) => r.json())
         ]);
-        $('appIds').value = '';
         const pills = [];
         if (st.running) pills.push('<span class="pill run">Running…</span>');
         else if (st.lastRunOk === true) pills.push('<span class="pill ok">Last audit OK</span>');
@@ -176,12 +243,15 @@
           ${pills.join(' ')}
           <p style="margin:0.75rem 0 0;font-size:0.9rem;color:var(--muted);">
             <strong>Schedule:</strong> ${st.cron ? st.cron.description : '—'}<br/>
+            <strong>Next automated run:</strong> <span id="countdown" class="countdown">—</span><br/>
+            <strong>When the box is empty, Run uses:</strong> ${escapeHtml((cfg.appIds && cfg.appIds.length ? cfg.appIds.join(', ') : '451, 206, 209 (defaults)'))}<br/>
             <strong>Last audit:</strong> ${st.lastRunAt || '—'}<br/>
             ${st.lastRunMessage ? `<span style="color:var(--text)">${escapeHtml(st.lastRunMessage)}</span><br/>` : ''}
             <strong>Sheet sync:</strong> ${st.lastSheetSyncAt || '—'}<br/>
             ${st.lastSheetSyncMessage ? escapeHtml(st.lastSheetSyncMessage) : ''}
           </p>`;
-        log('Ready. Edit App IDs, save, then run audit.');
+        armCountdown(st);
+        log('Ready. Leave App IDs blank for saved defaults, or type IDs for this run only. Use Save to persist for cron.');
       } catch (e) {
         log('Could not load /api/status: ' + e.message);
       }
@@ -211,10 +281,14 @@
       $('btnRun').disabled = true;
       log('Running audit (may take a minute)…');
       try {
+        const rawIds = $('appIds').value;
+        const appIds = rawIds.split(/[,\s]+/).map((s) => s.trim()).filter(Boolean);
+        const payload = { syncSheet: $('syncSheet').checked };
+        if (appIds.length) payload.appIds = appIds;
         const res = await fetch('/api/run', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ syncSheet: $('syncSheet').checked })
+          body: JSON.stringify(payload)
         });
         const j = await res.json();
         if (!res.ok) {

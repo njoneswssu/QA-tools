@@ -27,7 +27,23 @@ function noIssuesSheetValues(runIso, summary, appIds) {
 
 let runLock = false;
 
-async function executeAuditAndSync({ syncSheet }) {
+function normalizeOverrideAppIds(override) {
+  if (override == null) return null;
+  const arr = Array.isArray(override) ? override : [override];
+  const parsed = []
+    .concat(arr)
+    .flatMap((x) => String(x).split(/[,\s]+/))
+    .map((s) => parseInt(String(s).trim(), 10))
+    .filter((n) => !isNaN(n) && n > 0);
+  return parsed.length > 0 ? parsed : null;
+}
+
+/**
+ * @param {{ syncSheet: boolean, appIds?: unknown }} opts
+ * When the UI sends `appIds` and it parses to at least one ID, that list is used for this run only (not written to config).
+ * Otherwise uses saved `data/config.json` (cron, blank textarea, or omit `appIds` in the request body).
+ */
+async function executeAuditAndSync({ syncSheet, appIds: appIdsOverride }) {
   if (runLock) {
     return { ok: false, message: 'A run is already in progress.' };
   }
@@ -35,7 +51,8 @@ async function executeAuditAndSync({ syncSheet }) {
   writeState({ running: true });
   const runAt = new Date().toISOString();
   try {
-    const appIds = readAppIdsFromFile();
+    const fromUi = normalizeOverrideAppIds(appIdsOverride);
+    const appIds = fromUi || readAppIdsFromFile();
     const { report, rows } = await runMerchantRateAudit(appIds);
     const summary = report.summary || {};
     const message =

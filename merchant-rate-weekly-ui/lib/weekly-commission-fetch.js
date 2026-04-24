@@ -207,21 +207,17 @@ async function fetchWeeklyCommissionMap(merchantIds) {
   });
 }
 
-function severityRank(s) {
-  const t = String(s || '').toLowerCase();
-  if (t === 'high') return 2;
-  if (t === 'medium') return 1;
-  if (t === 'low') return 0;
-  return 1;
+function rowHasNumericCommission(r) {
+  if (!r || r.commission === '' || r.commission === undefined || r.commission === null) return false;
+  const n = Number(r.commission);
+  return !isNaN(n) && isFinite(n);
 }
 
-function rankToSeverity(r) {
-  const n = Math.max(0, Math.min(2, Math.round(Number(r))));
-  if (n >= 2) return 'high';
-  if (n >= 1) return 'medium';
-  return 'low';
-}
-
+/**
+ * Sheet severity follows **commission in this batch** (monotonic with $): higher total commissions
+ * → higher severity. Rows without commission data keep the auditor's severity.
+ * Uses value tertiles on [min,max] so sorting rows by commission descending matches high→low severity bands.
+ */
 function adjustSeverityByCommission(rows) {
   const issueRows = (rows || []).filter(
     (r) =>
@@ -232,30 +228,30 @@ function adjustSeverityByCommission(rows) {
       r.issueType !== 'Info'
   );
   if (issueRows.length === 0) return;
-  let maxC = 0;
-  let minC = Infinity;
-  for (const r of issueRows) {
-    const c = Number(r.commission);
-    if (!isNaN(c) && c > 0) {
-      if (c > maxC) maxC = c;
-      if (c < minC) minC = c;
+
+  const withComm = issueRows.filter(rowHasNumericCommission);
+  if (withComm.length === 0) return;
+
+  const amounts = withComm.map((r) => Number(r.commission));
+  const minC = Math.min(...amounts);
+  const maxC = Math.max(...amounts);
+
+  function severityForAmount(c) {
+    if (maxC > minC) {
+      // log1p spreads heavy-tailed payouts so mid-earners are not all "low" vs one outlier max
+      const lo = Math.log1p(Math.max(0, minC));
+      const hi = Math.log1p(Math.max(0, maxC));
+      const t = hi > lo ? (Math.log1p(Math.max(0, c)) - lo) / (hi - lo) : 1;
+      if (t >= 2 / 3) return 'high';
+      if (t >= 1 / 3) return 'medium';
+      return 'low';
     }
+    return 'high';
   }
-  if (maxC <= 0 || !isFinite(minC)) return;
 
   for (const r of issueRows) {
-    const c = Number(r.commission);
-    let dollarTier = 0;
-    if (!isNaN(c) && c > 0) {
-      if (maxC > minC) {
-        dollarTier = Math.round((2 * (c - minC)) / (maxC - minC));
-      } else {
-        dollarTier = 2;
-      }
-    }
-    const base = severityRank(r.severity);
-    const merged = Math.max(base, dollarTier);
-    r.severity = rankToSeverity(merged);
+    if (!rowHasNumericCommission(r)) continue;
+    r.severity = severityForAmount(Number(r.commission));
   }
 }
 
