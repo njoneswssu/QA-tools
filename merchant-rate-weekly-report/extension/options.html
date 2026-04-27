@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Merchant rate audit — options</title>
+  <link rel="stylesheet" href="popup.css" />
+  <style>
+    body { width: 100%; max-width: 520px; margin: 0 auto; }
+    .wrap { max-width: none; }
+    fieldset { border: 1px solid var(--border); border-radius: 8px; margin: 12px 0; padding: 10px 12px; }
+    legend { padding: 0 6px; color: var(--muted); font-size: 12px; }
+    .hint { font-size: 11px; color: var(--muted); margin: 6px 0 0; line-height: 1.45; }
+    input[type="text"], input[type="number"], input[type="time"], select {
+      width: 100%;
+      padding: 6px 8px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #121920;
+      color: var(--text);
+      font-size: 12px;
+    }
+    .checkrow { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+    .checkrow input { width: auto; }
+    .save-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Merchant rate audit — options</h1>
+    <p class="hint" style="margin-bottom:10px;padding:8px;background:#1a2535;border-radius:6px;border:1px solid var(--border);">
+      This page may have opened automatically when you first installed the extension — sign in below, set your spreadsheet ID, then use the toolbar popup to pick App IDs and run an audit.
+    </p>
+    <p class="sub">
+      To use <strong>BigQuery</strong> and/or <strong>Google Sheets</strong>, create a <strong>Chrome extension</strong> OAuth client in Google Cloud,
+      paste its client ID into <code>extension/manifest.json</code> (<code>oauth2.client_id</code>), reload the extension, then sign in here.
+      Your Google account needs BigQuery access to the commission project and <strong>Editor</strong> on the target spreadsheet.
+    </p>
+
+    <fieldset>
+      <legend>Google account</legend>
+      <p class="hint" id="oauthHint" style="margin-bottom:8px;"></p>
+      <div class="row">
+        <button type="button" class="primary" id="signIn">Sign in with Google</button>
+        <button type="button" class="secondary" id="signOut">Sign out</button>
+      </div>
+      <p class="hint" id="authStatus"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>BigQuery commissions</legend>
+      <div class="checkrow">
+        <input type="checkbox" id="useBigQuery" />
+        <label for="useBigQuery" style="margin:0">Load commissions from BigQuery (same query as the weekly Node job)</label>
+      </div>
+      <label>BigQuery project ID</label>
+      <input type="text" id="bqProjectId" placeholder="wildfire-1000" />
+      <label>Optional date column on <code>c</code> (leave blank for all-time, like COMMISSION_DATE_COLUMN=none)</label>
+      <input type="text" id="bqDateColumn" placeholder="e.g. event_date or leave empty" />
+      <label>Lookback months (only if date column is set)</label>
+      <input type="number" id="bqLookbackMonths" min="1" max="36" />
+    </fieldset>
+
+    <fieldset>
+      <legend>Automated run</legend>
+      <div class="checkrow">
+        <input type="checkbox" id="scheduleEnabled" />
+        <label for="scheduleEnabled" style="margin:0">Run the audit automatically each week</label>
+      </div>
+      <label for="scheduleDayOfWeek">Day (local time)</label>
+      <select id="scheduleDayOfWeek">
+        <option value="1">Monday</option>
+        <option value="2">Tuesday</option>
+        <option value="3">Wednesday</option>
+        <option value="4">Thursday</option>
+        <option value="5">Friday</option>
+        <option value="6">Saturday</option>
+        <option value="7">Sunday</option>
+      </select>
+      <label for="scheduleTimeLocal">Time</label>
+      <input type="time" id="scheduleTimeLocal" step="60" />
+      <p class="hint">Uses the App IDs currently selected in the popup. Keep this machine/browser awake or rely on Chrome waking the extension for the alarm.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Google Sheets export</legend>
+      <div class="checkrow">
+        <input type="checkbox" id="syncToSheets" />
+        <label for="syncToSheets" style="margin:0">After each audit run, create a <strong>new tab</strong> in this spreadsheet with the results</label>
+      </div>
+      <label>Spreadsheet ID (from the URL)</label>
+      <input type="text" id="spreadsheetId" placeholder="1abc… from docs.google.com/spreadsheets/d/THIS/edit" />
+    </fieldset>
+
+    <div class="save-row">
+      <button type="button" class="primary" id="save">Save settings</button>
+      <button type="button" class="secondary" id="exportJson">Export JSON</button>
+      <button type="button" class="secondary" id="importJson">Import JSON…</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden />
+    </div>
+    <p class="hint" id="saveStatus"></p>
+  </div>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

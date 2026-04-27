@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Merchant rate weekly audit",
+  "version": "1.5.6",
+  "description": "Wildlink merchant rate audit — BigQuery + Google Sheets optional via Google sign-in.",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Merchant rate audit"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "permissions": ["storage", "identity", "alarms"],
+  "host_permissions": [
+    "https://www.wildlink.me/*",
+    "https://storage.googleapis.com/*",
+    "https://bigquery.googleapis.com/*",
+    "https://sheets.googleapis.com/*"
+  ],
+  "oauth2": {
+    "client_id": "126252140209-9ia2isabs3dsbjb1kkcc4dvejf33i2h7.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/bigquery.readonly",
+      "https://www.googleapis.com/auth/spreadsheets"
+    ]
+  }
+}
