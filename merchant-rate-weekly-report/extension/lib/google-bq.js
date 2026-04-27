@@ -73,15 +73,61 @@ function rowsToMap(rows, schema) {
   return map;
 }
 
-async function waitForJob(accessToken, projectId, jobId) {
-  const encP = encodeURIComponent(projectId);
-  const encJ = encodeURIComponent(jobId);
+/**
+ * BigQuery returns `jobReference.location` for regional jobs. Omitting `location` on
+ * jobs.get / jobs.getQueryResults yields 404 Not found for that job id.
+ * @typedef {{ projectId: string, jobId: string, location?: string }} BqJobRef
+ */
+
+/** @param {BqJobRef} jobRef */
+function jobsGetUrl(jobRef) {
+  const { projectId, jobId, location } = jobRef;
+  let u = `https://bigquery.googleapis.com/bigquery/v2/projects/${encodeURIComponent(projectId)}/jobs/${encodeURIComponent(jobId)}?fields=status,jobReference`;
+  if (location) u += `&location=${encodeURIComponent(location)}`;
+  return u;
+}
+
+/** @param {BqJobRef} jobRef */
+function jobResultsUrl(jobRef, maxResults, pageToken) {
+  const { projectId, jobId, location } = jobRef;
+  const u = new URL(
+    `https://bigquery.googleapis.com/bigquery/v2/projects/${encodeURIComponent(projectId)}/jobs/${encodeURIComponent(jobId)}/results`
+  );
+  u.searchParams.set('maxResults', String(maxResults));
+  if (pageToken) u.searchParams.set('pageToken', pageToken);
+  if (location) u.searchParams.set('location', location);
+  return u.toString();
+}
+
+/**
+ * @param {BqJobRef} refFromApi
+ * @param {string} fallbackProjectId
+ * @returns {BqJobRef}
+ */
+function normalizeJobRef(refFromApi, fallbackProjectId) {
+  if (!refFromApi || !refFromApi.jobId) return null;
+  const loc = refFromApi.location && String(refFromApi.location).trim();
+  return {
+    projectId: String(refFromApi.projectId || fallbackProjectId).trim(),
+    jobId: String(refFromApi.jobId),
+    ...(loc ? { location: loc } : {})
+  };
+}
+
+async function waitForJob(accessToken, jobRef) {
   const start = Date.now();
   while (Date.now() - start < JOB_MAX_WAIT_MS) {
-    const job = await bqJson(
-      accessToken,
-      `https://bigquery.googleapis.com/bigquery/v2/projects/${encP}/jobs/${encJ}?fields=status,jobReference`
-    );
+    let job;
+    try {
+      job = await bqJson(accessToken, jobsGetUrl(jobRef));
+    } catch (e) {
+      // Right after jobs.query, job metadata can briefly 404; regional jobs need `location` on the URL.
+      if (/BigQuery 404/.test(String(e.message)) && Date.now() - start < 20000) {
+        await new Promise((r) => setTimeout(r, 400));
+        continue;
+      }
+      throw e;
+    }
     const state = job.status && job.status.state;
     if (state === 'DONE') {
       const er = job.status.errorResult;
@@ -97,19 +143,12 @@ async function waitForJob(accessToken, projectId, jobId) {
   throw new Error('BigQuery job timed out while waiting for completion.');
 }
 
-async function fetchAllResults(accessToken, projectId, jobId, schemaHint) {
-  const encP = encodeURIComponent(projectId);
-  const encJ = encodeURIComponent(jobId);
+async function fetchAllResults(accessToken, jobRef, schemaHint) {
   const allRows = [];
   let pageToken = null;
   let schema = schemaHint;
   do {
-    const u = new URL(
-      `https://bigquery.googleapis.com/bigquery/v2/projects/${encP}/jobs/${encJ}/results`
-    );
-    u.searchParams.set('maxResults', '10000');
-    if (pageToken) u.searchParams.set('pageToken', pageToken);
-    const data = await bqJson(accessToken, u.toString());
+    const data = await bqJson(accessToken, jobResultsUrl(jobRef, 10000, pageToken));
     if (data.schema) schema = data.schema;
     for (const row of data.rows || []) allRows.push(row);
     pageToken = data.pageToken || null;
@@ -132,13 +171,13 @@ async function runCommissionQueryChunk(accessToken, projectId, query) {
     return rowsToMap(data.rows, data.schema);
   }
 
-  const jobId = data.jobReference && data.jobReference.jobId;
-  if (!jobId) {
+  const jobRef = normalizeJobRef(data.jobReference, projectId);
+  if (!jobRef) {
     throw new Error('BigQuery returned an incomplete job with no jobId.');
   }
 
-  await waitForJob(accessToken, projectId, jobId);
-  const { rows, schema } = await fetchAllResults(accessToken, projectId, jobId, data.schema);
+  await waitForJob(accessToken, jobRef);
+  const { rows, schema } = await fetchAllResults(accessToken, jobRef, data.schema);
   return rowsToMap(rows, schema);
 }
 
