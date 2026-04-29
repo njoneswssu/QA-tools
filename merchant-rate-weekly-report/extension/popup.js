@@ -1,6 +1,6 @@
 import { rowsToTsv } from './lib/audit-pipeline.js';
 import { readExtensionSettings, writeExtensionSettings } from './lib/extension-settings.js';
-import { getNextScheduledRunDate, formatCountdown } from './lib/schedule-next-run.js';
+import { getNextScheduledRunDate, formatCountdownTimer } from './lib/schedule-next-run.js';
 import { AUDIT_JOB_STORAGE_KEY, readAuditJob } from './lib/audit-run-state.js';
 import { FALLBACK_APP_IDS, unionIdsForPicker } from './lib/app-id-catalog.js';
 import { getWildlinkAppCatalogEntries } from './lib/wildlink-app-catalog-cache.js';
@@ -18,7 +18,9 @@ const tableWrap = document.getElementById('tableWrap');
 const tbody = document.getElementById('tbody');
 const openOptsEl = document.getElementById('openOpts');
 const gearSettingsEl = document.getElementById('gearSettings');
-const nextRunLine = document.getElementById('nextRunLine');
+const scheduleBlock = document.getElementById('scheduleBlock');
+const scheduleBlockWhen = document.getElementById('scheduleBlockWhen');
+const scheduleBlockCount = document.getElementById('scheduleBlockCount');
 const tableToolbar = document.getElementById('tableToolbar');
 const toggleResultsBtn = document.getElementById('toggleResultsBtn');
 
@@ -166,39 +168,46 @@ function flaggedRateCell(r) {
 
 async function refreshScheduleCountdown() {
   clearCountdownTimer();
-  if (!nextRunLine) return;
+  if (!scheduleBlock || !scheduleBlockWhen || !scheduleBlockCount) return;
   let s;
   try {
     s = await readExtensionSettings();
   } catch {
-    nextRunLine.hidden = true;
+    scheduleBlock.hidden = true;
+    scheduleBlockWhen.textContent = '';
+    scheduleBlockCount.textContent = '';
     return;
   }
   if (!s.scheduleEnabled) {
-    nextRunLine.hidden = true;
-    nextRunLine.textContent = '';
+    scheduleBlock.hidden = true;
+    scheduleBlockWhen.textContent = '';
+    scheduleBlockCount.textContent = '';
     return;
   }
   const next = getNextScheduledRunDate(s.scheduleDayOfWeek, s.scheduleTimeLocal);
   if (!next) {
-    nextRunLine.hidden = true;
+    scheduleBlock.hidden = true;
+    scheduleBlockWhen.textContent = '';
+    scheduleBlockCount.textContent = '';
     return;
   }
-  nextRunLine.hidden = false;
+  scheduleBlock.hidden = false;
+  const whenText = next.toLocaleString(undefined, {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
   const tick = () => {
     const ms = next.getTime() - Date.now();
     if (ms <= 0) {
       void refreshScheduleCountdown();
       return;
     }
-    const when = next.toLocaleString(undefined, {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit'
-    });
-    nextRunLine.textContent = `Next auto-run: ${when} · in ${formatCountdown(ms)}`;
+    scheduleBlockWhen.textContent = whenText;
+    scheduleBlockCount.textContent = formatCountdownTimer(ms);
   };
   tick();
   countdownTimer = setInterval(tick, 1000);
@@ -289,6 +298,8 @@ async function loadPrefs() {
   const job = await readAuditJob();
   applyJobToUi(job);
 
+  void refreshScheduleCountdown();
+
   try {
     cachedDisplayNameMap = await loadWildlinkAppDisplayNameMap();
     cachedCatalogEntries = await getWildlinkAppCatalogEntries();
@@ -304,7 +315,6 @@ async function loadPrefs() {
     );
   }
   renderAppIdList();
-  void refreshScheduleCountdown();
 }
 
 async function savePrefs() {

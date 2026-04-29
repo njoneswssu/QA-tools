@@ -22,7 +22,13 @@
       Optional: <strong>BigQuery</strong> + <strong>Google Sheets</strong> — use the <strong>gear</strong> or
       <a href="#" id="openOpts">settings</a> (OAuth in <code>manifest.json</code>).
     </p>
-    <p class="next-run" id="nextRunLine" hidden aria-live="polite"></p>
+    <section class="schedule-block" id="scheduleBlock" hidden aria-label="Automated audit countdown">
+      <div class="schedule-block-head">
+        <span class="schedule-block-title">Next automated run</span>
+      </div>
+      <p class="schedule-block-when" id="scheduleBlockWhen"></p>
+      <p class="schedule-block-count" id="scheduleBlockCount" aria-live="polite"></p>
+    </section>
 
     <div class="app-id-panel">
       <label for="appIdSearch">App IDs</label>

@@ -207,16 +207,23 @@ async function fetchWeeklyCommissionMap(merchantIds) {
   });
 }
 
-function rowHasNumericCommission(r) {
+/** Missing, non-numeric, or ≤0 commission → treated as no payout for severity. */
+function rowCommissionIsMissingOrZero(r) {
+  if (!r || r.commission === '' || r.commission === undefined || r.commission === null) return true;
+  const n = Number(r.commission);
+  if (isNaN(n) || !isFinite(n)) return true;
+  return n <= 0;
+}
+
+function rowHasPositiveCommission(r) {
   if (!r || r.commission === '' || r.commission === undefined || r.commission === null) return false;
   const n = Number(r.commission);
-  return !isNaN(n) && isFinite(n);
+  return !isNaN(n) && isFinite(n) && n > 0;
 }
 
 /**
- * Sheet severity follows **commission in this batch** (monotonic with $): higher total commissions
- * → higher severity. Rows without commission data keep the auditor's severity.
- * Uses value tertiles on [min,max] so sorting rows by commission descending matches high→low severity bands.
+ * Sheet severity: only **high** | **medium** | **low**.
+ * No commission data or **0** commission → **low**. Positive commissions → tertiles on log scale within the batch.
  */
 function adjustSeverityByCommission(rows) {
   const issueRows = (rows || []).filter(
@@ -229,16 +236,21 @@ function adjustSeverityByCommission(rows) {
   );
   if (issueRows.length === 0) return;
 
-  const withComm = issueRows.filter(rowHasNumericCommission);
-  if (withComm.length === 0) return;
+  const positive = issueRows.filter(rowHasPositiveCommission);
 
-  const amounts = withComm.map((r) => Number(r.commission));
+  if (positive.length === 0) {
+    for (const r of issueRows) {
+      r.severity = 'low';
+    }
+    return;
+  }
+
+  const amounts = positive.map((r) => Number(r.commission));
   const minC = Math.min(...amounts);
   const maxC = Math.max(...amounts);
 
   function severityForAmount(c) {
     if (maxC > minC) {
-      // log1p spreads heavy-tailed payouts so mid-earners are not all "low" vs one outlier max
       const lo = Math.log1p(Math.max(0, minC));
       const hi = Math.log1p(Math.max(0, maxC));
       const t = hi > lo ? (Math.log1p(Math.max(0, c)) - lo) / (hi - lo) : 1;
@@ -246,11 +258,14 @@ function adjustSeverityByCommission(rows) {
       if (t >= 1 / 3) return 'medium';
       return 'low';
     }
-    return 'high';
+    return 'medium';
   }
 
   for (const r of issueRows) {
-    if (!rowHasNumericCommission(r)) continue;
+    if (rowCommissionIsMissingOrZero(r)) {
+      r.severity = 'low';
+      continue;
+    }
     r.severity = severityForAmount(Number(r.commission));
   }
 }

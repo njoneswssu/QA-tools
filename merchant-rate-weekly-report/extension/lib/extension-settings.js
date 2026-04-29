@@ -20,7 +20,7 @@ export const DEFAULT_EXTENSION_SETTINGS = {
   bqDateColumn: '',
   bqLookbackMonths: 6,
   /** When true, run audit on scheduleDayOfWeek + scheduleTimeLocal (local time). */
-  scheduleEnabled: false,
+  scheduleEnabled: true,
   /** Monday = 1 … Sunday = 7 */
   scheduleDayOfWeek: 1,
   /** "HH:MM" 24h local */

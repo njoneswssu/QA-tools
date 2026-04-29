@@ -32,11 +32,12 @@ async function fetchOneIfNamed(id, nameMap) {
  * Apps that publish a merchant-rate manifest **and** have a display name in
  * `data/wildlink-app-display-names.json`.
  * @param {number[]} candidateIds
- * @returns {Promise<Array<{ id: number, label: string, feedItemCount: number | null }>>}
+ * @returns {Promise<Array<{ id: number, label: string, feedItemCount: (number|null) }>>}
  */
 export async function enrichCatalogWithValidMerchantRateFeeds(candidateIds) {
   const nameMap = await loadWildlinkAppDisplayNameMap();
-  const fromGcs = [...new Set(candidateIds.map(Number).filter((n) => !isNaN(n) && n > 0))];
+  const gcsIds = candidateIds.map(Number).filter((n) => !isNaN(n) && n > 0);
+  const fromGcs = [...new Set(gcsIds)];
   const fromJson = Object.keys(nameMap)
     .filter((k) => /^\d+$/.test(k))
     .map((k) => parseInt(k, 10))

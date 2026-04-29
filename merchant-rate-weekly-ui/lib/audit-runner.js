@@ -112,7 +112,7 @@ const HEADER = [
   'Reason',
   'Rate name',
   'Rate amount',
-  'Count'
+  '# of Rates to Review'
 ];
 
 module.exports = {

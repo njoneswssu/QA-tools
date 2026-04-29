@@ -4,6 +4,7 @@
  */
 import { runAuditJobInServiceWorker } from './lib/background-audit-runner.js';
 import { rescheduleMerchantRateAlarm, SCHEDULE_ALARM_NAME } from './lib/schedule-alarms.js';
+import { readExtensionSettings } from './lib/extension-settings.js';
 
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
@@ -53,7 +54,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 async function handleScheduledAlarm() {
-  const { readExtensionSettings } = await import('./lib/extension-settings.js');
   const s = await readExtensionSettings();
   if (!s.scheduleEnabled) {
     await rescheduleMerchantRateAlarm();

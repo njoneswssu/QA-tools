@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Merchant rate weekly audit",
-  "version": "1.5.7",
+  "version": "1.5.9",
   "description": "Wildlink merchant rate audit — BigQuery + Google Sheets optional via Google sign-in.",
   "background": {
     "service_worker": "background.js",

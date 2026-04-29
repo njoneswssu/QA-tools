@@ -34,7 +34,7 @@ export const HEADER = [
   'Reason',
   'Rate name',
   'Rate amount',
-  'Count'
+  '# of Rates to Review'
 ];
 
 export function rowsToSheetValues(rows, runDateIso) {
@@ -44,7 +44,7 @@ export function rowsToSheetValues(rows, runDateIso) {
     let commCell = '';
     if (commRaw !== undefined && commRaw !== null && commRaw !== '') {
       const n = Number(commRaw);
-      commCell = !isNaN(n) && isFinite(n) ? n : '';
+      commCell = !isNaN(n) && isFinite(n) ? Math.round(n) : '';
     }
     return [
       dateStr,

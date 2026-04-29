@@ -57,3 +57,20 @@ export function formatCountdown(msDelta) {
   if (m > 0) return `${m}m ${sec}s`;
   return `${sec}s`;
 }
+
+/**
+ * Fixed-width style countdown for popup display (always shows d/h/m/s segments).
+ * @param {number} msDelta
+ * @returns {string}
+ */
+export function formatCountdownTimer(msDelta) {
+  if (!Number.isFinite(msDelta) || msDelta < 0) msDelta = 0;
+  const totalSec = Math.floor(msDelta / 1000);
+  const d = Math.floor(totalSec / 86400);
+  const h = Math.floor((totalSec % 86400) / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  if (d > 0) return `${d}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+  return `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+}
