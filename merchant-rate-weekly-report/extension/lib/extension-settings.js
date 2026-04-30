@@ -3,7 +3,7 @@
  * Migrates legacy flat keys from chrome.storage.sync on first read.
  */
 
-import { FALLBACK_APP_IDS } from './app-id-catalog.js';
+import { DEFAULT_SELECTED_APP_IDS } from './app-id-catalog.js';
 
 const STORAGE_KEY = 'extensionSettings';
 
@@ -11,8 +11,8 @@ const STORAGE_KEY = 'extensionSettings';
 export const DEFAULT_SPREADSHEET_ID = '194oJaxgMLAfoFvPgbqVOfTZnU3mVBSqT-hl8EIOnNQE';
 
 export const DEFAULT_EXTENSION_SETTINGS = {
-  appIdsText: '',
-  appIdsSelected: [],
+  appIdsText: DEFAULT_SELECTED_APP_IDS.join(', '),
+  appIdsSelected: [...DEFAULT_SELECTED_APP_IDS],
   useBigQuery: true,
   syncToSheets: true,
   spreadsheetId: DEFAULT_SPREADSHEET_ID,
@@ -57,7 +57,7 @@ function normalize(s) {
   } else if (String(src.appIdsText || '').trim()) {
     appIdsSelected = parseLegacyAppIdsText(src.appIdsText);
   } else {
-    appIdsSelected = [...FALLBACK_APP_IDS];
+    appIdsSelected = [...DEFAULT_SELECTED_APP_IDS];
   }
 
   const useBigQuery =

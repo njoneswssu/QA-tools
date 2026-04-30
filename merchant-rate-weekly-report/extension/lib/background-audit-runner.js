@@ -5,13 +5,13 @@ import { readExtensionSettings } from './extension-settings.js';
 import { friendlyGoogleAuthError, oauthClientPrecheckMessage } from './oauth-helper.js';
 import { writeAuditJob } from './audit-run-state.js';
 
-async function obtainGoogleToken() {
+/** Silent token only (no interactive UI from the service worker for BigQuery-only). */
+async function getGoogleTokenSilent() {
   try {
     return await getGoogleAuthToken(false);
   } catch {
-    /* no cached token */
+    return null;
   }
-  return getGoogleAuthToken(true);
 }
 
 /**
@@ -30,10 +30,12 @@ export async function runAuditJobInServiceWorker(payload) {
 
   try {
     const settings = await readExtensionSettings();
-    const needsGoogle = !!(settings.useBigQuery || settings.syncToSheets);
+    const wantsSheets = !!(settings.syncToSheets && String(settings.spreadsheetId || '').trim());
+    const wantsBq = !!settings.useBigQuery;
+    const needsGoogleForAuth = wantsSheets || wantsBq;
 
     let accessToken = null;
-    if (needsGoogle) {
+    if (needsGoogleForAuth) {
       const pre = oauthClientPrecheckMessage();
       if (pre) {
         await writeAuditJob({
@@ -45,10 +47,10 @@ export async function runAuditJobInServiceWorker(payload) {
         });
         return { ok: false, error: pre };
       }
-      try {
-        accessToken = await obtainGoogleToken();
-      } catch (e) {
-        const msg = friendlyGoogleAuthError(e);
+      accessToken = await getGoogleTokenSilent();
+      if (!accessToken && wantsSheets) {
+        const msg =
+          'Google sign-in required: open extension Settings (click the gear on the popup or “settings” below), choose **Sign in with Google**, then run the audit again.';
         await writeAuditJob({
           phase: 'error',
           startedAt,
@@ -60,9 +62,11 @@ export async function runAuditJobInServiceWorker(payload) {
       }
     }
 
+    const useBigQueryEffective = !!(settings.useBigQuery && accessToken);
+
     const { report, rows } = await runMerchantRateAudit(appIds, {
       accessToken,
-      useBigQuery: !!settings.useBigQuery,
+      useBigQuery: useBigQueryEffective,
       bqProjectId: settings.bqProjectId,
       bqDateColumn: settings.bqDateColumn,
       bqLookbackMonths: settings.bqLookbackMonths
@@ -75,12 +79,8 @@ export async function runAuditJobInServiceWorker(payload) {
     let sheetsMessage = '';
     if (settings.syncToSheets && settings.spreadsheetId && String(settings.spreadsheetId).trim()) {
       try {
-        let tokenForSheet = accessToken;
-        if (!tokenForSheet) {
-          tokenForSheet = await getGoogleAuthToken(true);
-        }
         const { sheetTitle, rowsWritten } = await writeAuditToNewSheetTab(
-          tokenForSheet,
+          accessToken,
           String(settings.spreadsheetId).trim(),
           exportLines,
           runAt
@@ -91,8 +91,13 @@ export async function runAuditJobInServiceWorker(payload) {
       }
     }
 
+    const bqSkipped =
+      wantsBq && !accessToken
+        ? 'BigQuery commissions skipped — sign in with your Wildfire Google account in Settings (gear) on a signed-in browser.'
+        : '';
     const baseMsg = rows.length ? `Done — ${rows.length} issue row(s).` : 'Done — no issues.';
-    const statusMessage = sheetsMessage ? `${baseMsg} · ${sheetsMessage}` : baseMsg;
+    const parts = [baseMsg, bqSkipped, sheetsMessage].filter(Boolean);
+    const statusMessage = parts.join(' · ');
 
     await writeAuditJob({
       phase: 'done',

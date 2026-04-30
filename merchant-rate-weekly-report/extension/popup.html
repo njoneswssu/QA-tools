@@ -8,6 +8,7 @@
 </head>
 <body>
   <div class="wrap">
+    <div class="popup-scroll">
     <div class="header-row">
       <h1>Merchant rate audit</h1>
       <button type="button" class="gear-btn" id="gearSettings" title="Settings (Google, Sheets, BigQuery)" aria-label="Settings">
@@ -19,8 +20,8 @@
     </div>
     <p class="sub">
       Same Wildlink checks as <code>auditAppId</code> + weekly export.
-      Optional: <strong>BigQuery</strong> + <strong>Google Sheets</strong> — use the <strong>gear</strong> or
-      <a href="#" id="openOpts">settings</a> (OAuth in <code>manifest.json</code>).
+      <strong>Google Sheets</strong> and <strong>BigQuery</strong> commissions require signing in with your Wildfire Google account under the
+      <strong>gear</strong> or <a href="#" id="openOpts">settings</a> page (<code>manifest.json</code> OAuth client).
     </p>
     <section class="schedule-block" id="scheduleBlock" hidden aria-label="Automated audit countdown">
       <div class="schedule-block-head">
@@ -37,7 +38,12 @@
         <button type="button" class="secondary tiny" id="appIdCheckAll">Check all</button>
         <button type="button" class="secondary tiny" id="appIdUncheckAll">Uncheck all</button>
       </div>
+      <div class="selected-ids-summary" aria-live="polite">
+        <span class="selected-ids-label">Checked App IDs</span>
+        <span class="selected-ids-value" id="selectedAppIdsSummary">—</span>
+      </div>
       <div id="appIdList" class="app-id-list" role="group" aria-label="App ID checkboxes"></div>
+    </div>
     </div>
 
     <div class="row">

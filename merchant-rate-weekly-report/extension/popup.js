@@ -5,6 +5,8 @@ import { AUDIT_JOB_STORAGE_KEY, readAuditJob } from './lib/audit-run-state.js';
 import { FALLBACK_APP_IDS, unionIdsForPicker } from './lib/app-id-catalog.js';
 import { getWildlinkAppCatalogEntries } from './lib/wildlink-app-catalog-cache.js';
 import { loadWildlinkAppDisplayNameMap, displayNameFromMap } from './lib/wildlink-app-display-name-map.js';
+import { getGoogleAuthToken } from './lib/google-auth.js';
+import { oauthClientPrecheckMessage } from './lib/oauth-helper.js';
 
 const appIdSearchEl = document.getElementById('appIdSearch');
 const appIdListEl = document.getElementById('appIdList');
@@ -23,6 +25,7 @@ const scheduleBlockWhen = document.getElementById('scheduleBlockWhen');
 const scheduleBlockCount = document.getElementById('scheduleBlockCount');
 const tableToolbar = document.getElementById('tableToolbar');
 const toggleResultsBtn = document.getElementById('toggleResultsBtn');
+const selectedAppIdsSummary = document.getElementById('selectedAppIdsSummary');
 
 let lastExportLines = null;
 /** @type {ReturnType<typeof setInterval> | null} */
@@ -40,16 +43,20 @@ let cachedCatalogEntries = null;
 /** @type {Record<string, string> | null} */
 let cachedDisplayNameMap = null;
 
-/** Catalog rows used for list + check-all (never null once load finishes). */
+function buildHardcodedCatalogEntries() {
+  const map = cachedDisplayNameMap || {};
+  return FALLBACK_APP_IDS.map((id) => ({
+    id,
+    label: displayNameFromMap(map, id) || `App ${id}`,
+    feedItemCount: null
+  }));
+}
+
+/** Catalog rows used for list + check-all (`null` only before first prefs load). */
 function effectiveCatalogEntries() {
   if (cachedCatalogEntries === null) return null;
   if (cachedCatalogEntries.length) return cachedCatalogEntries;
-  const map = cachedDisplayNameMap || {};
-  return FALLBACK_APP_IDS.filter((id) => displayNameFromMap(map, id)).map((id) => ({
-    id,
-    label: displayNameFromMap(map, id),
-    feedItemCount: null
-  }));
+  return buildHardcodedCatalogEntries();
 }
 
 function catalogIdsForPicker() {
@@ -104,10 +111,18 @@ function visibleCatalogRows() {
   );
 }
 
+function updateSelectedAppIdsSummary() {
+  if (!selectedAppIdsSummary) return;
+  selectedAppIdsSummary.textContent = pendingSelected.length
+    ? pendingSelected.join(', ')
+    : '(none — check at least one App ID above)';
+}
+
 function renderAppIdList() {
   if (cachedCatalogEntries === null) {
     appIdListEl.innerHTML =
       '<div class="app-id-empty">Loading apps… (GCS list + merchant-rate checks; first load can take ~20–40s.)</div>';
+    updateSelectedAppIdsSummary();
     return;
   }
   const selectedSet = new Set(pendingSelected);
@@ -117,6 +132,7 @@ function renderAppIdList() {
     appIdListEl.innerHTML = q
       ? '<div class="app-id-empty">No App IDs match this filter.</div>'
       : '<div class="app-id-empty">No apps to show — add IDs and display names in <code>data/wildlink-app-display-names.json</code>, then reload the extension.</div>';
+    updateSelectedAppIdsSummary();
     return;
   }
   appIdListEl.innerHTML = list
@@ -131,6 +147,7 @@ function renderAppIdList() {
       return `<label class="app-id-row"${titleAttr}><input type="checkbox" data-app-id="${e.id}"${checked}/><span class="app-id-line"><span class="app-id-num">${e.id}</span><span class="app-id-name">${esc(e.label)}</span></span></label>`;
     })
     .join('');
+  updateSelectedAppIdsSummary();
 }
 
 function validateSelectedAppIds() {
@@ -217,6 +234,49 @@ function openSettings() {
   if (chrome.runtime.openOptionsPage) chrome.runtime.openOptionsPage();
 }
 
+/** @returns {{ ok: true } | { ok: false, message: string }} */
+async function assertGoogleSignedInForRun() {
+  const pre = oauthClientPrecheckMessage();
+  if (pre) return { ok: false, message: pre };
+
+  const s = await readExtensionSettings();
+  const wantsSheets = !!(s.syncToSheets && String(s.spreadsheetId || '').trim());
+  const wantsBq = !!s.useBigQuery;
+  if (!wantsSheets && !wantsBq) return { ok: true };
+
+  let token = null;
+  try {
+    token = await getGoogleAuthToken(false);
+  } catch {
+    token = null;
+  }
+  if (!token) {
+    return {
+      ok: false,
+      message:
+        'Sign in with your Wildfire Google account in Settings before running an audit that uses Google Sheets or BigQuery.'
+    };
+  }
+  return { ok: true };
+}
+
+/** @param {string} detail - main sentence (OAuth precheck or sign-in prompt). */
+function showStatusWithOpenSettingsLink(detail) {
+  statusEl.textContent = '';
+  statusEl.className = 'status err';
+  const wrap = document.createElement('span');
+  wrap.appendChild(document.createTextNode(`${detail.trim()} `));
+  const a = document.createElement('a');
+  a.href = '#';
+  a.textContent = 'Open Settings';
+  a.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    openSettings();
+  });
+  wrap.appendChild(a);
+  statusEl.appendChild(wrap);
+}
+
 /** @param {Record<string, unknown>} job */
 function applyJobToUi(job) {
   if (!job || typeof job !== 'object') return;
@@ -291,8 +351,13 @@ async function loadPrefs() {
   const s = await readExtensionSettings();
   pendingSelected = Array.isArray(s.appIdsSelected) ? [...s.appIdsSelected] : [];
   appIdSearchEl.value = '';
-  cachedCatalogEntries = null;
-  cachedDisplayNameMap = null;
+
+  try {
+    cachedDisplayNameMap = await loadWildlinkAppDisplayNameMap();
+  } catch {
+    cachedDisplayNameMap = {};
+  }
+  cachedCatalogEntries = buildHardcodedCatalogEntries();
   renderAppIdList();
 
   const job = await readAuditJob();
@@ -301,18 +366,10 @@ async function loadPrefs() {
   void refreshScheduleCountdown();
 
   try {
-    cachedDisplayNameMap = await loadWildlinkAppDisplayNameMap();
     cachedCatalogEntries = await getWildlinkAppCatalogEntries();
   } catch (e) {
     console.warn('[popup] Wildlink app catalog fetch failed:', e);
-    cachedDisplayNameMap = await loadWildlinkAppDisplayNameMap().catch(() => ({}));
-    cachedCatalogEntries = FALLBACK_APP_IDS.filter((id) => displayNameFromMap(cachedDisplayNameMap, id)).map(
-      (id) => ({
-        id,
-        label: displayNameFromMap(cachedDisplayNameMap, id),
-        feedItemCount: null
-      })
-    );
+    cachedCatalogEntries = buildHardcodedCatalogEntries();
   }
   renderAppIdList();
 }
@@ -408,6 +465,13 @@ runBtn.addEventListener('click', async () => {
     statusEl.textContent = e.message || String(e);
     statusEl.classList.add('err');
     runBtn.disabled = false;
+    return;
+  }
+
+  const googleGate = await assertGoogleSignedInForRun();
+  if (!googleGate.ok) {
+    runBtn.disabled = false;
+    showStatusWithOpenSettingsLink(googleGate.message || 'Google sign-in or setup is required in Settings.');
     return;
   }
 

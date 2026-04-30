@@ -1,8 +1,11 @@
 /**
  * Fallback when the Wildlink GCS catalog has not loaded yet or fetch failed.
- * Live list comes from `wildlink-app-catalog-cache.js` (merchant-rate–valid apps only).
+ * Shown immediately in the popup (no GCS wait). Live list replaces this when the cache loads.
  */
-export const FALLBACK_APP_IDS = [451, 206, 209];
+export const FALLBACK_APP_IDS = [402, 206, 209, 451];
+
+/** Default checkbox selection on first install / empty saved selection. */
+export const DEFAULT_SELECTED_APP_IDS = [402];
 
 /** @deprecated use FALLBACK_APP_IDS */
 export const AUDITABLE_APP_IDS = FALLBACK_APP_IDS;

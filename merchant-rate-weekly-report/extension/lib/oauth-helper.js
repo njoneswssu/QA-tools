@@ -34,6 +34,20 @@ export function oauthClientPrecheckMessage() {
   );
 }
 
+/** True when the user closed the OAuth window or explicitly denied access (not a config / network bug). */
+export function isUserCancelledAuthError(err) {
+  const msg = String((err && err.message) || err || '').toLowerCase();
+  return (
+    msg.includes('cancel') ||
+    msg.includes('closed') ||
+    msg.includes('did not approve') ||
+    msg.includes('user did not approve') ||
+    msg.includes('access denied') ||
+    msg.includes('authorization page could not be loaded') ||
+    msg.includes('interaction_required')
+  );
+}
+
 /** Turn Google’s opaque error into something actionable when possible. */
 export function friendlyGoogleAuthError(err) {
   const msg = (err && err.message) || String(err || '');

@@ -14,18 +14,38 @@
 a {
   color: var(--accent);
 }
+html {
+  height: 560px;
+  max-height: 560px;
+}
 body {
   margin: 0;
   width: 400px;
+  height: 560px;
   max-height: 560px;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   font-family: system-ui, sans-serif;
   font-size: 13px;
   background: var(--bg);
   color: var(--text);
 }
 .wrap {
-  padding: 12px 14px 16px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px 12px;
+  overflow: hidden;
+}
+.popup-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding-bottom: 4px;
 }
 .header-row {
   display: flex;
@@ -222,10 +242,34 @@ button.tiny {
   color: var(--muted);
   font-size: 11px;
 }
+.selected-ids-summary {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #121920;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.selected-ids-label {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.selected-ids-value {
+  display: block;
+  font-family: ui-monospace, monospace;
+  color: var(--text);
+  word-break: break-word;
+}
 .row {
   display: flex;
   gap: 8px;
   margin-top: 10px;
+  flex-shrink: 0;
 }
 button {
   font-family: inherit;
@@ -254,12 +298,21 @@ button:disabled {
   color: var(--muted);
   margin: 8px 0 0;
   min-height: 1.2em;
+  flex-shrink: 0;
+  line-height: 1.45;
 }
 .status.err {
   color: var(--err);
 }
 .status.ok {
   color: var(--ok);
+}
+.status a {
+  color: var(--accent);
+  font-weight: 600;
+}
+.status a:hover {
+  text-decoration: underline;
 }
 .panel {
   margin-top: 10px;
@@ -269,13 +322,21 @@ button:disabled {
   border-radius: 8px;
   font-size: 11px;
   line-height: 1.45;
+  flex-shrink: 0;
+}
+.panel[hidden] {
+  display: none !important;
 }
 .table-wrap {
   margin-top: 8px;
-  max-height: 220px;
+  flex: 1 1 120px;
+  min-height: 0;
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
+}
+.table-wrap[hidden] {
+  display: none !important;
 }
 table {
   width: 100%;

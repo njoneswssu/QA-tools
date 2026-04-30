@@ -21,7 +21,7 @@ Self-contained folder with a **Chrome extension** (primary UI) that runs the sam
 
 On **Run audit**, the extension will: run Wildlink audits → optionally pull commissions from BigQuery → fall back to pasted CSV only if BigQuery returns no rows → then optionally **create a new tab** and write header + rows (same columns as the Node sheet export). BigQuery runs in **chunks** (many merchant IDs) and **polls** until each job finishes, then **pages** through results — large audits no longer require the Node app for commissions alone.
 
-**Options:** “Load commissions from BigQuery” is **on** by default for new installs. After a successful Google sign-in, **Sign in with Google** is hidden until you **Sign out**.
+**Options:** “Load commissions from BigQuery” is **on** by default for new installs. The same Google button shows **Sign out** while you are signed in, and **Sign in with Google** when you are not.
 
 **Logic parity:** `extension/lib/auditor-core.js` mirrors `merchant-rate-auditor/auditor.js`. `extension/lib/google-bq.js` mirrors the commission query in `lib/weekly-commission-fetch.js`. `extension/lib/google-sheets-rest.js` mirrors “new tab per run” from `lib/sheets.js`.
 
