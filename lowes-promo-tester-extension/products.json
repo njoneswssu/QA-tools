@@ -19,7 +19,7 @@
   },
   {
     "id": "4",
-    "name": "LEVOLOR Solar Shades",
+    "name": "LEVOLOR Solar Shade",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5014103423&refinement=description--LEVOLOR-Levolor-Solar-Shades",
     "model": "LEVOLOR Solar Shades"
   },
@@ -31,7 +31,7 @@
   },
   {
     "id": "6",
-    "name": "LEVOLOR Roman",
+    "name": "LEVOLOR Roman Shade",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5004859679&refinement=description--LEVOLOR-LEVOLOR-Roman",
     "model": "LEVOLOR Roman"
   },
@@ -61,9 +61,9 @@
   },
   {
     "id": "13",
-    "name": "LEVOLOR Sheer Shadings",
+    "name": "LEVOLOR Sheer Shade",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5004860219&refinement=description--LEVOLOR-Levolor-Sheer-Shadings",
-    "model": "LEVOLOR Sheer Shadings"
+    "model": "LEVOLOR Sheer Shade"
   },
   {
     "id": "14",
@@ -73,21 +73,21 @@
   },
   {
     "id": "15",
-    "name": "LEVOLOR Custom Riveria Mini Blinds (1)",
+    "name": "LEVOLOR Custom Riviera Classic Aluminum Mini-blinds",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5015174193&refinement=description--LEVOLOR-Custom-Riveria-Mini-blinds",
-    "model": "LEVOLOR Custom Riveria Mini Blinds"
+    "model": "LEVOLOR Custom Riviera Classic Aluminum Mini-blinds"
   },
   {
     "id": "16",
-    "name": "LEVOLOR Custom Riveria Mini Blinds (2)",
+    "name": "LEVOLOR Custom Riviera Select Aluminum Mini-blinds",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5015174195&refinement=description--LEVOLOR-Custom-Riveria-Mini-blinds",
-    "model": "LEVOLOR Custom Riveria Mini Blinds"
+    "model": "LEVOLOR Custom Riviera Select Aluminum Mini-blinds"
   },
   {
     "id": "17",
-    "name": "LEVOLOR Custom Riveria Mini Blinds (3)",
+    "name": "LEVOLOR Custom Riviera Complete Aluminum Mini-blinds",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5015174191&refinement=description--LEVOLOR-Custom-Riveria-Mini-blinds",
-    "model": "LEVOLOR Custom Riveria Mini Blinds"
+    "model": "LEVOLOR Custom Riviera Complete Aluminum Mini-blinds"
   },
   {
     "id": "18",
@@ -103,7 +103,7 @@
   },
   {
     "id": "22",
-    "name": "LEVOLOR French Doors",
+    "name": "LEVOLOR French Doors Shutters",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5004889457&refinement=description--LEVOLOR-Custom-Horizontal-Faux-Wood-Shutters",
     "model": "LEVOLOR French Doors"
   },
@@ -181,25 +181,25 @@
   },
   {
     "id": "34",
-    "name": "Allen + Roth Custom Banded (Zebra) Roller Shade",
+    "name": "Allen Roth Custom Banded (Zebra) Roller Shade",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5017344453&refinement=description--allen-roth-Custom-Zebra-Roller-shade",
     "model": "Allen Roth Custom Banded (Zebra) Roller Shade"
   },
   {
     "id": "35",
-    "name": "Allen + Roth Custom Faux Wood Horizontal Blinds",
-    "url": "https://www.lowes.com/configure/blinds?omniItemId=5004860441&refinement=description--allen-roth-Custom-Horizontal-Blinds",
+    "name": "Allen + Roth Custom Base Faux Wood Horizontal Blinds",
+    "url": "https://www.lowes.com/configure/blinds?omniItemId=5017443057&refinement=description--allen-roth-Custom-Faux-wood-Faux-wood-blinds",
     "model": "Allen Roth Custom Faux Wood Horizontal Blinds"
   },
   {
     "id": "36",
-    "name": "Allen + Roth Custom Natural Shade",
+    "name": "Allen Roth Custom Natural Shade",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5017344457&refinement=description--allen-roth-Custom-Natural-Natural-shade",
     "model": "Allen Roth Custom Natural Shade"
   },
   {
     "id": "37",
-    "name": "Allen + Roth Custom Vertical Blinds",
+    "name": "Allen Roth Custom Vertical Blinds",
     "url": "https://www.lowes.com/configure/blinds?omniItemId=5017344455&refinement=description--allen-roth-Custom-Vinyl-Vertical-blinds",
     "model": "Allen Roth Custom Fabric and Vinyl Vertical Blinds"
   }
