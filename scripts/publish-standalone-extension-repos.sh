@@ -25,6 +25,9 @@ if [[ -z "$GH_USER" ]]; then
 fi
 echo "Using GitHub owner: $GH_USER" >&2
 
+# gh repo create USER/REPO when USER is your own login can return HTTP 404 on /users/USER; use short REPO for personal accounts.
+GH_ME="$(gh api user -q .login)"
+
 if [[ ! -d "$ROOT/lowes-promo-tester-extension/.git" ]]; then
   echo "Missing standalone repos at $ROOT" >&2
   echo "Copy from your machine or re-run the export step (see agent notes)." >&2
@@ -40,7 +43,11 @@ push_create_or_push() {
     git remote add origin "git@github.com:${GH_USER}/${name}.git"
     git push -u origin main
   else
-    gh repo create "${GH_USER}/${name}" --public --source=. --remote=origin --push
+    if [[ "$GH_USER" == "$GH_ME" ]]; then
+      gh repo create "$name" --public --source=. --remote=origin --push
+    else
+      gh repo create "${GH_USER}/${name}" --public --source=. --remote=origin --push
+    fi
   fi
 }
 
