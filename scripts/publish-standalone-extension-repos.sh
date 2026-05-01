@@ -28,9 +28,8 @@ echo "Using GitHub owner: $GH_USER" >&2
 # gh repo create USER/REPO when USER is your own login can return HTTP 404 on /users/USER; use short REPO for personal accounts.
 GH_ME="$(gh api user -q .login)"
 
-if [[ ! -d "$ROOT/lowes-promo-tester-extension/.git" ]]; then
-  echo "Missing standalone repos at $ROOT" >&2
-  echo "Copy from your machine or re-run the export step (see agent notes)." >&2
+if [[ ! -d "$ROOT/lowes-promo-tester-extension/.git" ]] || [[ ! -d "$ROOT/jcp-wsco-cli/.git" ]]; then
+  echo "Missing standalone trees at $ROOT (need lowes-promo-tester-extension, merchant-rate-weekly-report, jcp-wsco-cli)." >&2
   exit 1
 fi
 
