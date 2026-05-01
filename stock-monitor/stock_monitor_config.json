@@ -1,9 +1,0 @@
-{
-  "discord_webhook": "https://discord.com/api/webhooks/1458068847495086151/YOK9cbnUUzxwmjItjcW78aT3IpoyVO3KTr6LLhvRIet2o1D0CPxqw8gAqgEuV9WJqgO1",
-  "check_interval_minutes": 20,
-  "lookback_days": 365,
-  "chart_display_days": 120,
-  "min_confidence": 0.75,
-  "custom_stocks": ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "ORCL", "ADBE", "NVDA", "TSLA", "DKNG", "COIN", "HOOD", "GOOG", "BABA", "NFLX", "LULU", "SOFI", "UNH", "PINS", "SPOT", "RBLX", "U", "EBAY", "BKNG", "ABNB", "UBER", "LYFT", "DASH", "ROKU", "SHOP", "PLTR", "AMD", "RDDT", "IREN", "AVGO", "PG", "LOW"]
-}
-
