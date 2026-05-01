@@ -4,7 +4,7 @@ A Node.js command-line tool that:
 
 1. Opens the JCP WCSO search page, runs a PO search for each order number you provide, and downloads linked `.xml` files.
 2. Finds the right `<Comergent>` message for each PO.
-3. Converts XML using the same rules as the local **`xml-converter.html`** tool (in the parent `playwrightautomation` folder).
+3. Converts XML using the same rules as the legacy **`xml-converter.html`** flow (logic lives in `xml-convert.js`).
 4. Writes a single **`ComergentData`** file (no `<?xml …?>` on the first line) under `jcp-wsco-cli/output/`.
 
 Search site: `http://transfer.levsuite.com/search_wsco.php`
@@ -35,18 +35,6 @@ Playwright drives Chromium to submit the search form and reuse session cookies w
 ```bash
 node cli.mjs
 ```
-
-### From the repo root (`playwrightautomation`)
-
-A thin wrapper forwards to this tool:
-
-```bash
-node cli.mjs
-```
-
-(Requires the same `npm install` and `npx playwright install chromium` inside `jcp-wsco-cli`.)
-
----
 
 ## End-to-end workflow
 

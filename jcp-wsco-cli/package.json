@@ -1,6 +1,7 @@
 {
   "name": "jcp-wsco-cli",
-  "private": true,
+  "version": "1.0.0",
+  "description": "CLI: JCP WSCO PO search, XML download, and Comergent conversion.",
   "type": "module",
   "bin": {
     "jcp-wsco": "./cli.mjs"

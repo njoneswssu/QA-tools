@@ -62,22 +62,27 @@ release_with_assets() {
     echo "Release $tag already exists for $name; skipping."
     return 0
   fi
-  gh release create "$tag" --title "$title" --notes "$title — Chrome extension / kit from QA-tools split." "${assets[@]}"
+  gh release create "$tag" --title "$title" --notes "$title — Standalone export from QA-tools." "${assets[@]}"
 }
 
 push_create_or_push lowes-promo-tester-extension
 push_create_or_push merchant-rate-weekly-report
-push_create_or_push xml-converter-extension
+push_create_or_push jcp-wsco-cli
 
 ART="$ROOT/artifacts"
+mkdir -p "$ART"
+if [[ ! -f "$ART/jcp-wsco-cli-v1.0.0.zip" ]]; then
+  (cd "$ROOT/jcp-wsco-cli" && zip -qr "$ART/jcp-wsco-cli-v1.0.0.zip" . -x '.git/*' -x 'node_modules/*')
+fi
+
 release_with_assets lowes-promo-tester-extension v1.0.0 "Lowe's Promo Tester v1.0.0" \
   "$ART/lowes-promo-tester-extension-v1.0.0.zip"
 release_with_assets merchant-rate-weekly-report v1.6.3 "Merchant rate weekly report v1.6.3" \
   "$ART/merchant-rate-weekly-report-extension-v1.6.3.zip" \
   "$ART/merchant-rate-weekly-report-full-v1.6.3.zip"
-release_with_assets xml-converter-extension v1.0.0 "XML Order Status Converter v1.0.0" \
-  "$ART/xml-order-status-converter-v1.0.0.zip"
+release_with_assets jcp-wsco-cli v1.0.0 "jcp-wsco-cli v1.0.0" \
+  "$ART/jcp-wsco-cli-v1.0.0.zip"
 
 echo "Done. Repos: https://github.com/${GH_USER}/lowes-promo-tester-extension"
 echo "             https://github.com/${GH_USER}/merchant-rate-weekly-report"
-echo "             https://github.com/${GH_USER}/xml-converter-extension"
+echo "             https://github.com/${GH_USER}/jcp-wsco-cli"
