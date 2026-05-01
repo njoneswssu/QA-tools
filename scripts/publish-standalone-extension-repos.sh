@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Creates public GitHub repos (njoneswssu) and publishes releases.
+# Creates public GitHub repos under your authenticated account and publishes releases.
 # Prerequisites: brew install gh && gh auth login
+# Optional: GH_USER=YourLogin if repos should live under a different owner (org or user).
 set -euo pipefail
 
-GH_USER="${GH_USER:-njoneswssu}"
 ROOT="${STANDALONE_REPO_ROOT:-$HOME/playwright-standalone-repos}"
 
 if ! command -v gh >/dev/null 2>&1; then
@@ -15,6 +15,15 @@ if ! gh auth status -h github.com >/dev/null 2>&1; then
   echo "Not logged in. Run: gh auth login -h github.com -p ssh -w" >&2
   exit 1
 fi
+
+if [[ -z "${GH_USER:-}" ]]; then
+  GH_USER="$(gh api user -q .login)"
+fi
+if [[ -z "$GH_USER" ]]; then
+  echo "Could not resolve GitHub login. Run: gh auth login -h github.com" >&2
+  exit 1
+fi
+echo "Using GitHub owner: $GH_USER" >&2
 
 if [[ ! -d "$ROOT/lowes-promo-tester-extension/.git" ]]; then
   echo "Missing standalone repos at $ROOT" >&2
