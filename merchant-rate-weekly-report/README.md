@@ -13,6 +13,7 @@ The extension runs the same **`auditAppId`-style checks** as the bundled `mercha
 - **Private key (Web Store only):** A generated `oauth-extension-private-key.pem` may exist locally for Chrome Web Store packaging; it is **gitignored** and not required for OAuth sign-in.
 - **UI:** Popup uses a **searchable App ID checklist** (Wildlink app catalog with display names), **gear** for settings, optional **weekly automated run** countdown, **Run audit** / **Copy TSV**, and an in-popup results table.
 - **Documentation:** This README, workflow overview, and **representative UI images** under `docs/screenshots/` (generated for docs; substitute your own captures if you need marketing-grade pixels).
+- **Source:** [github.com/njoneswssu/merchant-rate-weekly-report](https://github.com/njoneswssu/merchant-rate-weekly-report) (standalone); also lives under `QA-tools` in the monorepo.
 
 ---
 
