@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Merchant rate weekly audit",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "description": "Wildlink merchant rate audit — BigQuery + Google Sheets optional via Google sign-in.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtwi7CidUfwPrihf2ktWLlQndAAHkM7OuP+JeVGsSCp60vuEd5VDWSGI8Mg6k+XfukkbXZJQdhO9HagIJqjWhzdlfHag4wJmRJYjiP+vDk+vSHfgfiJmnwcpgWpd+wgsa0CeANeZ3gR1skI68iPmA9eJ/hgvfr9swV8bn0evA02udjROEFPiU+htryFar0A5aS9Hoz3bDa0bjVIHYJTL4nMEKxgWfsOUG7Id4xcv1pAlgb0Sz4quW8IYgdGdLsl5yHgYYFEkFQUTwRH9YT3AI3ML/1lhr/AFu8C54qm1bqt/tOT9HoVfky7BeNqD2U0/mAVekNZR4m0W9KrWFqWu1HwIDAQAB",
   "background": {

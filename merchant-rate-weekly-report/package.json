@@ -1,7 +1,7 @@
 {
   "name": "merchant-rate-weekly-report",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.7.0",
   "description": "Self-contained weekly merchant rate audit UI, Monday cron, Google Sheets export, and bundled auditor",
   "main": "server.js",
   "scripts": {
