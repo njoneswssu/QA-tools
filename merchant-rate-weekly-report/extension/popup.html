@@ -8,7 +8,6 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="popup-scroll">
     <div class="header-row">
       <h1>Merchant rate audit</h1>
       <button type="button" class="gear-btn" id="gearSettings" title="Settings (Google, Sheets, BigQuery)" aria-label="Settings">
@@ -44,7 +43,6 @@
       </div>
       <div id="appIdList" class="app-id-list" role="group" aria-label="App ID checkboxes"></div>
     </div>
-    </div>
 
     <div class="row">
       <button type="button" class="primary" id="runBtn">Run audit</button>
@@ -52,21 +50,23 @@
     </div>
     <p class="status" id="status"></p>
 
-    <div class="panel" id="summaryPanel" hidden></div>
-    <div class="table-wrap" id="tableWrap" hidden>
-      <div class="table-toolbar" id="tableToolbar" hidden>
-        <button type="button" class="secondary tiny" id="toggleResultsBtn">Minimize results</button>
+    <div class="popup-results">
+      <div class="panel" id="summaryPanel" hidden></div>
+      <div class="table-wrap" id="tableWrap" hidden>
+        <div class="table-toolbar" id="tableToolbar" hidden>
+          <button type="button" class="secondary tiny" id="toggleResultsBtn">Minimize results</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Merchant</th>
+              <th>Issue</th>
+              <th>Rate name</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Merchant</th>
-            <th>Issue</th>
-            <th>Rate name</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
     </div>
   </div>
   <script type="module" src="popup.js"></script>
