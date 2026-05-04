@@ -2,9 +2,13 @@ import { rowsToTsv } from './lib/audit-pipeline.js';
 import { readExtensionSettings, writeExtensionSettings } from './lib/extension-settings.js';
 import { getNextScheduledRunDate, formatCountdownTimer } from './lib/schedule-next-run.js';
 import { AUDIT_JOB_STORAGE_KEY, readAuditJob } from './lib/audit-run-state.js';
-import { FALLBACK_APP_IDS, unionIdsForPicker } from './lib/app-id-catalog.js';
+import { DEFAULT_SELECTED_APP_IDS, unionIdsForPicker } from './lib/app-id-catalog.js';
 import { getWildlinkAppCatalogEntries } from './lib/wildlink-app-catalog-cache.js';
-import { loadWildlinkAppDisplayNameMap, displayNameFromMap } from './lib/wildlink-app-display-name-map.js';
+import {
+  loadWildlinkAppDisplayNameMap,
+  displayNameFromMap,
+  sortedAppIdsFromDisplayNameMap
+} from './lib/wildlink-app-display-name-map.js';
 import { getGoogleAuthToken } from './lib/google-auth.js';
 import { oauthClientPrecheckMessage } from './lib/oauth-helper.js';
 
@@ -45,7 +49,9 @@ let cachedDisplayNameMap = null;
 
 function buildHardcodedCatalogEntries() {
   const map = cachedDisplayNameMap || {};
-  return FALLBACK_APP_IDS.map((id) => ({
+  let ids = sortedAppIdsFromDisplayNameMap(map);
+  if (!ids.length) ids = [...DEFAULT_SELECTED_APP_IDS];
+  return ids.map((id) => ({
     id,
     label: displayNameFromMap(map, id) || `App ${id}`,
     feedItemCount: null
@@ -61,7 +67,11 @@ function effectiveCatalogEntries() {
 
 function catalogIdsForPicker() {
   const rows = effectiveCatalogEntries();
-  if (!rows) return FALLBACK_APP_IDS;
+  if (!rows) {
+    const map = cachedDisplayNameMap || {};
+    const ids = sortedAppIdsFromDisplayNameMap(map);
+    return ids.length ? ids : [...DEFAULT_SELECTED_APP_IDS];
+  }
   return rows.map((e) => e.id);
 }
 

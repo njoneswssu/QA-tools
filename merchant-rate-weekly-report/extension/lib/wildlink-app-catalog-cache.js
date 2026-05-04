@@ -1,7 +1,11 @@
 import { fetchWildlinkAppIdsFromGcs } from './wildlink-app-catalog-fetch.js';
 import { enrichCatalogWithValidMerchantRateFeeds } from './wildlink-app-catalog-enrich.js';
-import { FALLBACK_APP_IDS } from './app-id-catalog.js';
-import { loadWildlinkAppDisplayNameMap, displayNameFromMap } from './wildlink-app-display-name-map.js';
+import { DEFAULT_SELECTED_APP_IDS } from './app-id-catalog.js';
+import {
+  loadWildlinkAppDisplayNameMap,
+  displayNameFromMap,
+  sortedAppIdsFromDisplayNameMap
+} from './wildlink-app-display-name-map.js';
 
 const STORAGE_KEY = 'wildlinkAppIdCatalog';
 const CACHE_VERSION = 4;
@@ -50,12 +54,13 @@ export async function writeWildlinkAppCatalogCache(entries) {
 
 async function fallbackCatalogEntriesAsync() {
   const map = await loadWildlinkAppDisplayNameMap();
-  const rows = [];
-  for (const id of FALLBACK_APP_IDS) {
-    const label = displayNameFromMap(map, id);
-    if (label) rows.push({ id, label, feedItemCount: null });
-  }
-  return rows;
+  let ids = sortedAppIdsFromDisplayNameMap(map);
+  if (!ids.length) ids = [...DEFAULT_SELECTED_APP_IDS];
+  return ids.map((id) => ({
+    id,
+    label: displayNameFromMap(map, id) || `App ${id}`,
+    feedItemCount: null
+  }));
 }
 
 /**

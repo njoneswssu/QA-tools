@@ -46,3 +46,16 @@ export function displayNameFromMap(map, id) {
   const v = map[String(id)];
   return typeof v === 'string' && v.trim() ? v.trim() : '';
 }
+
+/** All numeric application IDs present in the display-name map (same rules as `normalizeMap`). */
+export function sortedAppIdsFromDisplayNameMap(map) {
+  if (!map || typeof map !== 'object') return [];
+  const ids = [];
+  for (const k of Object.keys(map)) {
+    if (k.startsWith('_')) continue;
+    if (!/^\d+$/.test(k)) continue;
+    const n = parseInt(k, 10);
+    if (n > 0) ids.push(n);
+  }
+  return [...new Set(ids)].sort((a, b) => a - b);
+}
