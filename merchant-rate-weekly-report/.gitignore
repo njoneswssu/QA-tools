@@ -1,4 +1,5 @@
 node_modules/
+dist/
 # Private key for Chrome Web Store; public key is manifest.json "key" (do not commit .pem)
 extension/oauth-extension-private-key.pem
 .env

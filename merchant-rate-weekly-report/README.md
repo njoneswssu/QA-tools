@@ -6,7 +6,12 @@ The extension runs the same **`auditAppId`-style checks** as the bundled `mercha
 
 ---
 
-## Release notes (v1.7.0)
+## Release notes (v1.7.1)
+
+- **Packaged extension build:** run `npm run package:extension` from this directory to produce `dist/merchant-rate-weekly-audit-v1.7.1.zip` (Chrome **Load unpacked** → unzip, select the inner folder that contains `manifest.json`). GitHub **Releases** attach the same zip for download.
+- **Version bump** so installs and support tickets can reference **1.7.1**; includes the README source link and all **v1.7.0** items below.
+
+### v1.7.0 (baseline for this line)
 
 - **Stable extension ID:** `manifest.json` includes a fixed `key` (public RSA key) so every developer and machine gets the **same** extension ID when loading **Load unpacked** on `extension/`. One **Chrome extension** OAuth client in Google Cloud can serve the whole team.
 - **OAuth setup:** Use a Google Cloud OAuth client of type **Chrome extension** whose **Item ID** matches the ID shown in `chrome://extensions` for this build (see [Extension ID](#extension-id-stable-across-machines) below).
@@ -160,6 +165,8 @@ Recipients: unpack, **Load unpacked** on `extension/`, and optionally `npm insta
 |------|---------|
 | `extension/` | MV3 extension — popup, options, background, audit + optional OAuth BigQuery/Sheets |
 | `extension/manifest.json` | Version, `oauth2`, pinned `key`, permissions |
+| `scripts/package-extension.sh` | Builds `dist/merchant-rate-weekly-audit-v*.zip` (`npm run package:extension`) |
+| `dist/` | Zip output (gitignored); attach to GitHub Releases |
 | `docs/screenshots/` | README UI images |
 | `server.js` | Express + `/api/*` + Monday `node-cron` (optional) |
 | `public/index.html` | Legacy web UI (optional) |
