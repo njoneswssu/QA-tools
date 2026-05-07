@@ -143,10 +143,12 @@ Load the Wildlink merchant list, select merchants, **Run selected**. The server 
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `APP_ID` | `209` | Wildlink merchant JSON `wildlink.me/data/{APP_ID}/merchant/1` |
-| `OFFER_TIMEOUT_MS` | `90000` | Max wait after organic navigation |
+| `OFFER_TIMEOUT_MS` | `15000` | Base timeout (ms) for offer/EMA listener after organic navigation |
+| `OFFER_LISTENER_TIMEOUT_MS` | (derived) | Optional override; default `max(OFFER_TIMEOUT_MS, EMA_AFTER_OFFER_MS + 3000)` (~15s with defaults) |
+| `EMA_AFTER_OFFER_MS` | `10000` | After first `offer_view` network hit, keep listening for EMA this long before resolving as `offer_view` |
 | `EMA_MODAL_MIN_W` / `H` | `180` / `200` | Citi EMA is usually a **cross-origin** `chrome-extension` iframe (parent page cannot read ?Activate Offer?); when text is invisible to the page, we treat a **tall** visible iframe as the modal |
 | `EMA_MODAL_MIN_VIS_AREA` | `24000` | Min visible iframe area (px?) in viewport for that geometry path |
-| `EMA_STABLE_POLLS` / `EMA_POLL_MS` | `4` / `400` | Consecutive passes required and poll interval for `ema_visible` |
+| `EMA_STABLE_POLLS` / `EMA_POLL_MS` | `3` / `400` | Consecutive passes required and poll interval for `ema_visible` |
 | `CDP_URL` | (unset) | If set (e.g. `http://127.0.0.1:9222`), attach to existing Chrome instead of launching; **no extension warmup** |
 | `EXTENSION_WARMUP_MS` | `5000` | After **launch**, extra settle time (ms) for MV3 extensions after SW detection (skipped with `CDP_URL` or UI default skip) |
 | `EXTENSION_WARMUP_SW_DEADLINE_MS` | `12000` | Max time (ms) to poll for extension service workers before settle |

@@ -5,7 +5,7 @@ import { appendFileSync, existsSync, mkdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { pickOrganicAndClickInPage } from './page-organic-pick.js';
 
-const OFFER_TIMEOUT_MS = Number(process.env.OFFER_TIMEOUT_MS || '90000');
+const OFFER_TIMEOUT_MS = Number(process.env.OFFER_TIMEOUT_MS || '15000');
 
 /** EMA must look stable this many polls in a row (default 3 ? 400ms ? 1.2s). */
 const EMA_POLL_MS = Number(process.env.EMA_POLL_MS || '400');
@@ -25,9 +25,16 @@ const EMA_MODAL_MIN_VIS_AREA = Number(process.env.EMA_MODAL_MIN_VIS_AREA || '240
 const EMA_MODAL_MIN_FRAC = Number(process.env.EMA_MODAL_MIN_FRAC || '0.2');
 
 /** After `offer_view`, keep the tab open this long (ms) so Citi EMA can appear in the recording. `0` = old behavior (stop on first offer_view). */
-const EMA_AFTER_OFFER_MS = Math.max(0, Number(process.env.EMA_AFTER_OFFER_MS ?? '60000'));
-/** Listener must stay alive at least this long when we defer `offer_view` to hunt for EMA afterward. */
-const OFFER_LISTENER_TIMEOUT_MS = Math.max(OFFER_TIMEOUT_MS, EMA_AFTER_OFFER_MS + 30000);
+const EMA_AFTER_OFFER_MS = Math.max(0, Number(process.env.EMA_AFTER_OFFER_MS ?? '10000'));
+/**
+ * Max wait for offer_view or EMA after organic navigation. Defaults so a ~15s wall works with the
+ * default `EMA_AFTER_OFFER_MS` defer (override with `OFFER_LISTENER_TIMEOUT_MS`).
+ */
+const _listenerRaw = process.env.OFFER_LISTENER_TIMEOUT_MS?.trim();
+const OFFER_LISTENER_TIMEOUT_MS =
+  _listenerRaw != null && _listenerRaw !== '' && !Number.isNaN(Number(_listenerRaw))
+    ? Number(_listenerRaw)
+    : Math.max(OFFER_TIMEOUT_MS, EMA_AFTER_OFFER_MS + 3000);
 
 /** Shop tab only: max wall time from `newPage` until `close` for the `.webm` (SERP uses a separate tab whose recording is deleted). */
 const ORGANIC_VIDEO_MAX_MS = Math.max(2000, Number(process.env.ORGANIC_VIDEO_MAX_MS ?? '6000'));

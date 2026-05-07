@@ -180,6 +180,11 @@ button.primary {
   font-weight: 600;
 }
 
+button.primary.stop-run {
+  background: #b71c1c;
+  border-color: #8b0000;
+}
+
 button.secondary {
   background: #f0f0f0;
 }
@@ -220,6 +225,15 @@ h2 {
   flex: 1 1 12rem;
   min-width: 0;
   justify-content: flex-end;
+}
+
+.results-delete-hint {
+  flex: 1 1 100%;
+  order: 10;
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: #5c5c5c;
+  line-height: 1.35;
 }
 
 .results-search-label {

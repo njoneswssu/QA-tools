@@ -19,7 +19,6 @@ const runBtn = document.getElementById('run');
 const statusEl = document.getElementById('status');
 const checkFilteredBtn = document.getElementById('checkFiltered');
 const uncheckFilteredBtn = document.getElementById('uncheckFiltered');
-const clearSelBtn = document.getElementById('clearSel');
 const appIdLabel = document.getElementById('appIdLabel');
 const exportGoogleSheetEl = document.getElementById('exportGoogleSheet');
 const googleSpreadsheetIdEl = document.getElementById('googleSpreadsheetId');
@@ -30,7 +29,35 @@ const resultsFilterEl = document.getElementById('resultsFilter');
 const resultsMinimizeBtn = document.getElementById('resultsMinimize');
 const deleteAllResultsBtn = document.getElementById('deleteAllResults');
 
+const RUN_LABEL_IDLE = 'Run selected';
+const RUN_LABEL_STOP = 'Stop selected';
+
+/** @type {AbortController | null} */
+let runAbortController = null;
+
+/** True while `/api/run-stream` is reading; avoids merchant reload replacing the results table mid-run. */
+let runStreamActive = false;
+
 if (appIdLabel) appIdLabel.textContent = APP_ID;
+
+function setRunIdleUi() {
+  runStreamActive = false;
+  runAbortController = null;
+  if (runBtn) {
+    runBtn.disabled = false;
+    runBtn.textContent = RUN_LABEL_IDLE;
+    runBtn.classList.remove('stop-run');
+  }
+}
+
+function setRunActiveUi() {
+  runStreamActive = true;
+  if (runBtn) {
+    runBtn.disabled = false;
+    runBtn.textContent = RUN_LABEL_STOP;
+    runBtn.classList.add('stop-run');
+  }
+}
 
 /** @type {{ id: string, name: string }[]} */
 let merchants = [];
@@ -52,9 +79,6 @@ function stripRowUiFields(row) {
 
 /** Cancels in-flight chunked `renderList` when the filter changes again. */
 let renderListGeneration = 0;
-
-/** True while `/api/run-stream` is reading; avoids merchant reload replacing the results table mid-run. */
-let runStreamActive = false;
 
 function loadStored() {
   try {
@@ -198,6 +222,22 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+/** Split filter box on commas, semicolons, or newlines; OR-match merchants against each token. */
+function parseFilterTokens(raw) {
+  return String(raw || '')
+    .split(/[\n,;]+/)
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/** @param {{ id: string, name: string }} m @param {string[]} tokens */
+function merchantMatchesFilterTokens(m, tokens) {
+  if (!tokens.length) return true;
+  const name = m.name.toLowerCase();
+  const id = String(m.id).toLowerCase();
+  return tokens.some((q) => name.includes(q) || id.includes(q));
+}
+
 /** Same-origin URL for a `.webm` under the UI server (basename only; must match server path checks). */
 function traceMediaUrl(videoPath) {
   if (!videoPath || typeof videoPath !== 'string') return '';
@@ -240,7 +280,16 @@ function appendDataRow(row, opts = {}) {
   delBtn.innerHTML =
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>';
   delBtn.addEventListener('click', () => {
-    if (uiId != null) deleteResultByUiId(Number(uiId));
+    if (uiId == null) return;
+    const name = String(row.merchantName ?? 'this row');
+    if (
+      !window.confirm(
+        `Delete the result for "${name}"? This removes the row and updates the saved snapshot in this browser. This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    deleteResultByUiId(Number(uiId));
   });
   tDel.appendChild(delBtn);
 
@@ -351,7 +400,13 @@ function persistResultsSnapshot() {
 
 function deleteAllResults() {
   if (!tbody) return;
-  if (accumulatedResultRows.length && !window.confirm('Delete all result rows from this page and saved browser snapshot?')) {
+  const n = accumulatedResultRows.length;
+  if (
+    n > 0 &&
+    !window.confirm(
+      `You are about to delete all ${n} result row(s) from this page and clear the saved results snapshot in this browser. This cannot be undone.\n\nContinue?`
+    )
+  ) {
     return;
   }
   tbody.innerHTML = '';
@@ -365,7 +420,8 @@ function renderDoneStatus(done, opts = {}) {
   if (!statusEl) return;
   const traceDir = done.traceDir;
   const gs = done.googleSheet;
-  const intro = opts.restored ? 'Last run finished.' : 'Finished.';
+  const cancelled = Boolean(done.cancelled);
+  const intro = opts.restored ? 'Last run finished.' : cancelled ? 'Run cancelled.' : 'Finished.';
   if (gs?.spreadsheetUrl) {
     statusEl.textContent = '';
     statusEl.appendChild(
@@ -386,6 +442,9 @@ function renderDoneStatus(done, opts = {}) {
   let msg = `${intro} Results also appended under output/.`;
   if (traceDir) msg += ` Traces (.zip) and videos (.webm): ${traceDir}`;
   if (gs?.error) msg += ' Google Sheet: ' + gs.error;
+  if (cancelled && !gs?.spreadsheetUrl) {
+    msg += ' Google Sheet export was skipped.';
+  }
   statusEl.textContent = msg;
 }
 
@@ -397,10 +456,10 @@ function raf() {
 async function renderList() {
   if (!merchantList || !filterEl) return;
   const gen = ++renderListGeneration;
-  const q = filterEl.value.trim().toLowerCase();
+  const tokens = parseFilterTokens(filterEl.value);
 
   const rowHtml = (m) => {
-    const hit = !q || m.name.toLowerCase().includes(q) || m.id.includes(q);
+    const hit = merchantMatchesFilterTokens(m, tokens);
     const checked = selectedMerchantNames.has(m.name) ? ' checked' : '';
     return `<label class="merchant-item ${hit ? '' : 'hidden'}">
         <input type="checkbox" value="${escapeHtml(m.name)}" data-id="${escapeHtml(m.id)}"${checked} />
@@ -561,16 +620,15 @@ function appendRow(row) {
     renderDoneStatus(
       {
         traceDir: row.traceDir,
-        googleSheet: row.googleSheet
+        googleSheet: row.googleSheet,
+        cancelled: Boolean(row.cancelled)
       },
       { restored: false }
     );
-    runBtn.disabled = false;
     return;
   }
   if (row.type === 'error') {
     statusEl.textContent = 'Error: ' + row.message;
-    runBtn.disabled = false;
     return;
   }
   if (row.merchantName == null || row.merchantName === '') return;
@@ -587,8 +645,9 @@ async function runSelected() {
     return;
   }
   statusEl.textContent = 'Running (browser will open)?';
-  runBtn.disabled = true;
-  runStreamActive = true;
+  setRunActiveUi();
+  runAbortController = new AbortController();
+  const { signal } = runAbortController;
   reloadBtn?.setAttribute('disabled', 'disabled');
 
   const payload = {
@@ -602,12 +661,12 @@ async function runSelected() {
     const res = await fetch('/api/run-stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal
     });
 
     if (!res.ok) {
       statusEl.textContent = 'HTTP ' + res.status;
-      runBtn.disabled = false;
       return;
     }
 
@@ -633,11 +692,15 @@ async function runSelected() {
       }
     }
   } catch (e) {
-    if (statusEl) statusEl.textContent = String(/** @type {any} */ (e)?.message || e);
-    runBtn.disabled = false;
+    const aborted = signal.aborted || /** @type {any} */ (e)?.name === 'AbortError';
+    if (statusEl) {
+      statusEl.textContent = aborted
+        ? 'Stopped: request cancelled. The server may finish the current merchant before closing the browser.'
+        : String(/** @type {any} */ (e)?.message || e);
+    }
   } finally {
-    runStreamActive = false;
     reloadBtn?.removeAttribute('disabled');
+    setRunIdleUi();
   }
 }
 
@@ -677,20 +740,15 @@ function wireUi() {
     saveStored({ resultsMinimized: collapsed });
   });
   deleteAllResultsBtn?.addEventListener('click', () => deleteAllResults());
-  clearSelBtn?.addEventListener('click', () => {
-    merchantList?.querySelectorAll('input').forEach((el) => {
-      /** @type {HTMLInputElement} */ (el).checked = false;
-    });
-    selectedMerchantNames.clear();
-    if (filterEl) filterEl.value = '';
-    renderList().catch((e) => console.warn(e));
-    updateSelectedSummary();
-  });
-  runBtn?.addEventListener('click', () =>
+  runBtn?.addEventListener('click', () => {
+    if (runStreamActive && runAbortController) {
+      runAbortController.abort();
+      return;
+    }
     runSelected().catch((e) => {
       if (statusEl) statusEl.textContent = String(e.message || e);
-    })
-  );
+    });
+  });
 
   googleSpreadsheetIdEl?.addEventListener('input', persistFormDebounced);
   googleTabTitleEl?.addEventListener('input', persistFormDebounced);

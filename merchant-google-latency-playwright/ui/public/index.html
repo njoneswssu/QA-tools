@@ -10,7 +10,7 @@
     <header>
       <h1>Merchant Google latency</h1>
       <p class="sub">
-        Merchants from Wildlink app <strong id="appIdLabel">209</strong> (first <strong>400</strong> names for UI speed; filter still searches within that list). Select one or more, run, then watch rows stream in.
+        Merchants from Wildlink app <strong id="appIdLabel">209</strong> (first <strong>400</strong> names for UI speed; filter still searches within that list). In <strong>Filter list</strong>, separate several names with commas or newlines to show matches for any of them. Select one or more, run, then watch rows stream in.
         Timings are <strong>seconds from merchant navigation</strong> until <code>offer_view</code> or Citi EMA (see outcome).
         Each run writes a Playwright <strong>trace</strong> (<code>.zip</code>, open with Trace Viewer) and a <strong>screen recording</strong> (<code>.webm</code>) under the traces folder on the machine running this app.
       </p>
@@ -19,7 +19,13 @@
     <section class="panel">
       <div class="row">
         <label for="filter">Filter list</label>
-        <input id="filter" type="search" placeholder="Type to filter merchants?" autocomplete="off" />
+        <input
+          id="filter"
+          type="text"
+          placeholder="One name, or several separated by comma or newline?"
+          autocomplete="off"
+          spellcheck="false"
+        />
         <button type="button" id="reload" class="secondary">Reload feed</button>
       </div>
       <div id="merchantList" class="merchant-list" aria-label="Merchants"></div>
@@ -27,7 +33,6 @@
       <div class="row actions filter-actions">
         <button type="button" id="checkFiltered">Check visible in list</button>
         <button type="button" id="uncheckFiltered" class="secondary">Uncheck all</button>
-        <button type="button" id="clearSel" class="secondary">Clear all merchants</button>
         <button type="button" id="run" class="primary">Run selected</button>
       </div>
       <div class="row sheet-export">
@@ -61,6 +66,9 @@
             aria-label="Search results table"
           />
           <button type="button" id="resultsMinimize" class="secondary" aria-expanded="true">Minimize results</button>
+          <p class="results-delete-hint" role="note">
+            Deleting a row or all results cannot be undone; you will be asked to confirm.
+          </p>
           <button type="button" id="deleteAllResults" class="secondary danger-text">Delete all results</button>
         </div>
       </div>

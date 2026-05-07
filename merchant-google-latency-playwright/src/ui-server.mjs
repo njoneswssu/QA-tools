@@ -208,6 +208,13 @@ async function handleRunStream(req, res) {
   });
   if (typeof res.flushHeaders === 'function') res.flushHeaders();
 
+  let clientClosed = false;
+  const onReqClose = () => {
+    clientClosed = true;
+  };
+  req.on('close', onReqClose);
+  req.on('aborted', onReqClose);
+
   /** Add a ready-to-play URL when the file is on disk (helps the UI avoid table/innerHTML issues). */
   function latencyRowForSse(row) {
     if (!row || typeof row !== 'object' || row.type != null || row.merchantName == null) return row;
@@ -259,7 +266,14 @@ async function handleRunStream(req, res) {
     /** @type {object[]} */
     const sheetRows = [];
     for (const name of merchants) {
-      const row = await runMerchantLatencyOnDedicatedPage(context, name, { traceDir });
+      if (clientClosed) break;
+      let row;
+      try {
+        row = await runMerchantLatencyOnDedicatedPage(context, name, { traceDir });
+      } catch (e) {
+        if (clientClosed) break;
+        throw e;
+      }
       sheetRows.push(row);
       appendOutputRecord(outputDir, row);
       send(latencyRowForSse(row));
@@ -272,7 +286,7 @@ async function handleRunStream(req, res) {
       body.exportGoogleSheet === '1';
 
     let googleSheet = null;
-    if (wantsGoogleSheet && sheetRows.length > 0) {
+    if (!clientClosed && wantsGoogleSheet && sheetRows.length > 0) {
       const sidRaw =
         String(body.googleSpreadsheetId || '').trim() ||
         process.env.GOOGLE_LATENCY_SPREADSHEET_ID?.trim() ||
@@ -290,11 +304,17 @@ async function handleRunStream(req, res) {
         console.error('[latency-ui] Google Sheet export failed:', msg);
         googleSheet = { error: msg };
       }
-    } else if (wantsGoogleSheet && sheetRows.length === 0) {
+    } else if (!clientClosed && wantsGoogleSheet && sheetRows.length === 0) {
       googleSheet = { error: 'No result rows to export.' };
     }
 
-    send({ type: 'done', outputDir, traceDir, googleSheet });
+    send({
+      type: 'done',
+      outputDir,
+      traceDir,
+      googleSheet,
+      cancelled: Boolean(clientClosed)
+    });
   } catch (e) {
     send({ type: 'error', message: String(/** @type {any} */ (e)?.message || e) });
   } finally {
