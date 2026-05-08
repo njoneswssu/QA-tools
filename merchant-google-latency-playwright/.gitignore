@@ -5,5 +5,7 @@ traces/
 .wl-latency-profile/
 *.zip
 .env
+secrets/*.json
+!secrets/.gitkeep
 # Local Wildlink merchant backup (regenerate with `npm run sync:merchants` or UI ?refresh=1)
 data/merchants-app-*.json
