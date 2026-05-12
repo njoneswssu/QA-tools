@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="About Neil Jones — automation, QA, and how AI fits into day-to-day delivery."
+    />
+    <title>About · Neil Jones</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href="index.html">Neil Jones</a>
+        <nav class="nav" aria-label="Primary">
+          <a href="index.html">Home</a>
+          <a href="qa-reports.html">QA reports</a>
+          <a href="partner-api-qa-test-plan/">Test plan</a>
+          <a href="resume.html">Resume</a>
+          <a href="about.html" aria-current="page">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="about-page-main">
+      <section class="section about about-page" aria-labelledby="about-heading">
+        <div class="about-card">
+          <h1 id="about-heading" class="about-page-title">About</h1>
+          <p class="about-lead">
+            I am a builder who likes end-to-end ownership: from the cron job or
+            BigQuery pull to the operator-facing UI or browser extension. These
+            projects sit at the intersection of messy real-world data and
+            software that has to stay reliable week after week.
+          </p>
+          <h2 class="about-subhead">Skills I have leaned on—often alongside AI</h2>
+          <ul class="about-list">
+            <li>
+              <strong>Node &amp; Express</strong> for lightweight APIs, dashboards,
+              and glue services that sit between spreadsheets, databases, and
+              external APIs.
+            </li>
+            <li>
+              <strong>Playwright</strong> for flows where the browser is the source
+              of truth: retail configurators, promo paths, and internal tools that
+              were never meant to ship a public API.
+            </li>
+            <li>
+              <strong>BigQuery &amp; SQL</strong> for merchant-rate and feed
+              analysis—drafting queries, shaping aggregates, and iterating on
+              audits without losing sight of cost and correctness.
+            </li>
+            <li>
+              <strong>Google Sheets &amp; cron</strong> so stakeholders get familiar
+              surfaces and scheduled outputs without standing up heavy BI for every
+              problem.
+            </li>
+            <li>
+              <strong>PostgreSQL &amp; SQLite</strong> when state needs to live
+              closer to the app: dashboards with history, or local run logs for
+              automation suites.
+            </li>
+            <li>
+              <strong>Browser extensions</strong> to put audits and helpers directly
+              where people already work, instead of asking them to context-switch.
+            </li>
+          </ul>
+          <h2 class="about-subhead">How AI makes my day-to-day easier</h2>
+          <p>
+            I use AI as an accelerator, not a substitute for judgment. It helps me
+            spin up scaffolding faster (routes, scripts, test harnesses), explore
+            unfamiliar libraries with concrete examples, and refactor with a second
+            set of eyes on edge cases. It is especially useful for boilerplate,
+            repetitive refactors, and turning a rough idea into something I can run
+            and then harden.
+          </p>
+          <p>
+            Day to day, that means less time stuck on ceremony and more time on the
+            parts that matter: domain rules, failure modes, and how a tool will
+            behave when a feed is late or a selector changes. I still own
+            architecture, security-sensitive paths, and what ships to production—but
+            I get to those decisions faster, with clearer options on the table.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer id="contact" class="site-footer">
+      <p class="footer-nav-row">
+        <a class="footer-back-home" href="index.html">← Back to home</a>
+        <span class="footer-nav-sep" aria-hidden="true">·</span>
+        <a class="footer-next-page" href="index.html">Home →</a>
+      </p>
+      <ul class="contact-links" id="contact-links" aria-label="Contact links"></ul>
+      <p class="footer-copyright">© <span id="year"></span> Neil Jones.</p>
+    </footer>
+
+    <script src="tools-data.js"></script>
+    <script src="contact-footer.js"></script>
+    <script>
+      document.getElementById("year").textContent = String(new Date().getFullYear());
+    </script>
+  </body>
+</html>

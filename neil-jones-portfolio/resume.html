@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Resume — Neil Jones, QA and automation engineer."
+    />
+    <title>Resume · Neil Jones</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href="index.html">Neil Jones</a>
+        <nav class="nav" aria-label="Primary">
+          <a href="index.html">Home</a>
+          <a href="qa-reports.html">QA reports</a>
+          <a href="partner-api-qa-test-plan/">Test plan</a>
+          <a href="resume.html" aria-current="page">Resume</a>
+          <a href="about.html">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="resume-main">
+      <header class="resume-hero section">
+        <p class="resume-eyebrow">Resume</p>
+        <h1 class="resume-title">Neil Jones</h1>
+        <p class="resume-lede">
+          The resume below is rendered <strong>directly from your Word file</strong> in
+          the browser (no Microsoft sign-in). For pixel-perfect layout, use
+          <strong>Download .docx</strong> and open in Word or Google Docs.
+        </p>
+        <div class="resume-actions">
+          <a
+            class="btn btn-primary"
+            href="media/Neil_Jones_Resume_May_2026.docx"
+            download="Neil_Jones_Resume_May_2026.docx"
+          >
+            Download .docx
+          </a>
+          <a class="btn btn-ghost" href="index.html#contact">Get in touch</a>
+        </div>
+      </header>
+
+      <section class="section resume-embed-section" aria-labelledby="resume-embed-h2">
+        <h2 id="resume-embed-h2" class="visually-hidden">Resume document</h2>
+        <p id="resume-file-note" class="resume-embed-note resume-file-note" hidden>
+          Preview needs a local or hosted server (not <code>file://</code>). Run
+          <code>npm start</code> from the portfolio folder, or use
+          <strong>Download .docx</strong> above.
+        </p>
+        <p id="resume-loading" class="resume-status">Loading resume…</p>
+        <p id="resume-error" class="resume-status resume-error" hidden></p>
+        <div id="resume-html" class="resume-doc-html" hidden></div>
+      </section>
+    </main>
+
+    <footer id="contact" class="site-footer">
+      <p class="footer-nav-row">
+        <a class="footer-back-home" href="index.html">← Back to home</a>
+        <span class="footer-nav-sep" aria-hidden="true">·</span>
+        <a class="footer-next-page" href="about.html">About →</a>
+      </p>
+      <ul class="contact-links" id="contact-links" aria-label="Contact links"></ul>
+      <p class="footer-copyright">© <span id="year"></span> Neil Jones.</p>
+    </footer>
+
+    <script src="tools-data.js"></script>
+    <script src="contact-footer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+    <script>
+      document.getElementById("year").textContent = String(new Date().getFullYear());
+      (function () {
+        var loading = document.getElementById("resume-loading");
+        var errEl = document.getElementById("resume-error");
+        var htmlEl = document.getElementById("resume-html");
+        var note = document.getElementById("resume-file-note");
+        var proto = window.location.protocol;
+        if (proto !== "http:" && proto !== "https:") {
+          loading.hidden = true;
+          note.hidden = false;
+          return;
+        }
+        var docUrl = "media/Neil_Jones_Resume_May_2026.docx?v=1";
+        fetch(docUrl)
+          .then(function (r) {
+            if (!r.ok) throw new Error("Could not load the resume file.");
+            return r.arrayBuffer();
+          })
+          .then(function (buf) {
+            return mammoth.convertToHtml({ arrayBuffer: buf });
+          })
+          .then(function (result) {
+            loading.hidden = true;
+            htmlEl.innerHTML = result.value;
+            htmlEl.hidden = false;
+          })
+          .catch(function (e) {
+            loading.hidden = true;
+            errEl.textContent =
+              e.message ||
+              "Could not render the resume. Try Download .docx, or open this page from a server (npm start).";
+            errEl.hidden = false;
+          });
+      })();
+    </script>
+  </body>
+</html>

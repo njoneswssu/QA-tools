@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Neil Jones — portfolio of automation tools, dashboards, and CLIs built with AI-assisted development."
+    />
+    <title>Neil Jones · Tools &amp; automation</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href="index.html">Neil Jones</a>
+        <nav class="nav" aria-label="Primary">
+          <a href="index.html" aria-current="page">Home</a>
+          <a href="qa-reports.html">QA reports</a>
+          <a href="partner-api-qa-test-plan/">Test plan</a>
+          <a href="resume.html">Resume</a>
+          <a href="about.html">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <div class="hero-layout">
+          <figure class="hero-photo">
+            <img
+              src="media/neil-jones-headshot.png"
+              width="560"
+              height="700"
+              alt="Neil Jones"
+              decoding="async"
+              fetchpriority="high"
+            />
+          </figure>
+          <div class="hero-copy">
+            <p class="hero-eyebrow">Portfolio · Neil Jones</p>
+            <h1 id="hero-title" class="hero-title">
+              Practical software,<br />
+              <em>shipped faster</em> with AI.
+            </h1>
+            <p class="hero-lede">
+              I design and build automation, internal dashboards, and CLIs—mostly
+              around data quality, merchant feeds, and browser-based testing. This
+              site highlights representative tools from my workspace.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#tools">Browse tools</a>
+              <a class="btn btn-ghost" href="about.html">About me</a>
+              <a class="btn btn-ghost" href="resume.html">Resume</a>
+              <a class="btn btn-ghost" href="#contact">Get in touch</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tools" class="section tools" aria-label="Featured tools">
+        <div class="filter-bar" role="toolbar" aria-label="Filter by technology">
+          <button type="button" class="chip chip-all is-active" data-filter="all">
+            All
+          </button>
+        </div>
+
+        <div class="tool-grid-wrap" id="tool-grid-wrap">
+          <div class="tool-grid-strip" id="tool-grid-strip">
+            <ul class="tool-grid tool-grid-row" id="tool-grid">
+              <!-- populated by tools-data.js + app.js -->
+            </ul>
+            <ul
+              class="tool-grid tool-grid-row tool-grid--printer-feed"
+              id="tool-grid-feed"
+              aria-hidden="true"
+            ></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="contact" class="site-footer">
+      <p class="footer-nav-row">
+        <a class="footer-back-home" href="index.html">← Back to home</a>
+        <span class="footer-nav-sep" aria-hidden="true">·</span>
+        <a class="footer-next-page" href="qa-reports.html">QA reports →</a>
+      </p>
+      <ul class="contact-links" id="contact-links" aria-label="Contact links"></ul>
+      <p class="footer-copyright">© <span id="year"></span> Neil Jones.</p>
+    </footer>
+
+    <script src="tools-data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
