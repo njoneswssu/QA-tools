@@ -151,6 +151,16 @@ async function applyImportedBackup(text) {
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.type !== 'REQUEST_TAB_CAPTURE') return false;
+  let finished = false;
+  const done = (payload) => {
+    if (finished) return;
+    finished = true;
+    try {
+      sendResponse(payload);
+    } catch (_) {
+      /* Port closed (e.g. side panel hidden) — avoids unchecked runtime.lastError noise. */
+    }
+  };
   (async () => {
     try {
       const { tabId } = msg;
@@ -162,16 +172,73 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       const i = dataUrl.indexOf(',');
       const base64 = i >= 0 && dataUrl.slice(0, i).includes('base64') ? dataUrl.slice(i + 1) : '';
       if (base64.length < 24) {
-        sendResponse({ ok: false, error: 'empty capture' });
+        done({ ok: false, error: 'empty capture' });
         return;
       }
-      sendResponse({ ok: true, dataUrl, base64 });
+      done({ ok: true, dataUrl, base64 });
     } catch (e) {
-      sendResponse({ ok: false, error: e.message || String(e) });
+      done({ ok: false, error: e.message || String(e) });
     }
   })();
   return true;
 });
+
+/** YYYY-MM-DD from a result row for filtering (test_date preferred). */
+function resultDateKey(r) {
+  const td = r?.test_date;
+  if (td && /^\d{4}-\d{2}-\d{2}/.test(String(td))) return String(td).slice(0, 10);
+  if (r?.created_at) {
+    try {
+      const d = new Date(r.created_at);
+      if (!Number.isNaN(d.getTime())) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }
+    } catch (_) {}
+  }
+  return '';
+}
+
+function resultsDateRangeActive() {
+  const from = (document.getElementById('resultsDateFrom')?.value || '').trim();
+  const to = (document.getElementById('resultsDateTo')?.value || '').trim();
+  return { from, to, active: !!(from || to) };
+}
+
+function passesResultsDateFilter(r) {
+  const { from, to, active } = resultsDateRangeActive();
+  if (!active) return true;
+  const key = resultDateKey(r);
+  if (!key) return false;
+  if (from && key < from) return false;
+  if (to && key > to) return false;
+  return true;
+}
+
+/** Clears stale sequenceRunning when the service worker restarted mid-run (MV3). */
+async function reconcileStaleSequenceState() {
+  try {
+    const r = await chrome.runtime.sendMessage({ type: 'SEQUENCE_UI_SYNC' });
+    const { sequenceRunning } = await chrome.storage.local.get('sequenceRunning');
+    if (sequenceRunning && !r?.inMemoryRunning) {
+      await chrome.storage.local.set({
+        sequenceRunning: false,
+        shouldStop: false,
+        automationPaused: false
+      });
+    }
+  } catch (_) {
+    try {
+      const { sequenceRunning } = await chrome.storage.local.get('sequenceRunning');
+      if (sequenceRunning) {
+        await chrome.storage.local.set({
+          sequenceRunning: false,
+          shouldStop: false,
+          automationPaused: false
+        });
+      }
+    } catch (_2) {}
+  }
+}
 
 function displayName(name) {
   let n = name || '';
@@ -314,27 +381,38 @@ async function loadResults() {
   ]);
   const hidden = new Set((resultsHiddenProductIds || []).map(String));
   const visibleRows = testResults.filter((r) => !hidden.has(String(r.product_id ?? '')));
+  const rowsForGrid = visibleRows.filter(passesResultsDateFilter);
   const grid = document.getElementById('resultsGrid');
   if (!testResults.length) {
     grid.innerHTML = '<p class="muted">No results yet. Use <strong>Start testing</strong> above.</p>';
   } else if (!visibleRows.length) {
     grid.innerHTML =
       '<p class="muted">Every blind is hidden — open <strong>Filter blinds</strong> and check products to show them again.</p>';
+  } else if (!rowsForGrid.length) {
+    const { from, to, active } = resultsDateRangeActive();
+    grid.innerHTML = active
+      ? `<p class="muted">No results in this date range (${from || '…'} to ${to || '…'}). Use <strong>Clear dates</strong> or change the range.</p>`
+      : '<p class="muted">No results to show.</p>';
   } else {
-    renderResults(visibleRows);
+    renderResults(rowsForGrid);
   }
-  updateStats(testResults, visibleRows);
+  updateStats(testResults, visibleRows, rowsForGrid);
   const panel = document.getElementById('resultsFilterPanel');
   if (panel && !panel.hidden) {
     await renderResultsFilterList(testResults, hidden);
   }
 }
 
-function updateStats(allRows, visibleRows) {
+function updateStats(allRows, visibilityFilteredRows, gridRows) {
   document.getElementById('totalTests').textContent = String(allRows.length);
   const ids = new Set(allRows.map((r) => r.product_id).filter(Boolean));
   document.getElementById('totalProducts').textContent = String(ids.size);
-  const avgSource = visibleRows.length ? visibleRows : allRows;
+  const avgSource =
+    gridRows.length > 0
+      ? gridRows
+      : visibilityFilteredRows.length
+        ? visibilityFilteredRows
+        : allRows;
   const nums = avgSource
     .map((r) => parseFloat(String(r.promo_percentage ?? '')))
     .filter((n) => !Number.isNaN(n));
@@ -342,13 +420,20 @@ function updateStats(allRows, visibleRows) {
   document.getElementById('avgPromo').textContent = avg;
   const note = document.getElementById('resultsScopeNote');
   if (note) {
-    if (visibleRows.length !== allRows.length) {
-      note.textContent = `Showing ${visibleRows.length} of ${allRows.length} results`;
-      note.hidden = false;
-    } else {
-      note.textContent = '';
-      note.hidden = true;
+    const bits = [];
+    if (visibilityFilteredRows.length !== allRows.length) {
+      bits.push(`Showing ${visibilityFilteredRows.length} of ${allRows.length} results`);
     }
+    const { from, to, active } = resultsDateRangeActive();
+    if (active) {
+      bits.push(
+        gridRows.length
+          ? `${gridRows.length} card(s) in range ${from || '…'}–${to || '…'}`
+          : `No cards in ${from || '…'}–${to || '…'}`
+      );
+    }
+    note.textContent = bits.join(' · ');
+    note.hidden = bits.length === 0;
   }
 }
 
@@ -603,8 +688,10 @@ document.getElementById('btnSeq').addEventListener('click', async () => {
   if (sequenceRunning) {
     try {
       await chrome.runtime.sendMessage({ type: 'STOP_SEQUENCE' });
-      toast('Stopping after the current step…');
+      await syncSeqRunButton();
+      toast('Stop requested — the run exits soon after the current page step or wait.');
     } catch (e) {
+      await syncSeqRunButton();
       toast(e.message || 'Could not stop');
     }
     return;
@@ -628,19 +715,17 @@ document.getElementById('btnSeq').addEventListener('click', async () => {
   toast('Run started — Pause freezes between steps; keep the side panel open for screenshots');
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
   const tabId = tabs[0]?.url?.includes('lowes.com') ? tabs[0].id : undefined;
-  chrome.runtime.sendMessage(
-    { type: 'RUN_SEQUENCE', productIds: Array.from(selected), tabId },
-    async (res) => {
-      await syncSeqRunButton();
-      await loadResults();
-      if (chrome.runtime.lastError) {
-        toast(chrome.runtime.lastError.message);
+  chrome.runtime.sendMessage({ type: 'RUN_SEQUENCE', productIds: Array.from(selected), tabId }, (res) => {
+    const err = chrome.runtime.lastError;
+    Promise.all([syncSeqRunButton(), loadResults()]).then(() => {
+      if (err) {
+        toast(err.message || String(err));
         return;
       }
-      if (res?.ok) toast('Run finished');
+      if (res?.ok) toast(res.stopped ? 'Run stopped' : 'Run finished');
       else toast(res?.error || 'Run error');
-    }
-  );
+    });
+  });
 });
 
 document.getElementById('btnSeqPause').addEventListener('click', async () => {
@@ -737,6 +822,19 @@ document.getElementById('backupFileInput').addEventListener('change', async (e) 
   }
 });
 
+['resultsDateFrom', 'resultsDateTo'].forEach((id) => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', () => loadResults());
+});
+
+document.getElementById('btnResultsDateClear').addEventListener('click', () => {
+  const a = document.getElementById('resultsDateFrom');
+  const b = document.getElementById('resultsDateTo');
+  if (a) a.value = '';
+  if (b) b.value = '';
+  loadResults();
+});
+
 initShotLightbox();
 
 chrome.storage.onChanged.addListener((changes, area) => {
@@ -745,5 +843,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 loadProducts();
-loadResults();
-syncSeqRunButton();
+reconcileStaleSequenceState()
+  .then(() => loadResults())
+  .then(() => syncSeqRunButton());

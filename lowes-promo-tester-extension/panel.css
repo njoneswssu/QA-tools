@@ -209,6 +209,26 @@ body {
   gap: 6px;
   justify-content: flex-end;
 }
+.results-date-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  width: 100%;
+  justify-content: flex-end;
+}
+.results-date-lbl {
+  font-size: 11px;
+  color: #555;
+  font-weight: 500;
+}
+.results-date-input {
+  padding: 4px 6px;
+  border: 1px solid #cfd8dc;
+  border-radius: 6px;
+  font-size: 12px;
+  background: #fff;
+}
 .results-filter-panel {
   margin-bottom: 10px;
   padding: 10px;

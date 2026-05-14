@@ -44,6 +44,13 @@
         <p class="results-scope-note" id="resultsScopeNote" hidden></p>
       </div>
       <div class="results-toolbar-actions">
+        <div class="results-date-row" title="Filter cards by test date (uses each row’s test date, or saved time if missing)">
+          <label class="results-date-lbl" for="resultsDateFrom">From</label>
+          <input type="date" id="resultsDateFrom" class="results-date-input" />
+          <label class="results-date-lbl" for="resultsDateTo">To</label>
+          <input type="date" id="resultsDateTo" class="results-date-input" />
+          <button type="button" id="btnResultsDateClear" class="btn small">Clear dates</button>
+        </div>
         <button type="button" id="btnExportBackup" class="btn small" title="Download JSON you can re-import after reinstalling the extension">
           Export backup
         </button>

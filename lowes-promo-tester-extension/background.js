@@ -6,6 +6,73 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+/** Non-null while a RUN_SEQUENCE job is in flight (service worker memory only). */
+let activeSequenceHandle = null;
+
+function safeSendResponse(sendResponse, payload) {
+  try {
+    sendResponse(payload);
+  } catch (_) {
+    /* Message port may already be closed (side panel closed, etc.). */
+  }
+}
+
+async function storageShouldStop() {
+  const { shouldStop: s } = await chrome.storage.local.get('shouldStop');
+  return !!s;
+}
+
+/** Split sleep so Stop is picked up without waiting the full duration. */
+async function sleepUntilStop(totalMs) {
+  const end = Date.now() + totalMs;
+  while (Date.now() < end) {
+    if (await storageShouldStop()) return false;
+    const slice = Math.min(400, end - Date.now());
+    if (slice <= 0) break;
+    await sleep(slice);
+  }
+  return true;
+}
+
+/** Like waitTabComplete but rejects when the user requests Stop. */
+function waitTabCompleteOrStop(tabId) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let pollId = null;
+    const cleanup = () => {
+      clearTimeout(timeout);
+      if (pollId != null) clearInterval(pollId);
+      chrome.tabs.onUpdated.removeListener(onUpd);
+    };
+    const settle = (fn, arg) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      fn(arg);
+    };
+
+    const timeout = setTimeout(() => settle(reject, new Error('Tab load timeout')), 120000);
+
+    pollId = setInterval(() => {
+      chrome.storage.local.get('shouldStop').then(({ shouldStop: s }) => {
+        if (s) settle(reject, new Error('Stopped by user'));
+      });
+    }, 400);
+
+    function onUpd(id, info) {
+      if (id !== tabId) return;
+      if (info.status === 'complete') settle(resolve);
+    }
+    chrome.tabs.onUpdated.addListener(onUpd);
+    chrome.tabs
+      .get(tabId)
+      .then((t) => {
+        if (t.status === 'complete') settle(resolve);
+      })
+      .catch((e) => settle(reject, e));
+  });
+}
+
 async function loadProducts() {
   const url = chrome.runtime.getURL('products.json');
   const res = await fetch(url);
@@ -776,6 +843,9 @@ async function persistTestResult(tabId, partial) {
 async function sendRunTestToTab(tabId, product) {
   let lastErr = null;
   for (let attempt = 0; attempt < 30; attempt++) {
+    if (await storageShouldStop()) {
+      return { ok: false, error: 'Stopped by user' };
+    }
     try {
       const response = await chrome.tabs.sendMessage(tabId, {
         type: 'RUN_LOWES_TEST',
@@ -818,18 +888,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       try {
         const resultId = msg.resultId;
         if (resultId == null) {
-          sendResponse({ ok: false, error: 'Missing result id' });
+          safeSendResponse(sendResponse, { ok: false, error: 'Missing result id' });
           return;
         }
         const { testResults = [] } = await chrome.storage.local.get('testResults');
         const row = testResults.find((r) => String(r.id) === String(resultId));
         if (!row) {
-          sendResponse({ ok: false, error: 'Result not found' });
+          safeSendResponse(sendResponse, { ok: false, error: 'Result not found' });
           return;
         }
         const productUrl = row.product_url;
         if (!productUrl || typeof productUrl !== 'string' || !/lowes\.com/i.test(productUrl)) {
-          sendResponse({ ok: false, error: 'This result has no Lowe’s product URL to open' });
+          safeSendResponse(sendResponse, { ok: false, error: 'This result has no Lowe’s product URL to open' });
           return;
         }
         const tab = await pickOrNavigateLowesTab(productUrl);
@@ -840,7 +910,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           color: row.color
         });
         if (!applied?.ok) {
-          sendResponse({
+          safeSendResponse(sendResponse, {
             ok: false,
             error:
               applied?.error ||
@@ -856,29 +926,39 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const t2 = await chrome.tabs.get(tab.id);
         const cap = await captureFullWebpageForTab(t2.id, t2.windowId);
         if (!cap?.base64) {
-          sendResponse({
+          safeSendResponse(sendResponse, {
             ok: false,
             error: 'Screenshot failed — close DevTools on that tab if open, reload the Lowe’s page, and try again'
           });
           return;
         }
         await applyScreenshotToResultRow(resultId, cap);
-        sendResponse({ ok: true });
+        safeSendResponse(sendResponse, { ok: true });
       } catch (e) {
-        sendResponse({ ok: false, error: e.message || String(e) });
+        safeSendResponse(sendResponse, { ok: false, error: e.message || String(e) });
       }
     })();
     return true;
   }
 
   if (msg.type === 'GET_PRODUCTS') {
-    loadProducts().then((p) => sendResponse({ ok: true, products: p })).catch((e) => sendResponse({ ok: false, error: e.message }));
+    loadProducts()
+      .then((p) => safeSendResponse(sendResponse, { ok: true, products: p }))
+      .catch((e) => safeSendResponse(sendResponse, { ok: false, error: e.message }));
     return true;
   }
 
   if (msg.type === 'OPEN_URL') {
-    chrome.tabs.create({ url: msg.url, active: msg.active !== false }).then((t) => sendResponse({ ok: true, tabId: t.id })).catch((e) => sendResponse({ ok: false, error: e.message }));
+    chrome.tabs
+      .create({ url: msg.url, active: msg.active !== false })
+      .then((t) => safeSendResponse(sendResponse, { ok: true, tabId: t.id }))
+      .catch((e) => safeSendResponse(sendResponse, { ok: false, error: e.message }));
     return true;
+  }
+
+  if (msg.type === 'SEQUENCE_UI_SYNC') {
+    safeSendResponse(sendResponse, { inMemoryRunning: activeSequenceHandle !== null });
+    return false;
   }
 
   if (msg.type === 'RUN_PRODUCT_NEW_TAB') {
@@ -889,22 +969,35 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         await sleep(5000 + Math.random() * 2000);
         const response = await sendRunTestToTab(tab.id, msg.product);
         if (!response?.ok || !response.partial) {
-          sendResponse(response || { ok: false, error: 'No response from page' });
+          safeSendResponse(sendResponse, response || { ok: false, error: 'No response from page' });
           return;
         }
         const final = await persistTestResult(tab.id, response.partial);
-        sendResponse({ ok: true, result: final });
+        safeSendResponse(sendResponse, { ok: true, result: final });
       } catch (e) {
-        sendResponse({ ok: false, error: e.message });
+        safeSendResponse(sendResponse, { ok: false, error: e.message });
       }
     })();
     return true;
   }
 
   if (msg.type === 'RUN_SEQUENCE') {
+    if (activeSequenceHandle !== null) {
+      safeSendResponse(sendResponse, { ok: false, error: 'A test run is already in progress' });
+      return false;
+    }
+    const handle = {};
+    activeSequenceHandle = handle;
     (async () => {
       const { productIds, tabId: preferredTabId } = msg;
+      let responded = false;
+      const respondOnce = (payload) => {
+        if (responded) return;
+        responded = true;
+        safeSendResponse(sendResponse, payload);
+      };
       try {
+        let runStoppedByUser = false;
         await chrome.storage.local.set({ shouldStop: false, sequenceRunning: true, automationPaused: false });
         const products = await loadProducts();
         const selected = products.filter((p) => productIds.includes(p.id));
@@ -913,27 +1006,65 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (!tab || !tab.url?.includes('lowes.com')) {
           const t = await chrome.tabs.create({ url: 'https://www.lowes.com/', active: true });
           tabId = t.id;
-          await waitTabComplete(tabId);
-          await sleep(2000);
+          try {
+            await waitTabCompleteOrStop(tabId);
+          } catch (e) {
+            if (/stopped/i.test(String(e.message || e))) {
+              respondOnce({ ok: true, stopped: true });
+              return;
+            }
+            throw e;
+          }
+          if (!(await sleepUntilStop(2000))) {
+            respondOnce({ ok: true, stopped: true });
+            return;
+          }
         }
 
-        for (let i = 0; i < selected.length; i++) {
+        productLoop: for (let i = 0; i < selected.length; i++) {
           for (;;) {
-            const { shouldStop, automationPaused } = await chrome.storage.local.get(['shouldStop', 'automationPaused']);
-            if (shouldStop) break;
+            const { shouldStop: s1, automationPaused } = await chrome.storage.local.get(['shouldStop', 'automationPaused']);
+            if (s1) {
+              runStoppedByUser = true;
+              break productLoop;
+            }
             if (!automationPaused) break;
             await sleep(250);
           }
           const { shouldStop: stopNow } = await chrome.storage.local.get('shouldStop');
-          if (stopNow) break;
+          if (stopNow) {
+            runStoppedByUser = true;
+            break productLoop;
+          }
 
           const product = selected[i];
           await chrome.tabs.update(tabId, { url: product.url });
-          await waitTabComplete(tabId);
-          await sleep(4000 + Math.random() * 2000);
+          try {
+            await waitTabCompleteOrStop(tabId);
+          } catch (e) {
+            if (/stopped/i.test(String(e.message || e))) {
+              runStoppedByUser = true;
+              break productLoop;
+            }
+            throw e;
+          }
+          if (!(await sleepUntilStop(4000 + Math.random() * 2000))) {
+            runStoppedByUser = true;
+            break productLoop;
+          }
 
           const seqRes = await sendRunTestToTab(tabId, product);
+          if (!seqRes?.ok && /stopped/i.test(String(seqRes?.error || ''))) {
+            runStoppedByUser = true;
+            break productLoop;
+          }
+
           if (seqRes?.ok && seqRes.partial) {
+            const { shouldStop: sBeforePersist } = await chrome.storage.local.get('shouldStop');
+            if (sBeforePersist) {
+              runStoppedByUser = true;
+              break productLoop;
+            }
             try {
               await persistTestResult(tabId, seqRes.partial);
             } catch (_) {
@@ -942,24 +1073,35 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           }
 
           if (i < selected.length - 1) {
-            await sleep(3000 + Math.random() * 2000);
+            if (!(await sleepUntilStop(3000 + Math.random() * 2000))) {
+              runStoppedByUser = true;
+              break productLoop;
+            }
           }
         }
 
-        await chrome.storage.local.set({ sequenceRunning: false, shouldStop: false, automationPaused: false });
-        sendResponse({ ok: true });
+        respondOnce({ ok: true, stopped: runStoppedByUser });
       } catch (e) {
-        await chrome.storage.local.set({ sequenceRunning: false, shouldStop: false, automationPaused: false });
-        sendResponse({ ok: false, error: e.message });
+        respondOnce({ ok: false, error: e.message || String(e) });
+      } finally {
+        if (activeSequenceHandle === handle) activeSequenceHandle = null;
+        try {
+          await chrome.storage.local.set({ sequenceRunning: false, shouldStop: false, automationPaused: false });
+        } catch (_) {}
+        if (!responded) {
+          respondOnce({ ok: false, error: 'Run interrupted (panel closed or service worker restarted)' });
+        }
       }
     })();
     return true;
   }
 
   if (msg.type === 'STOP_SEQUENCE') {
-    chrome.storage.local.set({ shouldStop: true });
-    sendResponse({ ok: true });
-    return false;
+    (async () => {
+      await chrome.storage.local.set({ shouldStop: true, sequenceRunning: false });
+      safeSendResponse(sendResponse, { ok: true });
+    })();
+    return true;
   }
 
   if (msg.type === 'TOGGLE_PAUSE') {
@@ -967,13 +1109,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const { automationPaused } = await chrome.storage.local.get('automationPaused');
       const next = !automationPaused;
       await chrome.storage.local.set({ automationPaused: next });
-      sendResponse({ ok: true, paused: next });
+      safeSendResponse(sendResponse, { ok: true, paused: next });
     })();
     return true;
   }
 
   if (msg.type === 'GET_PAUSE_STATE') {
-    chrome.storage.local.get('automationPaused').then((o) => sendResponse({ paused: !!o.automationPaused }));
+    chrome.storage.local
+      .get('automationPaused')
+      .then((o) => safeSendResponse(sendResponse, { paused: !!o.automationPaused }));
     return true;
   }
 
