@@ -116,6 +116,27 @@ Outputs:
 - **Playwright trace** ZIPs under `traces/` (override with `TRACE_DIR=...`).
 - **JSONL** recordings under **`output/`** (override with `OUTPUT_DIR` or `--output-dir`): `output/latency-results-YYYY-MM-DD.jsonl` with `endReason`, **`secondsToSignalFromNav`** (seconds from **start of navigation to the organic merchant URL** until `offer_view` or EMA), `secondsToOfferViewFromNav`, `secondsToEmaFromNav`, `msToSignal`, `tracePath`, `recordedAt`.
 
+## Offer Activation Tool
+
+The activation runner uses the same Chrome / Citi setup as the latency test, but after landing on the merchant page it clicks a visible **Activate** / **Activate Offer** button and waits for a generated `https://wild.link/e?...` URL.
+
+```bash
+# Direct merchant URL
+npm run activation -- --url "https://www.ulta.com/"
+
+# Discover the merchant site through Google first, then activate
+npm run activation -- --merchant "Ulta"
+
+# Several merchants or URLs
+npm run activation -- --merchants "Ulta,Kohl's"
+npm run activation -- --urls "https://www.ulta.com/,https://www.kohls.com/"
+
+# Attach to Chrome you already started with remote debugging
+npm run activation -- --cdp-url 9222 --url "https://www.ulta.com/"
+```
+
+Outputs are appended to `output/activation-results-YYYY-MM-DD.jsonl`, with `endReason`, `generatedWildlinkUrl`, `wildlinkValid`, `validationErrors`, `wildlinkDestinationUrl`, `tracePath`, and `videoPath`. A generated link is considered valid when it is HTTPS on `wild.link`, uses path `/e`, includes numeric `c` and `d`, UUID-shaped `sc` and `tc`, and has a parseable destination `url` whose host matches the merchant page host.
+
 ## Web UI (pick merchants from app 209, stream results)
 
 ```bash
@@ -124,7 +145,7 @@ npm run ui
 # open http://127.0.0.1:8787/  (override port with UI_PORT=9999)
 ```
 
-Load the Wildlink merchant list, select merchants, **Run selected**. The server opens Chrome (same profile / Citi rules as the CLI) and appends each row to **`output/latency-results-*.jsonl`** while streaming rows to the page.
+Load the Wildlink merchant list, choose **Google latency** or **Offer activation**, select merchants, and run. In activation mode you can also paste direct merchant URLs such as `https://www.ulta.com/`. The server opens Chrome (same profile / Citi rules as the CLI) and appends each row to **`output/latency-results-*.jsonl`** or **`output/activation-results-*.jsonl`** while streaming rows to the page.
 
 **Merchant list cache:** `GET /api/merchants` reads **`data/merchants-app-<APP_ID>.json`** when it is younger than **`MERCHANT_CACHE_MAX_AGE_MS`** (default 7 days), so the UI does not call Wildlink on every load. Use **Reload feed** in the UI (adds `?refresh=1`) or run **`npm run sync:merchants`** (same `APP_ID` as env, default 209) to refresh the file. If a refresh fails but an older backup exists, the server falls back to that backup and marks the response `stale: true`.
 
@@ -144,6 +165,8 @@ Load the Wildlink merchant list, select merchants, **Run selected**. The server 
 |----------|---------|---------|
 | `APP_ID` | `209` | Wildlink merchant JSON `wildlink.me/data/{APP_ID}/merchant/1` |
 | `OFFER_TIMEOUT_MS` | `15000` | Base timeout (ms) for offer/EMA listener after organic navigation |
+| `ACTIVATE_BUTTON_TIMEOUT_MS` | `30000` | Activation runner: max time to wait for a visible Activate / Activate Offer control |
+| `WILDLINK_E_TIMEOUT_MS` | `30000` | Activation runner: max time after clicking Activate to wait for `wild.link/e` |
 | `OFFER_LISTENER_TIMEOUT_MS` | (derived) | Optional override; default `max(OFFER_TIMEOUT_MS, EMA_AFTER_OFFER_MS + 3000)` (~15s with defaults) |
 | `EMA_AFTER_OFFER_MS` | `10000` | After first `offer_view` network hit, keep listening for EMA this long before resolving as `offer_view` |
 | `EMA_MODAL_MIN_W` / `H` | `180` / `200` | Citi EMA is usually a **cross-origin** `chrome-extension` iframe (parent page cannot read ?Activate Offer?); when text is invisible to the page, we treat a **tall** visible iframe as the modal |

@@ -23,11 +23,13 @@ const appIdLabel = document.getElementById('appIdLabel');
 const exportGoogleSheetEl = document.getElementById('exportGoogleSheet');
 const googleSpreadsheetIdEl = document.getElementById('googleSpreadsheetId');
 const googleTabTitleEl = document.getElementById('googleTabTitle');
+const sheetExportRow = document.getElementById('sheetExportRow');
 const selectedSummaryEl = document.getElementById('selectedSummary');
 const resultsPanel = document.getElementById('resultsPanel');
 const resultsFilterEl = document.getElementById('resultsFilter');
 const resultsMinimizeBtn = document.getElementById('resultsMinimize');
 const deleteAllResultsBtn = document.getElementById('deleteAllResults');
+const modeEls = Array.from(document.querySelectorAll('input[name="toolMode"]'));
 
 const RUN_LABEL_IDLE = 'Run selected';
 const RUN_LABEL_STOP = 'Stop selected';
@@ -45,7 +47,7 @@ function setRunIdleUi() {
   runAbortController = null;
   if (runBtn) {
     runBtn.disabled = false;
-    runBtn.textContent = RUN_LABEL_IDLE;
+    runBtn.textContent = currentMode() === 'activation' ? 'Run activation' : RUN_LABEL_IDLE;
     runBtn.classList.remove('stop-run');
   }
 }
@@ -145,7 +147,8 @@ const persistFormDebounced = debounce(() => {
   saveStored({
     googleSpreadsheetId: googleSpreadsheetIdEl?.value ?? '',
     googleTabTitle: googleTabTitleEl?.value ?? '',
-    exportGoogleSheet: Boolean(exportGoogleSheetEl?.checked)
+    exportGoogleSheet: Boolean(exportGoogleSheetEl?.checked),
+    mode: currentMode()
   });
 }, 200);
 
@@ -203,6 +206,11 @@ function applyResultsFilter() {
 
 function applyStoredForm() {
   const s = loadStored();
+  if (typeof s.mode === 'string') {
+    for (const el of modeEls) {
+      if (el.value === s.mode) el.checked = true;
+    }
+  }
   if (googleSpreadsheetIdEl && typeof s.googleSpreadsheetId === 'string') {
     googleSpreadsheetIdEl.value = s.googleSpreadsheetId;
   }
@@ -212,6 +220,7 @@ function applyStoredForm() {
   if (exportGoogleSheetEl && typeof s.exportGoogleSheet === 'boolean') {
     exportGoogleSheetEl.checked = s.exportGoogleSheet;
   }
+  updateModeUi();
 }
 
 function escapeHtml(s) {
@@ -245,6 +254,71 @@ function traceMediaUrl(videoPath) {
   if (base.length > 240 || !/\.webm$/i.test(base)) return '';
   if (/[\\/]/.test(base) || base.includes('..')) return '';
   return `/api/traces/media?name=${encodeURIComponent(base)}`;
+}
+
+function currentMode() {
+  const checked = modeEls.find((el) => el.checked);
+  return checked?.value === 'activation' ? 'activation' : 'latency';
+}
+
+function updateModeUi() {
+  const activation = currentMode() === 'activation';
+  sheetExportRow?.classList.toggle('is-hidden', activation);
+  if (runBtn && !runStreamActive) runBtn.textContent = activation ? 'Run activation' : RUN_LABEL_IDLE;
+}
+
+function appendTextOrLink(td, value, opts = {}) {
+  if (!value) {
+    td.textContent = '?';
+    return;
+  }
+  const s = String(value);
+  if (/^https?:\/\//i.test(s)) {
+    const wrap = document.createElement('div');
+    wrap.className = 'link-cell';
+    const a = document.createElement('a');
+    a.href = s;
+    a.textContent = opts.label || (opts.short ? s.replace(/^https?:\/\//i, '') : s);
+    a.title = s;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    wrap.appendChild(a);
+    if (opts.copy) {
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'secondary copy-link-btn';
+      copyBtn.textContent = 'Copy';
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(s);
+          copyBtn.textContent = 'Copied';
+          setTimeout(() => {
+            copyBtn.textContent = 'Copy';
+          }, 1200);
+        } catch {
+          window.prompt('Copy generated link:', s);
+        }
+      });
+      wrap.appendChild(copyBtn);
+    }
+    td.appendChild(wrap);
+    return;
+  }
+  td.textContent = s;
+}
+
+function compactWildlinkLabel(raw) {
+  if (!raw) return undefined;
+  try {
+    const u = new URL(String(raw));
+    if (u.hostname.replace(/^www\./, '') !== 'wild.link') return undefined;
+    const c = u.searchParams.get('c');
+    const d = u.searchParams.get('d');
+    if (c && d) return `wild.link/e?c=${c}&d=${d}`;
+    return 'wild.link/e';
+  } catch {
+    return undefined;
+  }
 }
 
 /** Server sets `videoMediaUrl` when the file exists on disk (same-origin path). */
@@ -302,6 +376,25 @@ function appendDataRow(row, opts = {}) {
   const tOutcome = td('td-outcome');
   tOutcome.textContent =
     row.endReason != null && row.endReason !== '' ? String(row.endReason) : '?';
+  if (Array.isArray(row.validationErrors) && row.validationErrors.length) {
+    const small = document.createElement('small');
+    small.className = 'validation-errors';
+    small.textContent = row.validationErrors.map(String).join(', ');
+    tOutcome.appendChild(document.createElement('br'));
+    tOutcome.appendChild(small);
+  } else if (row.wildlinkValid === true) {
+    const small = document.createElement('small');
+    small.className = 'validation-ok';
+    small.textContent = 'wild.link/e valid';
+    tOutcome.appendChild(document.createElement('br'));
+    tOutcome.appendChild(small);
+  }
+
+  const tGenerated = td('td-link');
+  appendTextOrLink(tGenerated, row.generatedWildlinkUrl, {
+    label: compactWildlinkLabel(row.generatedWildlinkUrl),
+    copy: true
+  });
 
   const tRec = td('td-recording');
   tRec.textContent = initialRecordingSecondsDisplay(row);
@@ -359,11 +452,12 @@ function appendDataRow(row, opts = {}) {
     tTrace.textContent = '?';
   }
 
-  tr.append(tDel, tDate, tMerchant, tOutcome, tRec, tVid, tTrace);
+  tr.append(tDel, tDate, tMerchant, tOutcome, tGenerated, tRec, tVid, tTrace);
   const filterParts = [
     tDate.textContent,
     tMerchant.textContent,
     tOutcome.textContent,
+    tGenerated.textContent,
     tRec.textContent,
     row.tracePath ? String(row.tracePath) : ''
   ];
@@ -421,6 +515,7 @@ function renderDoneStatus(done, opts = {}) {
   const traceDir = done.traceDir;
   const gs = done.googleSheet;
   const cancelled = Boolean(done.cancelled);
+  const mode = done.mode === 'activation' ? 'Activation' : 'Latency';
   const intro = opts.restored ? 'Last run finished.' : cancelled ? 'Run cancelled.' : 'Finished.';
   if (gs?.spreadsheetUrl) {
     statusEl.textContent = '';
@@ -439,7 +534,7 @@ function renderDoneStatus(done, opts = {}) {
     statusEl.appendChild(a);
     return;
   }
-  let msg = `${intro} Results also appended under output/.`;
+  let msg = `${intro} ${mode} results also appended under output/.`;
   if (traceDir) msg += ` Traces (.zip) and videos (.webm): ${traceDir}`;
   if (gs?.error) msg += ' Google Sheet: ' + gs.error;
   if (cancelled && !gs?.spreadsheetUrl) {
@@ -613,7 +708,8 @@ function appendRow(row) {
         rows,
         done: {
           traceDir: row.traceDir,
-          googleSheet: row.googleSheet
+          googleSheet: row.googleSheet,
+          mode: row.mode
         }
       }
     });
@@ -621,6 +717,7 @@ function appendRow(row) {
       {
         traceDir: row.traceDir,
         googleSheet: row.googleSheet,
+        mode: row.mode,
         cancelled: Boolean(row.cancelled)
       },
       { restored: false }
@@ -640,25 +737,32 @@ function appendRow(row) {
 
 async function runSelected() {
   const names = selectedNames();
+  const mode = currentMode();
   if (!names.length) {
     statusEl.textContent = 'Select at least one merchant.';
     return;
   }
-  statusEl.textContent = 'Running (browser will open)?';
+  statusEl.textContent =
+    mode === 'activation' ? 'Running activation (browser will open)...' : 'Running latency (browser will open)...';
   setRunActiveUi();
   runAbortController = new AbortController();
   const { signal } = runAbortController;
   reloadBtn?.setAttribute('disabled', 'disabled');
 
-  const payload = {
-    merchants: names,
-    exportGoogleSheet: Boolean(exportGoogleSheetEl?.checked),
-    googleSpreadsheetId: googleSpreadsheetIdEl?.value?.trim() || undefined,
-    googleTabTitle: googleTabTitleEl?.value?.trim() || undefined
-  };
+  const payload =
+    mode === 'activation'
+      ? {
+          merchants: names
+        }
+      : {
+          merchants: names,
+          exportGoogleSheet: Boolean(exportGoogleSheetEl?.checked),
+          googleSpreadsheetId: googleSpreadsheetIdEl?.value?.trim() || undefined,
+          googleTabTitle: googleTabTitleEl?.value?.trim() || undefined
+        };
 
   try {
-    const res = await fetch('/api/run-stream', {
+    const res = await fetch(mode === 'activation' ? '/api/activation-stream' : '/api/run-stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -666,7 +770,10 @@ async function runSelected() {
     });
 
     if (!res.ok) {
-      statusEl.textContent = 'HTTP ' + res.status;
+      statusEl.textContent =
+        mode === 'activation' && res.status === 404
+          ? 'HTTP 404: activation endpoint is not available in the running UI server. Stop and restart npm run ui, then refresh this page.'
+          : 'HTTP ' + res.status;
       return;
     }
 
@@ -732,6 +839,12 @@ function wireUi() {
   checkFilteredBtn?.addEventListener('click', checkFiltered);
   uncheckFilteredBtn?.addEventListener('click', uncheckFiltered);
   resultsFilterEl?.addEventListener('input', () => applyResultsFilter());
+  for (const el of modeEls) {
+    el.addEventListener('change', () => {
+      persistFormDebounced();
+      updateModeUi();
+    });
+  }
   resultsMinimizeBtn?.addEventListener('click', () => {
     if (!resultsPanel) return;
     const collapsed = resultsPanel.classList.toggle('results-minimized');

@@ -72,6 +72,26 @@ header h1 {
   border-top: 1px solid #eee;
 }
 
+.row.mode-row {
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid #eee;
+}
+
+.mode-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.inline-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
 .row.sheet-export label.inline-check {
   font-weight: 500;
   display: flex;
@@ -339,6 +359,53 @@ tbody tr:last-child td {
 .td-outcome {
   vertical-align: top;
   max-width: 18rem;
+}
+
+.td-link {
+  vertical-align: top;
+  width: 13rem;
+  max-width: 13rem;
+  white-space: nowrap;
+}
+
+.td-link a {
+  color: #1748bd;
+}
+
+.link-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 13rem;
+  min-width: 0;
+}
+
+.link-cell a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-link-btn {
+  flex: 0 0 auto;
+  padding: 0.22rem 0.45rem;
+  font-size: 0.78rem;
+}
+
+.validation-errors,
+.validation-ok {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+}
+
+.validation-errors {
+  color: #b71c1c;
+}
+
+.validation-ok {
+  color: #1b5e20;
 }
 
 .td-video {

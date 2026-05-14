@@ -3,20 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Merchant Google latency</title>
+    <title>Merchant automation tools</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <header>
-      <h1>Merchant Google latency</h1>
+      <h1>Merchant automation tools</h1>
       <p class="sub">
-        Merchants from Wildlink app <strong id="appIdLabel">209</strong> (first <strong>400</strong> names for UI speed; filter still searches within that list). In <strong>Filter list</strong>, separate several names with commas or newlines to show matches for any of them. Select one or more, run, then watch rows stream in.
-        Timings are <strong>seconds from merchant navigation</strong> until <code>offer_view</code> or Citi EMA (see outcome).
+        Merchants from Wildlink app <strong id="appIdLabel">209</strong> (first <strong>400</strong> names for UI speed; filter still searches within that list). Choose Offer Load Time or offer activation, select merchants, then watch rows stream in.
+        Offer Load Time timings are <strong>seconds from merchant navigation</strong> until <code>offer_view</code> or Citi EMA. Activation checks the generated <code>wild.link/e</code> URL shape.
         Each run writes a Playwright <strong>trace</strong> (<code>.zip</code>, open with Trace Viewer) and a <strong>screen recording</strong> (<code>.webm</code>) under the traces folder on the machine running this app.
       </p>
     </header>
 
     <section class="panel">
+      <div class="row mode-row" role="radiogroup" aria-label="Tool mode">
+        <span class="mode-label">Tool</span>
+        <label class="inline-check">
+          <input type="radio" name="toolMode" value="latency" checked />
+          Offer Load Time
+        </label>
+        <label class="inline-check">
+          <input type="radio" name="toolMode" value="activation" />
+          Offer activation
+        </label>
+      </div>
       <div class="row">
         <label for="filter">Filter list</label>
         <input
@@ -35,7 +46,7 @@
         <button type="button" id="uncheckFiltered" class="secondary">Uncheck all</button>
         <button type="button" id="run" class="primary">Run selected</button>
       </div>
-      <div class="row sheet-export">
+      <div class="row sheet-export" id="sheetExportRow">
         <label class="inline-check">
           <input type="checkbox" id="exportGoogleSheet" checked />
           After run, add results to a <strong>new tab</strong> in Google Sheets (needs a service-account JSON; see terminal message if export fails)
@@ -80,6 +91,7 @@
               <th>Date</th>
               <th>Merchant</th>
               <th>Outcome</th>
+              <th>Wildlink</th>
               <th title="Wall time for the shop tab recording; updates from the video file when metadata loads.">Recording (s)</th>
               <th>Video (.webm)</th>
               <th>Trace (.zip)</th>

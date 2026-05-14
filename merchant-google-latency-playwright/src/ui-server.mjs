@@ -21,6 +21,7 @@ import {
   resolveSheetsKeyFile
 } from './google-sheets-export.mjs';
 import { resolveCitiExtensionPath, startLatencyBrowser, stopLatencyBrowser } from './run-latency.mjs';
+import { appendActivationRecord, runOfferActivationOnPage } from './run-offer-activation.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -120,6 +121,20 @@ function handleTraceMedia(req, res, url) {
   createReadStream(full).pipe(res);
 }
 
+/** Add a ready-to-play URL when the file is on disk (helps the UI avoid table/innerHTML issues). */
+function rowWithVideoMedia(row) {
+  if (!row || typeof row !== 'object' || row.type != null || row.merchantName == null) return row;
+  const vp = row.videoPath;
+  if (!vp || typeof vp !== 'string') return row;
+  const base = basename(vp);
+  if (!isSafeWebmBasename(base)) return row;
+  if (!resolveTraceMediaFile(base)) return row;
+  return {
+    ...row,
+    videoMediaUrl: `/api/traces/media?name=${encodeURIComponent(base)}`
+  };
+}
+
 async function handleMerchants(req, res, url) {
   const u = new URL(url, 'http://localhost');
   const appId = Number(u.searchParams.get('appId') || DEFAULT_APP_ID);
@@ -215,20 +230,6 @@ async function handleRunStream(req, res) {
   req.on('close', onReqClose);
   req.on('aborted', onReqClose);
 
-  /** Add a ready-to-play URL when the file is on disk (helps the UI avoid table/innerHTML issues). */
-  function latencyRowForSse(row) {
-    if (!row || typeof row !== 'object' || row.type != null || row.merchantName == null) return row;
-    const vp = row.videoPath;
-    if (!vp || typeof vp !== 'string') return row;
-    const base = basename(vp);
-    if (!isSafeWebmBasename(base)) return row;
-    if (!resolveTraceMediaFile(base)) return row;
-    return {
-      ...row,
-      videoMediaUrl: `/api/traces/media?name=${encodeURIComponent(base)}`
-    };
-  }
-
   const send = (obj) => {
     res.write(`data: ${JSON.stringify(obj)}\n\n`);
   };
@@ -276,7 +277,7 @@ async function handleRunStream(req, res) {
       }
       sheetRows.push(row);
       appendOutputRecord(outputDir, row);
-      send(latencyRowForSse(row));
+      send(rowWithVideoMedia(row));
     }
 
     const wantsGoogleSheet =
@@ -327,6 +328,104 @@ async function handleRunStream(req, res) {
   }
 }
 
+async function handleActivationStream(req, res) {
+  let body;
+  try {
+    body = JSON.parse(await readBody(req));
+  } catch {
+    res.writeHead(400);
+    res.end('Invalid JSON');
+    return;
+  }
+
+  const merchants = Array.isArray(body.merchants) ? body.merchants.map(String).filter(Boolean) : [];
+  const urls = Array.isArray(body.urls) ? body.urls.map(String).filter(Boolean) : [];
+  if (!merchants.length && !urls.length) {
+    res.writeHead(400);
+    res.end('merchants[] or urls[] required');
+    return;
+  }
+
+  const traceDir = body.traceDir || join(ROOT, 'traces');
+  const outputDir = body.outputDir || join(ROOT, 'output');
+  LAST_LATENCY_TRACE_DIR = pathResolve(traceDir);
+  mkdirSync(traceDir, { recursive: true });
+  mkdirSync(outputDir, { recursive: true });
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no'
+  });
+  if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+  let clientClosed = false;
+  const onReqClose = () => {
+    clientClosed = true;
+  };
+  req.on('close', onReqClose);
+  req.on('aborted', onReqClose);
+
+  const send = (obj) => {
+    res.write(`data: ${JSON.stringify(obj)}\n\n`);
+  };
+
+  /** @type {{ cdpBrowser: import('playwright').Browser | null; context: import('playwright').BrowserContext; page: import('playwright').Page | null; traceDir: string } | undefined} */
+  let session;
+  try {
+    const citiExt = resolveCitiExtensionPath(body.citiExtensionPath || null);
+    session = await startLatencyBrowser({
+      cdpUrl: body.cdpUrl || process.env.CDP_URL?.trim() || null,
+      citiExt,
+      skipWarmup: Boolean(body.skipWarmup) || body.skipExtensionWarmup !== false,
+      traceDir
+    });
+
+    const items = [];
+    for (const rawUrl of urls) {
+      let merchantName = rawUrl;
+      try {
+        merchantName = new URL(rawUrl).hostname.replace(/^www\./, '');
+      } catch {
+        /* keep raw URL as label */
+      }
+      items.push({ merchantName, url: rawUrl });
+    }
+    for (const merchantName of merchants) items.push({ merchantName, url: null });
+
+    for (const item of items) {
+      if (clientClosed) break;
+      let row;
+      try {
+        row = await runOfferActivationOnPage(session.context, item, { traceDir });
+      } catch (e) {
+        if (clientClosed) break;
+        throw e;
+      }
+      appendActivationRecord(outputDir, row);
+      send(rowWithVideoMedia(row));
+    }
+
+    send({
+      type: 'done',
+      outputDir,
+      traceDir,
+      mode: 'activation',
+      cancelled: Boolean(clientClosed)
+    });
+  } catch (e) {
+    send({ type: 'error', message: String(/** @type {any} */ (e)?.message || e) });
+  } finally {
+    if (session) await stopLatencyBrowser(session).catch(() => {});
+    try {
+      res.end();
+    } catch {
+      /* closed */
+    }
+  }
+}
+
 const server = http.createServer(async (req, res) => {
   const url = req.url || '/';
   try {
@@ -352,6 +451,10 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && url.startsWith('/api/run-stream')) {
       await handleRunStream(req, res);
+      return;
+    }
+    if (req.method === 'POST' && url.startsWith('/api/activation-stream')) {
+      await handleActivationStream(req, res);
       return;
     }
     res.writeHead(404);
