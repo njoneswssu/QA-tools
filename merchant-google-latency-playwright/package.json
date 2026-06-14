@@ -1,0 +1,22 @@
+{
+  "name": "merchant-google-latency-playwright",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome-for-Testing + Playwright: Google organic click then time until wild.link offer-view or Citi EMA (browser-level network, no MV3 limits).",
+  "scripts": {
+    "latency": "node src/run-latency.mjs",
+    "activation": "node src/run-offer-activation.mjs",
+    "ui": "node src/ui-server.mjs",
+    "debug-trace": "node src/debug-trace-ema.mjs",
+    "sync:merchants": "node src/sync-merchant-cache.mjs",
+    "install:browsers": "playwright install chrome"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0",
+    "playwright": "^1.50.0"
+  }
+}

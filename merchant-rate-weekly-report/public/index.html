@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Merchant rate weekly audit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a222d;
+      --border: #2d3a4d;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #3d9cf0;
+      --accent-dim: #2a6fa8;
+      --ok: #3ecf8e;
+      --warn: #f0c040;
+      --err: #f06b6b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.35rem;
+    }
+    .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
+    a { color: var(--accent); }
+    a:hover { color: #6bb8ff; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.35rem;
+      margin-bottom: 1.25rem;
+    }
+    .panel h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin: 0 0 1rem;
+      font-weight: 600;
+    }
+    label { display: block; font-size: 0.9rem; margin-bottom: 0.4rem; color: var(--muted); }
+    textarea {
+      width: 100%;
+      min-height: 72px;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #121920;
+      color: var(--text);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 0 2px rgba(61, 156, 240, 0.2);
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1rem; }
+    button {
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    button:active { transform: scale(0.98); }
+    button.primary {
+      background: var(--accent);
+      color: #0a0e12;
+    }
+    button.primary:hover { background: #5aadf5; }
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    button.secondary:hover { background: rgba(255,255,255,0.06); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--muted); }
+    .check input { width: 1rem; height: 1rem; accent-color: var(--accent); }
+    pre.log {
+      margin: 0;
+      padding: 0.85rem;
+      background: #121920;
+      border-radius: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--muted);
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .pill {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .pill.ok { background: rgba(62, 207, 142, 0.15); color: var(--ok); }
+    .pill.err { background: rgba(240, 107, 107, 0.15); color: var(--err); }
+    .pill.run { background: rgba(61, 156, 240, 0.2); color: var(--accent); }
+    .countdown {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Merchant rate weekly audit</h1>
+    <p class="sub">
+      Uses the same rules as the <strong>merchant-rate-auditor</strong>. Each run loads <strong>total commissions</strong> from BigQuery when available (optional date window via <code>COMMISSION_DATE_COLUMN</code> in <code>.env</code>) and <strong>raises severity</strong> for merchants with higher relative commission in that batch. Schedule: every <strong>Monday</strong> (see status). Optionally sync rows to your
+      <a href="https://docs.google.com/spreadsheets/d/194oJaxgMLAfoFvPgbqVOfTZnU3mVBSqT-hl8EIOnNQE/edit?gid=1072101362" target="_blank" rel="noopener">Google Sheet</a>.
+    </p>
+
+    <div class="panel">
+      <h2>App IDs</h2>
+      <label for="appIds">Comma or space separated (saved on this machine)</label>
+      <textarea id="appIds" placeholder="451, 206, 209"></textarea>
+      <div class="row">
+        <button type="button" class="secondary" id="btnSave">Save App IDs</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Run</h2>
+      <label class="check">
+        <input type="checkbox" id="syncSheet" checked />
+        After audit, append issue rows to Google Sheet (needs credentials in <code>.env</code>)
+      </label>
+      <div class="row">
+        <button type="button" class="primary" id="btnRun">Run audit now</button>
+      </div>
+      <pre class="log" id="log" style="margin-top:1rem;">Loading…</pre>
+    </div>
+
+    <div class="panel">
+      <h2>Last run</h2>
+      <div id="status"></div>
+    </div>
+  </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const log = (t) => { $('log').textContent = t; };
+
+    let countdownTimer = null;
+    let nextRunTargetMs = null;
+
+    function clearCountdown() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+    }
+
+    function formatCountdown(ms) {
+      if (ms <= 0) return 'due now';
+      const sec = Math.floor(ms / 1000);
+      const d = Math.floor(sec / 86400);
+      const h = Math.floor((sec % 86400) / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      const parts = [];
+      if (d > 0) parts.push(d + 'd');
+      if (d > 0 || h > 0) parts.push(h + 'h');
+      parts.push(m + 'm');
+      parts.push(String(s).padStart(2, '0') + 's');
+      return parts.join(' ');
+    }
+
+    function armCountdown(st) {
+      clearCountdown();
+      const el = $('countdown');
+      if (!el) return;
+      const c = st.cron || {};
+      if (c.automatedDisabled) {
+        el.textContent = 'off (DISABLE_WEEKLY_CRON)';
+        return;
+      }
+      if (!c.nextRunAt) {
+        el.textContent = '—';
+        return;
+      }
+      nextRunTargetMs = new Date(c.nextRunAt).getTime();
+      function tick() {
+        const el2 = $('countdown');
+        if (!el2) return;
+        let ms = nextRunTargetMs - Date.now();
+        if (ms <= 0) {
+          el2.textContent = 'due now';
+          fetch('/api/status')
+            .then((r) => r.json())
+            .then((fresh) => {
+              const nr = fresh.cron && fresh.cron.nextRunAt;
+              if (nr) nextRunTargetMs = new Date(nr).getTime();
+              const again = nextRunTargetMs - Date.now();
+              el2.textContent = again > 0 ? formatCountdown(again) : 'due now';
+            })
+            .catch(() => {});
+          return;
+        }
+        el2.textContent = formatCountdown(ms);
+      }
+      tick();
+      countdownTimer = setInterval(tick, 1000);
+    }
+
+    async function refresh() {
+      try {
+        const [st, cfg] = await Promise.all([
+          fetch('/api/status').then((r) => r.json()),
+          fetch('/api/config').then((r) => r.json())
+        ]);
+        const pills = [];
+        if (st.running) pills.push('<span class="pill run">Running…</span>');
+        else if (st.lastRunOk === true) pills.push('<span class="pill ok">Last audit OK</span>');
+        else if (st.lastRunOk === false) pills.push('<span class="pill err">Last audit failed</span>');
+        $('status').innerHTML = `
+          ${pills.join(' ')}
+          <p style="margin:0.75rem 0 0;font-size:0.9rem;color:var(--muted);">
+            <strong>Schedule:</strong> ${st.cron ? st.cron.description : '—'}<br/>
+            <strong>Next automated run:</strong> <span id="countdown" class="countdown">—</span><br/>
+            <strong>When the box is empty, Run uses:</strong> ${escapeHtml((cfg.appIds && cfg.appIds.length ? cfg.appIds.join(', ') : '451, 206, 209 (defaults)'))}<br/>
+            <strong>Last audit:</strong> ${st.lastRunAt || '—'}<br/>
+            ${st.lastRunMessage ? `<span style="color:var(--text)">${escapeHtml(st.lastRunMessage)}</span><br/>` : ''}
+            <strong>Sheet sync:</strong> ${st.lastSheetSyncAt || '—'}<br/>
+            ${st.lastSheetSyncMessage ? escapeHtml(st.lastSheetSyncMessage) : ''}
+          </p>`;
+        armCountdown(st);
+        log('Ready. Leave App IDs blank for saved defaults, or type IDs for this run only. Use Save to persist for cron.');
+      } catch (e) {
+        log('Could not load /api/status: ' + e.message);
+      }
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    $('btnSave').onclick = async () => {
+      const raw = $('appIds').value;
+      const appIds = raw.split(/[,\s]+/).map((s) => s.trim()).filter(Boolean);
+      const res = await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ appIds })
+      });
+      const j = await res.json();
+      if (!res.ok) return log('Save failed: ' + (j.error || res.status));
+      log('Saved App IDs: ' + j.appIds.join(', '));
+      refresh();
+    };
+
+    $('btnRun').onclick = async () => {
+      $('btnRun').disabled = true;
+      log('Running audit (may take a minute)…');
+      try {
+        const rawIds = $('appIds').value;
+        const appIds = rawIds.split(/[,\s]+/).map((s) => s.trim()).filter(Boolean);
+        const payload = { syncSheet: $('syncSheet').checked };
+        if (appIds.length) payload.appIds = appIds;
+        const res = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const j = await res.json();
+        if (!res.ok) {
+          log('Error: ' + (j.message || JSON.stringify(j)) + '\n\nRun finished with errors.');
+          return;
+        }
+        let t = 'Done.\n' + (j.message || JSON.stringify(j.summary || {}, null, 2));
+        if (j.sheet) t += '\n\nSheet: ' + (j.sheet.message || JSON.stringify(j.sheet));
+        t += '\n\nRun complete.';
+        log(t);
+      } catch (e) {
+        log('Request failed: ' + e.message + '\n\nRun finished with errors.');
+      } finally {
+        $('btnRun').disabled = false;
+        refresh();
+      }
+    };
+
+    refresh();
+  </script>
+</body>
+</html>

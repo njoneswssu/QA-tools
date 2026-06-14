@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Lowe's Promo Tester",
+  "version": "1.0.0",
+  "description": "Promo testing for Lowe's blind configurators — same flow as lowes-promo-tester (dimensions, color, prices, screenshot).",
+  "permissions": ["storage", "scripting", "tabs", "windows", "sidePanel", "activeTab", "debugger"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "panel.html"
+  },
+  "action": {
+    "default_title": "Open Lowe's Promo Tester"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.lowes.com/*", "https://lowes.com/*", "https://*.lowes.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

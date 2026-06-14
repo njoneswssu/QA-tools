@@ -1,0 +1,14 @@
+# Blueprint: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: citi-active-merchants-dashboard
+    runtime: node
+    rootDir: citi-active-merchants-dashboard
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false

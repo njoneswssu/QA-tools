@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Citi active merchants</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c1016;
+      --panel: #151c26;
+      --border: #2a3545;
+      --text: #e8edf4;
+      --muted: #8b99ad;
+      --accent: #2ee6a6;
+      --accent-dim: #1a9d72;
+      --warn: #f0b429;
+      --err: #f07178;
+      --link: #5cb3ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, rgba(46, 230, 166, 0.08), transparent),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    a { color: var(--link); }
+    a:hover { color: #8ecaff; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.35rem;
+    }
+    .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.75rem; max-width: 52rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+    }
+    .stat .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+    .stat .value { font-size: 1.35rem; font-weight: 700; }
+    .stat .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.35rem; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.2rem;
+      margin-bottom: 1.1rem;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; }
+    button {
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.08s;
+    }
+    button:active { transform: scale(0.98); }
+    button.primary {
+      background: var(--accent);
+      color: #06110c;
+    }
+    button.primary:hover { background: #5cf0c0; }
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    button.secondary:hover { background: rgba(255,255,255,0.05); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    input[type="text"], input[type="password"] {
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0e131a;
+      color: var(--text);
+      min-width: 200px;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 0 2px rgba(46, 230, 166, 0.15);
+    }
+    .tabs {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 0.85rem;
+    }
+    .tabs button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+    }
+    .tabs button.active {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255,255,255,0.04);
+    }
+    .table-wrap {
+      overflow: auto;
+      max-height: min(62vh, 560px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.5rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #121a24;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      z-index: 1;
+    }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.82rem; }
+    .pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      font-weight: 600;
+      background: rgba(46, 230, 166, 0.12);
+      color: var(--accent);
+    }
+    .pill.bad {
+      background: rgba(240, 113, 120, 0.12);
+      color: var(--err);
+    }
+    pre.msg {
+      margin: 0.5rem 0 0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .errline { color: var(--err); font-size: 0.88rem; margin-top: 0.35rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Citi live merchants</h1>
+    <p class="sub">
+      Snapshot of merchants currently on the Citi active-domain feed (Wildlink campaign <span class="mono">209</span>).
+      A scheduled job compares each run to the prior snapshot and records any merchant that disappeared from the feed.
+    </p>
+
+    <div class="grid" id="stats"></div>
+
+    <div class="panel">
+      <div class="row" style="margin-bottom: 0.65rem;">
+        <button type="button" class="primary" id="btnRun">Run sync now</button>
+        <button type="button" class="secondary" id="btnRefresh">Refresh data</button>
+        <span class="pill" id="keyHint" style="display:none;">API key required for sync</span>
+      </div>
+      <div class="row" id="keyRow" style="display:none;">
+        <input type="password" id="apiKey" placeholder="x-api-key (stored in this browser only)" autocomplete="off" />
+      </div>
+      <pre class="msg" id="runMsg"></pre>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="active" data-tab="live">Live in feed</button>
+      <button type="button" data-tab="removed">Removed from feed</button>
+    </div>
+
+    <div class="panel" id="paneLive">
+      <div class="row" style="margin-bottom: 0.75rem;">
+        <input type="text" id="search" placeholder="Filter by domain, merchant name, or ID…" style="flex:1; min-width: 220px;" />
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Merchant</th>
+              <th>IDs</th>
+              <th>Max rate</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyLive"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" id="paneRemoved" style="display:none;">
+      <p style="margin:0 0 0.75rem; color: var(--muted); font-size: 0.9rem;">
+        Each row was present on a previous snapshot and was missing on the next sync—documented automatically for audit.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Detected</th>
+              <th>Domain</th>
+              <th>Merchant</th>
+              <th>IDs</th>
+              <th>Last max rate</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyRemoved"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const statsEl = document.getElementById('stats');
+    const tbodyLive = document.getElementById('tbodyLive');
+    const tbodyRemoved = document.getElementById('tbodyRemoved');
+    const searchEl = document.getElementById('search');
+    const btnRun = document.getElementById('btnRun');
+    const btnRefresh = document.getElementById('btnRefresh');
+    const runMsg = document.getElementById('runMsg');
+    const keyRow = document.getElementById('keyRow');
+    const keyHint = document.getElementById('keyHint');
+    const apiKeyEl = document.getElementById('apiKey');
+    const paneLive = document.getElementById('paneLive');
+    const paneRemoved = document.getElementById('paneRemoved');
+
+    let debounceTimer;
+
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function fmtRate(r) {
+      if (!r.maxRateKind && !r.maxRateAmount) return '—';
+      const cur = r.maxRateCurrency ? ` ${r.maxRateCurrency}` : '';
+      return esc(`${r.maxRateKind || ''} ${r.maxRateAmount || ''}`.trim() + cur);
+    }
+
+    async function loadStatus() {
+      const r = await fetch('/api/status');
+      return r.json();
+    }
+
+    async function loadMerchants(q) {
+      const qs = q ? `?q=${encodeURIComponent(q)}` : '';
+      const r = await fetch('/api/merchants' + qs);
+      return r.json();
+    }
+
+    async function loadRemovals() {
+      const r = await fetch('/api/removals');
+      return r.json();
+    }
+
+    function renderStats(status, merchants) {
+      const m = status.meta || {};
+      const err = !m.lastRunOk && m.lastRunError;
+      statsEl.innerHTML = `
+        <div class="stat">
+          <div class="label">Live merchants</div>
+          <div class="value">${merchants.total != null ? merchants.total : '—'}</div>
+          <div class="hint">Last snapshot: ${esc(merchants.fetchedAt || 'never')}</div>
+        </div>
+        <div class="stat">
+          <div class="label">Documented removals</div>
+          <div class="value">${status.removalsTotal}</div>
+          <div class="hint">${status.store === 'postgres' ? 'Shared database — same list for everyone' : 'Local files — only this machine unless you set DATABASE_URL'}</div>
+        </div>
+        <div class="stat">
+          <div class="label">Weekly job</div>
+          <div class="value" style="font-size:0.95rem;">${esc(status.cron.description)}</div>
+          <div class="hint mono" style="font-size:0.75rem;">${esc(status.cron.expression)} · ${esc(status.cron.timezone)}</div>
+        </div>
+        <div class="stat">
+          <div class="label">Feed</div>
+          <div class="value" style="font-size:0.78rem; font-weight:600;"><a href="${esc(status.feedUrl)}" target="_blank" rel="noopener">Open JSON</a></div>
+          <div class="hint">Redirects to current model file</div>
+        </div>
+      `;
+      if (err) {
+        statsEl.insertAdjacentHTML(
+          'beforeend',
+          `<div class="stat" style="grid-column: 1 / -1;"><div class="label">Last sync error</div><div class="errline">${esc(m.lastRunError)}</div></div>`
+        );
+      }
+    }
+
+    function renderLive(rows) {
+      tbodyLive.innerHTML = rows
+        .map(
+          (r) => `<tr>
+            <td class="mono">${esc(r.domain)}</td>
+            <td>${esc(r.merchantName)}</td>
+            <td class="mono">row ${esc(r.domainRowId)} · m ${esc(r.merchantId)}</td>
+            <td>${fmtRate(r)}</td>
+          </tr>`
+        )
+        .join('');
+      if (!rows.length) {
+        tbodyLive.innerHTML = `<tr><td colspan="4" style="color:var(--muted);">No data yet. Use <strong>Run sync now</strong> (or wait for the weekly job).</td></tr>`;
+      }
+    }
+
+    function renderRemoved(rows) {
+      tbodyRemoved.innerHTML = rows
+        .map(
+          (r) => `<tr>
+            <td class="mono">${esc(r.detectedAt)}</td>
+            <td class="mono">${esc(r.domain)}</td>
+            <td>${esc(r.merchantName)}</td>
+            <td class="mono">row ${esc(r.domainRowId)} · m ${esc(r.merchantId)}</td>
+            <td>${fmtRate(r)}</td>
+          </tr>`
+        )
+        .join('');
+      if (!rows.length) {
+        tbodyRemoved.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">No removals recorded yet.</td></tr>`;
+      }
+    }
+
+    async function refreshAll() {
+      const status = await loadStatus();
+      const q = searchEl.value.trim();
+      const merchants = await loadMerchants(q);
+      const removals = await loadRemovals();
+      renderStats(status, merchants);
+      renderLive(merchants.records || []);
+      renderRemoved(removals.removals || []);
+      if (status.runApiKeyRequired) {
+        keyRow.style.display = 'flex';
+        keyHint.style.display = 'inline-block';
+        const saved = sessionStorage.getItem('citiDashApiKey');
+        if (saved) apiKeyEl.value = saved;
+      } else {
+        keyRow.style.display = 'none';
+        keyHint.style.display = 'none';
+      }
+    }
+
+    document.querySelectorAll('.tabs button').forEach((b) => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.tabs button').forEach((x) => x.classList.remove('active'));
+        b.classList.add('active');
+        const t = b.getAttribute('data-tab');
+        paneLive.style.display = t === 'live' ? 'block' : 'none';
+        paneRemoved.style.display = t === 'removed' ? 'block' : 'none';
+      });
+    });
+
+    searchEl.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        const merchants = await loadMerchants(searchEl.value.trim());
+        renderLive(merchants.records || []);
+      }, 200);
+    });
+
+    btnRefresh.addEventListener('click', () => {
+      runMsg.textContent = '';
+      refreshAll();
+    });
+
+    btnRun.addEventListener('click', async () => {
+      runMsg.textContent = '';
+      btnRun.disabled = true;
+      const headers = { 'Content-Type': 'application/json' };
+      const key = apiKeyEl.value.trim();
+      if (key) {
+        headers['x-api-key'] = key;
+        sessionStorage.setItem('citiDashApiKey', key);
+      }
+      try {
+        const r = await fetch('/api/run', { method: 'POST', headers, body: '{}' });
+        const j = await r.json();
+        if (!r.ok) {
+          runMsg.textContent = j.error || j.message || r.statusText;
+        } else {
+          runMsg.textContent = JSON.stringify(j, null, 2);
+        }
+      } catch (e) {
+        runMsg.textContent = String(e.message || e);
+      } finally {
+        btnRun.disabled = false;
+        await refreshAll();
+      }
+    });
+
+    refreshAll();
+  </script>
+</body>
+</html>

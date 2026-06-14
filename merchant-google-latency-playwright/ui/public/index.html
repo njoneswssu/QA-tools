@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Merchant automation tools</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Merchant automation tools</h1>
+      <p class="sub">
+        Merchants from Wildlink app <strong id="appIdLabel">209</strong> (first <strong>400</strong> names for UI speed; filter still searches within that list). Choose Offer Load Time or offer activation, select merchants, then watch rows stream in.
+        Offer Load Time timings are <strong>seconds from merchant navigation</strong> until <code>offer_view</code> or Citi EMA. Activation checks the generated <code>wild.link/e</code> URL shape.
+        Each run writes a Playwright <strong>trace</strong> (<code>.zip</code>, open with Trace Viewer) and a <strong>screen recording</strong> (<code>.webm</code>) under the traces folder on the machine running this app.
+      </p>
+    </header>
+
+    <section class="panel">
+      <div class="row mode-row" role="radiogroup" aria-label="Tool mode">
+        <span class="mode-label">Tool</span>
+        <label class="inline-check">
+          <input type="radio" name="toolMode" value="latency" checked />
+          Offer Load Time
+        </label>
+        <label class="inline-check">
+          <input type="radio" name="toolMode" value="activation" />
+          Offer activation
+        </label>
+      </div>
+      <div class="row">
+        <label for="filter">Filter list</label>
+        <input
+          id="filter"
+          type="text"
+          placeholder="One name, or several separated by comma or newline?"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button type="button" id="reload" class="secondary">Reload feed</button>
+      </div>
+      <div id="merchantList" class="merchant-list" aria-label="Merchants"></div>
+      <div id="selectedSummary" class="selected-summary" aria-live="polite"></div>
+      <div class="row actions filter-actions">
+        <button type="button" id="checkFiltered">Check visible in list</button>
+        <button type="button" id="uncheckFiltered" class="secondary">Uncheck all</button>
+        <button type="button" id="run" class="primary">Run selected</button>
+      </div>
+      <div class="row sheet-export" id="sheetExportRow">
+        <label class="inline-check">
+          <input type="checkbox" id="exportGoogleSheet" checked />
+          After run, add results to a <strong>new tab</strong> in Google Sheets (needs a service-account JSON; see terminal message if export fails)
+        </label>
+        <label for="googleSpreadsheetId">Spreadsheet ID or URL</label>
+        <input
+          id="googleSpreadsheetId"
+          type="text"
+          placeholder="Default from server env or built-in template sheet"
+          autocomplete="off"
+        />
+        <label for="googleTabTitle">New tab name (optional)</label>
+        <input id="googleTabTitle" type="text" placeholder="Latency YYYY-MM-DD HH.mm" autocomplete="off" />
+      </div>
+      <div id="status" class="status status-line" role="status"></div>
+    </section>
+
+    <section class="panel results-panel" id="resultsPanel">
+      <div class="results-header">
+        <h2>Results</h2>
+        <div class="results-toolbar">
+          <label class="results-search-label" for="resultsFilter">Search results</label>
+          <input
+            id="resultsFilter"
+            type="search"
+            placeholder="Merchant, outcome, trace, date?"
+            autocomplete="off"
+            aria-label="Search results table"
+          />
+          <button type="button" id="resultsMinimize" class="secondary" aria-expanded="true">Minimize results</button>
+          <p class="results-delete-hint" role="note">
+            Deleting a row or all results cannot be undone; you will be asked to confirm.
+          </p>
+          <button type="button" id="deleteAllResults" class="secondary danger-text">Delete all results</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="resultsTableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="th-actions" aria-label="Delete"></th>
+              <th>Date</th>
+              <th>Merchant</th>
+              <th>Outcome</th>
+              <th>Wildlink</th>
+              <th title="Wall time for the shop tab recording; updates from the video file when metadata loads.">Recording (s)</th>
+              <th>Video (.webm)</th>
+              <th>Trace (.zip)</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Merchant rate audit</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="header-row">
+      <h1>Merchant rate audit</h1>
+      <button type="button" class="gear-btn" id="gearSettings" title="Settings (Google, Sheets, BigQuery)" aria-label="Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
+    <p class="sub">
+      Same Wildlink checks as <code>auditAppId</code> + weekly export.
+      <strong>Google Sheets</strong> and <strong>BigQuery</strong> commissions require signing in with your Wildfire Google account under the
+      <strong>gear</strong> or <a href="#" id="openOpts">settings</a> page (<code>manifest.json</code> OAuth client).
+    </p>
+    <section class="schedule-block" id="scheduleBlock" hidden aria-label="Automated audit countdown">
+      <div class="schedule-block-head">
+        <span class="schedule-block-title">Next automated run</span>
+      </div>
+      <p class="schedule-block-when" id="scheduleBlockWhen"></p>
+      <p class="schedule-block-count" id="scheduleBlockCount" aria-live="polite"></p>
+    </section>
+
+    <div class="app-id-panel">
+      <label for="appIdSearch">App IDs</label>
+      <input type="search" id="appIdSearch" class="app-id-search" placeholder="Filter by number or label…" autocomplete="off" />
+      <div class="app-id-actions">
+        <button type="button" class="secondary tiny" id="appIdCheckAll">Check all</button>
+        <button type="button" class="secondary tiny" id="appIdUncheckAll">Uncheck all</button>
+      </div>
+      <div class="selected-ids-summary" aria-live="polite">
+        <span class="selected-ids-label">Checked App IDs</span>
+        <span class="selected-ids-value" id="selectedAppIdsSummary">—</span>
+      </div>
+      <div id="appIdList" class="app-id-list" role="group" aria-label="App ID checkboxes"></div>
+    </div>
+
+    <div class="row">
+      <button type="button" class="primary" id="runBtn">Run audit</button>
+      <button type="button" class="secondary" id="copyBtn" disabled>Copy TSV</button>
+    </div>
+    <p class="status" id="status"></p>
+
+    <div class="popup-results">
+      <div class="panel" id="summaryPanel" hidden></div>
+      <div class="table-wrap" id="tableWrap" hidden>
+        <div class="table-toolbar" id="tableToolbar" hidden>
+          <button type="button" class="secondary tiny" id="toggleResultsBtn">Minimize results</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Merchant</th>
+              <th>Issue</th>
+              <th>Rate name</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

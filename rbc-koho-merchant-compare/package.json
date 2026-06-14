@@ -1,0 +1,14 @@
+{
+  "name": "rbc-koho-merchant-compare",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Compare Wildlink active-domain feeds (RBC vs Koho) and write spreadsheet or CSVs.",
+  "main": "compare.js",
+  "scripts": {
+    "compare": "node compare.js",
+    "start": "node compare.js"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Partner API QA test plan — focused regression for DIY browser extension updates: stand down, UX, tracking, and Chrome Web Store."
+    />
+    <title>Partner API QA test plan · Neil Jones</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="test-plan.css" />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="tp-header">
+      <div class="tp-header-inner">
+        <a class="tp-back" href="../index.html">← Home</a>
+        <nav class="tp-mini-nav" aria-label="Site sections">
+          <a class="tp-mini-link" href="../index.html">Home</a>
+          <a class="tp-mini-link" href="../qa-reports.html">QA reports</a>
+          <span class="tp-mini-current" aria-current="page">Test plan</span>
+          <a class="tp-mini-link" href="../resume.html">Resume</a>
+          <a class="tp-mini-link" href="../about.html">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <article class="tp-wrap">
+      <header class="tp-hero">
+        <p class="tp-eyebrow">Case study</p>
+        <h1 class="tp-title">Partner API QA test plan</h1>
+        <p class="tp-lede">
+          A focused regression strategy for when a DIY client ships an update to a
+          browser extension that already passed full QA. The goal is to catch new
+          regressions—not to re-validate the entire build from scratch.
+        </p>
+      </header>
+
+      <figure class="tp-figure">
+        <img
+          class="tp-zoom-img"
+          src="../media/TestPlanOverview.png"
+          alt="Screenshot of the Partner API QA test plan document in Linear: objectives, severity levels, and four focus areas."
+          width="1200"
+          height="800"
+          loading="eager"
+        />
+        <figcaption>
+          High-level plan in Linear: context, regression objective, and the four
+          areas where updates tend to break compliance or revenue.
+        </figcaption>
+      </figure>
+
+      <section class="tp-section tp-prose" aria-labelledby="how-h2">
+        <h2 id="how-h2">How this plan works</h2>
+        <p>
+          After a full QA cycle, most risk from a client-side update clusters in a
+          handful of behaviors: passive “stand down” after a referral, modal UX,
+          attribution tracking, and the public Chrome Web Store listing. This plan
+          routes testers through those themes first, with explicit severity so the
+          team knows what must block a pass versus what is recommended or optional.
+        </p>
+        <ul class="tp-severity" aria-label="Severity guidance">
+          <li>
+            <strong>Critical</strong>
+            <span class="tp-pill tp-pill-crit">Block</span>
+            — should block a pass if failed.
+          </li>
+          <li>
+            <strong>High</strong>
+            <span class="tp-pill tp-pill-high">Strong</span>
+            — strongly recommended before sign-off.
+          </li>
+          <li>
+            <strong>Medium</strong>
+            <span class="tp-pill tp-pill-med">Opt</span>
+            — optional but reduces residual risk.
+          </li>
+        </ul>
+      </section>
+
+      <section class="tp-section" aria-labelledby="pillars-h2">
+        <h2 id="pillars-h2">Four focus areas</h2>
+        <div class="tp-grid-2">
+          <div class="tp-card">
+            <h3>1 · Stand down compliance</h3>
+            <p>
+              Highest-risk bucket: once affiliate referral is detected, the
+              extension must stay passive for the rest of the session. Most
+              compliance escalations trace back to stand down behavior.
+            </p>
+          </div>
+          <div class="tp-card">
+            <h3>2 · Modal and UX</h3>
+            <p>
+              Layout, copy, and interaction changes: dismiss controls must be
+              obvious, and modals must not obstruct the page in ways that trigger
+              merchant or network complaints even when technically “compliant.”
+            </p>
+          </div>
+          <div class="tp-card">
+            <h3>3 · Tracking and backend integrity</h3>
+            <p>
+              Protect the attribution chain: tracking code formats, device mapping,
+              and purchase validation so the commission pipeline is not broken by
+              refactors.
+            </p>
+          </div>
+          <div class="tp-card">
+            <h3>4 · Store listing and disclosures</h3>
+            <p>
+              Chrome Web Store copy, screenshots, and claims—the public footprint can
+              create compliance exposure independent of runtime extension code.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="tp-section" aria-labelledby="coverage-h2">
+        <h2 id="coverage-h2">Issue coverage (14 checks)</h2>
+        <p style="margin: 0 0 1rem; color: var(--muted)">
+          Each item is tracked as its own issue in Linear under the QA label. Together
+          they map the four pillars above into executable checks.
+        </p>
+        <figure class="tp-figure">
+          <img
+            class="tp-zoom-img"
+            src="../media/TestPlanCoverage.png"
+            alt="Linear backlog list of 14 QA issues for the Partner API regression plan."
+            width="1200"
+            height="900"
+            loading="lazy"
+          />
+          <figcaption>Backlog view: all fourteen issues in one place for a release sweep.</figcaption>
+        </figure>
+        <ol class="tp-issue-list">
+          <li>Spot-check Chrome Web Store listing for accuracy and disclosures</li>
+          <li>Make 1 test purchase and confirm order in reporting</li>
+          <li>Validate tracking code format and deviceID mapping</li>
+          <li>Check for JS console errors on modal render and interaction</li>
+          <li>Confirm activation button clarity and styling</li>
+          <li>Validate copy accuracy — merchant names, rates, partner branding</li>
+          <li>Check modal sizing and position across 3+ merchants</li>
+          <li>Test all opt-out paths (dismiss now, session, permanent)</li>
+          <li>Confirm dismiss button is visible without scrolling or sub-menus</li>
+          <li>Verify reaffiliation prompt fires only when affiliation is lost</li>
+          <li>Test stand down across multiple referring sources</li>
+          <li>Confirm affiliate detection for known URL params and tracking domains</li>
+          <li>Validate stand down persistence across full merchant session</li>
+          <li>Verify modal suppression during active affiliate session</li>
+        </ol>
+      </section>
+
+      <section class="tp-section" aria-labelledby="examples-h2">
+        <h2 id="examples-h2">What a written issue looks like</h2>
+        <p style="margin: 0 0 0.25rem; color: var(--muted)">
+          Issues pair a short compliance rationale with a checkbox checklist so
+          execution is consistent across testers and runs.
+        </p>
+
+        <div class="tp-example">
+          <h3>Stand down through checkout</h3>
+          <p class="tp-tagline">
+            Validates that stand down survives real navigation—not only the first
+            page load.
+          </p>
+          <figure class="tp-figure">
+            <img
+              class="tp-zoom-img"
+              src="../media/StandDown.png"
+              alt="Issue: Validate stand down persistence across full merchant session, with checklist for product, cart, and checkout."
+              width="900"
+              height="500"
+              loading="lazy"
+            />
+            <figcaption>
+              After stand down triggers, navigate product → cart → checkout and
+              confirm no modal surfaces—some builds accidentally reset state on
+              navigation.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="tp-example">
+          <h3>Dismiss path visibility</h3>
+          <p class="tp-tagline">Networks expect a clear, single-click dismiss without hunting.</p>
+          <figure class="tp-figure">
+            <img
+              class="tp-zoom-img"
+              src="../media/DismissButton.png"
+              alt="Issue: Confirm dismiss button is visible without scrolling or sub-menus."
+              width="900"
+              height="500"
+              loading="lazy"
+            />
+            <figcaption>
+              On modal render, the dismiss control must be visible without scrolling
+              and must close the modal with one click.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="tp-example">
+          <h3>Activation clarity</h3>
+          <p class="tp-tagline">Activation cannot be ambiguous or disguised as dismiss.</p>
+          <figure class="tp-figure">
+            <img
+              class="tp-zoom-img"
+              src="../media/Activationbutton.png"
+              alt="Issue: Confirm activation button clarity and styling with compliance-oriented checklist."
+              width="900"
+              height="500"
+              loading="lazy"
+            />
+            <figcaption>
+              Label describes the action; styling must not mimic a close or dismiss
+              control—aligned with partner compliance guidelines.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="tp-example">
+          <h3>Chrome Web Store disclosures</h3>
+          <p class="tp-tagline">Public listing must match how the extension actually behaves.</p>
+          <figure class="tp-figure">
+            <img
+              class="tp-zoom-img"
+              src="../media/ChromeWebStore.png"
+              alt="Issue: Spot-check Chrome Web Store listing for accuracy and disclosures."
+              width="900"
+              height="500"
+              loading="lazy"
+            />
+            <figcaption>
+              Disclosure of affiliate or cashback behavior, no contradictory claims,
+              screenshots and description aligned with this build.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <p class="tp-footer-note">
+        Screenshots are exports from the working test plan (e.g. Linear). Images live
+        in <code style="font-size: 0.85em">../media/</code> next to the main portfolio
+        site.
+      </p>
+
+      <footer id="contact" class="site-footer tp-wrap-footer">
+        <p class="footer-nav-row">
+          <a class="footer-back-home" href="../index.html">← Back to home</a>
+          <span class="footer-nav-sep" aria-hidden="true">·</span>
+          <a class="footer-next-page" href="../resume.html">Resume →</a>
+        </p>
+        <ul class="contact-links" id="contact-links" aria-label="Contact links"></ul>
+        <p class="footer-copyright">© <span id="year"></span> Neil Jones.</p>
+      </footer>
+    </article>
+    <script src="../tools-data.js"></script>
+    <script src="../contact-footer.js"></script>
+    <script>
+      document.getElementById("year").textContent = String(new Date().getFullYear());
+    </script>
+    <script src="test-plan.js"></script>
+  </body>
+</html>

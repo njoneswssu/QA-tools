@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lowe's Promo Tester</title>
+  <link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+  <header class="hdr">
+    <h1>Lowe's Promo Tester</h1>
+    <div class="stats" id="stats">
+      <span id="totalTests">0</span> tests ·
+      <span id="totalProducts">0</span> products ·
+      <span id="avgPromo">0</span>% avg promo
+    </div>
+    <p class="hdr-hint muted">
+      Removing the extension clears saved results. Use <strong>Export backup</strong> below to keep a copy, then <strong>Import backup</strong> after reinstalling.
+    </p>
+  </header>
+
+  <section class="panel">
+    <label class="lbl">Products</label>
+    <div class="search-row">
+      <input type="text" id="productSearch" placeholder="Search…" />
+      <label class="check-all"><input type="checkbox" id="checkAll" /> All</label>
+      <button type="button" id="btnUncheckFiltered" class="btn small" title="With search text: uncheck matching products. With empty search: clear all selections.">
+        Uncheck shown
+      </button>
+    </div>
+    <p class="selected-count" id="selectedCount" aria-live="polite">0 products selected</p>
+    <div id="productList" class="product-list"></div>
+
+    <div class="btn-row">
+      <button type="button" id="btnSeq" class="btn primary">Start testing</button>
+      <button type="button" id="btnSeqPause" class="btn warn" hidden>Pause</button>
+    </div>
+  </section>
+
+  <section class="results-section">
+    <div class="results-toolbar">
+      <div class="results-toolbar-titles">
+        <label class="lbl">Results</label>
+        <p class="results-scope-note" id="resultsScopeNote" hidden></p>
+      </div>
+      <div class="results-toolbar-actions">
+        <div class="results-date-row" title="Filter cards by test date (uses each row’s test date, or saved time if missing)">
+          <label class="results-date-lbl" for="resultsDateFrom">From</label>
+          <input type="date" id="resultsDateFrom" class="results-date-input" />
+          <label class="results-date-lbl" for="resultsDateTo">To</label>
+          <input type="date" id="resultsDateTo" class="results-date-input" />
+          <button type="button" id="btnResultsDateClear" class="btn small">Clear dates</button>
+        </div>
+        <button type="button" id="btnExportBackup" class="btn small" title="Download JSON you can re-import after reinstalling the extension">
+          Export backup
+        </button>
+        <button type="button" id="btnImportBackup" class="btn small" title="Restore from a previously exported JSON file">
+          Import backup
+        </button>
+        <input type="file" id="backupFileInput" accept="application/json,.json" hidden />
+        <button type="button" id="btnResultsFilter" class="btn small">Filter blinds</button>
+        <button type="button" id="btnClear" class="btn small">Clear all</button>
+      </div>
+    </div>
+    <div id="resultsFilterPanel" class="results-filter-panel" hidden>
+      <div class="results-filter-top">
+        <strong class="results-filter-title">Show results for</strong>
+        <button type="button" id="btnResultsFilterClose" class="btn small results-filter-close" title="Close filter">
+          Close
+        </button>
+      </div>
+      <div class="results-filter-bulk">
+        <button type="button" id="btnResultsFilterAll" class="btn small">Check all</button>
+        <button type="button" id="btnResultsFilterNone" class="btn small">Uncheck all</button>
+        <button type="button" id="btnResultsFilterCheckShown" class="btn small" title="Check every blind that matches the search below">
+          Check matches
+        </button>
+        <button type="button" id="btnResultsFilterUncheckShown" class="btn small" title="Uncheck every blind that matches the search below">
+          Uncheck matches
+        </button>
+      </div>
+      <label class="results-filter-search-lbl" for="resultsFilterSearch">Search blinds</label>
+      <input
+        type="search"
+        id="resultsFilterSearch"
+        class="results-filter-search"
+        placeholder="Type to narrow the list…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <p class="results-filter-hint muted">Unchecked blinds stay saved but are hidden from the results list.</p>
+      <div id="resultsFilterList" class="results-filter-list"></div>
+    </div>
+    <div id="resultsGrid" class="results-grid"></div>
+  </section>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <div id="shotLightbox" class="shot-lightbox" hidden aria-modal="true" role="dialog" aria-label="Screenshot preview">
+    <button type="button" class="shot-lightbox__backdrop" id="shotLightboxBackdrop" aria-label="Close preview"></button>
+    <div class="shot-lightbox__panel" id="shotLightboxPanel">
+      <div class="shot-lightbox__toolbar">
+        <span class="shot-lightbox__title">Configuration</span>
+        <div class="shot-lightbox__actions">
+          <button type="button" class="shot-lightbox__btn" id="shotLightboxMin" title="Minimize to bar">Minimize</button>
+          <button type="button" class="shot-lightbox__btn shot-lightbox__btn--close" id="shotLightboxClose" title="Close">Close</button>
+        </div>
+      </div>
+      <div class="shot-lightbox__body">
+        <img id="shotLightboxImg" alt="Configuration screenshot" />
+      </div>
+    </div>
+  </div>
+
+  <div id="shotLightboxDock" class="shot-lightbox-dock" hidden>
+    <button type="button" class="shot-lightbox-dock__thumb-wrap" id="shotLightboxDockThumb" title="Restore full view">
+      <img id="shotLightboxDockImg" alt="" />
+    </button>
+    <span class="shot-lightbox-dock__hint">Minimized</span>
+    <button type="button" class="shot-lightbox-dock__restore" id="shotLightboxDockRestore">Restore</button>
+    <button type="button" class="shot-lightbox-dock__close" id="shotLightboxDockClose" title="Close">×</button>
+  </div>
+
+  <script src="panel.js"></script>
+</body>
+</html>

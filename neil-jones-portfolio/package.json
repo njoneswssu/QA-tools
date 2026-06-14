@@ -1,0 +1,9 @@
+{
+  "name": "neil-jones-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static portfolio site for Neil Jones",
+  "scripts": {
+    "start": "npx --yes serve . -l 3456"
+  }
+}
